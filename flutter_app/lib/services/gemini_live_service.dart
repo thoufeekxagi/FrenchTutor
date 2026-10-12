@@ -123,17 +123,27 @@ class GeminiLiveService {
   // API re-processes active context on later turns, so a small compression
   // window matters more than the WebSocket itself. This keeps roughly the
   // latest couple of short exchanges plus a compact summary.
-  static const _liveTutorCompressionTriggerTokens = 1200;
-  static const _liveTutorCompressionTargetTokens = 600;
+  static const _liveTutorCompressionTriggerTokens = 800;
+  static const _liveTutorCompressionTargetTokens = 400;
+  // The onboarding trial now uses the same cost discipline as Live Tutor. It
+  // is still a separate session type for analytics and the three-minute timer,
+  // but it does not need a large calibration history to answer the current turn.
+  static const _trialCompressionTriggerTokens = 600;
+  static const _trialCompressionTargetTokens = 300;
   // Live Tutor should tolerate a short thinking pause without making the
   // learner wait several seconds before the next turn begins.
   // Google recommends roughly 500–800ms for general Live API VAD. A slightly
   // longer 900ms window gives French learners room to breathe without adding
   // the noticeable delay of a multi-second endpoint.
-  static const _liveTutorSilenceDurationMs = 900;
+  // Keep short pauses inside one learner turn. The local PCM gate already
+  // removes long silence; this server fallback should not answer on a breath,
+  // click, or the gap between two words.
+  static const _liveTutorSilenceDurationMs = 1800;
 
-  int get _contextCompressionTriggerTokens => liveTutorMode
-      ? _liveTutorCompressionTriggerTokens
+  int get _contextCompressionTriggerTokens => liveTutorMode || isTrial
+      ? (liveTutorMode
+            ? _liveTutorCompressionTriggerTokens
+            : _trialCompressionTriggerTokens)
       : compactGuidedContext
       ? sessionType == LiveSessionType.liaisonStage
             ? _compactLiaisonCompressionTriggerTokens
@@ -144,8 +154,10 @@ class GeminiLiveService {
             : _compactGuidedCompressionTriggerTokens
       : _defaultContextCompressionTriggerTokens;
 
-  int get _contextCompressionTargetTokens => liveTutorMode
-      ? _liveTutorCompressionTargetTokens
+  int get _contextCompressionTargetTokens => liveTutorMode || isTrial
+      ? (liveTutorMode
+            ? _liveTutorCompressionTargetTokens
+            : _trialCompressionTargetTokens)
       : compactGuidedContext
       ? sessionType == LiveSessionType.liaisonStage
             ? _compactLiaisonCompressionTargetTokens
@@ -603,18 +615,22 @@ class GeminiLiveService {
 
   Future<String> _fullSystemPrompt() async {
     if (liveTutorMode) {
-      var compactPrompt = LivePrompts.compactLiveTutor(
+      // Keep Live Tutor on the small prompt path: no profile, lesson history,
+      // lesson context, or rolling transcript is appended to this call. The
+      // selected CEFR level is the only learner-specific instruction.
+      final level = levelOverride ?? await _learnerLevel() ?? 'A1';
+      return LivePrompts.compactLiveTutor(
         persona: _persona,
-        languageMix: await TutorTuning.languageMix(),
+        level: level,
         voiceSpeed: await TutorTuning.voiceSpeed(),
       );
-      // Deliberately do not append the learner profile or lesson context here.
-      // Live Tutor is an open conversation; those blocks become persistent
-      // context and are reprocessed by the provider on later turns. The setup
-      // screen's selected level is the only dynamic calibration it needs.
-      final level = levelOverride ?? await _learnerLevel();
-      if (level != null) compactPrompt += '\n\nLEVEL: $level';
-      return compactPrompt;
+    }
+    if (isTrial) {
+      // The three-minute trial keeps its onboarding session type and timer, but
+      // no longer pays for the full onboarding prompt/profile/history. It only
+      // needs a small, self-contained tutor contract to respond to the current
+      // learner turn.
+      return LivePrompts.compactOnboardingCalibration(persona: _persona);
     }
     if (compactGuidedContext &&
         (sessionType == LiveSessionType.speakingGuided ||
@@ -839,10 +855,19 @@ class GeminiLiveService {
       generationConfig['temperature'] = 0.65;
     }
     if (liveTutorMode) {
-      // The prompt already limits replies to 1–2 short sentences. This hard
-      // ceiling prevents an occasional long spoken answer from multiplying
-      // output-audio and transcription tokens.
-      generationConfig['maxOutputTokens'] = 96;
+      // Live API setup config cannot change on an open socket. Keep a hard
+      // safety ceiling high enough for a complete spoken explanation (audio
+      // output is tokenized over time); the prompt keeps ordinary replies short
+      // and uses more only when the learner asks for detail.
+      generationConfig['maxOutputTokens'] = 400;
+      // Gemini 3.1 supports minimal thinking. Make the low-cost setting
+      // explicit so a future model default cannot silently increase spend.
+      generationConfig['thinkingConfig'] = {'thinkingLevel': 'minimal'};
+    } else if (isTrial) {
+      // Do not hard-truncate the short onboarding call: the old 64-token cap
+      // could cut the opening or a useful answer off mid-sentence. Its compact
+      // prompt keeps normal replies brief without a brittle output ceiling.
+      generationConfig['thinkingConfig'] = {'thinkingLevel': 'minimal'};
     }
     final setupBody = <String, dynamic>{
       'model': _model,

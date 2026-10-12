@@ -5,6 +5,7 @@ import '../../config/api_keys.dart';
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
+import '../../prompts/live_prompts.dart';
 import '../../services/ai_session_gate.dart';
 import '../../widgets/live_tutor_mascot.dart';
 import '../session/session_screen.dart';
@@ -103,13 +104,11 @@ insult the learner, intelligence, identity, accent, or personal traits.
         levelOverride: _level,
         lessonContext: contextNote,
         lessonContextCharacterLimit: 1400,
-        kickoffMessage:
-            '(START NOW. Speak first without waiting for the learner. Open in '
-            'French with a brief natural introduction such as "Bonjour, je suis '
-            'Marie, ta tutrice de français. Aujourd\'hui, on va pratiquer '
-            '$_topic." Then ask one short, level-matched question about $_topic. '
-            'Use the selected $_style delivery. Stop after that first turn and '
-            'wait for the learner.)',
+        kickoffMessage: LivePrompts.liveTutorKickoff(
+          topic: _topic,
+          style: _style,
+          courseFocus: currentCourseLesson?.title,
+        ),
         liveTutorMode: true,
         liveTutorLessonTitle: _topic,
       ),

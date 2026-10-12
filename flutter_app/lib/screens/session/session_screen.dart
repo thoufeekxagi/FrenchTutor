@@ -130,7 +130,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   String _liveTutorTranscriptBuffer = '';
   bool _liveTutorScolding = false;
   bool _liveTutorResponseStarted = false;
-  bool _liveTutorKickoffRetried = false;
   double _liveTutorVoiceLevel = 0;
   int _liveTutorDisplayedCharacters = 0;
   bool _liveTutorAudioStarted = false;
@@ -150,6 +149,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
   Timer? _timer;
   Timer? _liveTutorKickoffWatchdog;
+  Timer? _liveTutorInputWatchdog;
   final ScrollController _scrollController = ScrollController();
 
   late final GeminiLiveService _gemini;
@@ -169,12 +169,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   bool get _isRoleplay => widget.stage == 'speaking';
   bool get _isGuided => widget.stage == 'speaking_guided';
   bool get _isLiveTutor => widget.liveTutorMode;
+  // The onboarding calibration keeps its existing socket/session contract,
+  // but uses the same restrained Live Tutor presentation. This is UI-only:
+  // audio gating, prompts, timers, and trial accounting remain unchanged.
+  bool get _showLiveTutorUi => _isLiveTutor || widget.stage == 'trial';
   bool get _isFreeTalk =>
       widget.stage == null || widget.stage == 'free_talk' || _isLiveTutor;
 
   String get _practiceLabel {
     if (widget.reviewSession) return 'Personal review';
-    if (_isLiveTutor) return 'Live tutor';
+    if (_showLiveTutorUi) return 'Live tutor';
     if (_isGuided) return 'Guided conversation';
     if (_isRoleplay) return 'Guided roleplay';
     if (widget.stage == 'speaking_exam') return 'TEF / TCF practice';
@@ -199,8 +203,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       ref.read(notetakerStateProvider).currentContext = 'Speaking';
     });
     _audio = AudioStreamingService();
-    _audio.allowBargeIn = _isLiveTutor;
-    _audio.speechGateEnabled = _isLiveTutor;
+    // Keep the proven Live API automatic-VAD path for hands-free conversation.
+    // Local speech gating combined with audioStreamEnd at every pause caused
+    // the Live socket to treat ordinary pauses like the end of its audio stream.
+    _audio.allowBargeIn = false;
     _audio.onPlaybackChunk = _handleLiveTutorPlaybackChunk;
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
@@ -224,12 +230,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       liveTutorMode: widget.liveTutorMode,
       lessonContextCharacterLimit: widget.lessonContextCharacterLimit,
     );
-    _audio.onSpeechEnded = _isLiveTutor ? _gemini.endAudioTurn : null;
     _mic = MicController(
       startStream: () => _audio.startStreaming(onChunk: _gemini.sendAudioChunk),
       stopStream: _audio.stopStreaming,
       sendAudio: _gemini.sendAudioChunk,
-      endTurn: _isLiveTutor ? _gemini.endAudioTurn : null,
+      // audioStreamEnd is appropriate when push-to-talk actually closes the
+      // microphone, but must not be used as a per-pause marker in Auto mode.
+      endTurn: _isLiveTutor ? _closeLiveTutorInputTurn : null,
       silenceTailChunkCount: 10,
     );
     MicModePrefs.load().then((saved) {
@@ -247,6 +254,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _liveTutorKickoffWatchdog?.cancel();
+    _liveTutorInputWatchdog?.cancel();
     _liveTutorTranscriptTimer?.cancel();
     _endCall();
     _scrollController.dispose();
@@ -448,6 +456,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       setState(() => _callStatus = CallStatus.listening);
       _startTimer();
       try {
+        // Warm the native PCM player before the first tutor response. This
+        // removes the cold-start cost from the first network audio chunk;
+        // the Gemini socket, kickoff, timer, and trial accounting are unchanged.
+        if (_showLiveTutorUi) await _audio.preparePlayback();
         await _mic.onConnected();
         // Ending while audio is preparing must win over this async callback.
         // Without this guard a late callback could send the kickoff into a
@@ -474,7 +486,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                       'one short English sentence to set the scene from today\'s material, '
                       'then your first line in French, in character. Do not greet '
                       'generically, do not ask what they want to practice.)'
-                : "(Le student vient de rejoindre l'appel. Salue-le chaleureusement en français et demande ce qu'il veut pratiquer aujourd'hui.)");
+                : '(App instruction, not the student): Open the call now in French. '
+                      'Begin with a short Bonjour greeting, introduce yourself as the '
+                      'selected French tutor, ask one simple French question, then stop '
+                      'and wait. Do not open in English.');
         if (_isLiveTutor) {
           _sendLiveTutorKickoff(kickoff);
         } else {
@@ -537,7 +552,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       if (!isFrenchEnglishTranscript(text)) return;
       _userUtteranceCount += 1;
       if (!mounted) return;
-      if (_isLiveTutor) _liveTutorScolding = false;
+      if (_showLiveTutorUi) _liveTutorScolding = false;
       _appendMessage(ChatMessage(role: 'user', content: text));
     };
 
@@ -545,14 +560,31 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       if (!mounted) return;
       _markLiveTutorResponseStarted();
       _clearStaleConnectionError();
-      if (_isLiveTutor) {
+      if (_showLiveTutorUi) {
         // Keep the final normalized text in the audio-paced buffer. Do not
         // append it to `_messages` yet: doing that would replace the slowly
         // revealed transcript with Gemini's complete response immediately.
-        _liveTutorTranscriptBuffer = text.trim();
+        final finalText = text.trim();
+        final audioDuration = _audio.playbackTimelineDuration;
+        final playedRatio = audioDuration <= Duration.zero
+            ? 0.0
+            : (_audio.playbackTimelinePosition.inMicroseconds /
+                      audioDuration.inMicroseconds)
+                  .clamp(0.0, 1.0);
+        _liveTutorTranscriptBuffer = finalText;
         _liveTutorTurnComplete = true;
         setState(() {
           _liveTutorScolding = _isCorrectionLine(text);
+          // The provider's final transcript can normalize or revise the
+          // streamed partial. Re-map the visible offset to the audio clock so
+          // a word from the old partial cannot linger over the new transcript.
+          _liveTutorDisplayedCharacters = _endOfWholeWord(
+            finalText,
+            (finalText.length * playedRatio).floor(),
+          );
+          _liveTutorPartialText = finalText
+              .substring(0, _liveTutorDisplayedCharacters)
+              .trimRight();
         });
         _startLiveTutorTranscriptTicker();
         unawaited(_finishLiveTutorTurnAfterPlayback());
@@ -562,7 +594,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     };
 
     _gemini.onTranscriptDelta = (delta) {
-      if (!_isLiveTutor || !mounted) return;
+      if (!_showLiveTutorUi || !mounted) return;
       _markLiveTutorResponseStarted();
       _liveTutorTranscriptBuffer += delta;
       _liveTutorScolding = _isCorrectionLine(_liveTutorTranscriptBuffer);
@@ -572,7 +604,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _gemini.onAudioChunk = (audioData) {
       _markLiveTutorResponseStarted();
       _clearStaleConnectionError();
-      if (_isLiveTutor && !_liveTutorAudioStarted) {
+      if (_showLiveTutorUi && !_liveTutorAudioStarted) {
         // The playback timeline is the clock for transcript reveal. Reset it
         // only at the first chunk of each tutor turn, before this chunk is
         // queued, so network bursts cannot make the text jump ahead.
@@ -589,12 +621,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           });
         }
       }
-      if (_isLiveTutor) _startLiveTutorTranscriptTicker();
+      if (_showLiveTutorUi) _startLiveTutorTranscriptTicker();
     };
 
     _gemini.onTurnComplete = () {
       _audio.isOutputActive = false;
-      if (_isLiveTutor) {
+      if (_showLiveTutorUi) {
         // The server has finished generating, but the native player may still
         // have buffered PCM. Keep the tutor turn alive until that real audio
         // tail finishes, then commit the final two-line transcript.
@@ -618,9 +650,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     };
 
     _gemini.onInterrupted = () {
+      _liveTutorInputWatchdog?.cancel();
+      _audio.isAwaitingTutorResponse = false;
       _audio.isOutputActive = false;
       _audio.stopPlayback();
-      if (_isLiveTutor) {
+      if (_showLiveTutorUi) {
         // A barge-in invalidates the unspoken part of the buffered response.
         // Keep only the words that had actually reached the display.
         _liveTutorTurnComplete = false;
@@ -640,14 +674,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   void _handleLiveTutorPlaybackChunk(List<int> audioData) {
-    if (!_isLiveTutor || !mounted) return;
+    if (!_showLiveTutorUi || !mounted) return;
     final level = _liveTutorPcmLevel(audioData);
     if ((level - _liveTutorVoiceLevel).abs() <= 0.01) return;
     setState(() => _liveTutorVoiceLevel = level);
   }
 
   void _startLiveTutorTranscriptTicker() {
-    if (!_isLiveTutor || _liveTutorTranscriptTimer != null) return;
+    if (!_showLiveTutorUi || _liveTutorTranscriptTimer != null) return;
     _liveTutorTranscriptTimer = Timer.periodic(
       const Duration(milliseconds: 50),
       (_) => _advanceLiveTutorTranscript(),
@@ -655,7 +689,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   void _advanceLiveTutorTranscript() {
-    if (!mounted || !_isLiveTutor) return;
+    if (!mounted || !_showLiveTutorUi) return;
     final source = _liveTutorTranscriptBuffer;
     if (source.isEmpty) return;
 
@@ -702,7 +736,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   Future<void> _finishLiveTutorTurnAfterPlayback() async {
-    if (!_isLiveTutor || _liveTutorFinalizing) return;
+    if (!_showLiveTutorUi || _liveTutorFinalizing) return;
     _liveTutorFinalizing = true;
     await _audio.waitForPlaybackDrained();
     if (!mounted || !_liveTutorTurnComplete) {
@@ -711,6 +745,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     }
 
     final finalText = _liveTutorTranscriptBuffer.trim();
+    _liveTutorInputWatchdog?.cancel();
+    _audio.isAwaitingTutorResponse = false;
     _liveTutorTranscriptTimer?.cancel();
     _liveTutorTranscriptTimer = null;
     _liveTutorTranscriptBuffer = '';
@@ -743,28 +779,52 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   void _markLiveTutorResponseStarted() {
-    if (!_isLiveTutor || _liveTutorResponseStarted) return;
+    if (!_showLiveTutorUi || _liveTutorResponseStarted) return;
     _liveTutorResponseStarted = true;
     _liveTutorKickoffWatchdog?.cancel();
+    if (_errorMessage == 'The tutor is taking longer than expected.') {
+      setState(() => _errorMessage = '');
+    }
   }
 
-  void _sendLiveTutorKickoff(String kickoff, {bool retry = false}) {
+  void _sendLiveTutorKickoff(String kickoff) {
     if (!_isLiveTutor || _sessionSaved || !_gemini.isConnected) return;
-    if (retry) _liveTutorKickoffRetried = true;
+    _audio.isAwaitingTutorResponse = true;
     _gemini.sendOpeningPrompt(kickoff);
     _liveTutorKickoffWatchdog?.cancel();
-    _liveTutorKickoffWatchdog = Timer(const Duration(seconds: 6), () {
+    _liveTutorKickoffWatchdog = Timer(const Duration(seconds: 12), () {
       if (!mounted || _sessionSaved || _liveTutorResponseStarted) return;
-      if (!_liveTutorKickoffRetried) {
-        // A transient Live turn can be accepted but fail to start audio. One
-        // bounded replay recovers that state without creating duplicate tutor
-        // replies during a slow but healthy connection.
-        _sendLiveTutorKickoff(kickoff, retry: true);
-        return;
-      }
+      // Do not resend the opening turn: a slow-but-healthy first response
+      // would receive the same completed app instruction twice and could
+      // supersede/cut its own audio.
       setState(
         () => _errorMessage = 'The tutor is taking longer than expected.',
       );
+    });
+  }
+
+  void _closeLiveTutorInputTurn() {
+    _audio.isAwaitingTutorResponse = true;
+    _gemini.endAudioTurn();
+    // A provider hiccup must not leave the learner's mic gated indefinitely,
+    // but never reopen it while Gemini is generating or its audio is still
+    // queued. Reopening at a fixed 15 seconds let room/speaker audio reach VAD
+    // during a long tutor answer, which Gemini interpreted as barge-in and cut
+    // off the final sentence.
+    _armLiveTutorInputWatchdog();
+  }
+
+  void _armLiveTutorInputWatchdog({
+    Duration delay = const Duration(seconds: 15),
+  }) {
+    _liveTutorInputWatchdog?.cancel();
+    _liveTutorInputWatchdog = Timer(delay, () {
+      if (!mounted || _sessionSaved) return;
+      if (_gemini.isModelGenerating || _audio.hasPendingPlayback) {
+        _armLiveTutorInputWatchdog(delay: const Duration(seconds: 3));
+        return;
+      }
+      _audio.isAwaitingTutorResponse = false;
     });
   }
 
@@ -1183,7 +1243,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       child: Scaffold(
         backgroundColor: DesignTokens.nightCanvas,
         body: SafeArea(
-          child: _isLiveTutor
+          child: _showLiveTutorUi
               ? _liveTutorLayout()
               : Stack(
                   children: [
@@ -1250,7 +1310,47 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
             ),
           ),
         ),
+        _liveTutorControls(),
       ],
+    );
+  }
+
+  Widget _liveTutorControls() {
+    final enabled =
+        _callStatus != CallStatus.connecting &&
+        _callStatus != CallStatus.reconnecting &&
+        _callStatus != CallStatus.ended;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          KeyedSubtree(
+            key: AppTour.micButtonKey,
+            child: _controlButton(
+              icon: _callStatus == CallStatus.muted
+                  ? CupertinoIcons.mic_slash_fill
+                  : CupertinoIcons.mic_fill,
+              label: _callStatus == CallStatus.muted ? 'Unmute' : 'Mute',
+              color: DesignTokens.primary,
+              iconColor: Colors.black,
+              onTap: enabled ? _toggleMute : null,
+            ),
+          ),
+          const SizedBox(width: 28),
+          KeyedSubtree(
+            key: AppTour.endCallKey,
+            child: _controlButton(
+              icon: CupertinoIcons.phone_down_fill,
+              label: 'End',
+              color: DesignTokens.primary,
+              iconColor: Colors.black,
+              onTap: enabled ? _confirmEnd : null,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1334,77 +1434,72 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       }
     }
 
-    if (visible.isEmpty) return const SizedBox(height: 86);
-    final transcriptKey = visible.map((message) => message.content).join('|');
+    if (visible.isEmpty) return const SizedBox(height: 96);
+
+    // Keep two fixed-height slots so a streamed word never changes the
+    // transcript column's height or its vertical anchor. A single visible
+    // turn occupies the lower slot; once a learner/tutor pair exists, each
+    // turn has a stable row. The rolling tail still moves horizontally as
+    // newer words replace older ones.
+    final slots = <ChatMessage?>[
+      visible.length > 1 ? visible[0] : null,
+      visible.length > 1 ? visible[1] : visible[0],
+    ];
     return SizedBox(
       width: double.infinity,
+      height: 96,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final textWidth = math.min(
             350.0,
             math.max(1.0, constraints.maxWidth - 44),
           );
-          return AnimatedSwitcher(
-            duration: const Duration(milliseconds: 240),
-            switchInCurve: Curves.easeOutCubic,
-            switchOutCurve: Curves.easeInCubic,
-            transitionBuilder: (child, animation) => FadeTransition(
-              opacity: animation,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 0.08),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              ),
-            ),
-            child: Column(
-              key: ValueKey(transcriptKey),
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var index = 0; index < visible.length; index++) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 22),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 350),
-                      child: Builder(
-                        builder: (context) {
-                          final message = visible[index];
-                          final style =
-                              DesignTokens.body(
-                                message.isUser ? 16.5 : 18,
-                                weight: message.isUser
-                                    ? FontWeight.w500
-                                    : FontWeight.w700,
-                              ).copyWith(
-                                color: message.isUser
-                                    ? DesignTokens.nightAccent.withValues(
-                                        alpha: 0.86,
-                                      )
-                                    : DesignTokens.nightText,
-                                height: 1.18,
-                              );
-                          return Text(
-                            _tailForTwoLines(message.content, style, textWidth),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            // The rolling window already removes the older
-                            // words. Never add an ellipsis at the beginning;
-                            // the newest word must remain the final word on
-                            // screen.
-                            overflow: TextOverflow.clip,
-                            style: style,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  if (index < visible.length - 1) const SizedBox(height: 8),
-                ],
-              ],
-            ),
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _liveTutorTranscriptSlot(slots[0], textWidth),
+              const SizedBox(height: 8),
+              _liveTutorTranscriptSlot(slots[1], textWidth),
+            ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _liveTutorTranscriptSlot(ChatMessage? message, double textWidth) {
+    if (message == null) return const SizedBox(height: 44);
+
+    final style =
+        DesignTokens.body(
+          message.isUser ? 16.5 : 18,
+          weight: message.isUser ? FontWeight.w500 : FontWeight.w700,
+        ).copyWith(
+          color: message.isUser
+              ? DesignTokens.nightAccent.withValues(alpha: 0.86)
+              : DesignTokens.nightText,
+          height: 1.18,
+        );
+
+    return SizedBox(
+      height: 44,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 350),
+          child: Center(
+            child: Text(
+              _tailForTwoLines(message.content, style, textWidth),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              // The rolling window already removes the older words. Never
+              // add an ellipsis at the beginning; the newest word must remain
+              // the final word on screen.
+              overflow: TextOverflow.clip,
+              style: style,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1708,6 +1803,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     required IconData icon,
     required String label,
     required Color color,
+    Color? iconColor,
     required VoidCallback? onTap,
   }) {
     return Semantics(
@@ -1738,11 +1834,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 ),
                 child: Icon(
                   icon,
-                  color: color == DesignTokens.primary
-                      ? Colors.white
-                      : onTap == null
+                  color: onTap == null
                       ? DesignTokens.nightMuted
-                      : color,
+                      : iconColor ??
+                            (color == DesignTokens.primary
+                                ? Colors.white
+                                : color),
                   size: 23,
                 ),
               ),

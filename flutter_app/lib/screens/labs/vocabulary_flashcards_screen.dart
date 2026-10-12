@@ -137,6 +137,7 @@ class _VocabularyFlashcardsScreenState
   }
 
   VocabEntry get _current => _entries[_index];
+  bool get _isPhraseDeck => _entries.length > 5;
   bool get _showsSentences =>
       widget.studyDepth == VocabularyStudyDepth.wordsAndSentences;
 
@@ -156,8 +157,11 @@ class _VocabularyFlashcardsScreenState
     WidgetsBinding.instance.addObserver(this);
     _entries = widget.entries
         .where((entry) => entry.fr.trim().isNotEmpty)
-        .take(5)
+        .take(10)
         .toList(growable: false);
+    _preparationStatus = _entries.length > 5
+        ? 'Preparing your phrases…'
+        : 'Preparing your words…';
     if (_entries.isNotEmpty) _revealedWordIds.add(_entries.first.id);
     _srs = ref.read(srsServiceProvider);
     _sessions = ref.read(vocabularySessionStoreProvider);
@@ -1046,7 +1050,7 @@ class _VocabularyFlashcardsScreenState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'WORD ${_index + 1} OF ${_entries.length}',
+              '${_isPhraseDeck ? 'PHRASE' : 'WORD'} ${_index + 1} OF ${_entries.length}',
               style: DesignTokens.label(
                 11,
               ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
@@ -1080,7 +1084,7 @@ class _VocabularyFlashcardsScreenState
       child: Column(
         children: [
           Text(
-            'FRENCH WORD',
+            _isPhraseDeck ? 'FRENCH PHRASE' : 'FRENCH WORD',
             style: DesignTokens.label(
               10,
             ).copyWith(color: DesignTokens.nightAccent, letterSpacing: 1.2),
@@ -1260,7 +1264,9 @@ class _VocabularyFlashcardsScreenState
               ),
               const SizedBox(height: 8),
               Text(
-                'Your words and examples will be ready before the first word.',
+                _isPhraseDeck
+                    ? 'Your phrases and examples will be ready before the first phrase.'
+                    : 'Your words and examples will be ready before the first word.',
                 textAlign: TextAlign.center,
                 style: DesignTokens.body(
                   12,
@@ -1302,7 +1308,7 @@ class _VocabularyFlashcardsScreenState
               Text('Set complete', style: DesignTokens.display(30)),
               const SizedBox(height: 8),
               Text(
-                '${_entries.length} words reviewed · $correctCount complete · $revisitCount to revisit.',
+                '${_entries.length} ${_isPhraseDeck ? 'phrases' : 'words'} reviewed · $correctCount complete · $revisitCount to revisit.',
                 textAlign: TextAlign.center,
                 style: DesignTokens.body(
                   15,

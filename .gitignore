@@ -28,3 +28,7 @@ server/*.db
 
 # Generated marketing content: Reels, carousel exports, captions, and schedules.
 /marketing/
+
+# Large local reference material (screenshots, zips, extracted frames). Never source-controlled.
+/references/
+/.video_analysis/

@@ -643,7 +643,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
               SpeakPrimaryButton(
                 label: _startingTrial
                     ? 'Connecting to ${_tutor.displayName}…'
-                    : 'Try it free — 3 minutes',
+                    : 'Try it free · 3 minutes',
                 icon: Icons.arrow_forward_rounded,
                 onTap: _startingTrial ? () {} : () => unawaited(_startTrial()),
               ),
@@ -1416,7 +1416,7 @@ class _SpeakOnboardingScreenState extends ConsumerState<SpeakOnboardingScreen>
                       padding: EdgeInsets.all(22),
                       child: CircularProgressIndicator(
                         strokeWidth: 3,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                     ),
                   ),

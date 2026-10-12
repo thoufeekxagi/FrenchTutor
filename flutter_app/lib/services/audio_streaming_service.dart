@@ -42,6 +42,7 @@ class AudioStreamingService {
   /// the way native VoIP/Messages calls do.
   StreamSubscription<AudioInterruptionEvent>? _interruptionSub;
   StreamSubscription<AudioDevicesChangedEvent>? _devicesChangedSub;
+  int _audioInterruptionGeneration = 0;
 
   bool _isStreaming = false;
   bool _isPlayerStarted = false;
@@ -104,6 +105,11 @@ class AudioStreamingService {
   /// Gemini as an echo, since we don't use platform echo-cancellation (which would degrade
   /// output audio quality).
   bool isOutputActive = false;
+
+  /// After local VAD closes the learner turn, hold further mic frames until
+  /// the tutor response has completed and playback has drained. Otherwise room
+  /// noise during response latency can start a fresh turn and interrupt audio.
+  bool isAwaitingTutorResponse = false;
 
   /// Lets the live session show its in-app microphone explanation only when
   /// the OS permission has not already been granted.
@@ -236,24 +242,32 @@ class AudioStreamingService {
   void _listenForRouteChanges(AudioSession session) {
     _interruptionSub?.cancel();
     _devicesChangedSub?.cancel();
-    _interruptionSub = session.interruptionEventStream.listen((event) {
+    _interruptionSub = session.interruptionEventStream.listen((event) async {
       if (event.begin) {
-        // Anything that takes audio focus away from us — a real incoming call,
-        // another app's sound, even the OS's own screenshot-shutter sound —
-        // fires this. Previously nothing happened here, so whatever briefly
-        // played through that conflict (including our own already-buffered
-        // audio getting forcibly ducked by iOS) sounded like an abrupt
-        // stutter/cut. Muting our own output cleanly the instant this starts
-        // means the interruption is silent on our end instead of glitchy.
+        final generation = ++_audioInterruptionGeneration;
+        // iOS distinguishes short notification ducking from a true pause.
+        // Muting to zero for a duck event made a notification sound like the
+        // tutor had stopped mid-sentence. Preserve intelligibility at reduced
+        // volume; only fully mute events that actually pause/interrupt audio.
         try {
-          _player.setVolume(0);
+          await _player.setVolume(
+            event.type == AudioInterruptionType.duck ? 0.35 : 0.0,
+          );
         } catch (_) {}
+        // An end event may have arrived while the native volume call was in
+        // flight. Do not let that late call leave the player muted/ducked.
+        if (generation != _audioInterruptionGeneration) {
+          try {
+            await _player.setVolume(1.0);
+          } catch (_) {}
+        }
       } else {
+        ++_audioInterruptionGeneration;
         // iOS restores *a* route on its own by an interruption's end, but not always the
         // one we want (it can land back on the speaker even with AirPods connected), so
         // reclaiming here nudges it to re-resolve against our configured options.
-        _reclaimPreferredRoute();
-        _recoverFromInterruptionIfNeeded();
+        await _reclaimPreferredRoute();
+        await _recoverFromInterruptionIfNeeded();
       }
     });
     _devicesChangedSub = session.devicesChangedEventStream.listen((event) {
@@ -278,9 +292,6 @@ class AudioStreamingService {
           toStream: _micStreamController!.sink,
           sampleRate: _inputSampleRate,
           numChannels: 1,
-          enableVoiceProcessing: true,
-          enableNoiseSuppression: true,
-          enableEchoCancellation: true,
         );
       }
     } catch (_) {
@@ -328,9 +339,6 @@ class AudioStreamingService {
       toStream: _micStreamController!.sink,
       sampleRate: _inputSampleRate,
       numChannels: 1,
-      enableVoiceProcessing: true,
-      enableNoiseSuppression: true,
-      enableEchoCancellation: true,
     );
 
     await _ensurePlayerStarted();
@@ -380,16 +388,21 @@ class AudioStreamingService {
   void Function()? onSpeechEnded;
 
   // Keep barge-in available, but do not let a cough, click, or short noise
-  // burst cut the tutor off. Three consecutive speech-like packets is a small
-  // amount of real speech while restoring most of the previous stability.
+  // burst cut the tutor off. Packet sizes are not stable across iOS routes, so
+  // use elapsed audio time instead of a packet count.
   static const _bargeInSpeechThreshold = 0.10;
-  static const _bargeInSpeechChunksRequired = 3;
+  static const _bargeInSpeechDurationMs = 240.0;
   final Queue<Uint8List> _bargeInPreRoll = Queue<Uint8List>();
-  int _bargeInSpeechChunks = 0;
+  int _bargeInPreRollBytes = 0;
+  double _bargeInSpeechMs = 0;
   bool _bargeInSpeechDetected = false;
 
-  static const _speechGateStartMs = 140.0;
-  static const _speechGateEndSilenceMs = 800.0;
+  // A short gate start was the main false-turn regression: clicks, taps and
+  // speaker bleed could open a Gemini turn before a learner had spoken.
+  static const _speechGateStartMs = 200.0;
+  // Learners often pause between French words or clauses. Keep the turn open
+  // for the full natural pause window before asking Gemini to answer.
+  static const _speechGateEndSilenceMs = 1800.0;
   static const _speechGatePreRollMs = 280.0;
   double _speechNoiseFloor = 0.035;
   double _speechCandidateMs = 0;
@@ -399,7 +412,14 @@ class AudioStreamingService {
   int _speechPreRollBytes = 0;
 
   void _handleMicChunk(Uint8List chunk) {
-    if (speechGateEnabled) {
+    if (isAwaitingTutorResponse) return;
+    // While tutor audio is pending, use the conservative barge-in detector
+    // below instead of the cheaper speech gate. The raw mic can still contain
+    // a small amount of speaker bleed even with iOS voice processing enabled;
+    // sending that through the normal gate makes the tutor answer its own
+    // voice. Once playback is drained, the speech gate handles learner audio
+    // and suppresses silence/background noise for cost savings.
+    if (speechGateEnabled && !hasPendingPlayback) {
       _handleSpeechGatedMicChunk(chunk);
       return;
     }
@@ -435,15 +455,21 @@ class AudioStreamingService {
     // Hold a small pre-roll so the first syllable is preserved while deciding
     // whether the learner is really speaking or there was only a noise spike.
     _bargeInPreRoll.addLast(chunk);
-    while (_bargeInPreRoll.length > _bargeInSpeechChunksRequired) {
-      _bargeInPreRoll.removeFirst();
+    _bargeInPreRollBytes += chunk.length;
+    final maxPreRollBytes = (_speechGatePreRollMs / 1000 * _inputSampleRate * 2)
+        .round();
+    while (_bargeInPreRollBytes > maxPreRollBytes &&
+        _bargeInPreRoll.isNotEmpty) {
+      _bargeInPreRollBytes -= _bargeInPreRoll.removeFirst().length;
     }
-    if (_micSpeechLevel(chunk) >= _bargeInSpeechThreshold) {
-      _bargeInSpeechChunks++;
+    final level = _micSpeechLevel(chunk);
+    final durationMs = chunk.length / 2 / _inputSampleRate * 1000;
+    if (level >= _bargeInSpeechThreshold) {
+      _bargeInSpeechMs += durationMs;
     } else {
-      _bargeInSpeechChunks = 0;
+      _bargeInSpeechMs = 0;
     }
-    if (_bargeInSpeechChunks < _bargeInSpeechChunksRequired) return;
+    if (_bargeInSpeechMs < _bargeInSpeechDurationMs) return;
 
     _bargeInSpeechDetected = true;
     while (_bargeInPreRoll.isNotEmpty) {
@@ -455,8 +481,11 @@ class AudioStreamingService {
     final durationMs = chunk.length / 2 / _inputSampleRate * 1000;
     if (durationMs <= 0) return;
     final level = _micSpeechLevel(chunk);
+    // Keep the floor low enough for quiet speech on the phone mic, while the
+    // sustained start window above prevents a click or short room noise from
+    // opening a turn.
     final threshold = math
-        .max(0.055, _speechNoiseFloor * 2.2 + 0.012)
+        .max(0.065, _speechNoiseFloor * 2.35 + 0.014)
         .toDouble();
     final speechLike = level >= threshold;
 
@@ -522,7 +551,8 @@ class AudioStreamingService {
 
   void _resetBargeInDetector() {
     _bargeInPreRoll.clear();
-    _bargeInSpeechChunks = 0;
+    _bargeInPreRollBytes = 0;
+    _bargeInSpeechMs = 0;
     _bargeInSpeechDetected = false;
   }
 
@@ -545,6 +575,20 @@ class AudioStreamingService {
     return _playerStartLatch ??= _startPlayer().whenComplete(
       () => _playerStartLatch = null,
     );
+  }
+
+  /// Opens the native PCM player before the first Gemini response arrives.
+  /// Live audio otherwise pays the iOS player-start cost on the same first
+  /// chunk that is arriving from the network, which can make the intro sound
+  /// briefly uneven even though later chunks are queued correctly.
+  Future<void> preparePlayback() async {
+    try {
+      await _ensurePlayerStarted();
+    } catch (error) {
+      // The first real chunk will retry startup. Prewarming is an optimization,
+      // never a reason to fail a live session before it has started.
+      debugPrint('AudioStreamingService: playback prewarm failed: $error');
+    }
   }
 
   Future<void> _startPlayer() async {

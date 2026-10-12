@@ -1,12 +1,90 @@
 import '../models/content_models.dart';
 
-/// The first vocabulary release is deliberately small: five selectable story
-/// sets with five words each. Every target has a stable line in the same story
-/// so review can return to the original memory instead of inventing a new one.
+/// Starter vocabulary lessons. Most sets have five words; Survival French is
+/// the first lesson and introduces ten essential phrases.
 class VocabularyStoryCatalog {
   const VocabularyStoryCatalog._();
 
   static const starterSets = <VocabularyStorySetDefinition>[
+    VocabularyStorySetDefinition(
+      id: 'survival-french',
+      title: 'Survival French',
+      subtitle: 'Essential phrases for greetings, help, and everyday questions',
+      topic: 'Everyday essentials',
+      levelBand: 'A1',
+      words: [
+        VocabularyStoryWord(
+          en: 'Hello / Good morning',
+          fr: 'Bonjour',
+          phonetic: 'bohn-zhoor',
+          sentenceFr: 'Bonjour, madame.',
+          sentenceEn: 'Hello, ma’am.',
+        ),
+        VocabularyStoryWord(
+          en: 'Thank you',
+          fr: 'Merci',
+          phonetic: 'mehr-see',
+          sentenceFr: 'Merci beaucoup.',
+          sentenceEn: 'Thank you very much.',
+        ),
+        VocabularyStoryWord(
+          en: 'Please',
+          fr: 'S’il vous plaît',
+          phonetic: 'seel voo pleh',
+          sentenceFr: 'Un verre d’eau, s’il vous plaît.',
+          sentenceEn: 'A glass of water, please.',
+        ),
+        VocabularyStoryWord(
+          en: 'Yes',
+          fr: 'Oui',
+          phonetic: 'wee',
+          sentenceFr: 'Oui, je comprends.',
+          sentenceEn: 'Yes, I understand.',
+        ),
+        VocabularyStoryWord(
+          en: 'No',
+          fr: 'Non',
+          phonetic: 'nohn',
+          sentenceFr: 'Non, merci.',
+          sentenceEn: 'No, thank you.',
+        ),
+        VocabularyStoryWord(
+          en: 'Excuse me / Sorry',
+          fr: 'Pardon',
+          phonetic: 'par-dohn',
+          sentenceFr: 'Pardon, je cherche la gare.',
+          sentenceEn: 'Excuse me, I’m looking for the station.',
+        ),
+        VocabularyStoryWord(
+          en: 'Help me',
+          fr: 'Aidez-moi',
+          phonetic: 'eh-day mwah',
+          sentenceFr: 'Aidez-moi, s’il vous plaît.',
+          sentenceEn: 'Help me, please.',
+        ),
+        VocabularyStoryWord(
+          en: 'Where',
+          fr: 'Où',
+          phonetic: 'oo',
+          sentenceFr: 'Où est la sortie ?',
+          sentenceEn: 'Where is the exit?',
+        ),
+        VocabularyStoryWord(
+          en: 'How much / How many',
+          fr: 'Combien',
+          phonetic: 'kohm-byehn',
+          sentenceFr: 'Combien ça coûte ?',
+          sentenceEn: 'How much does it cost?',
+        ),
+        VocabularyStoryWord(
+          en: 'Goodbye',
+          fr: 'Au revoir',
+          phonetic: 'oh ruh-vwahr',
+          sentenceFr: 'Au revoir et bonne journée.',
+          sentenceEn: 'Goodbye and have a nice day.',
+        ),
+      ],
+    ),
     VocabularyStorySetDefinition(
       id: 'morning-breakfast',
       title: 'Morning breakfast',

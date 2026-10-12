@@ -70,6 +70,68 @@ void main() {
       },
     );
 
+    test('compact Live Tutor language policy is strict by CEFR level', () {
+      final a1 = LivePrompts.compactLiveTutor(
+        persona: TutorPersona.marie,
+        level: 'A1',
+      );
+      final a2 = LivePrompts.compactLiveTutor(
+        persona: TutorPersona.marie,
+        level: 'A2',
+      );
+      final b1 = LivePrompts.compactLiveTutor(
+        persona: TutorPersona.marie,
+        level: 'B1',
+      );
+      final b2 = LivePrompts.compactLiveTutor(
+        persona: TutorPersona.marie,
+        level: 'B2',
+      );
+
+      expect(a1, contains('roughly half'));
+      expect(a1, contains('English orientation'));
+      expect(a2, contains('balanced English and French'));
+      for (final prompt in [b1, b2]) {
+        expect(prompt, contains('FRENCH ONLY'));
+        expect(prompt, contains('Never speak English'));
+        expect(prompt, contains('explanations, corrections, examples'));
+        expect(prompt, contains('respond in French and continue'));
+      }
+    });
+
+    test(
+      'compact Live Tutor adapts reply length under a hard output ceiling',
+      () {
+        final prompt = LivePrompts.compactLiveTutor(
+          persona: TutorPersona.marie,
+          level: 'A1',
+        );
+
+        expect(prompt, contains('ADAPT REPLY LENGTH TO THE REQUEST'));
+        expect(prompt, contains('one or two concise sentences'));
+        expect(prompt, contains('If they ask for an explanation'));
+        expect(prompt, contains('Never pad, repeat an old French word'));
+        expect(prompt, contains('hard maximum, not a target'));
+      },
+    );
+
+    test(
+      'Live Tutor kickoff asks for a fresh topic-based intro, not a script',
+      () {
+        final kickoff = LivePrompts.liveTutorKickoff(
+          topic: 'Daily life',
+          style: 'Sharp',
+          courseFocus: 'Talking about friends',
+        );
+
+        expect(kickoff, contains('vary the angle and wording each session'));
+        expect(kickoff, contains('concrete, easy conversational hook'));
+        expect(kickoff, contains('Talking about friends'));
+        expect(kickoff, isNot(contains('Bonjour, je suis')));
+        expect(kickoff, isNot(contains('what do you want to learn today')));
+      },
+    );
+
     test('onboarding calibration uses the selected goal and level', () {
       final role = LivePrompts.forSession(
         LiveSessionType.onboardingCalibration,

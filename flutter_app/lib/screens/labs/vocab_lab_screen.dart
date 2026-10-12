@@ -19,8 +19,8 @@ import '../speak/v3_settings_screen.dart';
 import 'vocabulary_flashcards_screen.dart';
 import '../../widgets/v3/v3_surface.dart';
 
-/// Vocabulary starts with a small set library. Each set owns five words and a
-/// short connected story that supplies the teaching and review context.
+/// Vocabulary starts with a small set library. Each lesson owns a fixed deck
+/// and saved example context for teaching and review.
 class VocabLabScreen extends ConsumerStatefulWidget {
   const VocabLabScreen({super.key, this.topic});
 
@@ -148,7 +148,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
               Text('Make words stick', style: DesignTokens.display(30)),
               const SizedBox(height: 8),
               Text(
-                'Choose a story set and learn five useful words that stay connected.',
+                'Choose a focused set and learn useful French words and phrases in context.',
                 style: DesignTokens.body(
                   14,
                 ).copyWith(color: DesignTokens.inkSoft, height: 1.4),
@@ -160,7 +160,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      '${sets.length} story sets · $completedCount complete',
+                      '${sets.length} vocabulary sets · $completedCount complete',
                       style: DesignTokens.body(
                         12,
                       ).copyWith(color: DesignTokens.muted),
@@ -169,11 +169,11 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-              _sectionLabel('NEXT SET'),
+              _sectionLabel('NEXT LESSON'),
               const SizedBox(height: 10),
               if (featured != null) _featuredSetCard(featured),
               const SizedBox(height: 28),
-              _sectionLabel('STORY SETS'),
+              _sectionLabel('LESSONS'),
               const SizedBox(height: 10),
               _setGrid(sets),
               const SizedBox(height: 22),
@@ -241,7 +241,9 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
 
   IconData _iconForSet(String title, String topic) {
     final value = '$title $topic'.toLowerCase();
-    if (value.contains('greet') || value.contains('polite')) {
+    if (value.contains('greet') ||
+        value.contains('polite') ||
+        value.contains('survival')) {
       return Icons.chat_bubble_outline_rounded;
     }
     if (value.contains('food') ||
@@ -310,7 +312,9 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
                     Text(set.title, style: DesignTokens.display(18)),
                     const SizedBox(height: 4),
                     Text(
-                      '${set.levelBand} · ${set.entries.length} words',
+                      set.id == 'survival-french'
+                          ? 'Lesson 1 · ${set.levelBand} · 10 phrases'
+                          : '${set.levelBand} · ${set.entries.length} words',
                       style: DesignTokens.body(
                         12,
                       ).copyWith(color: DesignTokens.muted),
@@ -359,7 +363,7 @@ class _VocabLabScreenState extends ConsumerState<VocabLabScreen> {
           ),
           const SizedBox(height: 16),
           PrimaryActionButton(
-            label: 'Start story set',
+            label: 'Start lesson',
             onPressed: () => unawaited(_openPreviewSet(set)),
           ),
         ],
@@ -490,7 +494,8 @@ class _VocabularySetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     button: true,
-    label: '${set.title}, ${set.entries.length} vocabulary words',
+    label:
+        '${set.title}, ${set.entries.length} ${set.entries.length == 10 ? 'phrases' : 'vocabulary words'}',
     child: Material(
       color: selected ? DesignTokens.primarySoft : DesignTokens.surface,
       borderRadius: BorderRadius.circular(18),
@@ -546,7 +551,9 @@ class _VocabularySetCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '${set.entries.length} words',
+                set.entries.length == 10
+                    ? '10 phrases'
+                    : '${set.entries.length} words',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: DesignTokens.body(
