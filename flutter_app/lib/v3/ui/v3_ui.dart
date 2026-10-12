@@ -198,7 +198,10 @@ class V3TextAction extends StatelessWidget {
   }
 }
 
+enum V3Tone { none, correct, wrong }
+
 /// A selectable row: big title, quiet subtitle, a check that fills on select.
+/// [tone] shows the result after an answer is checked.
 class V3OptionCard extends StatelessWidget {
   const V3OptionCard({
     super.key,
@@ -207,17 +210,30 @@ class V3OptionCard extends StatelessWidget {
     this.leading,
     required this.selected,
     required this.onTap,
+    this.tone = V3Tone.none,
   });
 
   final String title;
   final String? subtitle;
   final String? leading;
   final bool selected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final V3Tone tone;
 
   @override
   Widget build(BuildContext context) {
     final label = subtitle == null ? title : '$title, $subtitle';
+    final marked = selected || tone != V3Tone.none;
+    final accent = switch (tone) {
+      V3Tone.correct => DesignTokens.success,
+      V3Tone.wrong => DesignTokens.danger,
+      V3Tone.none => DesignTokens.primary,
+    };
+    final soft = switch (tone) {
+      V3Tone.correct => DesignTokens.successSoft,
+      V3Tone.wrong => DesignTokens.dangerSoft,
+      V3Tone.none => DesignTokens.primarySoft,
+    };
     return V3Pressable(
       label: label,
       onTap: onTap,
@@ -226,13 +242,13 @@ class V3OptionCard extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
         decoration: BoxDecoration(
-          color: selected ? DesignTokens.primarySoft : DesignTokens.surface,
+          color: marked ? soft : DesignTokens.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? DesignTokens.primary : DesignTokens.hairline,
-            width: selected ? 1.6 : 1,
+            color: marked ? accent : DesignTokens.hairline,
+            width: marked ? 1.6 : 1,
           ),
-          boxShadow: selected ? const [] : DesignTokens.surfaceShadow,
+          boxShadow: marked ? const [] : DesignTokens.surfaceShadow,
         ),
         child: Row(
           children: [
@@ -265,19 +281,19 @@ class V3OptionCard extends StatelessWidget {
               height: 24,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selected ? DesignTokens.primary : Colors.transparent,
+                color: marked ? accent : Colors.transparent,
                 border: Border.all(
-                  color: selected
-                      ? DesignTokens.primary
-                      : DesignTokens.hairline,
+                  color: marked ? accent : DesignTokens.hairline,
                   width: 1.6,
                 ),
               ),
-              child: selected
+              child: marked
                   ? Icon(
-                      Icons.check_rounded,
+                      tone == V3Tone.wrong
+                          ? Icons.close_rounded
+                          : Icons.check_rounded,
                       size: 16,
-                      color: DesignTokens.onPrimary,
+                      color: Colors.white,
                     )
                   : null,
             ),

@@ -1,0 +1,62 @@
+{
+  "id": "dev-sample",
+  "dev": true,
+  "title": "Sample lesson: Bonjour",
+  "subtitle": "A short test of every step type",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Silent letters",
+      "body": "In French, many letters at the end of a word are not said.\n\nYou read the word, but you do not say every letter. That is why you need to hear French, not only read it.",
+      "examples": [
+        {"fr": "petit", "en": "small (the final t is silent)"},
+        {"fr": "bonjour", "en": "hello"}
+      ]
+    },
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "bonjour",
+      "en": "hello",
+      "sound": "bon-ZHOOR",
+      "exampleFr": "Bonjour, madame.",
+      "exampleEn": "Hello, madam."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "merci",
+      "en": "thank you",
+      "sound": "mehr-SEE",
+      "exampleFr": "Merci beaucoup.",
+      "exampleEn": "Thank you very much."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je m'appelle Sam.",
+      "en": "My name is Sam.",
+      "tip": "Say it slowly. The e in je is very short."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this word mean?",
+      "promptFr": "merci",
+      "options": ["hello", "thank you", "goodbye"],
+      "answer": 1,
+      "explain": "Merci means thank you."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Il est huit heures.",
+      "question": "What time is it?",
+      "options": ["7:00", "8:00", "9:00"],
+      "answer": 1,
+      "explain": "Huit means eight."
+    }
+  ]
+}

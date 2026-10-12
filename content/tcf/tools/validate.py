@@ -171,10 +171,99 @@ def check_units(info, strict):
     return len(files)
 
 
+
+APP_CONTENT = ROOT.parent.parent / "flutter_app" / "assets" / "content" / "tcf"
+STEP_TYPES = {"explain", "word", "phrase", "choose", "listen"}
+
+
+def _need(step, key, where):
+    v = step.get(key)
+    if not (isinstance(v, str) and v.strip()):
+        err(f"{where}: missing or empty '{key}'")
+        return ""
+    return v
+
+
+def check_lessons():
+    """Validates the lesson files the app plays (same rules as V3Lesson.fromJson)
+    and returns (lesson_count, french_line_count)."""
+    index_path = APP_CONTENT / "course.json"
+    if not index_path.exists():
+        return 0, 0
+    index = load(index_path) or {}
+    files = index.get("lessons", [])
+    seen_ids, lines = set(), 0
+    for name in files:
+        path = APP_CONTENT / "lessons" / name
+        if not path.exists():
+            err(f"course.json lists {name} but the file does not exist")
+            continue
+        lesson = load(path)
+        if not lesson:
+            continue
+        lid = lesson.get("id", name)
+        where = f"lesson {lid}"
+        if lid in seen_ids:
+            err(f"{where}: duplicate lesson id")
+        seen_ids.add(lid)
+        _need(lesson, "title", where)
+        steps = lesson.get("steps")
+        if not isinstance(steps, list) or not steps:
+            err(f"{where}: has no steps")
+            continue
+        ids = set()
+        for step in steps:
+            sid = step.get("id")
+            sw = f"{where} step {sid}"
+            if not sid or sid in ids:
+                err(f"{sw}: missing or duplicate step id")
+            ids.add(sid)
+            kind = step.get("type")
+            if kind not in STEP_TYPES:
+                err(f"{sw}: unknown type {kind!r}")
+                continue
+            fr = []
+            if kind == "explain":
+                _need(step, "title", sw); _need(step, "body", sw)
+                for ex in step.get("examples", []):
+                    fr.append(_need(ex, "fr", sw)); _need(ex, "en", sw)
+            elif kind == "word":
+                fr.append(_need(step, "fr", sw)); _need(step, "en", sw)
+                if step.get("exampleFr"):
+                    fr.append(step["exampleFr"])
+                    _need(step, "exampleEn", sw)
+            elif kind == "phrase":
+                fr.append(_need(step, "fr", sw)); _need(step, "en", sw)
+            elif kind in ("choose", "listen"):
+                if kind == "choose":
+                    _need(step, "prompt", sw)
+                    if step.get("promptFr"):
+                        fr.append(step["promptFr"])
+                else:
+                    fr.append(_need(step, "fr", sw)); _need(step, "question", sw)
+                opts = step.get("options")
+                if not (isinstance(opts, list) and len(opts) >= 2 and all(isinstance(o, str) and o.strip() for o in opts)):
+                    err(f"{sw}: needs at least 2 non-empty options")
+                elif len(set(opts)) != len(opts):
+                    err(f"{sw}: options must be different from each other")
+                ans = step.get("answer")
+                if not (isinstance(ans, int) and isinstance(opts, list) and 0 <= ans < len(opts)):
+                    err(f"{sw}: answer must be a valid option index")
+                if not step.get("explain"):
+                    warn(f"{sw}: no 'explain' text for the feedback bar")
+            for text in fr:
+                lines += 1
+                if len(text) > 220:
+                    err(f"{sw}: French line is over 220 characters")
+        if lesson.get("dev"):
+            warn(f"{where}: is marked dev (hidden in release builds)")
+    return len(seen_ids), lines
+
 def main():
     strict = "--strict-ledger" in sys.argv
     info = check_syllabus()
     n_units = check_units(info, strict) if info else 0
+    n_lessons, n_lines = check_lessons()
     for w in warnings:
         print("warn :", w)
     for e in errors:
@@ -182,6 +271,7 @@ def main():
     if info:
         print(f"syllabus: stage0 {info['s0']} lessons, A1 {len(info['a1']['units'])} units, "
               f"{info['total']} target words, {n_units} authored unit file(s)")
+    print(f"lessons: {n_lessons} file(s), {n_lines} French lines to voice")
     print(f"content validation: {len(errors)} error(s), {len(warnings)} warning(s)")
     sys.exit(1 if errors else 0)
 

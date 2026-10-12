@@ -34,7 +34,10 @@ interaction (see BUILD_STRUCTURE.md).
 | `integration_test/smoke_test.dart` | `tool/e2e.sh integration_test/smoke_test.dart` | app boots, first screen is describable |
 | `integration_test/explore_test.dart` | `tool/e2e.sh ...` (add `E2E_DEFINES='--dart-define=E2E_DARK=true'` for dark) | discovery walk, saves every screen and its tappables |
 | `integration_test/v3_onboarding_test.dart` | `E2E_DEFINES='--dart-define=SKIP_NOTIFICATION_PROMPT=true' tool/e2e.sh ...` | launch, welcome, level, Marie, rhythm, plan, then the account gate. Asserts facts on the plan screen |
+| `integration_test/v3_lesson_test.dart` | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh ...` | plays the dev sample lesson from Learn to completion: every step type, wrong then right answer, score, missed list, completion saved, hero moves on. Never taps a speaker (that would call Gemini Live and cost money) |
 | `integration_test/v3_shell_test.dart` | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh ...` | four tabs, exam countdown, Path units, TCF format numbers, dark toggle persists |
+
+`tool/e2e.sh` stops any leftover copy of our own app on the phone before each run (matched by bundle id, never other apps). A copy still running under a debugger makes Flutter's launch fail.
 
 `E2E_SHELL` is a debug-only switch in `lib/app.dart` (guarded by `kDebugMode`, so
 it is compiled out of release builds). It skips sign-in so the shell can be

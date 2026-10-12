@@ -485,10 +485,17 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/v3/learn/v3_learn_screen.dart`
 - widgets: V3LearnScreen
-- opens: SpeakCourseActivityScreen, SpeakReviewScreen
+- opens: SpeakCourseActivityScreen, SpeakReviewScreen, V3LessonPlayer
 - tap handlers: 5
 - keys: `learn.lesson.${s.contentKey}`, `learn.review`, `learn.segment.${label.toLowerCase()}`, `learn.startLesson`, `learn.unit.$unit`
 - labels: 'Start lesson', 'Time to review'
+
+## `lib/v3/lesson/v3_lesson_player.dart`
+- widgets: V3LessonPlayer, V3Speaker
+- opens: SpeakingPracticeScreen
+- tap handlers: 8
+- keys: `lesson.askMarie`, `lesson.check`, `lesson.close`, `lesson.continue`, `lesson.done`, `lesson.option.$i`, `step-${_step.id}`
+- labels: 'Ask Marie', 'Check', 'Close lesson', 'Continue', 'Done'
 
 ## `lib/v3/marie/v3_marie_screen.dart`
 - widgets: V3MarieScreen

@@ -43,9 +43,11 @@ string from a baked shared catalog.
    (`validateVocabulary`, `validateStory`, `validateWriting`, `validateGrammar`,
    `validateSpeaking`) so the file matches what the renderers accept. Do not
    assume field names.
-3. Write `content/tcf/units/<stage>/<unit-id>/unit.json` with six lessons in
-   the fixed order: words (two 5-word lessons), phrases, grammar mini,
-   dialogue, speak and write, TCF corner plus checkpoint.
+3. Write each lesson as its own file in
+   `flutter_app/assets/content/tcf/lessons/` (format: `docs/v3/LESSON_FORMAT.md`)
+   and list it in `course.json`. A unit is six lessons in the fixed order:
+   words (two 5-word lessons), phrases, grammar mini, dialogue, speak and
+   write, TCF corner plus checkpoint. The player and validator already exist.
 4. Write `audio.json` next to it listing every French string with its voice
    and lesson id. This is the bake list.
 5. Run `python3 content/tcf/tools/validate.py`. Fix until green.

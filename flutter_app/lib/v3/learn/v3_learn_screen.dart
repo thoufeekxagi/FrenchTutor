@@ -12,6 +12,9 @@ import '../../screens/speak/speak_course_activity_screen.dart';
 import '../../screens/speak/speak_review_screen.dart';
 import '../../services/course_generation_test_harness.dart';
 import '../../services/speak_roadmap_service.dart';
+import '../lesson/v3_course.dart';
+import '../lesson/v3_lesson.dart';
+import '../lesson/v3_lesson_player.dart';
 import '../ui/v3_ui.dart';
 
 /// Learn tab. Screen contract:
@@ -35,12 +38,41 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   var _tab = 0;
   int? _openUnit;
   DateTime? _examDate;
+  List<V3Lesson> _course = const [];
+  Set<String> _done = const {};
 
   @override
   void initState() {
     super.initState();
+    unawaited(_loadCourse());
     unawaited(_loadExamDate());
     unawaited(_ensureUpcomingMedia());
+  }
+
+  Future<void> _loadCourse() async {
+    final course = await V3Course.load();
+    final done = await V3Progress.completed();
+    if (!mounted) return;
+    setState(() {
+      _course = course;
+      _done = done;
+    });
+  }
+
+  V3Lesson? get _nextAuthored {
+    for (final lesson in _course) {
+      if (!_done.contains(lesson.id)) return lesson;
+    }
+    return null;
+  }
+
+  Future<void> _openLesson(V3Lesson lesson) async {
+    await AppRouter.push<bool>(
+      context,
+      (_) => V3LessonPlayer(lesson: lesson),
+      fullscreenDialog: true,
+    );
+    if (mounted) unawaited(_loadCourse());
   }
 
   Future<void> _loadExamDate() async {
@@ -221,7 +253,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
         ),
         const SizedBox(height: 14),
       ],
-      _hero(next),
+      _heroFor(next),
       const SizedBox(height: 14),
       V3Pressable(
         key: const ValueKey('learn.review'),
@@ -262,7 +294,43 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     ];
   }
 
-  Widget _hero(SpeakRoadmapSession? next) {
+  /// The authored TCF course comes first. The legacy adaptive course fills in
+  /// until authored lessons cover it.
+  Widget _heroFor(SpeakRoadmapSession? legacyNext) {
+    final authored = _nextAuthored;
+    if (authored != null) {
+      return _heroCard(
+        eyebrow: 'NEXT  ·  ${authored.minutes} MIN',
+        title: authored.title,
+        subtitle: authored.subtitle.isEmpty
+            ? 'TCF Canada course'
+            : authored.subtitle,
+        onStart: () => _openLesson(authored),
+      );
+    }
+    if (legacyNext == null) {
+      return _heroCard(
+        eyebrow: 'ALL CAUGHT UP',
+        title: 'You are all caught up',
+        subtitle: 'New lessons appear here as soon as they are ready.',
+      );
+    }
+    return _heroCard(
+      eyebrow: 'NEXT  ·  ${legacyNext.estimatedMinutes} MIN',
+      title: legacyNext.title,
+      subtitle: 'Unit ${legacyNext.unit}: ${legacyNext.unitTitle}',
+      onStart: () => _open(legacyNext),
+    );
+  }
+
+  Widget _heroCard({
+    required String eyebrow,
+    required String title,
+    required String subtitle,
+    VoidCallback? onStart,
+  }) {
+    // Brand-blue hero in both appearances: white text on the fixed blue keeps
+    // contrast, where the lighter dark-mode action blue would wash out.
     const onBlue = Colors.white;
     final dim = onBlue.withValues(alpha: 0.8);
     return Container(
@@ -281,30 +349,17 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            next == null
-                ? 'ALL CAUGHT UP'
-                : 'NEXT  ·  ${next.estimatedMinutes} MIN',
-            style: V3Type.eyebrow(dim),
-          ),
+          Text(eyebrow, style: V3Type.eyebrow(dim)),
           const SizedBox(height: 12),
-          Text(
-            next?.title ?? 'You are all caught up',
-            style: V3Type.title(30, color: onBlue),
-          ),
+          Text(title, style: V3Type.title(30, color: onBlue)),
           const SizedBox(height: 8),
-          Text(
-            next == null
-                ? 'New lessons appear here as soon as they are ready.'
-                : 'Unit ${next.unit}: ${next.unitTitle}',
-            style: V3Type.body(15, dim),
-          ),
-          if (next != null) ...[
+          Text(subtitle, style: V3Type.body(15, dim)),
+          if (onStart != null) ...[
             const SizedBox(height: 22),
             V3Pressable(
               key: const ValueKey('learn.startLesson'),
               label: 'Start lesson',
-              onTap: () => _open(next),
+              onTap: onStart,
               child: Container(
                 height: 54,
                 padding: const EdgeInsets.symmetric(horizontal: 20),

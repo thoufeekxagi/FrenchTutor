@@ -19,6 +19,7 @@ MAX="${3:-600}"
 [[ -f "$TARGET" ]] || { echo "No such test file: $TARGET" >&2; exit 2; }
 require_device "$DEVICE"
 guard_machine
+stop_app_on_device "$DEVICE"
 load_defines
 
 rm -rf artifacts/e2e && mkdir -p artifacts/e2e/shots

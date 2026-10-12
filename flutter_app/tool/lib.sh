@@ -50,3 +50,20 @@ require_device() {
     exit 4
   fi
 }
+
+# Stops our own app if it is still running on the phone (for example left over
+# from an earlier run). A copy still running under a debugger makes Flutter's
+# launch fail and fall back to driving Xcode. Only the app whose bundle id is
+# ours is stopped; other apps on the phone are never touched. Dev data is
+# disposable, so a hard stop is fine.
+stop_app_on_device() {
+  local id="$1" path pid
+  path=$(xcrun devicectl device info apps --device "$id" --bundle-id "$BUNDLE_ID" --verbose 2>/dev/null \
+    | grep -m1 'url: Optional(file://' | sed -E 's#.*Application/([^/]+)/Runner.app.*#\1#')
+  [[ -n "$path" ]] || return 0
+  for pid in $(xcrun devicectl device info processes --device "$id" 2>/dev/null \
+    | grep "$path/Runner.app/Runner" | awk '{print $1}'); do
+    echo "stopping leftover ParleSprint on the phone (pid $pid)"
+    xcrun devicectl device process terminate --device "$id" --pid "$pid" --kill >/dev/null 2>&1 || true
+  done
+}

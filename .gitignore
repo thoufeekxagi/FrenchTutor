@@ -41,3 +41,4 @@ server/*.db
 /flutter_app/artifacts/run_light/
 /flutter_app/artifacts/run_dark/
 /docs/v3/design/*.pdf
+/flutter_app/artifacts/look/
