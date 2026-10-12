@@ -37,3 +37,7 @@ server/*.db
 /flutter_app/artifacts/e2e/
 /flutter_app/artifacts/check_*
 /docs/v3/design/_*
+/flutter_app/artifacts/review/
+/flutter_app/artifacts/run_light/
+/flutter_app/artifacts/run_dark/
+/docs/v3/design/*.pdf

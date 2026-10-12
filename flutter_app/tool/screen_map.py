@@ -25,7 +25,7 @@ KEY_RE = re.compile(r"""(?:Value)?Key\(\s*['"]([^'"]+)['"]\s*\)""")
 LABEL_RE = re.compile(r"""(?:label|semanticLabel|semanticsLabel|tooltip)\s*:\s*['"]([^'"$]{2,80})['"]""")
 PUSH_RE = re.compile(r"AppRouter\.(?:push|replace|pushReplacement)\w*(?:<[^>]*>)?\(\s*\w+\s*,\s*\(\w*\)\s*=>\s*(?:const\s+)?(\w+)")
 TAP_RE = re.compile(r"\b(onTap|onPressed|onLongPress|onChanged|onSubmitted)\s*:")
-GUARD_RE = re.compile(r"key\s*:|Semantics\(|semanticLabel|tooltip\s*:|label\s*:|Key\(")
+GUARD_RE = re.compile(r"key\s*:|Semantics\(|semanticLabel|tooltip\s*:|label\s*:|Key\(|^\s*_\w+\(", re.M)
 
 
 def scan(path):

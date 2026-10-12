@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -11,9 +12,9 @@ import 'providers/appearance_provider.dart';
 import 'providers/database_provider.dart';
 import 'screens/auth/speak_auth_screen.dart';
 import 'screens/auth/password_recovery_screen.dart';
-import 'screens/main_tab_screen.dart';
+import 'v3/shell/v3_shell.dart';
 import 'screens/onboarding/ai_consent_screen.dart';
-import 'screens/onboarding/speak_onboarding_screen.dart';
+import 'v3/onboarding/v3_onboarding_flow.dart';
 import 'services/auth_service.dart';
 import 'services/gemini_live_service.dart';
 import 'services/revenue_cat_service.dart';
@@ -403,6 +404,11 @@ class _AuthGateState extends ConsumerState<AuthGate>
 
   @override
   Widget build(BuildContext context) {
+    // Debug-only test entry: lets on-device tests reach the shell without a
+    // real account. `kDebugMode` is false in release, so this is compiled out.
+    if (kDebugMode && const bool.fromEnvironment('E2E_SHELL')) {
+      return const V3Shell();
+    }
     if (_passwordRecoveryPending) {
       return PasswordRecoveryScreen(
         onContinue: () {
@@ -420,7 +426,7 @@ class _AuthGateState extends ConsumerState<AuthGate>
       return const SpeakAuthScreen(initialSignUp: false);
     }
     if (_requiresInstallOnboarding) {
-      return SpeakOnboardingScreen(onFinished: _finishInstallOnboarding);
+      return V3OnboardingFlow(onFinished: _finishInstallOnboarding);
     }
     if (_hasSession && _isRestoringAccount) {
       return _RestoringProgressView(
@@ -434,7 +440,7 @@ class _AuthGateState extends ConsumerState<AuthGate>
       );
     }
     if (!_hasSession) return const SpeakAuthScreen();
-    return const MainTabScreen();
+    return const V3Shell();
   }
 }
 

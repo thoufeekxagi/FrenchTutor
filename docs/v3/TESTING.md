@@ -27,6 +27,20 @@ because `google_mlkit_*` has no arm64 simulator slice. Do not try them against
 the phone. Removing Photo tutor and ML Kit in v3 unlocks simulator
 interaction (see BUILD_STRUCTURE.md).
 
+## Device tests that exist today
+
+| Test | Run | What it proves |
+|---|---|---|
+| `integration_test/smoke_test.dart` | `tool/e2e.sh integration_test/smoke_test.dart` | app boots, first screen is describable |
+| `integration_test/explore_test.dart` | `tool/e2e.sh ...` (add `E2E_DEFINES='--dart-define=E2E_DARK=true'` for dark) | discovery walk, saves every screen and its tappables |
+| `integration_test/v3_onboarding_test.dart` | `E2E_DEFINES='--dart-define=SKIP_NOTIFICATION_PROMPT=true' tool/e2e.sh ...` | launch, welcome, level, Marie, rhythm, plan, then the account gate. Asserts facts on the plan screen |
+| `integration_test/v3_shell_test.dart` | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh ...` | four tabs, exam countdown, Path units, TCF format numbers, dark toggle persists |
+
+`E2E_SHELL` is a debug-only switch in `lib/app.dart` (guarded by `kDebugMode`, so
+it is compiled out of release builds). It skips sign-in so the shell can be
+tested without a real account. `SKIP_NOTIFICATION_PROMPT` skips the iOS
+permission alert, which the driver cannot tap.
+
 ## Baselines (what "green" means today)
 
 The restore-point snapshot already had failures. They are recorded, so the gate
@@ -110,6 +124,7 @@ removal passes it.
 | Screenshot missing but test passes | `reportData` was replaced | use `probe.capture` only |
 | Tap changes the wrong thing | tapped an oversized semantics node | probe marks it `oversized`, `tapLabel` falls back to the text |
 | Test passes but captured "Restoring your progress..." | settled before async startup ended | use `probe.settle` (content-based) |
+| Log says `You may be prompted to give access to control Xcode`, then VM service not found, and Xcode.app opens by itself | Flutter's LLDB launch failed, usually because a previous (interrupted) run left ParleSprint running under a debugger on the phone, so it fell back to driving Xcode | `xcrun devicectl device info apps --device <id> --bundle-id com.thoufeekx.frenchtutor --verbose` shows the app's bundle path. `xcrun devicectl device info processes --device <id> \| grep Runner` lists pids. Match the path, then `xcrun devicectl device process terminate --device <id> --pid <pid> --kill` (a plain terminate did not stop it). Never kill the other Runner (a different app). SIGTERM the Xcode.app and `lldb-rpc-server` that your own failed run launched, then retry once |
 | Orphaned `flutter drive` or `lldb` after an aborted run | parent died | `ps -axo pid,ppid,etime,command | grep -E "dartvm|lldb"`, SIGTERM the orphans |
 
 ## Unit and widget tests

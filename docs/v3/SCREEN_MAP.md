@@ -475,12 +475,55 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - widgets: V3SettingsScreen
 - opens: PrivacyAiScreen, SpeakPaywallScreen
 - tap handlers: 10
-- labels: 'A1', 'A2', 'B1', 'B2', 'Deep', 'Everyday French', 'Explore first', 'Quick', 'Standard', 'TEF Canada'
+- keys: `settings.darkMode`
+- labels: 'A1', 'A2', 'B1', 'B2', 'Dark mode', 'Deep', 'Everyday French', 'Explore first', 'Quick', 'Standard', 'TEF Canada'
 
 ## `lib/screens/subscription/speak_paywall_screen.dart`
 - widgets: SpeakPaywallScreen
 - tap handlers: 6
 - labels: 'BEST VALUE'
+
+## `lib/v3/learn/v3_learn_screen.dart`
+- widgets: V3LearnScreen
+- opens: SpeakCourseActivityScreen, SpeakReviewScreen
+- tap handlers: 5
+- keys: `learn.lesson.${s.contentKey}`, `learn.review`, `learn.segment.${label.toLowerCase()}`, `learn.startLesson`, `learn.unit.$unit`
+- labels: 'Start lesson', 'Time to review'
+
+## `lib/v3/marie/v3_marie_screen.dart`
+- widgets: V3MarieScreen
+- opens: LiveTutorSetupScreen, MocksScreen
+- tap handlers: 3
+- keys: `marie.mode.$id`
+
+## `lib/v3/me/v3_me_screen.dart`
+- widgets: V3MeScreen
+- opens: V3SettingsScreen
+- tap handlers: 5
+- keys: `me.$id`
+- labels: 'Dark mode', 'Settings'
+
+## `lib/v3/onboarding/v3_onboarding_flow.dart`
+- widgets: V3OnboardingFlow
+- opens: SpeakingPracticeScreen
+- tap handlers: 13
+- keys: `onboarding.day.${d.$1}`, `onboarding.examDate`, `onboarding.finish`, `onboarding.getStarted`, `onboarding.level.${l.$1}`, `onboarding.levelContinue`, `onboarding.marieSkip`, `onboarding.marieStart`, `onboarding.minutes.$m`, `onboarding.notSure`, `onboarding.planContinue`, `onboarding.reminder`
+- labels: 'Continue', 'Create my account', 'Exam date (optional)', 'Get started', 'Not sure? Let Marie check', 'Reminder', 'Skip for now'
+
+## `lib/v3/shell/v3_shell.dart`
+- widgets: V3Shell
+- tap handlers: 1
+- keys: `shell.tab.$id`
+
+## `lib/v3/tests/v3_tests_screen.dart`
+- widgets: V3TestsScreen
+- opens: ExamReadinessScreen
+- tap handlers: 1
+- keys: `tests.section.${s.$1.toLowerCase()}`
+
+## `lib/v3/ui/v3_ui.dart`
+- widgets: V3Pressable, V3Button, V3TextAction, V3OptionCard, V3Segments, V3FadeIn, V3Screen
+- tap handlers: 6
 
 ## `lib/widgets/adaptive/adaptive.dart`
 - widgets: PSSwitch, PSProgressIndicator, PSContentColumn, PSBottomActionBar

@@ -49,19 +49,21 @@ void main() {
       ),
     );
 
-    // Let theme and onboarding layout finish their first frame.
+    // Let the gate restore local state and mount onboarding, then wait out the
+    // V3 launch splash (1.7s) so it advances to the welcome page.
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 2500));
     await tester.pumpAndSettle();
 
-    // Deliberate order: a fresh learner experiences the product first —
-    // a gradient welcome, then goal/level/tutor onboarding — and is asked to
-    // create an account only at the END of onboarding — never an account
-    // wall up front.
+    // Deliberate order: a fresh learner experiences the product first, and is
+    // asked to create an account only at the END of onboarding. Never an
+    // account wall up front.
     expect(find.text('ParleSprint'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
 
-    await tester.tap(find.text('Build my plan'));
+    await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
-    expect(find.text('What should French unlock for you?'), findsOneWidget);
+    expect(find.textContaining('How much French'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
   });
 

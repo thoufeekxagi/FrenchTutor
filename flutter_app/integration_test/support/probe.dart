@@ -72,6 +72,32 @@ class Probe {
     );
   }
 
+  /// Waits until a tappable with [label] is on screen. On timeout the failure
+  /// carries a screenshot and the tappable labels that were visible.
+  Future<void> waitForLabel(
+    WidgetTester tester,
+    String label, {
+    bool startsWith = false,
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
+    final deadline = DateTime.now().add(timeout);
+    List<String> labels = const [];
+    while (DateTime.now().isBefore(deadline)) {
+      await tester.pump(const Duration(milliseconds: 150));
+      labels = (describe(tester)['tappable']! as List)
+          .map((e) => (e as Map)['label'] as String)
+          .toList();
+      final hit = startsWith
+          ? labels.any((l) => l.startsWith(label))
+          : labels.contains(label);
+      if (hit) return;
+    }
+    await capture(tester, 'timeout_${DateTime.now().millisecondsSinceEpoch}');
+    throw TimeoutException(
+      'No tappable "$label" within $timeout. Visible tappables: $labels',
+    );
+  }
+
   /// Taps a tappable semantics node by its label, using the exact rect the
   /// probe reports. Semantics rects are physical pixels (they include the
   /// device pixel ratio), so the tap point is divided by it.
