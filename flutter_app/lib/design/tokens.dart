@@ -36,8 +36,7 @@ abstract final class DesignTokens {
       dark ? AppearanceColors.darkSurface : AppearanceColors.lightSurface;
   static Color raisedSurfaceFor(bool dark) =>
       dark ? AppearanceColors.darkRaised : AppearanceColors.lightSurface;
-  static Color accentFor(bool dark) =>
-      dark ? AppearanceColors.gold : AppearanceColors.goldDeep;
+  static Color accentFor(bool dark) => AppearanceColors.accentFor(dark);
   static Color hairlineFor(bool dark) => inkFor(dark).withValues(alpha: 0.09);
   static Color get inkSoft =>
       isDark ? AppearanceColors.darkMuted : AppearanceColors.lightMuted;
@@ -50,26 +49,27 @@ abstract final class DesignTokens {
   // The bright gold is comfortable on the dark canvas. In light mode the
   // darker gold is the action/accent role so labels and icons do not wash out
   // against white surfaces.
-  static Color get primary =>
-      isDark ? AppearanceColors.gold : AppearanceColors.goldDeep;
+  static Color get primary => AppearanceColors.accentFor(isDark);
   static Color get primaryReadable => primary;
-  static Color get primaryDeep => AppearanceColors.goldDeep;
-  static Color get primarySoft =>
-      isDark ? AppearanceColors.goldSoftDark : AppearanceColors.goldSoftLight;
+  static Color get primaryDeep =>
+      isDark ? AppearanceColors.blueDark : AppearanceColors.blueDeep;
+  static Color get primarySoft => AppearanceColors.accentSoftFor(isDark);
   // Secondary/info are semantic slots, not a second brand color. They share
   // the gold accent so legacy screens cannot reintroduce a competing hue.
-  static Color get secondary => AppearanceColors.goldDeep;
-  static Color get success => AppearanceColors.success;
+  static Color get secondary => primary;
+  static Color get success => AppearanceColors.successFor(isDark);
   static Color get successSoft => isDark
       ? AppearanceColors.successSoftDark
       : AppearanceColors.successSoftLight;
-  static Color get info => AppearanceColors.goldDeep;
+  static Color get info => primary;
   static Color get infoSoft => primarySoft;
-  static Color get mastery => AppearanceColors.goldDeep;
-  static Color get masterySoft => primarySoft;
-  static Color get warning => AppearanceColors.goldDeep;
-  static Color get warningSoft => primarySoft;
-  static Color get danger => AppearanceColors.danger;
+  static Color get mastery =>
+      isDark ? AppearanceColors.gold : AppearanceColors.goldDeep;
+  static Color get masterySoft =>
+      isDark ? AppearanceColors.goldSoftDark : AppearanceColors.goldSoftLight;
+  static Color get warning => mastery;
+  static Color get warningSoft => masterySoft;
+  static Color get danger => AppearanceColors.dangerFor(isDark);
   static Color get dangerSoft => isDark
       ? AppearanceColors.dangerSoftDark
       : AppearanceColors.dangerSoftLight;
@@ -79,7 +79,7 @@ abstract final class DesignTokens {
       ? AppearanceColors.darkMuted.withValues(alpha: 0.78)
       : AppearanceColors.lightMuted.withValues(alpha: 0.84);
   static Color get text => ink;
-  static Color get onPrimary => const Color(0xFF000000);
+  static Color get onPrimary => AppearanceColors.onAccentFor(isDark);
 
   // Legacy aliases (Passeport era) — migrate call sites, don't add new uses.
   static Color get parchment => canvas;

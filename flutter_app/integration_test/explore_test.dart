@@ -51,6 +51,11 @@ void main() {
     final semantics = tester.ensureSemantics();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('dev_force_pro_unlock', true);
+    // Force the appearance so light and dark runs are comparable. Pass with
+    // E2E_DEFINES='--dart-define=E2E_DARK=true' tool/e2e.sh ...
+    const dark = bool.fromEnvironment('E2E_DARK');
+    await prefs.setBool('app_dark_mode_v3_choice', true);
+    await prefs.setBool('app_dark_mode', dark);
 
     app.main();
     await probe.settle(tester, timeout: const Duration(seconds: 45));

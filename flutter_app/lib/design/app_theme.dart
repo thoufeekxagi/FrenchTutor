@@ -39,10 +39,9 @@ abstract final class AppTheme {
     final hairline = dark
         ? AppearanceColors.darkHairline
         : AppearanceColors.lightHairline;
-    final accent = dark ? AppearanceColors.gold : AppearanceColors.goldDeep;
-    final goldSoft = dark
-        ? AppearanceColors.goldSoftDark
-        : AppearanceColors.goldSoftLight;
+    final accent = AppearanceColors.accentFor(dark);
+    final onAccent = AppearanceColors.onAccentFor(dark);
+    final goldSoft = AppearanceColors.accentSoftFor(dark);
 
     return ThemeData(
       useMaterial3: true,
@@ -53,12 +52,12 @@ abstract final class AppTheme {
       colorScheme: ColorScheme(
         brightness: dark ? Brightness.dark : Brightness.light,
         primary: accent,
-        onPrimary: Colors.black,
-        secondary: AppearanceColors.goldDeep,
-        onSecondary: Colors.black,
+        onPrimary: onAccent,
+        secondary: accent,
+        onSecondary: onAccent,
         surface: surface,
         onSurface: ink,
-        error: AppearanceColors.danger,
+        error: AppearanceColors.dangerFor(dark),
         onError: Colors.white,
       ),
       // Keep the neutral container roles in the same black/gold or
@@ -139,7 +138,7 @@ abstract final class AppTheme {
         style: ElevatedButton.styleFrom(
           minimumSize: const Size(48, 56),
           backgroundColor: accent,
-          foregroundColor: Colors.black,
+          foregroundColor: onAccent,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
@@ -147,14 +146,14 @@ abstract final class AppTheme {
           textStyle: DesignTokens.body(
             15,
             weight: FontWeight.w700,
-          ).copyWith(color: Colors.black),
+          ).copyWith(color: onAccent),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(48, 56),
           backgroundColor: accent,
-          foregroundColor: Colors.black,
+          foregroundColor: onAccent,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
@@ -162,13 +161,13 @@ abstract final class AppTheme {
           textStyle: DesignTokens.body(
             15,
             weight: FontWeight.w700,
-          ).copyWith(color: Colors.black),
+          ).copyWith(color: onAccent),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size(48, 52),
-          foregroundColor: AppearanceColors.goldDeep,
+          foregroundColor: accent,
           side: BorderSide(color: hairline),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignTokens.radiusMedium),
@@ -176,17 +175,17 @@ abstract final class AppTheme {
           textStyle: DesignTokens.body(
             14,
             weight: FontWeight.w700,
-          ).copyWith(color: AppearanceColors.goldDeep),
+          ).copyWith(color: accent),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           minimumSize: const Size(48, 48),
-          foregroundColor: AppearanceColors.goldDeep,
+          foregroundColor: accent,
           textStyle: DesignTokens.body(
             14,
             weight: FontWeight.w700,
-          ).copyWith(color: AppearanceColors.goldDeep),
+          ).copyWith(color: accent),
         ),
       ),
       switchTheme: SwitchThemeData(
@@ -214,7 +213,7 @@ abstract final class AppTheme {
         linearTrackColor: raised,
       ),
       tabBarTheme: TabBarThemeData(
-        labelColor: AppearanceColors.goldDeep,
+        labelColor: accent,
         unselectedLabelColor: muted,
         indicatorColor: accent,
       ),
@@ -246,16 +245,12 @@ abstract final class AppTheme {
                     ? FontWeight.w700
                     : FontWeight.w500,
               ).copyWith(
-                color: states.contains(WidgetState.selected)
-                    ? AppearanceColors.goldDeep
-                    : muted,
+                color: states.contains(WidgetState.selected) ? accent : muted,
               ),
         ),
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
-            color: states.contains(WidgetState.selected)
-                ? AppearanceColors.goldDeep
-                : muted,
+            color: states.contains(WidgetState.selected) ? accent : muted,
             size: 23,
           ),
         ),

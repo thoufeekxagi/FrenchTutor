@@ -97,12 +97,11 @@ class SessionSettings extends ChangeNotifier {
   }
 
   Future<void> setDarkMode(bool value) async {
-    darkMode = true;
-    AppAppearanceSettings.shared.adoptDarkMode(true);
+    darkMode = value;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_darkModeKey, true);
-    await prefs.setBool('app_dark_mode', true);
+    await prefs.setBool(_darkModeKey, value);
+    await AppAppearanceSettings.shared.setDarkMode(value);
   }
 
   double _validRate(double value) {

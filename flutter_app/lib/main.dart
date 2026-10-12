@@ -19,6 +19,7 @@ import 'services/alphabet_prewarm.dart';
 import 'services/lesson_speech_service.dart';
 import 'services/ai_cost_tracker.dart';
 import 'services/pilot_access_service.dart';
+import 'services/app_appearance_settings.dart';
 import 'services/subscription_gate_service.dart';
 
 void main() {
@@ -103,6 +104,7 @@ void main() {
         // this reads app assets only and never contacts Supabase or Gemini.
         unawaited(AlphabetPrewarm.maybeStart(isBeginner: true));
         await DevSubscriptionOverride.load();
+        await AppAppearanceSettings.shared.load();
         const OrchestrationBootstrapper().bootstrap(
           content: ContentService.shared,
           store: CompetencyStore(db),

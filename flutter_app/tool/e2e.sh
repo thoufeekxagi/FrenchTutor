@@ -30,6 +30,7 @@ flutter drive \
   -d "$DEVICE" \
   --no-pub \
   ${DEFINE_ARGS[@]+"${DEFINE_ARGS[@]}"} \
+  ${E2E_DEFINES:-} \
   > artifacts/e2e/run.log 2>&1 &
 PID=$!
 

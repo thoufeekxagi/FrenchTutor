@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'design/app_theme.dart';
 import 'models/pilot_access.dart';
+import 'providers/appearance_provider.dart';
 import 'providers/database_provider.dart';
 import 'screens/auth/speak_auth_screen.dart';
 import 'screens/auth/password_recovery_screen.dart';
@@ -23,15 +24,16 @@ class FrenchTutorApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final dark = ref.watch(appearanceSettingsProvider).darkMode;
     return MaterialApp(
+      // Keyed by mode so the whole tree rebuilds with the new palette:
+      // DesignTokens reads the mode statically, not through Theme.of.
+      key: ValueKey('app.appearance.${dark ? 'dark' : 'light'}'),
       title: 'ParleSprint',
       debugShowCheckedModeBanner: false,
-      // The product palette is intentionally dark-only for this release. The
-      // appearance preference remains available as a compatibility service,
-      // but there is no user-facing mode switch.
-      theme: AppTheme.themeData(darkMode: true),
+      theme: AppTheme.themeData(darkMode: false),
       darkTheme: AppTheme.themeData(darkMode: true),
-      themeMode: ThemeMode.dark,
+      themeMode: dark ? ThemeMode.dark : ThemeMode.light,
       scrollBehavior: const AppScrollBehavior(),
       home: const AuthGate(),
     );

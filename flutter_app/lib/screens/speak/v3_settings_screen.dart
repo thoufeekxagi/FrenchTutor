@@ -9,7 +9,9 @@ import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
+import '../../providers/appearance_provider.dart';
 import '../../providers/database_provider.dart';
+import '../../services/app_appearance_settings.dart';
 import '../../services/auth_service.dart';
 import '../../services/revenue_cat_service.dart';
 import '../../widgets/adaptive/adaptive.dart';
@@ -253,6 +255,22 @@ class _V3SettingsScreenState extends ConsumerState<V3SettingsScreen> {
           const SizedBox(height: 20),
           V3SectionLabel('Preferences'),
           const SizedBox(height: 9),
+          Semantics(
+            container: true,
+            label: 'Dark mode',
+            toggled: ref.watch(appearanceSettingsProvider).darkMode,
+            child: KeyedSubtree(
+              key: const ValueKey('settings.darkMode'),
+              child: _toggleRow(
+                Icons.dark_mode_outlined,
+                'Dark mode',
+                'Black background instead of light',
+                ref.watch(appearanceSettingsProvider).darkMode,
+                (value) => AppAppearanceSettings.shared.setDarkMode(value),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           _toggleRow(
             Icons.notifications_none_rounded,
             'Daily reminder',
