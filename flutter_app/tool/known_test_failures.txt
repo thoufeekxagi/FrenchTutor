@@ -1,0 +1,11 @@
+test/competency_graph_test.dart: Competency graph persists and restores the framework through current migrations
+test/confident_momentum_contract_test.dart: active tokens match the Northstar Studio contract
+test/evidence_store_test.dart: EvidenceStore runs forward-only migrations once
+test/story_reader_screen_test.dart: renders the continuous story reader with shared settings
+test/vocabulary_flashcards_test.dart: starter vocabulary is five story sets of five linked words
+test/vocabulary_flashcards_test.dart: teaches one word and reveals its sentence after repeat
+test/vocabulary_home_test.dart: vocabulary home exposes five story-set tiles
+test/widget_test.dart: completed speaking result reports real evidence
+test/widget_test.dart: full funnel: welcome → questions → preparing → free trial → sign-in gate
+test/widget_test.dart: short speaking result does not claim completion
+test/writing_course_v2_test.dart: writing home exposes five cards per mode in light and dark

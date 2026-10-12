@@ -1,0 +1,34 @@
+error|Missing concrete implementations of 'AudioStreamingService.preparePlayback', 'getter AudioStreamingService.isAwaitingTutorResponse', and 'setter AudioStreamingService.isAwaitingTutorResponse'. Try implementing the missing methods, or make the class abstract|lib/services/audio_streaming_service_web.dart|non_abstract_class_inherits_abstract_member
+warning|The declaration '_accountRow' isn't referenced. Try removing the declaration of '_accountRow'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_actualStudySeconds' isn't referenced. Try removing the declaration of '_actualStudySeconds'|lib/screens/speak/speak_profile_screen.dart|unused_element
+warning|The declaration '_chooseLanguage' isn't referenced. Try removing the declaration of '_chooseLanguage'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_chooseTutor' isn't referenced. Try removing the declaration of '_chooseTutor'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_confirmDeleteAccount' isn't referenced. Try removing the declaration of '_confirmDeleteAccount'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_confirmSignOut' isn't referenced. Try removing the declaration of '_confirmSignOut'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_deletionLabel' isn't referenced. Try removing the declaration of '_deletionLabel'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_formatStudyTime' isn't referenced. Try removing the declaration of '_formatStudyTime'|lib/screens/speak/speak_profile_screen.dart|unused_element
+warning|The declaration '_goBack' isn't referenced. Try removing the declaration of '_goBack'|lib/screens/speak/speak_profile_screen.dart|unused_element
+warning|The declaration '_membershipSubtitle' isn't referenced. Try removing the declaration of '_membershipSubtitle'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_openMembership' isn't referenced. Try removing the declaration of '_openMembership'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_openSupport' isn't referenced. Try removing the declaration of '_openSupport'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_profileRow' isn't referenced. Try removing the declaration of '_profileRow'|lib/screens/speak/speak_profile_screen.dart|unused_element
+warning|The declaration '_replayPracticeTour' isn't referenced. Try removing the declaration of '_replayPracticeTour'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_section' isn't referenced. Try removing the declaration of '_section'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The declaration '_toggleRow' isn't referenced. Try removing the declaration of '_toggleRow'|lib/screens/speak/speak_settings_screen.dart|unused_element
+warning|The value of the field '_dailyReminder' isn't used. Try removing the field, or using it|lib/screens/speak/speak_settings_screen.dart|unused_field
+warning|The value of the field '_haptics' isn't used. Try removing the field, or using it|lib/screens/speak/speak_settings_screen.dart|unused_field
+warning|The value of the field '_wifiOnly' isn't used. Try removing the field, or using it|lib/screens/speak/speak_settings_screen.dart|unused_field
+warning|Unused import: '../../design/app_router.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: '../../models/profile.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: '../../providers/database_provider.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: '../../services/auth_service.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: '../../services/learning_streak_service.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: '../history/all_history_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: '../notes/notes_review_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: '../progress/progress_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: 'french_fingerprint_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: 'speak_advanced_settings_screen.dart'. Try removing the import directive|lib/screens/speak/speak_settings_screen.dart|unused_import
+warning|Unused import: 'speak_roadmap_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: 'speak_settings_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: 'streak_calendar_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
+warning|Unused import: 'v3_settings_screen.dart'. Try removing the import directive|lib/screens/speak/speak_profile_screen.dart|unused_import
