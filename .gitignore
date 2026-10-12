@@ -42,3 +42,4 @@ server/*.db
 /flutter_app/artifacts/run_dark/
 /docs/v3/design/*.pdf
 /flutter_app/artifacts/look/
+/flutter_app/artifacts/peek/

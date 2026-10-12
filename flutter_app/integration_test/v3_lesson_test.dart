@@ -38,7 +38,12 @@ void main() {
     await prefs.setBool('dev_force_pro_unlock', true);
     await prefs.setBool('app_dark_mode_v3_choice', true);
     await prefs.setBool('app_dark_mode', false);
-    await prefs.remove('v3_completed_lessons');
+    // Mark the real lessons done so the dev sample is the next one offered.
+    await prefs.setStringList('v3_completed_lessons', [
+      's0-01',
+      'a1-u01-words-a',
+      'a1-u01-words-b',
+    ]);
 
     app.main();
 

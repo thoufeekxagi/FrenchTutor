@@ -1,0 +1,150 @@
+{
+  "id": "a1-u01-words-a",
+  "title": "Greetings and yes or no",
+  "subtitle": "Unit 1: Introduce yourself, words 1 of 2",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Saying hello",
+      "body": "French has more than one way to say hello. The right one depends on the time of day and on who you are talking to.\n\nIn this lesson you learn 5 words. You hear each one, then you use it."
+    },
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "bonjour",
+      "en": "hello, good day",
+      "sound": "bon-ZHOOR (the on is nasal)",
+      "exampleFr": "Bonjour !",
+      "exampleEn": "Hello! (morning and afternoon)"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "bonsoir",
+      "en": "good evening",
+      "sound": "bon-SWAHR",
+      "exampleFr": "Bonsoir !",
+      "exampleEn": "Good evening! (late afternoon and night)"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "salut",
+      "en": "hi (friends and family)",
+      "sound": "sa-LÜ (round your lips, like saying ee)",
+      "exampleFr": "Salut !",
+      "exampleEn": "Hi! (only with people you know well)"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "oui",
+      "en": "yes",
+      "sound": "wee",
+      "exampleFr": "Oui.",
+      "exampleEn": "Yes."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "non",
+      "en": "no",
+      "sound": "noh (nasal: do not say the n)",
+      "exampleFr": "Non.",
+      "exampleEn": "No."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this word mean?",
+      "promptFr": "bonsoir",
+      "options": [
+        "Good morning",
+        "Good evening",
+        "Goodbye"
+      ],
+      "answer": 1,
+      "explain": "Bonsoir means good evening. Use it from the late afternoon on."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which greeting is only for friends and family?",
+      "options": [
+        "bonjour",
+        "bonsoir",
+        "salut"
+      ],
+      "answer": 2,
+      "explain": "Salut is informal. With a stranger, a clinic receptionist or an official, say bonjour."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Hello in Canada",
+      "body": "In Canada you will also hear allô as a casual hello, especially on the phone.\n\nIn Québec shops, people often say bonjour when you leave as well. It is a friendly goodbye, so do not be surprised.",
+      "examples": [
+        {
+          "fr": "allô",
+          "en": "hello (casual, on the phone)"
+        },
+        {
+          "fr": "bonjour",
+          "en": "hello, and a friendly goodbye in a Québec shop"
+        }
+      ]
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Bonsoir.",
+      "question": "Which greeting did you hear?",
+      "options": [
+        "Bonjour",
+        "Bonsoir",
+        "Salut"
+      ],
+      "answer": 1,
+      "explain": "Bonsoir ends with the sound swahr: bon-SWAHR."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Non.",
+      "question": "Did you hear yes or no?",
+      "options": [
+        "Yes",
+        "No"
+      ],
+      "answer": 1,
+      "explain": "Non sounds like noh, with a nasal o. Oui sounds like wee."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the French word for yes.",
+      "options": [
+        "oui",
+        "non",
+        "salut"
+      ],
+      "answer": 0,
+      "explain": "Oui means yes. You say wee."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour !",
+      "en": "Hello!",
+      "tip": "Both syllables are even: bon-JOUR. Say it as if you were walking into a shop."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Next: your name",
+      "body": "In the next lesson you learn the words nom, prénom, français, anglais and Canada. You will need them to fill in forms and to say who you are."
+    }
+  ]
+}

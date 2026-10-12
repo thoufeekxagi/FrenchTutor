@@ -1,0 +1,160 @@
+{
+  "id": "s0-01",
+  "title": "How French works",
+  "subtitle": "Spelling, silent letters and rhythm",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "French is not read like English",
+      "body": "French uses the same letters as English, but they often make different sounds.\n\nThe good news: French spelling follows rules, and the rules are very regular. In this course you learn them one at a time.\n\nYou will start by hearing French, not only reading it.",
+      "examples": [
+        {
+          "fr": "hôtel",
+          "en": "hotel"
+        },
+        {
+          "fr": "restaurant",
+          "en": "restaurant"
+        },
+        {
+          "fr": "orange",
+          "en": "orange"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Most last letters are silent",
+      "body": "In French, the last letter of a word is very often not said. You see the letter, but you do not pronounce it.\n\nListen to these words and notice what you do not hear.\n\nThere are exceptions. The letters c, r, f and l are often said at the end, as in avec, bonjour, neuf and sel. You will practise them later.",
+      "examples": [
+        {
+          "fr": "petit",
+          "en": "small (the t is silent)"
+        },
+        {
+          "fr": "grand",
+          "en": "big (the d is silent)"
+        },
+        {
+          "fr": "vous",
+          "en": "you (the s is silent)"
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which letter is silent at the end of this word?",
+      "promptFr": "petit",
+      "options": [
+        "the p",
+        "the e",
+        "the t"
+      ],
+      "answer": 2,
+      "explain": "The last letter, t, is silent. You say puh-TEE."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Every syllable counts",
+      "body": "English puts a strong stress on one syllable, like PHO-to-graph. French is different: each syllable has almost the same length and force.\n\nThink of a steady beat: ta, ta, ta. The only small lift is on the last syllable of a group of words.",
+      "examples": [
+        {
+          "fr": "Canada",
+          "en": "ka-na-DA, an even beat with a small lift at the end"
+        },
+        {
+          "fr": "bonjour",
+          "en": "bon-JOUR, two even syllables"
+        },
+        {
+          "fr": "restaurant",
+          "en": "res-to-RAN, three even syllables"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "You already read French every day",
+      "body": "If you live in Canada, you see French on road signs, packages and shop doors.\n\nNow you will hear how these words really sound. Notice the silent last letters in arrêt and ouvert.",
+      "examples": [
+        {
+          "fr": "sortie",
+          "en": "exit"
+        },
+        {
+          "fr": "entrée",
+          "en": "entrance"
+        },
+        {
+          "fr": "arrêt",
+          "en": "stop"
+        },
+        {
+          "fr": "ouvert",
+          "en": "open"
+        },
+        {
+          "fr": "fermé",
+          "en": "closed"
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this word mean?",
+      "promptFr": "sortie",
+      "options": [
+        "Entrance",
+        "Exit",
+        "Closed"
+      ],
+      "answer": 1,
+      "explain": "Sortie means exit. You will see it above doors in Canada."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "arrêt",
+      "question": "What does the sign say?",
+      "options": [
+        "Exit",
+        "Stop",
+        "Open"
+      ],
+      "answer": 1,
+      "explain": "Arrêt means stop. The final t is silent, so you say a-RAY."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Complete the rule: in French, the last letter of a word is…",
+      "options": [
+        "always said",
+        "often silent",
+        "never written"
+      ],
+      "answer": 1,
+      "explain": "Often silent. So listen first, then read."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour !",
+      "en": "Hello!",
+      "tip": "Say it slowly: bon-JOUR. Keep both syllables the same length."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "What comes next",
+      "body": "Next you learn the alphabet and how to spell your name out loud. Then you learn the sounds one group at a time.\n\nYou do not need to memorise anything today. Just listen a lot, and use Ask Marie whenever a sound feels strange."
+    }
+  ]
+}

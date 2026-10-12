@@ -1,4 +1,9 @@
 {
   "version": 1,
-  "lessons": ["dev_sample.json"]
+  "lessons": [
+    "s0-01.json",
+    "a1-u01-words-a.json",
+    "a1-u01-words-b.json",
+    "dev_sample.json"
+  ]
 }
