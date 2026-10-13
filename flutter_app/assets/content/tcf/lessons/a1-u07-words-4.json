@@ -1,0 +1,229 @@
+{
+  "id": "a1-u07-words-4",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Words: drinks and serving sizes",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "l'eau (f.)",
+      "en": "water",
+      "say": "l'eau",
+      "sound": "loh",
+      "exampleFr": "Je demande de l'eau.",
+      "exampleEn": "I ask for water."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'eau gazeuse (f.)",
+      "en": "sparkling water",
+      "say": "l'eau gazeuse",
+      "sound": "loh gah-ZUHZ",
+      "exampleFr": "Je demande de l'eau gazeuse.",
+      "exampleEn": "I ask for sparkling water."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le jus",
+      "en": "juice",
+      "sound": "luh zhü",
+      "exampleFr": "Je demande du jus.",
+      "exampleEn": "I ask for juice."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la limonade",
+      "en": "lemonade",
+      "sound": "lah lee-moh-NAHD",
+      "exampleFr": "Je demande une limonade.",
+      "exampleEn": "I ask for a lemonade."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le thé",
+      "en": "tea",
+      "sound": "luh tay",
+      "exampleFr": "Je demande du thé.",
+      "exampleEn": "I ask for tea."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le chocolat chaud",
+      "en": "hot chocolate",
+      "sound": "luh shoh-koh-LAH shoh",
+      "exampleFr": "Je demande un chocolat chaud.",
+      "exampleEn": "I ask for a hot chocolate."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "la boisson",
+      "en": "drink, beverage",
+      "sound": "lah bwah-SOH(N)",
+      "exampleFr": "L'eau est une boisson.",
+      "exampleEn": "Water is a drink."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le verre",
+      "en": "glass",
+      "sound": "luh vehr",
+      "exampleFr": "Je demande un verre d'eau.",
+      "exampleEn": "I ask for a glass of water."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la bouteille",
+      "en": "bottle",
+      "sound": "lah boo-TAY",
+      "exampleFr": "Je demande une bouteille d'eau.",
+      "exampleEn": "I ask for a bottle of water."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "la tasse",
+      "en": "cup, mug",
+      "sound": "lah tahs",
+      "exampleFr": "Je demande une tasse de thé.",
+      "exampleEn": "I ask for a cup of tea."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "boire",
+      "en": "to drink",
+      "sound": "bwahr",
+      "exampleFr": "Je peux boire de l'eau.",
+      "exampleEn": "I can drink water."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "l'eau (f.)",
+      "options": [
+        "lemonade",
+        "water",
+        "drink, beverage",
+        "cup, mug"
+      ],
+      "answer": 1,
+      "explain": "l'eau (f.) means water."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "l'eau gazeuse (f.)",
+      "options": [
+        "tea",
+        "glass",
+        "to drink",
+        "sparkling water"
+      ],
+      "answer": 3,
+      "explain": "l'eau gazeuse (f.) means sparkling water."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le jus",
+      "options": [
+        "hot chocolate",
+        "juice",
+        "bottle",
+        "water"
+      ],
+      "answer": 1,
+      "explain": "le jus means juice."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la limonade",
+      "options": [
+        "drink, beverage",
+        "cup, mug",
+        "sparkling water",
+        "lemonade"
+      ],
+      "answer": 3,
+      "explain": "la limonade means lemonade."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le thé",
+      "options": [
+        "glass",
+        "tea",
+        "to drink",
+        "juice"
+      ],
+      "answer": 1,
+      "explain": "le thé means tea."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le chocolat chaud",
+      "options": [
+        "bottle",
+        "water",
+        "lemonade",
+        "hot chocolate"
+      ],
+      "answer": 3,
+      "explain": "le chocolat chaud means hot chocolate."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "l'eau gazeuse",
+      "question": "Which word did you hear?",
+      "options": [
+        "la limonade",
+        "l'eau gazeuse",
+        "la boisson",
+        "la bouteille"
+      ],
+      "answer": 1,
+      "explain": "You heard l'eau gazeuse: sparkling water."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le thé",
+      "question": "Which word did you hear?",
+      "options": [
+        "le verre",
+        "le thé",
+        "la tasse",
+        "l'eau"
+      ],
+      "answer": 1,
+      "explain": "You heard le thé: tea."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: drinks and serving sizes",
+      "body": "You learned la carte as a payment card in Unit 5. In a restaurant, it also means the list of dishes. Context tells you which meaning is intended."
+    }
+  ]
+}

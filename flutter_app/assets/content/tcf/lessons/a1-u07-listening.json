@@ -1,0 +1,86 @@
+{
+  "id": "a1-u07-listening",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Listening practice",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je voudrais un verre d'eau gazeuse, s'il vous plaît.",
+      "question": "What drink does the person ask for?",
+      "options": [
+        "Sparkling water",
+        "Milk",
+        "Tea",
+        "Juice"
+      ],
+      "answer": 0,
+      "explain": "Eau gazeuse means sparkling water."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Au déjeuner, je mange du pain et du fromage.",
+      "question": "What does the person eat?",
+      "options": [
+        "Bread and cheese",
+        "Bread and jam",
+        "Rice and cheese",
+        "Soup and bread"
+      ],
+      "answer": 0,
+      "explain": "The person says du pain et du fromage."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le plat contient du poulet et des légumes.",
+      "question": "What is in the dish?",
+      "options": [
+        "Chicken and vegetables",
+        "Fish and rice",
+        "Ham and potatoes",
+        "Soup and pasta"
+      ],
+      "answer": 0,
+      "explain": "The dish contains poulet et légumes."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Je peux avoir une tasse de thé ?",
+      "question": "What does the person ask for?",
+      "options": [
+        "A cup of tea",
+        "A glass of water",
+        "A bottle of juice",
+        "A cup of coffee"
+      ],
+      "answer": 0,
+      "explain": "Une tasse de thé is a cup of tea."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Pour le souper, elle commande de la salade.",
+      "question": "What does she order for dinner?",
+      "options": [
+        "Salad",
+        "Soup",
+        "Pasta",
+        "A dessert"
+      ],
+      "answer": 0,
+      "explain": "She orders de la salade."
+    }
+  ]
+}

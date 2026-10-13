@@ -1,0 +1,155 @@
+{
+  "id": "a1-u07-phrases",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Phrases",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "With staff, use vous. Practise the whole line first. Then replace the food or drink and keep the polite frame."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, vous avez une table pour deux ?",
+      "en": "Hello, do you have a table for two?",
+      "tip": "Say it: boh(n)-ZHOOR voo zah-VAY ün tahbl poor duh"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je voudrais la carte, s'il vous plaît.",
+      "en": "I would like the menu, please.",
+      "tip": "Say it: zhuh voo-DREH lah kahrt seel voo PLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je voudrais du pain et du fromage.",
+      "en": "I would like bread and cheese.",
+      "tip": "Say it: zhuh voo-DREH dü pa(n) ay dü froh-MAHZH"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Pour moi, du poulet et du riz.",
+      "en": "For me, chicken and rice.",
+      "tip": "Say it: poor mwah dü poo-LEH ay dü ree"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je peux avoir un verre d'eau, s'il vous plaît ?",
+      "en": "Can I have a glass of water, please?",
+      "tip": "Say it: zhuh puh ah-VWAHR uh(n) vehr doh seel voo PLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Vous avez de l'eau gazeuse ?",
+      "en": "Do you have sparkling water?",
+      "tip": "Say it: voo zah-VAY duh loh gah-ZUHZ"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je suis végétarien. / Je suis végétarienne.",
+      "en": "I am vegetarian.",
+      "say": "Je suis végétarien., Je suis végétarienne.",
+      "tip": "Say it: zhuh swee vay-zhay-tah-RYA(N) / vay-zhay-tah-RYEN"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Je suis allergique à l'arachide.",
+      "en": "I am allergic to peanuts.",
+      "tip": "Say it: zhuh swee ah-lehr-ZHEEK ah lah-rah-SHEED"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Le plat contient de l'arachide ?",
+      "en": "Does the dish contain peanuts?",
+      "tip": "Say it: luh plah kohn-TYEN duh lah-rah-SHEED"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "L'addition, s'il vous plaît.",
+      "en": "The bill, please.",
+      "tip": "Say it: lah-dee-SYOH(N) seel voo PLEH"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Bonjour, vous avez une table pour deux ?",
+      "options": [
+        "For me, chicken and rice.",
+        "Hello, do you have a table for two?",
+        "I am vegetarian.",
+        "The bill, please."
+      ],
+      "answer": 1,
+      "explain": "Bonjour, vous avez une table pour deux ? means Hello, do you have a table for two?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je voudrais du pain et du fromage.",
+      "options": [
+        "Do you have sparkling water?",
+        "I would like bread and cheese.",
+        "Does the dish contain peanuts?",
+        "Can I have a glass of water, please?"
+      ],
+      "answer": 1,
+      "explain": "Je voudrais du pain et du fromage. means I would like bread and cheese.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je peux avoir un verre d'eau, s'il vous plaît ?",
+      "options": [
+        "I am allergic to peanuts.",
+        "Can I have a glass of water, please?",
+        "Hello, do you have a table for two?",
+        "For me, chicken and rice."
+      ],
+      "answer": 1,
+      "explain": "Je peux avoir un verre d'eau, s'il vous plaît ? means Can I have a glass of water, please?."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis végétarien. / Je suis végétarienne.",
+      "options": [
+        "The bill, please.",
+        "I am vegetarian.",
+        "I would like bread and cheese.",
+        "Do you have sparkling water?"
+      ],
+      "answer": 1,
+      "explain": "Je suis végétarien. / Je suis végétarienne. means I am vegetarian.."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Tip",
+      "body": "Je voudrais... is a useful, polite default. Je veux... means “I want”; it is correct, but can sound more direct as an order. Je peux avoir... ? is another natural way to ask."
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "a1-u07-write-speak",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Write and speak",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a short restaurant message",
+      "body": "Write 3 or 4 short lines. Greet the server, order one food and one drink, and ask politely. If you have an allergy, state it clearly.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour. Je voudrais du poulet et du riz, s'il vous plaît. Je peux avoir un verre d'eau ? Merci.\n\nCheck:\n• Use je voudrais for a polite order.\n• Choose du, de la, de l' or des for an amount of food.\n• Use s'il vous plaît and check that the order is clear."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: At a restaurant",
+      "body": "Role-play ordering with a server. Ask for the menu, choose a dish and drink, then ask one ingredient question. If you have an allergy, say what it is and ask the server to check.\n\n• Use vous with the server.\n• Say je voudrais smoothly as one polite phrase.\n• Repeat the ingredient name if the server does not understand."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Je voudrais la carte, s'il vous plaît. Je voudrais du poisson avec des légumes et un verre d'eau. Le plat contient de l'arachide ? Merci.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

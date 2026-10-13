@@ -1,0 +1,80 @@
+{
+  "id": "a1-u07-reading",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Reading practice",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which drink comes with this breakfast?",
+      "options": [
+        "Tea",
+        "Milk",
+        "Juice",
+        "Water"
+      ],
+      "answer": 0,
+      "explain": "The menu lists du thé.",
+      "promptFr": "DÉJEUNER · Gruau, fruit et thé · 9,50 $"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What comes with the chicken?",
+      "options": [
+        "Rice and vegetables",
+        "Soup and fries",
+        "Bread and cheese",
+        "Pasta and salad"
+      ],
+      "answer": 0,
+      "explain": "The line says poulet, riz et légumes.",
+      "promptFr": "DÎNER · Soupe du jour · Poulet, riz et légumes · 12,50 $"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should the customer tell the staff?",
+      "options": [
+        "They have a peanut allergy",
+        "They want a table for four",
+        "They would like a dessert",
+        "They need the bill"
+      ],
+      "answer": 0,
+      "explain": "The message says the person is allergic to peanuts.",
+      "promptFr": "MESSAGE · Je suis allergique à l'arachide. Merci de vérifier avec la cuisine."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which drink costs 3,00 $?",
+      "options": [
+        "Sparkling water",
+        "Still water",
+        "Juice",
+        "Tea"
+      ],
+      "answer": 0,
+      "explain": "Eau gazeuse costs 3,00 $.",
+      "promptFr": "BOISSONS · Eau 2,00 $ · Eau gazeuse 3,00 $ · Jus 3,50 $"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "When is dinner served?",
+      "options": [
+        "Monday to Friday, 5 p.m. to 9 p.m.",
+        "Monday to Friday, 7 a.m. to 9 a.m.",
+        "Saturday and Sunday, 5 p.m. to 9 p.m.",
+        "Monday to Friday, noon to 1 p.m."
+      ],
+      "answer": 0,
+      "explain": "The notice gives weekdays from 17 h to 21 h.",
+      "promptFr": "SOUPER · Du lundi au vendredi : 17 h à 21 h"
+    }
+  ]
+}

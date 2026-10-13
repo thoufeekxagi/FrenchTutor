@@ -1,0 +1,218 @@
+{
+  "id": "a1-u07-words-1",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Words: meals and mealtimes",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le déjeuner",
+      "en": "breakfast in Québec and much of French-speaking Canada; lunch in France",
+      "sound": "luh day-zhuh-NAY",
+      "exampleFr": "Le déjeuner est à huit heures.",
+      "exampleEn": "Breakfast is at eight o'clock in Québec."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le dîner",
+      "en": "lunch in Québec and much of French-speaking Canada; dinner in France",
+      "sound": "luh dee-NAY",
+      "exampleFr": "Le dîner est à midi.",
+      "exampleEn": "Lunch is at noon in Québec."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le souper",
+      "en": "dinner, the evening meal in Québec and much of French-speaking Canada",
+      "sound": "luh soo-PAY",
+      "exampleFr": "Le souper est à dix-huit heures.",
+      "exampleEn": "Dinner is at six p.m. in Québec."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le petit-déjeuner",
+      "en": "breakfast (usual word in France)",
+      "sound": "luh puh-tee day-zhuh-NAY",
+      "exampleFr": "Le petit-déjeuner est le matin.",
+      "exampleEn": "Breakfast is in the morning."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le repas",
+      "en": "meal",
+      "sound": "luh ruh-PAH",
+      "exampleFr": "Le repas est à midi.",
+      "exampleEn": "The meal is at noon."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la collation",
+      "en": "snack, small food between meals",
+      "sound": "lah koh-lah-SYOH(N)",
+      "exampleFr": "La collation est à trois heures.",
+      "exampleEn": "The snack is at three o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le plat",
+      "en": "dish; plate of food",
+      "sound": "luh plah",
+      "exampleFr": "Le plat est très bon.",
+      "exampleEn": "The dish is very good."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le dessert",
+      "en": "dessert",
+      "sound": "luh day-SEHR",
+      "exampleFr": "Le dessert est très bon.",
+      "exampleEn": "The dessert is very good."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le menu",
+      "en": "set meal; menu",
+      "sound": "luh muh-NÜ",
+      "exampleFr": "Le menu est ici.",
+      "exampleEn": "The menu is here."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "la faim",
+      "en": "hunger",
+      "sound": "lah fa(n)",
+      "exampleFr": "J'ai faim.",
+      "exampleEn": "I am hungry."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le déjeuner",
+      "options": [
+        "dish; plate of food",
+        "breakfast in Québec and much of French-speaking Canada; lunch in France",
+        "hunger",
+        "snack, small food between meals"
+      ],
+      "answer": 1,
+      "explain": "le déjeuner means breakfast in Québec and much of French-speaking Canada; lunch in France."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le dîner",
+      "options": [
+        "meal",
+        "dessert",
+        "dish; plate of food",
+        "lunch in Québec and much of French-speaking Canada; dinner in France"
+      ],
+      "answer": 3,
+      "explain": "le dîner means lunch in Québec and much of French-speaking Canada; dinner in France."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le souper",
+      "options": [
+        "snack, small food between meals",
+        "dinner, the evening meal in Québec and much of French-speaking Canada",
+        "dessert",
+        "breakfast (usual word in France)"
+      ],
+      "answer": 1,
+      "explain": "le souper means dinner, the evening meal in Québec and much of French-speaking Canada."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le petit-déjeuner",
+      "options": [
+        "dish; plate of food",
+        "hunger",
+        "dinner, the evening meal in Québec and much of French-speaking Canada",
+        "breakfast (usual word in France)"
+      ],
+      "answer": 3,
+      "explain": "le petit-déjeuner means breakfast (usual word in France)."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le repas",
+      "options": [
+        "dessert",
+        "meal",
+        "breakfast in Québec and much of French-speaking Canada; lunch in France",
+        "breakfast (usual word in France)"
+      ],
+      "answer": 1,
+      "explain": "le repas means meal."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la collation",
+      "options": [
+        "set meal; menu",
+        "lunch in Québec and much of French-speaking Canada; dinner in France",
+        "meal",
+        "snack, small food between meals"
+      ],
+      "answer": 3,
+      "explain": "la collation means snack, small food between meals."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le dîner",
+      "question": "Which word did you hear?",
+      "options": [
+        "le petit-déjeuner",
+        "le dîner",
+        "la collation",
+        "le dessert"
+      ],
+      "answer": 1,
+      "explain": "You heard le dîner: lunch in Québec and much of French-speaking Canada; dinner in France."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le repas",
+      "question": "Which word did you hear?",
+      "options": [
+        "le plat",
+        "le repas",
+        "le menu",
+        "le déjeuner"
+      ],
+      "answer": 1,
+      "explain": "You heard le repas: meal."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "Use the time and the place to make the meal clear: le dîner à midi; le souper à 18 h. In this course, the Québec/Canadian meal names are the main forms to recognize and use in a Canadian setting. The words vary by region, so listen for the local meaning."
+    }
+  ]
+}

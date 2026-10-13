@@ -1,0 +1,214 @@
+{
+  "id": "a1-u07-words-2",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Words: breakfast and simple foods",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la tartine",
+      "en": "slice of bread with a topping",
+      "sound": "lah tahr-TEEN",
+      "exampleFr": "Je mange une tartine.",
+      "exampleEn": "I eat a slice of bread with a topping."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le beurre",
+      "en": "butter",
+      "sound": "luh buhr",
+      "exampleFr": "Je mange du pain avec du beurre.",
+      "exampleEn": "I eat bread with butter."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la confiture",
+      "en": "jam, preserves",
+      "sound": "lah kohn-fee-TÜR",
+      "exampleFr": "Je mange du pain avec de la confiture.",
+      "exampleEn": "I eat bread with jam."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le fromage",
+      "en": "cheese",
+      "sound": "luh froh-MAHZH",
+      "exampleFr": "Je mange du fromage.",
+      "exampleEn": "I eat cheese."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "l'œuf (m.)",
+      "en": "egg",
+      "say": "l'œuf",
+      "sound": "luhf",
+      "exampleFr": "Je mange un œuf.",
+      "exampleEn": "I eat an egg."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le jambon",
+      "en": "ham",
+      "sound": "luh zhah(n)-BOH(N)",
+      "exampleFr": "Je mange du jambon.",
+      "exampleEn": "I eat ham."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le yogourt",
+      "en": "yogurt (common Canadian spelling)",
+      "sound": "luh yoh-GOOR",
+      "exampleFr": "Je mange un yogourt.",
+      "exampleEn": "I eat a yogurt."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "les céréales (f. pl.)",
+      "en": "cereal",
+      "say": "les céréales",
+      "sound": "lay say-ray-AHL",
+      "exampleFr": "Je mange des céréales le matin.",
+      "exampleEn": "I eat cereal in the morning."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le gruau",
+      "en": "oatmeal, porridge (common Canadian word)",
+      "sound": "luh grü-OH",
+      "exampleFr": "Je mange du gruau.",
+      "exampleEn": "I eat oatmeal."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "le fruit",
+      "en": "fruit",
+      "sound": "luh frwee",
+      "exampleFr": "Je mange un fruit.",
+      "exampleEn": "I eat a piece of fruit."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la tartine",
+      "options": [
+        "cheese",
+        "slice of bread with a topping",
+        "yogurt (common Canadian spelling)",
+        "fruit"
+      ],
+      "answer": 1,
+      "explain": "la tartine means slice of bread with a topping."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le beurre",
+      "options": [
+        "egg",
+        "cereal",
+        "slice of bread with a topping",
+        "butter"
+      ],
+      "answer": 3,
+      "explain": "le beurre means butter."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la confiture",
+      "options": [
+        "ham",
+        "jam, preserves",
+        "oatmeal, porridge (common Canadian word)",
+        "butter"
+      ],
+      "answer": 1,
+      "explain": "la confiture means jam, preserves."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le fromage",
+      "options": [
+        "yogurt (common Canadian spelling)",
+        "fruit",
+        "jam, preserves",
+        "cheese"
+      ],
+      "answer": 3,
+      "explain": "le fromage means cheese."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "l'œuf (m.)",
+      "options": [
+        "cereal",
+        "egg",
+        "slice of bread with a topping",
+        "cheese"
+      ],
+      "answer": 1,
+      "explain": "l'œuf (m.) means egg."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le jambon",
+      "options": [
+        "oatmeal, porridge (common Canadian word)",
+        "butter",
+        "egg",
+        "ham"
+      ],
+      "answer": 3,
+      "explain": "le jambon means ham."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le beurre",
+      "question": "Which word did you hear?",
+      "options": [
+        "le fromage",
+        "le beurre",
+        "le jambon",
+        "les céréales"
+      ],
+      "answer": 1,
+      "explain": "You heard le beurre: butter."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "l'œuf",
+      "question": "Which word did you hear?",
+      "options": [
+        "le yogourt",
+        "l'œuf",
+        "le gruau",
+        "la tartine"
+      ],
+      "answer": 1,
+      "explain": "You heard l'œuf: egg."
+    }
+  ]
+}

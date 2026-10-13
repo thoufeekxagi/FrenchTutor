@@ -1,0 +1,240 @@
+{
+  "id": "a1-u07-words-3",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Words: dishes and ingredient questions",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le poulet",
+      "en": "chicken",
+      "sound": "luh poo-LEH",
+      "exampleFr": "Je mange du poulet.",
+      "exampleEn": "I eat chicken."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le poisson",
+      "en": "fish",
+      "sound": "luh pwah-SOH(N)",
+      "exampleFr": "Je mange du poisson.",
+      "exampleEn": "I eat fish."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la viande",
+      "en": "meat",
+      "sound": "lah vee-AH(N)d",
+      "exampleFr": "Je mange de la viande.",
+      "exampleEn": "I eat meat."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le riz",
+      "en": "rice",
+      "sound": "luh ree",
+      "exampleFr": "Je mange du riz.",
+      "exampleEn": "I eat rice."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "les pâtes (f. pl.)",
+      "en": "pasta",
+      "say": "les pâtes",
+      "sound": "lay paht",
+      "exampleFr": "Je mange des pâtes.",
+      "exampleEn": "I eat pasta."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la soupe",
+      "en": "soup",
+      "sound": "lah soop",
+      "exampleFr": "Je mange de la soupe.",
+      "exampleEn": "I eat soup."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "la salade",
+      "en": "salad",
+      "sound": "lah sah-LAHD",
+      "exampleFr": "Je mange de la salade.",
+      "exampleEn": "I eat salad."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "les légumes (m. pl.)",
+      "en": "vegetables",
+      "say": "les légumes",
+      "sound": "lay lay-GÜM",
+      "exampleFr": "Je mange des légumes.",
+      "exampleEn": "I eat vegetables."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "les frites (f. pl.)",
+      "en": "French fries",
+      "say": "les frites",
+      "sound": "lay freet",
+      "exampleFr": "Je mange des frites.",
+      "exampleEn": "I eat French fries."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "les pommes de terre (f. pl.)",
+      "en": "potatoes",
+      "say": "les pommes de terre",
+      "sound": "lay pom duh tehr",
+      "exampleFr": "Je mange des pommes de terre.",
+      "exampleEn": "I eat potatoes."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "la cuisine",
+      "en": "cooking; food; kitchen",
+      "sound": "lah kwee-ZEEN",
+      "exampleFr": "La cuisine est très bonne.",
+      "exampleEn": "The food is very good."
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "vérifier",
+      "en": "to check, verify",
+      "sound": "vay-ree-FYAY",
+      "exampleFr": "Je vérifie le menu.",
+      "exampleEn": "I check the menu."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le poulet",
+      "options": [
+        "rice",
+        "chicken",
+        "salad",
+        "potatoes"
+      ],
+      "answer": 1,
+      "explain": "le poulet means chicken."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la viande",
+      "options": [
+        "soup",
+        "meat",
+        "French fries",
+        "to check, verify"
+      ],
+      "answer": 1,
+      "explain": "la viande means meat."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "les pâtes (f. pl.)",
+      "options": [
+        "vegetables",
+        "pasta",
+        "cooking; food; kitchen",
+        "fish"
+      ],
+      "answer": 1,
+      "explain": "les pâtes (f. pl.) means pasta."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la salade",
+      "options": [
+        "potatoes",
+        "salad",
+        "chicken",
+        "rice"
+      ],
+      "answer": 1,
+      "explain": "la salade means salad."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "les frites (f. pl.)",
+      "options": [
+        "to check, verify",
+        "French fries",
+        "meat",
+        "soup"
+      ],
+      "answer": 1,
+      "explain": "les frites (f. pl.) means French fries."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la cuisine",
+      "options": [
+        "fish",
+        "cooking; food; kitchen",
+        "pasta",
+        "vegetables"
+      ],
+      "answer": 1,
+      "explain": "la cuisine means cooking; food; kitchen."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le poisson",
+      "question": "Which word did you hear?",
+      "options": [
+        "le riz",
+        "le poisson",
+        "la soupe",
+        "les légumes"
+      ],
+      "answer": 1,
+      "explain": "You heard le poisson: fish."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "les pâtes",
+      "question": "Which word did you hear?",
+      "options": [
+        "la salade",
+        "les pâtes",
+        "les frites",
+        "vérifier"
+      ],
+      "answer": 1,
+      "explain": "You heard les pâtes: pasta."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Watch out",
+      "body": "The French sound guide is only a first approximation. Listen to the speaker in the app, especially for the nasal sounds in pain, jambon and poisson. The final consonant in riz is silent."
+    }
+  ]
+}

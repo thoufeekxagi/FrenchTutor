@@ -1,0 +1,150 @@
+{
+  "id": "a1-u07-dialogues",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Dialogues",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "The customer and staff use vous. Read once for the situation, then listen and repeat a full line at a time. Pay attention to how a polite request sounds."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Lunch in Montréal",
+      "body": "Léa and Sam order at a restaurant. They are colleagues and use vous with the server.",
+      "examples": [
+        {
+          "fr": "Bonjour. Vous êtes deux ?",
+          "en": "Serveuse: Hello. Are there two of you?"
+        },
+        {
+          "fr": "Oui, une table pour deux, s'il vous plaît.",
+          "en": "Léa: Yes, a table for two, please."
+        },
+        {
+          "fr": "Voici la carte.",
+          "en": "Serveuse: Here is the menu."
+        },
+        {
+          "fr": "Je voudrais de la soupe et du pain.",
+          "en": "Léa: I would like soup and bread."
+        },
+        {
+          "fr": "Pour moi, du poulet et du riz.",
+          "en": "Sam: For me, chicken and rice."
+        },
+        {
+          "fr": "Et à boire ?",
+          "en": "Serveuse: And to drink?"
+        },
+        {
+          "fr": "Je peux avoir un verre d'eau, s'il vous plaît ?",
+          "en": "Sam: Can I have a glass of water, please?"
+        },
+        {
+          "fr": "Bien sûr. Voilà.",
+          "en": "Serveuse: Of course. Here you are."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Checking an ingredient",
+      "body": "Nadia needs to ask clearly about an allergy. The dish is imaginary; the server checks with the kitchen.",
+      "examples": [
+        {
+          "fr": "Je suis allergique à l'arachide.",
+          "en": "Nadia: I am allergic to peanuts."
+        },
+        {
+          "fr": "La soupe contient de l'arachide ?",
+          "en": "Nadia: Does the soup contain peanuts?"
+        },
+        {
+          "fr": "Je vérifie avec la cuisine.",
+          "en": "Serveuse: I will check with the kitchen."
+        },
+        {
+          "fr": "Merci.",
+          "en": "Nadia: Thank you."
+        },
+        {
+          "fr": "La soupe est sans arachide.",
+          "en": "Serveuse: The soup is peanut-free."
+        },
+        {
+          "fr": "Merci. Je voudrais du riz et du poulet.",
+          "en": "Nadia: Thank you. I would like rice and chicken."
+        },
+        {
+          "fr": "Oui, bien sûr.",
+          "en": "Serveuse: Yes, of course."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "In Canada",
+      "body": "For a real allergy, say exactly what you are allergic to and ask staff to check ingredients and food preparation. The answer in this practice dialogue is about an imaginary dish; it does not guarantee that a real meal is safe."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does Léa order?",
+      "options": [
+        "Soup and bread",
+        "Fish and rice",
+        "Pasta and salad",
+        "A sandwich and fries"
+      ],
+      "answer": 0,
+      "explain": "Léa asks for de la soupe et du pain."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does Sam ask for to drink?",
+      "options": [
+        "A glass of water",
+        "A cup of tea",
+        "A bottle of milk",
+        "A glass of juice"
+      ],
+      "answer": 0,
+      "explain": "He asks for un verre d'eau."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does Nadia ask the server to check?",
+      "options": [
+        "Whether the soup contains peanuts",
+        "Whether the restaurant is open",
+        "Whether the table is free",
+        "Whether the bill is correct"
+      ],
+      "answer": 0,
+      "explain": "She asks whether the soup contains arachide."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Nadia order after the check?",
+      "options": [
+        "Rice and chicken",
+        "Soup and bread",
+        "Cheese and fruit",
+        "Fish and vegetables"
+      ],
+      "answer": 0,
+      "explain": "She asks for du riz et du poulet."
+    }
+  ]
+}

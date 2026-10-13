@@ -1,0 +1,210 @@
+{
+  "id": "a1-diner-montreal",
+  "title": "Le dîner à Montréal",
+  "titleEn": "Lunch in Montréal",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Nadia orders lunch at a Montréal restaurant and pays by card.",
+  "unit": "a1-u07",
+  "sentences": [
+    {
+      "fr": "Au dîner, Nadia est au restaurant à Montréal.",
+      "en": "At lunch, Nadia is at a restaurant in Montréal.",
+      "note": "In this Montréal scene, au dîner means at lunch. In France, dîner usually means the evening meal."
+    },
+    {
+      "fr": "La carte est sur la table.",
+      "en": "The menu is on the table."
+    },
+    {
+      "fr": "Nadia veut du poulet avec des légumes.",
+      "en": "Nadia wants chicken with vegetables."
+    },
+    {
+      "fr": "Elle demande de l'eau.",
+      "en": "She asks for water."
+    },
+    {
+      "fr": "La serveuse apporte le plat.",
+      "en": "The server brings the dish."
+    },
+    {
+      "fr": "Nadia dit : « C'est très bon ! »",
+      "en": "Nadia says, “It is very good!”"
+    },
+    {
+      "fr": "Nadia demande l'addition.",
+      "en": "Nadia asks for the bill."
+    },
+    {
+      "fr": "Elle paie par carte.",
+      "en": "She pays by card."
+    }
+  ],
+  "words": {
+    "au": {
+      "en": "at the; at (à + le)"
+    },
+    "dîner": {
+      "en": "lunch in Québec and much of French-speaking Canada; dinner in France"
+    },
+    "nadia": {
+      "en": "Nadia (a woman's name)"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "restaurant": {
+      "en": "restaurant",
+      "sound": "rehs-toh-RAH(N)"
+    },
+    "à": {
+      "en": "in, at, to"
+    },
+    "montréal": {
+      "en": "Montréal"
+    },
+    "la": {
+      "en": "the"
+    },
+    "carte": {
+      "en": "card",
+      "pos": "noun, feminine"
+    },
+    "sur": {
+      "en": "on"
+    },
+    "table": {
+      "en": "table",
+      "pos": "noun, feminine"
+    },
+    "veut": {
+      "en": "wants (vouloir)",
+      "pos": "verb",
+      "sound": "vø"
+    },
+    "du": {
+      "en": "some (partitive form); of the (de + le)"
+    },
+    "poulet": {
+      "en": "chicken"
+    },
+    "avec": {
+      "en": "with"
+    },
+    "des": {
+      "en": "some; of the (de + les)"
+    },
+    "légumes": {
+      "en": "vegetables",
+      "pos": "noun, masculine plural",
+      "sound": "lay-GÜM"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "demande": {
+      "en": "asks for (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d"
+    },
+    "de": {
+      "en": "of; some (partitive form)"
+    },
+    "l'eau": {
+      "en": "the water",
+      "pos": "noun, feminine"
+    },
+    "serveuse": {
+      "en": "server, waitress",
+      "pos": "noun, feminine",
+      "sound": "sehr-VUHZ"
+    },
+    "apporte": {
+      "en": "brings (apporter)",
+      "pos": "verb",
+      "sound": "ah-POHRT"
+    },
+    "le": {
+      "en": "the"
+    },
+    "plat": {
+      "en": "dish",
+      "pos": "noun, masculine"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "c'est": {
+      "en": "it is, that is"
+    },
+    "très": {
+      "en": "very"
+    },
+    "bon": {
+      "en": "good, tasty",
+      "pos": "adjective",
+      "sound": "boh(n)"
+    },
+    "l'addition": {
+      "en": "bill, check at a restaurant",
+      "sound": "lah-dee-SYOH(N)"
+    },
+    "paie": {
+      "en": "pays (payer)",
+      "pos": "verb",
+      "sound": "peh"
+    },
+    "par": {
+      "en": "by"
+    }
+  },
+  "keywords": [
+    "dîner",
+    "restaurant",
+    "carte",
+    "poulet",
+    "légumes",
+    "l'eau",
+    "serveuse",
+    "l'addition"
+  ],
+  "quiz": [
+    {
+      "prompt": "What time of day is this meal in Montréal?",
+      "options": [
+        "Morning",
+        "Midday",
+        "Evening",
+        "Late at night"
+      ],
+      "answer": 1,
+      "explain": "In this Canadian context, dîner is the midday meal."
+    },
+    {
+      "prompt": "What does Nadia want?",
+      "options": [
+        "Chicken with vegetables",
+        "Fish with rice",
+        "Soup with bread",
+        "Pasta with cheese"
+      ],
+      "answer": 0,
+      "explain": "Nadia veut du poulet avec des légumes."
+    },
+    {
+      "prompt": "How does Nadia pay?",
+      "options": [
+        "By card",
+        "In cash",
+        "By transfer",
+        "She does not pay"
+      ],
+      "answer": 0,
+      "explain": "Elle paie par carte."
+    }
+  ]
+}

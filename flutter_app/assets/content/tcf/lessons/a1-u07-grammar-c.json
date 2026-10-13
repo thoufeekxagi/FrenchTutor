@@ -1,0 +1,167 @@
+{
+  "id": "a1-u07-grammar-c",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Grammar: Want, can, and would like",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Want, can, and would like",
+      "body": "Vouloir means “to want”; pouvoir means “can” or “to be able to.” Put the second verb in its infinitive form after them: je peux commander. For an order, je voudrais is the softer, more polite form of “I would like.” Learn it as a useful phrase; you do not need to build the whole conditional tense now."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Present tense",
+      "headers": [
+        "Person",
+        "vouloir: want",
+        "pouvoir: can"
+      ],
+      "rows": [
+        [
+          "je",
+          "je veux",
+          "je peux"
+        ],
+        [
+          "tu",
+          "tu veux",
+          "tu peux"
+        ],
+        [
+          "il / elle / on",
+          "il veut / elle veut / on veut",
+          "il peut / elle peut / on peut"
+        ],
+        [
+          "nous",
+          "nous voulons",
+          "nous pouvons"
+        ],
+        [
+          "vous",
+          "vous voulez",
+          "vous pouvez"
+        ],
+        [
+          "ils / elles",
+          "ils veulent / elles veulent",
+          "ils peuvent / elles peuvent"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Want, can, and would like",
+      "headers": [
+        "Frame",
+        "Example",
+        "Use"
+      ],
+      "rows": [
+        [
+          "Je voudrais + noun",
+          "Je voudrais du riz.",
+          "A polite order"
+        ],
+        [
+          "Je voudrais + infinitive",
+          "Je voudrais commander.",
+          "A polite action"
+        ],
+        [
+          "Je peux + infinitive",
+          "Je peux payer par carte.",
+          "Ability or possibility"
+        ],
+        [
+          "Je peux avoir... ?",
+          "Je peux avoir de l'eau ?",
+          "A simple request"
+        ],
+        [
+          "Vous pouvez + infinitive ?",
+          "Vous pouvez vérifier ?",
+          "A polite question to staff"
+        ]
+      ],
+      "hear": 1
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "The first forms je veux and je peux sound alike at the end: veux and peux both sound like vø / pø. In ils veulent and ils peuvent, the final -ent is silent."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Use the right form of vouloir or pouvoir.  Je ___ du poulet, s'il vous plaît. (would like)",
+      "options": [
+        "pouvez",
+        "voulons",
+        "peux",
+        "voudrais"
+      ],
+      "answer": 3,
+      "explain": "The answer is voudrais."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Use the right form of vouloir or pouvoir.  Vous ___ vérifier avec la cuisine ? (can)",
+      "options": [
+        "voudrais",
+        "voulons",
+        "peux",
+        "pouvez"
+      ],
+      "answer": 3,
+      "explain": "The answer is pouvez."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Use the right form of vouloir or pouvoir.  Nous ___ une table pour deux. (want)",
+      "options": [
+        "voudrais",
+        "pouvez",
+        "peux",
+        "voulons"
+      ],
+      "answer": 3,
+      "explain": "The answer is voulons."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Use the right form of vouloir or pouvoir.  Je ___ commander. (can)",
+      "options": [
+        "voudrais",
+        "pouvez",
+        "voulons",
+        "peux"
+      ],
+      "answer": 3,
+      "explain": "The answer is peux."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Use the right form of vouloir or pouvoir.  Je ___ de l'eau. (would like)",
+      "options": [
+        "pouvez",
+        "voudrais",
+        "voulons",
+        "peux"
+      ],
+      "answer": 1,
+      "explain": "The answer is voudrais."
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "id": "a1-u07-words-5",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Words: ordering at a restaurant",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le restaurant",
+      "en": "restaurant",
+      "sound": "luh rehs-toh-RAH(N)",
+      "exampleFr": "Le restaurant est ouvert.",
+      "exampleEn": "The restaurant is open."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le serveur / la serveuse",
+      "en": "waiter / server",
+      "say": "le serveur, la serveuse",
+      "sound": "luh sehr-VUHR / lah sehr-VUHZ",
+      "exampleFr": "La serveuse est ici.",
+      "exampleEn": "The server is here."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le comptoir",
+      "en": "counter",
+      "sound": "luh kohn-TWAHR",
+      "exampleFr": "Le comptoir est ici.",
+      "exampleEn": "The counter is here."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la carte",
+      "en": "menu, list of dishes",
+      "sound": "lah kahrt",
+      "exampleFr": "Je demande la carte.",
+      "exampleEn": "I ask for the menu."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "commander",
+      "en": "to order",
+      "sound": "koh-mahn-DAY",
+      "exampleFr": "Je commande du riz.",
+      "exampleEn": "I order rice."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "l'addition (f.)",
+      "en": "bill, check at a restaurant",
+      "say": "l'addition",
+      "sound": "lah-dee-SYOH(N)",
+      "exampleFr": "Je demande l'addition.",
+      "exampleEn": "I ask for the bill."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le pourboire",
+      "en": "tip, gratuity",
+      "sound": "luh poor-BWAHR",
+      "exampleFr": "Le pourboire est de deux dollars.",
+      "exampleEn": "The tip is two dollars."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "végétarien / végétarienne",
+      "en": "vegetarian",
+      "say": "végétarien, végétarienne",
+      "sound": "vay-zhay-tah-RYA(N) / vay-zhay-tah-RYEN",
+      "exampleFr": "Elle est végétarienne.",
+      "exampleEn": "She is vegetarian."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "allergique",
+      "en": "allergic",
+      "sound": "ah-lehr-ZHEEK",
+      "exampleFr": "Je suis allergique à l'arachide.",
+      "exampleEn": "I am allergic to peanuts."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "l'arachide (f.)",
+      "en": "peanut",
+      "say": "l'arachide",
+      "sound": "lah-rah-SHEED",
+      "exampleFr": "Je suis allergique à l'arachide.",
+      "exampleEn": "I am allergic to peanuts."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "apporter",
+      "en": "to bring",
+      "sound": "ah-pohr-TAY",
+      "exampleFr": "La serveuse apporte le plat.",
+      "exampleEn": "The server brings the dish."
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "sans",
+      "en": "without",
+      "sound": "sah(n)",
+      "exampleFr": "Je voudrais une soupe sans arachide.",
+      "exampleEn": "I would like a soup without peanuts."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le restaurant",
+      "options": [
+        "menu, list of dishes",
+        "restaurant",
+        "tip, gratuity",
+        "peanut"
+      ],
+      "answer": 1,
+      "explain": "le restaurant means restaurant."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le comptoir",
+      "options": [
+        "bill, check at a restaurant",
+        "counter",
+        "allergic",
+        "without"
+      ],
+      "answer": 1,
+      "explain": "le comptoir means counter."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "commander",
+      "options": [
+        "vegetarian",
+        "to order",
+        "to bring",
+        "waiter / server"
+      ],
+      "answer": 1,
+      "explain": "commander means to order."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le pourboire",
+      "options": [
+        "peanut",
+        "tip, gratuity",
+        "restaurant",
+        "menu, list of dishes"
+      ],
+      "answer": 1,
+      "explain": "le pourboire means tip, gratuity."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "allergique",
+      "options": [
+        "without",
+        "allergic",
+        "counter",
+        "bill, check at a restaurant"
+      ],
+      "answer": 1,
+      "explain": "allergique means allergic."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "apporter",
+      "options": [
+        "waiter / server",
+        "to bring",
+        "to order",
+        "vegetarian"
+      ],
+      "answer": 1,
+      "explain": "apporter means to bring."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le comptoir",
+      "question": "Which word did you hear?",
+      "options": [
+        "commander",
+        "le comptoir",
+        "le pourboire",
+        "l'arachide"
+      ],
+      "answer": 1,
+      "explain": "You heard le comptoir: counter."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "l'addition",
+      "question": "Which word did you hear?",
+      "options": [
+        "allergique",
+        "l'addition",
+        "apporter",
+        "le restaurant"
+      ],
+      "answer": 1,
+      "explain": "You heard l'addition: bill, check at a restaurant."
+    }
+  ]
+}

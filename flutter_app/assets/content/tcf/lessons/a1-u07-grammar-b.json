@@ -1,0 +1,112 @@
+{
+  "id": "a1-u07-grammar-b",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Grammar: Two meanings of du and des",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Two meanings of du and des",
+      "body": "The same spelling can do two jobs. A partitive means an unspecified amount. A contraction means de + le or de + les. Use the words around it to understand the meaning."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Contraction or partitive?",
+      "headers": [
+        "Words before",
+        "Change",
+        "Example",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "de + le",
+          "du",
+          "la carte du restaurant",
+          "the menu of the restaurant"
+        ],
+        [
+          "de + les",
+          "des",
+          "le prix des boissons",
+          "the price of the drinks"
+        ],
+        [
+          "partitive + masculine noun",
+          "du",
+          "du fromage",
+          "some cheese"
+        ],
+        [
+          "partitive + plural noun",
+          "des",
+          "des pâtes",
+          "some pasta"
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Tip",
+      "body": "Ask yourself: does du/des mean of the or some here? La carte du restaurant = of the restaurant. Je mange du fromage = some cheese."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "In Je mange du fromage, what does du mean?",
+      "options": [
+        "some",
+        "of the",
+        "to the",
+        "with the"
+      ],
+      "answer": 0,
+      "explain": "Here du means some cheese."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "In la carte du restaurant, what does du mean?",
+      "options": [
+        "some",
+        "of the",
+        "to the",
+        "with the"
+      ],
+      "answer": 1,
+      "explain": "Here du joins de + le: the restaurant's menu."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "In Je commande des pâtes, what does des mean?",
+      "options": [
+        "some",
+        "of the",
+        "to the",
+        "with the"
+      ],
+      "answer": 0,
+      "explain": "Here des means some pasta."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "In le prix des boissons, what does des mean?",
+      "options": [
+        "some",
+        "of the",
+        "to the",
+        "with the"
+      ],
+      "answer": 1,
+      "explain": "Here des joins de + les: the price of the drinks."
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "id": "a1-u07-grammar-a",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Grammar: Some food or drink: du, de la, de l', des",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Some food or drink: du, de la, de l', des",
+      "body": "First choose whether you mean an amount of food or one whole item. Then choose a polite sentence frame. These two choices make a restaurant order much easier.\n\nWhen you name food without saying exactly how much, French often uses a partitive form. English often has no separate word for it: Je mange du riz means “I eat rice.”"
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Partitive forms for food and drink",
+      "headers": [
+        "Form",
+        "Use it before",
+        "Example"
+      ],
+      "rows": [
+        [
+          "du",
+          "a masculine singular noun",
+          "du pain, du poulet"
+        ],
+        [
+          "de la",
+          "a feminine singular noun",
+          "de la soupe, de la viande"
+        ],
+        [
+          "de l'",
+          "a singular noun starting with a vowel or silent h",
+          "de l'eau, de l'arachide"
+        ],
+        [
+          "des",
+          "a plural noun",
+          "des légumes, des pâtes"
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Unspecified amount or one countable item",
+      "headers": [
+        "Meaning",
+        "French"
+      ],
+      "rows": [
+        [
+          "some rice / rice",
+          "Je mange du riz."
+        ],
+        [
+          "some soup / soup",
+          "Je mange de la soupe."
+        ],
+        [
+          "some water / water",
+          "Je demande de l'eau."
+        ],
+        [
+          "some vegetables / vegetables",
+          "Je commande des légumes."
+        ],
+        [
+          "one egg",
+          "Je commande un œuf."
+        ],
+        [
+          "one bottle of water",
+          "Je demande une bouteille d'eau."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Some food or drink: du, de la, de l', des",
+      "body": "• Use du, de la, de l', des for an unspecified amount. English often leaves “some” out.\n• Use un or une when you mean one countable item: un œuf, une bouteille.\n• The noun decides the form: du riz but de la soupe. Learn each food with its article."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Watch out",
+      "body": "After a negative such as ne...pas, the form can change to de. Unit 8 teaches that pattern. For now, practise positive orders."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Complete with du, de la, de l', des, un or une.  Je mange ___ riz.",
+      "options": [
+        "de la",
+        "de l'",
+        "des",
+        "du"
+      ],
+      "answer": 3,
+      "explain": "The answer is du."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Complete with du, de la, de l', des, un or une.  Je voudrais ___ soupe.",
+      "options": [
+        "du",
+        "de l'",
+        "des",
+        "de la"
+      ],
+      "answer": 3,
+      "explain": "The answer is de la."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Complete with du, de la, de l', des, un or une.  Je demande ___ eau.",
+      "options": [
+        "de l'",
+        "du",
+        "de la",
+        "des"
+      ],
+      "answer": 0,
+      "explain": "The answer is de l'."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Complete with du, de la, de l', des, un or une.  Je commande ___ légumes.",
+      "options": [
+        "du",
+        "de la",
+        "de l'",
+        "des"
+      ],
+      "answer": 3,
+      "explain": "The answer is des."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Complete with du, de la, de l', des, un or une.  Je mange ___ œuf.",
+      "options": [
+        "du",
+        "de la",
+        "de l'",
+        "un"
+      ],
+      "answer": 3,
+      "explain": "The answer is un."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Complete with du, de la, de l', des, un or une.  Je demande ___ bouteille d'eau.",
+      "options": [
+        "du",
+        "de la",
+        "une",
+        "de l'"
+      ],
+      "answer": 2,
+      "explain": "The answer is une."
+    }
+  ]
+}

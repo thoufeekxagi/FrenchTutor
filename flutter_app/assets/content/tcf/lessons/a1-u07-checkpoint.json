@@ -1,0 +1,140 @@
+{
+  "id": "a1-u07-checkpoint",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "Checkpoint",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "In Québec, which meal is usually at noon?",
+      "options": [
+        "Le dîner",
+        "Le souper",
+        "Le petit-déjeuner",
+        "La collation"
+      ],
+      "answer": 0,
+      "explain": "In Québec, le dîner is the midday meal."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which phrase means “some soup”?",
+      "options": [
+        "de la soupe",
+        "du soupe",
+        "des soupe",
+        "une soupe"
+      ],
+      "answer": 0,
+      "explain": "Soupe is feminine, so use de la for an unspecified amount."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which phrase means “some water”?",
+      "options": [
+        "de l'eau",
+        "du eau",
+        "de la eau",
+        "des eau"
+      ],
+      "answer": 0,
+      "explain": "Before a vowel, use de l'."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which phrase means “some vegetables”?",
+      "options": [
+        "des légumes",
+        "de la légumes",
+        "du légumes",
+        "un légumes"
+      ],
+      "answer": 0,
+      "explain": "Légumes is plural, so use des."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which one means one egg?",
+      "options": [
+        "un œuf",
+        "du œuf",
+        "de la œuf",
+        "des œuf"
+      ],
+      "answer": 0,
+      "explain": "Use un for one countable masculine item."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Which request sounds most polite for ordering?",
+      "options": [
+        "Je voudrais du riz, s'il vous plaît.",
+        "Je veux riz.",
+        "Du riz tout de suite.",
+        "Donne riz."
+      ],
+      "answer": 0,
+      "explain": "Je voudrais is a polite way to say I would like."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Complete: Je ___ commander. (can)",
+      "options": [
+        "peux",
+        "peut",
+        "pouvons",
+        "pouvez"
+      ],
+      "answer": 0,
+      "explain": "With je, the present form is peux."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What does l'addition mean at a restaurant?",
+      "options": [
+        "The bill",
+        "The menu",
+        "The tip",
+        "The table"
+      ],
+      "answer": 0,
+      "explain": "L'addition is the restaurant bill."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What should you say to explain a peanut allergy?",
+      "options": [
+        "Je suis allergique à l'arachide.",
+        "Je voudrais de l'arachide.",
+        "Je commande l'arachide.",
+        "Je paie par arachide."
+      ],
+      "answer": 0,
+      "explain": "Je suis allergique à l'arachide clearly states the allergy."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "In France, which word usually means the evening meal?",
+      "options": [
+        "le dîner",
+        "le déjeuner",
+        "le petit-déjeuner",
+        "la collation"
+      ],
+      "answer": 0,
+      "explain": "In France, le dîner usually names the evening meal."
+    }
+  ]
+}

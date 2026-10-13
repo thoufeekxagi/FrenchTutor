@@ -17,6 +17,8 @@ STORY_META = {
                    keywords=["dépanneur", "lait", "pain", "taxes", "total", "carte"]),
     "a1-u06": dict(id="a1-rendez-vous", minutes=3, summary="Priya checks the date and arrives early for her clinic appointment.",
                    keywords=["calendrier", "rendez-vous", "date", "réception", "avance"]),
+    "a1-u07": dict(id="a1-diner-montreal", minutes=3, summary="Nadia orders lunch at a Montréal restaurant and pays by card.",
+                   keywords=["dîner", "restaurant", "carte", "poulet", "légumes", "l'eau", "serveuse", "l'addition"]),
 }
 
 STORY_GLOSS = {
@@ -92,5 +94,20 @@ STORY_GLOSS = {
         "date": ("date", "noun, feminine"), "réception": ("reception desk", "noun, feminine", "ray-sehp-SYOH(N)"),
         "prochain": ("next", "adjective"), "1er": ("first (of the month)", "ordinal", "pruh-MYAY"),
         "mai": ("May", "month", "may"), "10": ("ten", "number"),
+    },
+    "a1-diner-montreal": {
+        "au": ("at the; at (à + le)",), "nadia": ("Nadia (a woman's name)",),
+        "est": ("is (être)", "verb"), "à": ("in, at, to",), "montréal": ("Montréal",),
+        "le": ("the",), "sur": ("on",), "la": ("the",), "table": ("table", "noun, feminine"),
+        "veut": ("wants (vouloir)", "verb", "vø"), "avec": ("with",),
+        "du": ("some (partitive form); of the (de + le)",), "des": ("some; of the (de + les)",),
+        "elle": ("she", "pronoun"), "demande": ("asks for (demander)", "verb", "duh-MAH(N)d"),
+        "de": ("of; some (partitive form)",), "l'eau": ("the water", "noun, feminine"),
+        "légumes": ("vegetables", "noun, masculine plural", "lay-GÜM"),
+        "serveuse": ("server, waitress", "noun, feminine", "sehr-VUHZ"),
+        "apporte": ("brings (apporter)", "verb", "ah-POHRT"), "le": ("the",), "plat": ("dish", "noun, masculine"),
+        "dit": ("says (dire)", "verb"), "c'est": ("it is, that is",), "très": ("very",),
+        "bon": ("good, tasty", "adjective", "boh(n)"), "addition": ("bill, check", "noun, feminine"),
+        "paie": ("pays (payer)", "verb", "peh"), "par": ("by",), "carte": ("card", "noun, feminine"),
     },
 }

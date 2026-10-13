@@ -1,0 +1,114 @@
+{
+  "id": "a1-u07-tcf",
+  "unit": "a1-u07",
+  "unitTitle": "Eating: déjeuner, dîner, souper",
+  "title": "TCF corner",
+  "subtitle": "Unit 7: Eating: déjeuner, dîner, souper",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je voudrais du riz et du poulet, s'il vous plaît.",
+      "question": "What meal does the customer order?",
+      "options": [
+        "Rice and chicken",
+        "Soup and bread",
+        "Fish and fries",
+        "Cheese and fruit"
+      ],
+      "answer": 0,
+      "explain": "The customer asks for du riz et du poulet."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Pour le déjeuner, j'aimerais du gruau et un yogourt.",
+      "question": "What does the person eat for breakfast?",
+      "options": [
+        "Oatmeal and yogurt",
+        "Bread and cheese",
+        "Soup and salad",
+        "Chicken and rice"
+      ],
+      "answer": 0,
+      "explain": "The person says du gruau et un yogourt."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La serveuse vérifie avec la cuisine.",
+      "question": "What does the server do?",
+      "options": [
+        "Checks with the kitchen",
+        "Brings the bill",
+        "Orders a drink",
+        "Closes the restaurant"
+      ],
+      "answer": 0,
+      "explain": "She checks with the kitchen."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Je peux avoir une bouteille d'eau, s'il vous plaît ?",
+      "question": "What does the customer ask for?",
+      "options": [
+        "A bottle of water",
+        "A cup of tea",
+        "A glass of juice",
+        "A bottle of milk"
+      ],
+      "answer": 0,
+      "explain": "Une bouteille d'eau means a bottle of water."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which main dish is offered?",
+      "options": [
+        "Fish and rice",
+        "Chicken and fries",
+        "Soup and bread",
+        "Pasta and cheese"
+      ],
+      "answer": 0,
+      "explain": "The menu lists poisson et riz.",
+      "promptFr": "MENU DU DÎNER · Poisson et riz · Dessert : fruit"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How much is the juice?",
+      "options": [
+        "2,00 $",
+        "2,50 $",
+        "3,00 $",
+        "3,50 $"
+      ],
+      "answer": 2,
+      "explain": "The juice costs 3,00 $.",
+      "promptFr": "BOISSON · Thé : 2,50 $ · Jus : 3,00 $"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does the person ask for?",
+      "options": [
+        "A table for two and the menu",
+        "A table for one and the bill",
+        "A bottle of water and a dessert",
+        "A table for four and a coffee"
+      ],
+      "answer": 0,
+      "explain": "The person asks for une table pour deux and la carte.",
+      "promptFr": "MESSAGE · Bonjour. Une table pour deux, s'il vous plaît. Je voudrais la carte."
+    }
+  ]
+}
