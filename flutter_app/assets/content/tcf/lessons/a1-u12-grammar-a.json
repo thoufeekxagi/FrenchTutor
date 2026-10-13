@@ -1,0 +1,117 @@
+{
+  "id": "a1-u12-grammar-a",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Grammar: -er verbs for a work routine (review g09a and g09b)",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "-er verbs for a work routine (review g09a and g09b)",
+      "body": "This unit adds workplace words, not a new grammar rule. Bring together the present tense, simple questions and clock times you learned earlier."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Present tense of travailler",
+      "headers": [
+        "Person",
+        "travailler",
+        "Example"
+      ],
+      "rows": [
+        [
+          "je",
+          "travaille",
+          "Je travaille dans une entreprise."
+        ],
+        [
+          "tu",
+          "travailles",
+          "Tu travailles à temps partiel."
+        ],
+        [
+          "il / elle",
+          "travaille",
+          "Elle travaille au bureau."
+        ],
+        [
+          "nous",
+          "travaillons",
+          "Nous travaillons en équipe."
+        ],
+        [
+          "vous",
+          "travaillez",
+          "Vous travaillez aujourd'hui ?"
+        ],
+        [
+          "ils / elles",
+          "travaillent",
+          "Elles travaillent le matin."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "-er verbs for a work routine (review g09a and g09b)",
+      "body": "• For a routine, say the person, the verb and one detail: Je travaille le matin; je commence à huit heures.\n• The endings sound alike in many forms: je travaille, tu travailles, il travaille, ils travaillent. The subject tells you who.\n• Use nous travaillons and vous travaillez when speaking about those groups."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je ___ dans une entreprise.",
+      "options": [
+        "travaillez",
+        "travaillent",
+        "travaille",
+        "travailles"
+      ],
+      "answer": 2,
+      "explain": "With je, use travaille."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Tu ___ à temps partiel.",
+      "options": [
+        "travailles",
+        "travaillons",
+        "travaillent",
+        "travaille"
+      ],
+      "answer": 0,
+      "explain": "With tu, use travailles."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Nous ___ en équipe.",
+      "options": [
+        "travaillent",
+        "travaillez",
+        "travaille",
+        "travaillons"
+      ],
+      "answer": 3,
+      "explain": "With nous, use travaillons."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Elles ___ le matin.",
+      "options": [
+        "travaillons",
+        "travaillent",
+        "travaillez",
+        "travaille"
+      ],
+      "answer": 1,
+      "explain": "With elles, use travaillent."
+    }
+  ]
+}

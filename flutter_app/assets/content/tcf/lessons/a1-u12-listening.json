@@ -1,0 +1,86 @@
+{
+  "id": "a1-u12-listening",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Listening practice",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je travaille à temps partiel.",
+      "question": "How does the person work?",
+      "options": [
+        "On Monday only",
+        "Part-time",
+        "Full-time",
+        "At night only"
+      ],
+      "answer": 1,
+      "explain": "The speaker says à temps partiel."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La réunion commence à neuf heures.",
+      "question": "What time does the meeting start?",
+      "options": [
+        "12:00",
+        "16:00",
+        "9:00",
+        "8:00"
+      ],
+      "answer": 2,
+      "explain": "The speaker says à neuf heures."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Mon cours est au cégep.",
+      "question": "Where is the class?",
+      "options": [
+        "At a cégep",
+        "At a clinic",
+        "At a restaurant",
+        "At a bus stop"
+      ],
+      "answer": 0,
+      "explain": "The speaker says au cégep."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Je finis mon quart à seize heures.",
+      "question": "When does the shift finish?",
+      "options": [
+        "At 8 h",
+        "At 12 h",
+        "At 18 h",
+        "At 16 h"
+      ],
+      "answer": 3,
+      "explain": "Seize heures is 16 h."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "J'envoie mon CV par courriel.",
+      "question": "What does the speaker send?",
+      "options": [
+        "A diploma",
+        "A CV",
+        "A pay stub",
+        "A schedule"
+      ],
+      "answer": 1,
+      "explain": "The speaker sends mon CV."
+    }
+  ]
+}

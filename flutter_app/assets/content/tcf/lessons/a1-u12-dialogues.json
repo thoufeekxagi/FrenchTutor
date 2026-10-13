@@ -1,0 +1,144 @@
+{
+  "id": "a1-u12-dialogues",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Dialogues",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for who is speaking, what they do and the time in their schedule. The speakers use vous when they first meet and tu after they agree to use it."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Meeting the manager",
+      "body": "A new employee meets his manager on his first day.",
+      "examples": [
+        {
+          "fr": "Bonjour. Je m'appelle Sam. C'est mon premier jour.",
+          "en": "Employé: Hello. My name is Sam. It is my first day."
+        },
+        {
+          "fr": "Bonjour Sam. Je suis Karine, la gérante. Bienvenue !",
+          "en": "Karine: Hello, Sam. I am Karine, the manager. Welcome!"
+        },
+        {
+          "fr": "Merci. Je commence à huit heures ?",
+          "en": "Sam: Thank you. Do I start at eight o'clock?"
+        },
+        {
+          "fr": "Oui. Votre horaire est ici. La pause est à midi.",
+          "en": "Karine: Yes. Your schedule is here. The break is at noon."
+        },
+        {
+          "fr": "Et à quelle heure est la réunion ?",
+          "en": "Sam: And what time is the meeting?"
+        },
+        {
+          "fr": "À neuf heures. Voici votre bureau.",
+          "en": "Karine: At nine o'clock. Here is your office."
+        },
+        {
+          "fr": "Merci, madame. Je suis content d'être ici.",
+          "en": "Sam: Thank you, ma'am. I am happy to be here."
+        },
+        {
+          "fr": "Tu peux m'appeler Karine.",
+          "en": "Karine: You can call me Karine."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Talking about work and school",
+      "body": "Two coworkers discuss their jobs and studies.",
+      "examples": [
+        {
+          "fr": "Tu travailles à temps plein ?",
+          "en": "Sam: Do you work full-time?"
+        },
+        {
+          "fr": "Non, je travaille à temps partiel. J'étudie au cégep.",
+          "en": "Nadia: No, I work part-time. I study at a cégep."
+        },
+        {
+          "fr": "Quel est ton cours ?",
+          "en": "Sam: What is your class?"
+        },
+        {
+          "fr": "Un cours de français. Et toi, tu travailles où ?",
+          "en": "Nadia: A French class. And you, where do you work?"
+        },
+        {
+          "fr": "Je travaille dans une entreprise. Je finis à seize heures.",
+          "en": "Sam: I work at a company. I finish at four p.m."
+        },
+        {
+          "fr": "Moi, je finis mon cours à quinze heures.",
+          "en": "Nadia: I finish my class at three p.m."
+        },
+        {
+          "fr": "Bonne journée !",
+          "en": "Sam: Have a good day!"
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Who is Karine?",
+      "options": [
+        "Sam's sister",
+        "A job applicant",
+        "Sam's manager",
+        "Sam's teacher"
+      ],
+      "answer": 2,
+      "explain": "Karine says she is la gérante, the manager."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "At what time is the break?",
+      "options": [
+        "At noon",
+        "At eight o'clock",
+        "At nine o'clock",
+        "At four o'clock"
+      ],
+      "answer": 0,
+      "explain": "Karine says La pause est à midi."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where does Nadia study?",
+      "options": [
+        "At Sam's office",
+        "At a clinic",
+        "At the library",
+        "At a cégep"
+      ],
+      "answer": 3,
+      "explain": "Nadia says J'étudie au cégep."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What time does Sam finish work?",
+      "options": [
+        "At 8 h",
+        "At 16 h",
+        "At 15 h",
+        "At 12 h"
+      ],
+      "answer": 1,
+      "explain": "Sam says Je finis à seize heures."
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "id": "a1-u12-words-3",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Words: hours and pay",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un quart de travail",
+      "en": "a work shift",
+      "sound": "uh(n) kahr duh trah-VAHY",
+      "exampleFr": "Mon quart de travail commence à neuf heures.",
+      "exampleEn": "My work shift starts at nine o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "à temps plein",
+      "en": "full-time",
+      "sound": "ah tah(n) pla(n)",
+      "exampleFr": "Elle travaille à temps plein.",
+      "exampleEn": "She works full-time."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "à temps partiel",
+      "en": "part-time",
+      "sound": "ah tah(n) pahr-SYEL",
+      "exampleFr": "Il travaille à temps partiel.",
+      "exampleEn": "He works part-time."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un salaire",
+      "en": "a salary, pay",
+      "sound": "uh(n) sah-LEHR",
+      "exampleFr": "Le salaire est écrit dans l'offre.",
+      "exampleEn": "The pay is written in the job posting."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la paie",
+      "en": "pay, wages",
+      "sound": "lah pay",
+      "exampleFr": "La paie est le vendredi.",
+      "exampleEn": "Payday is Friday."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un talon de paie",
+      "en": "a pay stub",
+      "sound": "uh(n) tah-loh(n) duh pay",
+      "exampleFr": "Je lis mon talon de paie.",
+      "exampleEn": "I read my pay stub."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un congé",
+      "en": "a day off, leave",
+      "sound": "uh(n) kohn-ZHAY",
+      "exampleFr": "Mon congé est lundi.",
+      "exampleEn": "My day off is Monday."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "disponible",
+      "en": "available",
+      "sound": "dee-spoh-NEEBL",
+      "exampleFr": "Je suis disponible le matin.",
+      "exampleEn": "I am available in the morning."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "tôt",
+      "en": "early",
+      "sound": "toh",
+      "exampleFr": "Je commence tôt.",
+      "exampleEn": "I start early."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "tard",
+      "en": "late",
+      "sound": "tahr",
+      "exampleFr": "Je finis tard.",
+      "exampleEn": "I finish late."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un quart de travail",
+      "options": [
+        "a salary, pay",
+        "a work shift",
+        "a day off, leave",
+        "late"
+      ],
+      "answer": 1,
+      "explain": "un quart de travail means a work shift."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "à temps plein",
+      "options": [
+        "pay, wages",
+        "available",
+        "a work shift",
+        "full-time"
+      ],
+      "answer": 3,
+      "explain": "à temps plein means full-time."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "à temps partiel",
+      "options": [
+        "a pay stub",
+        "part-time",
+        "early",
+        "pay, wages"
+      ],
+      "answer": 1,
+      "explain": "à temps partiel means part-time."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un salaire",
+      "options": [
+        "a day off, leave",
+        "late",
+        "part-time",
+        "a salary, pay"
+      ],
+      "answer": 3,
+      "explain": "un salaire means a salary, pay."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la paie",
+      "options": [
+        "available",
+        "pay, wages",
+        "a work shift",
+        "a day off, leave"
+      ],
+      "answer": 1,
+      "explain": "la paie means pay, wages."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un talon de paie",
+      "options": [
+        "early",
+        "full-time",
+        "available",
+        "a pay stub"
+      ],
+      "answer": 3,
+      "explain": "un talon de paie means a pay stub."
+    }
+  ]
+}

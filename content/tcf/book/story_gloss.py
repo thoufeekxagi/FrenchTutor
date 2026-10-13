@@ -27,6 +27,8 @@ STORY_META = {
                    keywords=["annonce", "appartement", "chambre", "chauffage", "clé", "bail"]),
     "a1-u11": dict(id="a1-hiver-montreal", minutes=3, summary="Julie checks a Montréal winter forecast and walks carefully on an icy sidewalk.",
                    keywords=["tuque", "mitaines", "bottes", "manteau", "verglas", "trottoir"]),
+    "a1-u12": dict(id="a1-premier-jour", minutes=3, summary="Sam takes the bus to his first day at work and meets his manager, Karine.",
+                   keywords=["travail", "l'autobus", "bureau", "gérante", "manteau", "premier"]),
 }
 
 STORY_GLOSS = {
@@ -178,6 +180,19 @@ STORY_GLOSS = {
         "clé": ("key", "noun, feminine", "klay"), "signe": ("signs (signer)", "verb", "seen-YAY"),
         "bail": ("lease", "noun, masculine", "bahy"), "elle": ("she", "pronoun"),
         "déménage": ("moves house (déménager)", "verb", "day-may-nahzh"), "juillet": ("July", "month", "zhwee-YEH"),
+    },
+    "a1-premier-jour": {
+        "au": ("at the, to the (à + le)",), "c'est": ("it is, this is",), "de": ("of",),
+        "fait": ("is (faire, in a weather phrase)", "verb", "feh"), "froid": ("cold", "adjective", "frwah"),
+        "gérante": ("woman manager", "noun, feminine", "zhay-RAH(N)T"),
+        "heures": ("hours, o'clock", "noun, feminine plural"), "huit": ("eight", "number"),
+        "j'arrive": ("I arrive (arriver)", "verb"), "jour": ("day", "noun, masculine", "zhoor"),
+        "journée": ("day (the day as a whole)", "noun, feminine", "zhoor-NAY"),
+        "karine": ("Karine (a woman's name)",), "ma": ("my (feminine)",),
+        "mon": ("my (masculine)",), "porte": ("wear (porter)", "verb"),
+        "prends": ("take (prendre)", "verb"), "s'appelle": ("is called (s'appeler)", "verb"),
+        "sept": ("seven", "number"), "suis": ("am (être)", "verb"),
+        "travail": ("work", "noun, masculine", "tra-VAHY"), "un": ("a",), "une": ("a",),
     },
     "a1-hiver-montreal": {
         "ce": ("this",), "matin": ("morning", "noun, masculine", "mah-TA(N)"),

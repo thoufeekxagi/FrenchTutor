@@ -1,0 +1,215 @@
+{
+  "id": "a1-u12-words-1",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Words: people and places at work",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un emploi",
+      "en": "a job",
+      "sound": "uh(n) ah(n)-plwah",
+      "exampleFr": "J'ai un emploi dans une entreprise.",
+      "exampleEn": "I have a job at a company."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un métier",
+      "en": "a line of work, profession",
+      "sound": "uh(n) may-TYAY",
+      "exampleFr": "Mon métier est cuisinier.",
+      "exampleEn": "My profession is cook."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un employé / une employée",
+      "en": "an employee",
+      "say": "un employé, une employée",
+      "sound": "uh(n) ah(n)-plwah-YAY / ün ah(n)-plwah-YAYT",
+      "exampleFr": "L'employée est au bureau.",
+      "exampleEn": "The employee is at the office."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un collègue / une collègue",
+      "en": "a coworker",
+      "say": "un collègue, une collègue",
+      "sound": "uh(n) koh-LEHG / ün koh-LEHG",
+      "exampleFr": "Mon collègue est dans mon équipe.",
+      "exampleEn": "My coworker is on my team."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un patron / une patronne",
+      "en": "a boss",
+      "say": "un patron, une patronne",
+      "sound": "uh(n) pah-TROH(N) / ün pah-TROHN",
+      "exampleFr": "La patronne parle avec l'équipe.",
+      "exampleEn": "The boss speaks with the team."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une gérante",
+      "en": "a woman manager",
+      "sound": "ün zhay-RAH(N)T",
+      "exampleFr": "Ma gérante s'appelle Karine.",
+      "exampleEn": "My manager is called Karine."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un bureau",
+      "en": "an office; a desk",
+      "sound": "uh(n) bü-ROH",
+      "exampleFr": "Le bureau est près de la porte.",
+      "exampleEn": "The office is near the door."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une entreprise",
+      "en": "a company",
+      "sound": "ün ah(n)-truh-PREEZ",
+      "exampleFr": "L'entreprise est à Montréal.",
+      "exampleEn": "The company is in Montréal."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une équipe",
+      "en": "a team",
+      "sound": "ün ay-KEEP",
+      "exampleFr": "L'équipe est ici.",
+      "exampleEn": "The team is here."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "un poste",
+      "en": "a position, job",
+      "sound": "uh(n) pohst",
+      "exampleFr": "Le poste est à Montréal.",
+      "exampleEn": "The position is in Montréal."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un emploi",
+      "options": [
+        "a coworker",
+        "a job",
+        "an office; a desk",
+        "an employee"
+      ],
+      "answer": 1,
+      "explain": "un emploi means a job."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un métier",
+      "options": [
+        "a boss",
+        "a company",
+        "a job",
+        "a line of work, profession"
+      ],
+      "answer": 3,
+      "explain": "un métier means a line of work, profession."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un employé / une employée",
+      "options": [
+        "a woman manager",
+        "an employee",
+        "a team",
+        "a line of work, profession"
+      ],
+      "answer": 1,
+      "explain": "un employé / une employée means an employee."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un collègue / une collègue",
+      "options": [
+        "an office; a desk",
+        "a position, job",
+        "an employee",
+        "a coworker"
+      ],
+      "answer": 3,
+      "explain": "un collègue / une collègue means a coworker."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un patron / une patronne",
+      "options": [
+        "a company",
+        "a boss",
+        "a job",
+        "a coworker"
+      ],
+      "answer": 1,
+      "explain": "un patron / une patronne means a boss."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une gérante",
+      "options": [
+        "a team",
+        "a line of work, profession",
+        "a boss",
+        "a woman manager"
+      ],
+      "answer": 3,
+      "explain": "une gérante means a woman manager."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un métier",
+      "question": "Which word did you hear?",
+      "options": [
+        "un bureau",
+        "un métier",
+        "une équipe",
+        "un emploi"
+      ],
+      "answer": 1,
+      "explain": "You heard un métier: a line of work, profession."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un bureau",
+      "question": "Which word did you hear?",
+      "options": [
+        "un bureau",
+        "une équipe",
+        "un emploi",
+        "une gérante"
+      ],
+      "answer": 0,
+      "explain": "You heard un bureau: an office; a desk."
+    }
+  ]
+}

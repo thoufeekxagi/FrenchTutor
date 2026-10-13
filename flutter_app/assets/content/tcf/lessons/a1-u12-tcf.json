@@ -1,0 +1,114 @@
+{
+  "id": "a1-u12-tcf",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "TCF corner",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je commence à huit heures et je finis à seize heures.",
+      "question": "What time does the person finish?",
+      "options": [
+        "16 h",
+        "8 h",
+        "12 h",
+        "18 h"
+      ],
+      "answer": 0,
+      "explain": "The speaker says je finis à seize heures."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Nadia étudie au cégep à temps partiel.",
+      "question": "Where does Nadia study?",
+      "options": [
+        "At a university",
+        "At an office",
+        "At a clinic",
+        "At a cégep"
+      ],
+      "answer": 3,
+      "explain": "The speaker says au cégep."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La pause commence à midi.",
+      "question": "When does the break begin?",
+      "options": [
+        "At 4 p.m.",
+        "At noon",
+        "At 9 a.m.",
+        "At 2 p.m."
+      ],
+      "answer": 1,
+      "explain": "Midi means noon."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Mon entrevue est jeudi à dix heures.",
+      "question": "When is the interview?",
+      "options": [
+        "Thursday at 2 p.m.",
+        "Friday at 4 p.m.",
+        "Thursday at 10 a.m.",
+        "Tuesday at 10 a.m."
+      ],
+      "answer": 2,
+      "explain": "The speaker says jeudi à dix heures."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How many hours is this schedule?",
+      "options": [
+        "Four hours",
+        "Three hours",
+        "Five hours",
+        "Eight hours"
+      ],
+      "answer": 0,
+      "explain": "From 9 h to 13 h is four hours.",
+      "promptFr": "POSTE À TEMPS PARTIEL · Début : 9 h · Fin : 13 h"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "On which days is the class?",
+      "options": [
+        "Monday and Wednesday",
+        "Wednesday and Friday",
+        "Saturday and Sunday",
+        "Tuesday and Thursday"
+      ],
+      "answer": 3,
+      "explain": "The notice says mardi et jeudi.",
+      "promptFr": "COURS DE FRANÇAIS · Cégep du Centre · Mardi et jeudi, 18 h"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should the applicant do?",
+      "options": [
+        "Send a pay stub Thursday",
+        "Reply by Tuesday before noon",
+        "Go to an interview Monday",
+        "Start work at noon"
+      ],
+      "answer": 1,
+      "explain": "The notice asks the person to reply by Tuesday before noon.",
+      "promptFr": "ENTREVUE · Poste : employée · Répondre : mardi avant 12 h"
+    }
+  ]
+}

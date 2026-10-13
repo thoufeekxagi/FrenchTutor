@@ -1,0 +1,214 @@
+{
+  "id": "a1-u12-words-5",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Words: looking for work",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un curriculum vitæ (un CV)",
+      "en": "a résumé, CV",
+      "say": "un curriculum vitæ",
+      "sound": "uh(n) kü-ree-KÜ-luhm vee-TAY (say-vay)",
+      "exampleFr": "Mon CV est dans mon dossier.",
+      "exampleEn": "My CV is in my file."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une offre d'emploi",
+      "en": "a job posting",
+      "sound": "ün ohfr duh ah(n)-plwah",
+      "exampleFr": "Je lis une offre d'emploi.",
+      "exampleEn": "I read a job posting."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une entrevue",
+      "en": "an interview (common in Canada)",
+      "sound": "ün ah(n)-truh-VÜ",
+      "exampleFr": "L'entrevue est mardi.",
+      "exampleEn": "The interview is Tuesday."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une candidature",
+      "en": "an application",
+      "sound": "ün kah(n)-dee-dah-TÜR",
+      "exampleFr": "Ma candidature est prête.",
+      "exampleEn": "My application is ready."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "l'expérience (f.)",
+      "en": "experience",
+      "say": "l'expérience",
+      "sound": "lehk-spay-ree-AH(N)S",
+      "exampleFr": "J'ai de l'expérience.",
+      "exampleEn": "I have experience."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une formation",
+      "en": "training, education",
+      "sound": "ün for-mah-SYOH(N)",
+      "exampleFr": "Ma formation est au Canada.",
+      "exampleEn": "My training is in Canada."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une compétence",
+      "en": "a skill",
+      "sound": "ün koh(n)-pay-TAH(N)S",
+      "exampleFr": "Le français est une compétence.",
+      "exampleEn": "French is a skill."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "postuler",
+      "en": "to apply for a job",
+      "sound": "pohs-tü-LAY",
+      "exampleFr": "Je postule pour le poste.",
+      "exampleEn": "I apply for the position."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un stage",
+      "en": "an internship, placement",
+      "sound": "uh(n) stahzh",
+      "exampleFr": "Mon stage est en juin.",
+      "exampleEn": "My internship is in June."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "une référence",
+      "en": "a reference",
+      "sound": "ün ray-fay-RAH(N)S",
+      "exampleFr": "La référence est dans mon CV.",
+      "exampleEn": "The reference is in my CV."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un curriculum vitæ (un CV)",
+      "options": [
+        "an application",
+        "a résumé, CV",
+        "a skill",
+        "a reference"
+      ],
+      "answer": 1,
+      "explain": "un curriculum vitæ (un CV) means a résumé, CV."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une offre d'emploi",
+      "options": [
+        "experience",
+        "a résumé, CV",
+        "an application",
+        "a job posting"
+      ],
+      "answer": 3,
+      "explain": "une offre d'emploi means a job posting."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une entrevue",
+      "options": [
+        "training, education",
+        "an interview (common in Canada)",
+        "an internship, placement",
+        "a job posting"
+      ],
+      "answer": 1,
+      "explain": "une entrevue means an interview (common in Canada)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une candidature",
+      "options": [
+        "a skill",
+        "a reference",
+        "an interview (common in Canada)",
+        "an application"
+      ],
+      "answer": 3,
+      "explain": "une candidature means an application."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "l'expérience (f.)",
+      "options": [
+        "to apply for a job",
+        "experience",
+        "a résumé, CV",
+        "an application"
+      ],
+      "answer": 1,
+      "explain": "l'expérience (f.) means experience."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une formation",
+      "options": [
+        "an internship, placement",
+        "a job posting",
+        "experience",
+        "training, education"
+      ],
+      "answer": 3,
+      "explain": "une formation means training, education."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une candidature",
+      "question": "Which word did you hear?",
+      "options": [
+        "une formation",
+        "une candidature",
+        "postuler",
+        "une référence"
+      ],
+      "answer": 1,
+      "explain": "You heard une candidature: an application."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une formation",
+      "question": "Which word did you hear?",
+      "options": [
+        "une formation",
+        "postuler",
+        "une référence",
+        "une candidature"
+      ],
+      "answer": 0,
+      "explain": "You heard une formation: training, education."
+    }
+  ]
+}

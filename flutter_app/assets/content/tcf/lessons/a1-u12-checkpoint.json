@@ -1,0 +1,140 @@
+{
+  "id": "a1-u12-checkpoint",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Checkpoint",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does une équipe mean?",
+      "options": [
+        "A class",
+        "A pay stub",
+        "A team",
+        "A schedule"
+      ],
+      "answer": 2,
+      "explain": "Une équipe means a team."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does un horaire mean?",
+      "options": [
+        "A schedule",
+        "A job interview",
+        "A diploma",
+        "A computer"
+      ],
+      "answer": 0,
+      "explain": "Un horaire is a schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Je ___ à huit heures. (commencer)",
+      "options": [
+        "commences",
+        "commençons",
+        "commencent",
+        "commence"
+      ],
+      "answer": 3,
+      "explain": "With je, use commence."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Nous ___ à seize heures. (finir)",
+      "options": [
+        "finissent",
+        "finissons",
+        "finissez",
+        "finit"
+      ],
+      "answer": 1,
+      "explain": "With nous, use finissons."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does à temps partiel mean?",
+      "options": [
+        "On a day off",
+        "At noon",
+        "Part-time",
+        "Full-time"
+      ],
+      "answer": 2,
+      "explain": "À temps partiel means part-time."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What is a cégep?",
+      "options": [
+        "A Québec college",
+        "A pay stub",
+        "A company",
+        "An interview"
+      ],
+      "answer": 0,
+      "explain": "A cégep is a college-level institution in Québec."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "What does une entrevue mean in this Canadian context?",
+      "options": [
+        "A schedule",
+        "A school subject",
+        "A day off",
+        "An interview"
+      ],
+      "answer": 3,
+      "explain": "Une entrevue is an interview."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "At what time is 16 h?",
+      "options": [
+        "Noon",
+        "4 p.m.",
+        "6 p.m.",
+        "4 a.m."
+      ],
+      "answer": 1,
+      "explain": "16 h is 4 p.m."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What does a pay stub show?",
+      "options": [
+        "The weather",
+        "The bus route",
+        "Pay information",
+        "The class location"
+      ],
+      "answer": 2,
+      "explain": "A pay stub is a document with pay information."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which question asks for the time a shift ends?",
+      "options": [
+        "À quelle heure finis-tu ?",
+        "Où est le poste ?",
+        "Qui est la gérante ?",
+        "Quand est le cégep ?"
+      ],
+      "answer": 0,
+      "explain": "À quelle heure asks for a clock time."
+    }
+  ]
+}

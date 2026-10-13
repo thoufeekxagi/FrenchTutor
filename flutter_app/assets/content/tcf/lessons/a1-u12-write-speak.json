@@ -1,0 +1,35 @@
+{
+  "id": "a1-u12-write-speak",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Write and speak",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write to a coworker",
+      "body": "Write 3 or 4 short lines. Say what time you start or finish, and ask one simple question about the workday.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour Nadia. Je commence à huit heures. À quelle heure est la réunion ? Je finis à seize heures. Merci !\n\nCheck:\n• Begin with a greeting.\n• Use a clock time from your schedule.\n• Ask one question with où, quand or à quelle heure."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Introduce your workday",
+      "body": "Say whether you work or study, name a place or schedule detail, and ask your partner one question.\n\n• Use je travaille or j'étudie.\n• Give one place, day or time.\n• Ask a short question and listen to the answer."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je travaille dans une entreprise. Je commence à huit heures et je finis à seize heures. Et toi, tu travailles où ?",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

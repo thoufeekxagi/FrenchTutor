@@ -1,0 +1,95 @@
+{
+  "id": "a1-u12-grammar-b",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Grammar: ask and answer basic questions (review g10)",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Simple questions about work or school",
+      "headers": [
+        "Ask",
+        "Answer"
+      ],
+      "rows": [
+        [
+          "Qu'est-ce que tu fais ?",
+          "Je travaille dans un bureau."
+        ],
+        [
+          "Où est ton cours ?",
+          "Il est au cégep."
+        ],
+        [
+          "Quand commence ton horaire ?",
+          "Il commence à neuf heures."
+        ],
+        [
+          "À quelle heure finis-tu ?",
+          "Je finis à seize heures."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "ask and answer basic questions (review g10)",
+      "body": "• Use a question word to ask for the missing detail: où for place, quand for a day or date, and à quelle heure for a time.\n• For an easy spoken question, use a rising voice: Tu travailles aujourd'hui ? You can also begin with est-ce que.\n• Answer with one complete sentence. Reuse the same verb and add the detail: À quelle heure ? Je commence à huit heures."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "You want to know the place of the class.",
+      "options": [
+        "Qui est le cours ?",
+        "Comment est le cours ?",
+        "Où est le cours ?",
+        "Quand est le cours ?"
+      ],
+      "answer": 2,
+      "explain": "Où asks for a place."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "You want to know the day of the interview.",
+      "options": [
+        "Quand est l'entrevue ?",
+        "Où est l'entrevue ?",
+        "Combien est l'entrevue ?",
+        "Qui est l'entrevue ?"
+      ],
+      "answer": 0,
+      "explain": "Quand asks when something happens."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "You want to know the exact start time.",
+      "options": [
+        "Où commence le quart ?",
+        "Qui commence le quart ?",
+        "Comment commence le quart ?",
+        "À quelle heure commence le quart ?"
+      ],
+      "answer": 3,
+      "explain": "À quelle heure asks for a clock time."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which question asks what a person does for work?",
+      "options": [
+        "À quelle heure est le cours ?",
+        "Qu'est-ce que tu fais ?",
+        "Où est ton bureau ?",
+        "Quand est la pause ?"
+      ],
+      "answer": 1,
+      "explain": "Qu'est-ce que tu fais ? asks what you do."
+    }
+  ]
+}

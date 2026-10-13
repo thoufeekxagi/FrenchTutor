@@ -1,0 +1,148 @@
+{
+  "id": "a1-u12-phrases",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Phrases",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Use a familiar present-tense verb with one new work or study word. Use a time you already know to make the routine clear."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je travaille dans une entreprise.",
+      "en": "I work at a company.",
+      "tip": "Say it: zhuh trah-VAI dah(n)z ün ah(n)-truh-PREEZ"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je travaille à temps partiel.",
+      "en": "I work part-time.",
+      "tip": "Say it: zhuh trah-VAI ah tah(n) pahr-SYEL"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je commence à huit heures.",
+      "en": "I start at eight o'clock.",
+      "tip": "Say it: zhuh koh-mah(n)S ah weet UHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je finis à seize heures.",
+      "en": "I finish at four p.m.",
+      "tip": "Say it: zhuh fee-NEE ah SEHZ UHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Ma pause est à midi.",
+      "en": "My break is at noon.",
+      "tip": "Say it: mah pohz eh ah mee-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Je suis étudiant au cégep.",
+      "en": "I am a student at a cégep.",
+      "tip": "Say it: zhuh swee ay-tü-DYAH(N) oh say-ZHEHP"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "J'ai un cours de français.",
+      "en": "I have a French class.",
+      "tip": "Say it: zhay uh(n) koor duh frahn-SEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Mon entrevue est mardi.",
+      "en": "My interview is Tuesday.",
+      "tip": "Say it: mohn ah(n)-truh-VÜ eh mahr-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "J'envoie mon CV par courriel.",
+      "en": "I send my CV by email.",
+      "tip": "Say it: zhah(n)-vwah mohn say-VAY pahr koo-RYEL"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Je réponds à ma collègue.",
+      "en": "I reply to my coworker.",
+      "tip": "Say it: zhuh ray-POH(N) ah mah koh-LEHG"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Je travaille dans une entreprise.",
+      "options": [
+        "I finish at four p.m.",
+        "I work at a company.",
+        "I have a French class.",
+        "I reply to my coworker."
+      ],
+      "answer": 1,
+      "explain": "Je travaille dans une entreprise. means I work at a company.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je commence à huit heures.",
+      "options": [
+        "I am a student at a cégep.",
+        "I start at eight o'clock.",
+        "I send my CV by email.",
+        "I work part-time."
+      ],
+      "answer": 1,
+      "explain": "Je commence à huit heures. means I start at eight o'clock.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Ma pause est à midi.",
+      "options": [
+        "My interview is Tuesday.",
+        "My break is at noon.",
+        "I work at a company.",
+        "I finish at four p.m."
+      ],
+      "answer": 1,
+      "explain": "Ma pause est à midi. means My break is at noon.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai un cours de français.",
+      "options": [
+        "I reply to my coworker.",
+        "I have a French class.",
+        "I start at eight o'clock.",
+        "I am a student at a cégep."
+      ],
+      "answer": 1,
+      "explain": "J'ai un cours de français. means I have a French class.."
+    }
+  ]
+}

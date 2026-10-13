@@ -1,0 +1,212 @@
+{
+  "id": "a1-u12-words-2",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Words: a workday",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un horaire",
+      "en": "a schedule",
+      "sound": "uh(n) oh-REHR",
+      "exampleFr": "Mon horaire est sur la table.",
+      "exampleEn": "My schedule is on the table."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une pause",
+      "en": "a break",
+      "sound": "ün pohz",
+      "exampleFr": "La pause est à midi.",
+      "exampleEn": "The break is at noon."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "commencer",
+      "en": "to start",
+      "sound": "koh-mah(n)-SAY",
+      "exampleFr": "Je commence à huit heures.",
+      "exampleEn": "I start at eight o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "finir",
+      "en": "to finish",
+      "sound": "fee-NEER",
+      "exampleFr": "Nous finissons à seize heures.",
+      "exampleEn": "We finish at four p.m."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une réunion",
+      "en": "a meeting",
+      "sound": "ün ray-ü-NYOH(N)",
+      "exampleFr": "La réunion est à dix heures.",
+      "exampleEn": "The meeting is at ten o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une tâche",
+      "en": "a task",
+      "sound": "ün tahsh",
+      "exampleFr": "Ma tâche est simple.",
+      "exampleEn": "My task is simple."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un dossier",
+      "en": "a file",
+      "sound": "uh(n) doh-SYAY",
+      "exampleFr": "Le dossier est sur le bureau.",
+      "exampleEn": "The file is on the desk."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un ordinateur",
+      "en": "a computer",
+      "sound": "uh(n) or-dee-nah-TUHR",
+      "exampleFr": "L'ordinateur est dans le bureau.",
+      "exampleEn": "The computer is in the office."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "répondre",
+      "en": "to answer, reply",
+      "sound": "ray-POH(N)dr",
+      "exampleFr": "Je réponds à ma collègue.",
+      "exampleEn": "I answer my coworker."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "envoyer",
+      "en": "to send",
+      "sound": "ah(n)-vwah-YAY",
+      "exampleFr": "J'envoie un courriel.",
+      "exampleEn": "I send an email."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un horaire",
+      "options": [
+        "to finish",
+        "a schedule",
+        "a file",
+        "to send"
+      ],
+      "answer": 1,
+      "explain": "un horaire means a schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une pause",
+      "options": [
+        "a meeting",
+        "a computer",
+        "a schedule",
+        "a break"
+      ],
+      "answer": 3,
+      "explain": "une pause means a break."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "commencer",
+      "options": [
+        "a task",
+        "to start",
+        "to answer, reply",
+        "a break"
+      ],
+      "answer": 1,
+      "explain": "commencer means to start."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "finir",
+      "options": [
+        "a file",
+        "to send",
+        "to start",
+        "to finish"
+      ],
+      "answer": 3,
+      "explain": "finir means to finish."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une réunion",
+      "options": [
+        "a computer",
+        "a meeting",
+        "a schedule",
+        "to finish"
+      ],
+      "answer": 1,
+      "explain": "une réunion means a meeting."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une tâche",
+      "options": [
+        "to answer, reply",
+        "a break",
+        "a meeting",
+        "a task"
+      ],
+      "answer": 3,
+      "explain": "une tâche means a task."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une pause",
+      "question": "Which word did you hear?",
+      "options": [
+        "finir",
+        "une pause",
+        "une tâche",
+        "un ordinateur"
+      ],
+      "answer": 1,
+      "explain": "You heard une pause: a break."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une réunion",
+      "question": "Which word did you hear?",
+      "options": [
+        "un dossier",
+        "une réunion",
+        "répondre",
+        "un horaire"
+      ],
+      "answer": 1,
+      "explain": "You heard une réunion: a meeting."
+    }
+  ]
+}

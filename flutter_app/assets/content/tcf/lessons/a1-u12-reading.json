@@ -1,0 +1,80 @@
+{
+  "id": "a1-u12-reading",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Reading practice",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What are the work hours?",
+      "options": [
+        "4 p.m. to midnight",
+        "9 a.m. to 5 p.m.",
+        "8 a.m. to 4 p.m.",
+        "8 a.m. to noon"
+      ],
+      "answer": 2,
+      "explain": "The notice gives 8 h à 16 h.",
+      "promptFr": "OFFRE D'EMPLOI · Poste : employée de bureau · Horaire : lundi au vendredi, 8 h à 16 h"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is the interview?",
+      "options": [
+        "Tuesday at 2 p.m.",
+        "Tuesday at 4 p.m.",
+        "Monday at 2 p.m.",
+        "Friday at 8 a.m."
+      ],
+      "answer": 0,
+      "explain": "Mardi, 14 h is Tuesday at 2 p.m.",
+      "promptFr": "ENTREVUE · Mardi, 14 h · Bureau 2"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What time does the French class begin?",
+      "options": [
+        "12 p.m.",
+        "8 a.m.",
+        "4 p.m.",
+        "9 a.m."
+      ],
+      "answer": 3,
+      "explain": "The notice says Début : 9 h.",
+      "promptFr": "CÉGEP · Cours de français · Salle 12 · Début : 9 h"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "When is the break?",
+      "options": [
+        "At 4 p.m.",
+        "At noon",
+        "At 10 a.m.",
+        "At 2 p.m."
+      ],
+      "answer": 1,
+      "explain": "À midi means at noon.",
+      "promptFr": "MESSAGE · La réunion est à 10 h. · La pause est à midi."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What dates does the pay period cover?",
+      "options": [
+        "June 1 to June 15",
+        "May 1 to June 15",
+        "May 1 to May 15",
+        "May 15 to May 30"
+      ],
+      "answer": 2,
+      "explain": "The notice says du 1er au 15 mai.",
+      "promptFr": "TALON DE PAIE · Nom : Sam · Du 1er au 15 mai"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "a1-u12-grammar-c",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Grammar: give a simple schedule (review g15)",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "give a simple schedule (review g15)",
+      "body": "Use the 24-hour times you learned for appointments and schedules. In a workplace notice, 16 h is 4 p.m. and 8 h 30 is 8:30 a.m."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Read a work or class schedule",
+      "headers": [
+        "French schedule",
+        "Say it",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "8 h",
+          "huit heures",
+          "8:00 a.m."
+        ],
+        [
+          "8 h 30",
+          "huit heures trente",
+          "8:30 a.m."
+        ],
+        [
+          "12 h",
+          "douze heures",
+          "noon"
+        ],
+        [
+          "16 h",
+          "seize heures",
+          "4:00 p.m."
+        ]
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "A notice says the class begins at 8 h 30. What time is it?",
+      "options": [
+        "6:30 a.m.",
+        "8:00 a.m.",
+        "8:30 a.m.",
+        "8:30 p.m."
+      ],
+      "answer": 2,
+      "explain": "8 h 30 means eight thirty in the 24-hour schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "A shift ends at 16 h. What time is that?",
+      "options": [
+        "4:00 p.m.",
+        "6:00 p.m.",
+        "4:00 a.m.",
+        "12:00 p.m."
+      ],
+      "answer": 0,
+      "explain": "16 h is 4 p.m."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "The pause is at 12 h. When is it?",
+      "options": [
+        "At midnight",
+        "At 2 p.m.",
+        "At 10 a.m.",
+        "At noon"
+      ],
+      "answer": 3,
+      "explain": "12 h is noon."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "The meeting begins at 9 h. What time does it begin?",
+      "options": [
+        "12:00 p.m.",
+        "9:00 a.m.",
+        "7:00 p.m.",
+        "9:30 a.m."
+      ],
+      "answer": 1,
+      "explain": "9 h is nine o'clock in the morning on this daytime schedule."
+    }
+  ]
+}

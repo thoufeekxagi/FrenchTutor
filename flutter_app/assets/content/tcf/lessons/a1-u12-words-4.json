@@ -1,0 +1,220 @@
+{
+  "id": "a1-u12-words-4",
+  "unit": "a1-u12",
+  "unitTitle": "Work and studies",
+  "title": "Words: studies",
+  "subtitle": "Unit 12: Work and studies",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un cégep",
+      "en": "a Québec college",
+      "sound": "uh(n) say-ZHEHP",
+      "exampleFr": "Ma sœur étudie au cégep.",
+      "exampleEn": "My sister studies at a cégep."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un cours",
+      "en": "a course, class",
+      "sound": "uh(n) koor",
+      "exampleFr": "Mon cours est à neuf heures.",
+      "exampleEn": "My class is at nine o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un programme",
+      "en": "a program of study",
+      "sound": "uh(n) proh-GRAHM",
+      "exampleFr": "Le programme est à Québec.",
+      "exampleEn": "The program is in Québec City."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une matière",
+      "en": "a school subject",
+      "sound": "ün mah-TYEHR",
+      "exampleFr": "Le français est une matière.",
+      "exampleEn": "French is a school subject."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un étudiant / une étudiante",
+      "en": "a student",
+      "say": "un étudiant, une étudiante",
+      "sound": "uh(n) ay-tü-DYAH(N) / ün ay-tü-DYAH(N)T",
+      "exampleFr": "L'étudiante a un cours aujourd'hui.",
+      "exampleEn": "The student has a class today."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un diplôme",
+      "en": "a diploma, degree",
+      "sound": "uh(n) dee-PLOHM",
+      "exampleFr": "J'ai un diplôme.",
+      "exampleEn": "I have a diploma."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un examen",
+      "en": "an exam",
+      "sound": "uh(n) ehk-sah-MAH(N)",
+      "exampleFr": "L'examen est lundi.",
+      "exampleEn": "The exam is Monday."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une session",
+      "en": "a school term, session",
+      "sound": "ün say-SYOH(N)",
+      "exampleFr": "La session commence en septembre.",
+      "exampleEn": "The term starts in September."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un professeur / une professeure",
+      "en": "a teacher, professor",
+      "say": "un professeur, une professeure",
+      "sound": "uh(n) proh-feh-SUHR / ün proh-feh-SUHR",
+      "exampleFr": "La professeure parle avec la classe.",
+      "exampleEn": "The teacher speaks with the class."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "une classe",
+      "en": "a class, classroom",
+      "sound": "ün klass",
+      "exampleFr": "La classe est grande.",
+      "exampleEn": "The classroom is large."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un cégep",
+      "options": [
+        "a school subject",
+        "a Québec college",
+        "an exam",
+        "a class, classroom"
+      ],
+      "answer": 1,
+      "explain": "un cégep means a Québec college."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un cours",
+      "options": [
+        "a student",
+        "a school term, session",
+        "a Québec college",
+        "a course, class"
+      ],
+      "answer": 3,
+      "explain": "un cours means a course, class."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un programme",
+      "options": [
+        "a diploma, degree",
+        "a program of study",
+        "a teacher, professor",
+        "a course, class"
+      ],
+      "answer": 1,
+      "explain": "un programme means a program of study."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une matière",
+      "options": [
+        "an exam",
+        "a class, classroom",
+        "a program of study",
+        "a school subject"
+      ],
+      "answer": 3,
+      "explain": "une matière means a school subject."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un étudiant / une étudiante",
+      "options": [
+        "a school term, session",
+        "a student",
+        "a Québec college",
+        "a school subject"
+      ],
+      "answer": 1,
+      "explain": "un étudiant / une étudiante means a student."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un diplôme",
+      "options": [
+        "a teacher, professor",
+        "a course, class",
+        "a student",
+        "a diploma, degree"
+      ],
+      "answer": 3,
+      "explain": "un diplôme means a diploma, degree."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un cours",
+      "question": "Which word did you hear?",
+      "options": [
+        "une matière",
+        "un cours",
+        "un examen",
+        "une classe"
+      ],
+      "answer": 1,
+      "explain": "You heard un cours: a course, class."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une matière",
+      "question": "Which word did you hear?",
+      "options": [
+        "une matière",
+        "un examen",
+        "une classe",
+        "un cours"
+      ],
+      "answer": 0,
+      "explain": "You heard une matière: a school subject."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "At a cégep, the college-level stage comes after secondary school and before university in Québec. The word is useful to recognize if you study or work in Québec; it is not the name for every college in Canada."
+    }
+  ]
+}
