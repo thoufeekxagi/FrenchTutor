@@ -22,7 +22,7 @@ STRIP = "«»\"“”‘’'.,!?;:()—–…·/"
 PROPER = {"sam", "marc", "léa", "anna", "nadia", "julie", "karim", "priya", "awa", "samira", "diallo",
           "haddad", "tremblay", "gagnon", "karine", "wei", "montréal", "ottawa", "toronto", "gatineau",
           "québec", "vancouver", "lyon", "sainte-anne", "paris", "dakar", "rabat", "mallette", "ahmed",
-          "fatou", "patel", "moncton", "érables", "service", "canada", "luc", "jean", "marie", "sophie", "ali", "omar", "chen", "li", "singh", "tran"}
+          "fatou", "yasmine", "patel", "moncton", "érables", "service", "canada", "luc", "jean", "marie", "sophie", "ali", "omar", "chen", "li", "singh", "tran"}
 
 
 def toks(text):
