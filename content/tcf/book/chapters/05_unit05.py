@@ -121,9 +121,9 @@ CHAPTER = chapter(
         DIALOGUE("At the café", "Léa pays for a coffee. The clerk and Léa use vous.", [
             ("Employé", "Bonjour. Je vous écoute.", "Hello. I am listening (what would you like?)."),
             ("Léa", "Un café et un croissant, s'il vous plaît.", "A coffee and a croissant, please."),
-            ("Employé", "Voilà. Ça fait six dollars cinquante.", "Here you are. That is 6.50."),
+            ("Employé", "Voilà. Ça fait six dollars.", "Here you are. That is 6 dollars."),
             ("Léa", "C'est combien avec les taxes ?", "How much is it with taxes?"),
-            ("Employé", "Avec les taxes, ça fait sept dollars vingt-quatre.", "With taxes, it is 7.24."),
+            ("Employé", "Avec les taxes, ça fait six dollars quatre-vingt-dix.", "With taxes, it is 6.90."),
             ("Léa", "Je paie par carte.", "I pay by card."),
             ("Employé", "D'accord. Le reçu ?", "Okay. The receipt?"),
             ("Léa", "Oui, s'il vous plaît. Merci !", "Yes, please. Thank you!"),
@@ -137,7 +137,8 @@ CHAPTER = chapter(
             ("Le propriétaire", "Par virement, le premier du mois.", "By transfer, on the first of the month."),
         ]),
         MCQ("5.4", "Understand the dialogues", "reading", "Choose the best answer.", [
-            dict(q="How much is the order before taxes?", options=["$5.50", "$6.50", "$7.24", "$7.50"], answer=1, explain="Six dollars cinquante."),
+            dict(q="How much is the order before taxes?", options=["$5.00", "$6.00", "$6.90", "$7.50"], answer=1, explain="Ça fait six dollars (avant les taxes)."),
+            dict(q="How much is the order with taxes?", options=["$6.00", "$6.50", "$6.90", "$7.90"], answer=2, explain="Six dollars quatre-vingt-dix: 6,90."),
             dict(q="How does Léa pay?", options=["Cash", "By card", "By transfer", "She does not pay"], answer=1, explain="Par carte."),
             dict(q="How much is the rent?", options=["$800", "$1 000", "$1 200", "$2 000"], answer=2, explain="Mille deux cents."),
             dict(q="How does Sam pay the rent?", options=["By cash", "By card", "By transfer", "By cheque"], answer=2, explain="Par virement."),
