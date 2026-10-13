@@ -22,11 +22,12 @@ STRIP = "«»\"“”‘’'.,!?;:()—–…·/"
 PROPER = {"sam", "marc", "léa", "anna", "nadia", "julie", "karim", "priya", "awa", "samira", "diallo",
           "haddad", "tremblay", "gagnon", "karine", "wei", "montréal", "ottawa", "toronto", "gatineau",
           "québec", "vancouver", "lyon", "sainte-anne", "paris", "dakar", "rabat", "mallette", "ahmed",
-          "fatou", "luc", "jean", "marie", "sophie", "ali", "omar", "chen", "li", "singh", "tran"}
+          "fatou", "patel", "moncton", "érables", "service", "canada", "luc", "jean", "marie", "sophie", "ali", "omar", "chen", "li", "singh", "tran"}
 
 
 def toks(text):
     out = []
+    text = text.replace('(e)', '').replace('(ne)', '')
     for raw in text.replace("\u2019", "'").replace("’", "'").split():
         t = raw.strip(STRIP).lower()
         if t:
@@ -69,7 +70,7 @@ def main():
             return  # Stage 0 listening is about sounds; unknown words are expected
         missing = []
         for t in toks(text):
-            if re.fullmatch(r"[\d,.%$ ]+", t) or not re.search(r"[a-zà-ÿœ]", t):
+            if re.fullmatch(r"[\d,.%$ ]+", t) or not re.search(r"[a-zà-ÿœ]", t) or re.fullmatch(r"[a-z]\d[a-z]|\d[a-z]\d", t):
                 continue
             if not any(p in known for p in split_elision(t)):
                 missing.append(t)
