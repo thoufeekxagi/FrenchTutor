@@ -4,6 +4,10 @@
     "s0-01.json",
     "a1-u01-words-a.json",
     "a1-u01-words-b.json",
+    "a1-u01-phrases.json",
+    "a1-u01-grammar.json",
+    "a1-u01-dialogue.json",
+    "a1-u01-tcf.json",
     "dev_sample.json"
   ]
 }

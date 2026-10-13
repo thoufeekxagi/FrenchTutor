@@ -1,0 +1,154 @@
+{
+  "id": "a1-u01-tcf",
+  "title": "TCF corner: Unit 1",
+  "subtitle": "Exam-style questions with only Unit 1 words",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "How the real test works",
+      "body": "In the TCF Canada listening test you hear each recording once and you cannot go back. Each question has 4 answers and only one is correct.\n\nA wrong answer and a blank answer both score zero. So never leave a question empty. If you are not sure, choose the answer that sounds most likely.\n\nHere you practise with only the words from Unit 1. First 5 listening questions, then 5 reading questions."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Bonjour. Je m'appelle Léa.",
+      "question": "What is the speaker's name?",
+      "options": [
+        "Léa",
+        "Sam",
+        "Anna",
+        "Marie"
+      ],
+      "answer": 0,
+      "explain": "Je m'appelle Léa means my name is Léa."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je parle anglais.",
+      "question": "Which language does the speaker speak?",
+      "options": [
+        "French",
+        "English",
+        "Spanish",
+        "Arabic"
+      ],
+      "answer": 1,
+      "explain": "Je parle anglais means I speak English."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "J'habite à Montréal.",
+      "question": "Where does the speaker live?",
+      "options": [
+        "Toronto",
+        "Montréal",
+        "Ottawa",
+        "Vancouver"
+      ],
+      "answer": 1,
+      "explain": "J'habite à Montréal means I live in Montréal."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Salut !",
+      "question": "Who would you say this to?",
+      "options": [
+        "A stranger",
+        "Your landlord",
+        "A friend",
+        "A doctor"
+      ],
+      "answer": 2,
+      "explain": "Salut is informal. Use it with friends and family only."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Il est canadien.",
+      "question": "Who is Canadian?",
+      "options": [
+        "I",
+        "you",
+        "he",
+        "she"
+      ],
+      "answer": 2,
+      "explain": "Il means he. Il est canadien means he is Canadian."
+    },
+    {
+      "type": "choose",
+      "id": "r1",
+      "prompt": "What is the first name?",
+      "promptFr": "Nom : Tremblay. Prénom : Sam.",
+      "options": [
+        "Tremblay",
+        "Sam",
+        "Nom",
+        "Prénom"
+      ],
+      "answer": 1,
+      "explain": "Prénom is the first name, so it is Sam."
+    },
+    {
+      "type": "choose",
+      "id": "r2",
+      "prompt": "What is the last name?",
+      "promptFr": "Nom : Diallo. Prénom : Awa.",
+      "options": [
+        "Awa",
+        "Diallo",
+        "Nom",
+        "Prénom"
+      ],
+      "answer": 1,
+      "explain": "Nom is the last name, so it is Diallo."
+    },
+    {
+      "type": "choose",
+      "id": "r3",
+      "prompt": "Where does Julie live?",
+      "promptFr": "Salut ! Je suis Julie. J'habite à Toronto.",
+      "options": [
+        "Toronto",
+        "Montréal",
+        "Ottawa",
+        "Vancouver"
+      ],
+      "answer": 0,
+      "explain": "J'habite à Toronto means I live in Toronto."
+    },
+    {
+      "type": "choose",
+      "id": "r4",
+      "prompt": "When would you say this?",
+      "promptFr": "Bonsoir !",
+      "options": [
+        "In the morning",
+        "In the evening",
+        "On the phone only",
+        "Never"
+      ],
+      "answer": 1,
+      "explain": "Bonsoir means good evening."
+    },
+    {
+      "type": "choose",
+      "id": "r5",
+      "prompt": "Who is writing this?",
+      "promptFr": "Je suis canadienne.",
+      "options": [
+        "A man",
+        "A woman",
+        "A group",
+        "A company"
+      ],
+      "answer": 1,
+      "explain": "Canadienne is the feminine form, so the writer is a woman."
+    }
+  ]
+}

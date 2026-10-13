@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/main.dart' as app;
+import 'package:french_tutor/v3/lesson/v3_course.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,12 +39,10 @@ void main() {
     await prefs.setBool('dev_force_pro_unlock', true);
     await prefs.setBool('app_dark_mode_v3_choice', true);
     await prefs.setBool('app_dark_mode', false);
-    // Mark the real lessons done so the dev sample is the next one offered.
-    await prefs.setStringList('v3_completed_lessons', [
-      's0-01',
-      'a1-u01-words-a',
-      'a1-u01-words-b',
-    ]);
+    // Mark every real lesson done so the dev sample is the next one offered,
+    // however many real lessons exist.
+    final real = (await V3Course.load()).where((l) => !l.dev).map((l) => l.id);
+    await prefs.setStringList('v3_completed_lessons', real.toList());
 
     app.main();
 
