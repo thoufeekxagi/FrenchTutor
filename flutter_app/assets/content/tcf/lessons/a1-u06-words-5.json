@@ -1,0 +1,212 @@
+{
+  "id": "a1-u06-words-5",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Words: appointment words",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un rendez-vous",
+      "en": "appointment",
+      "sound": "uh(n) rah(n)-day-VOO",
+      "exampleFr": "J'ai un rendez-vous mardi.",
+      "exampleEn": "I have an appointment on Tuesday."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "prendre rendez-vous",
+      "en": "to make an appointment",
+      "sound": "pra(n)dr rah(n)-day-VOO",
+      "exampleFr": "Je téléphone pour prendre rendez-vous.",
+      "exampleEn": "I am calling to make an appointment."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "téléphoner",
+      "en": "to phone, to call",
+      "sound": "tay-lay-foh-NAY",
+      "exampleFr": "Je téléphone à la clinique.",
+      "exampleEn": "I call the clinic."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la réception",
+      "en": "reception desk",
+      "sound": "lah ray-sehp-SYOH(N)",
+      "exampleFr": "La réception est ouverte.",
+      "exampleEn": "The reception desk is open."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la salle d'attente",
+      "en": "waiting room",
+      "sound": "lah sahl dah-TAH(N)t",
+      "exampleFr": "La salle d'attente est ici.",
+      "exampleEn": "The waiting room is here."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "confirmer",
+      "en": "to confirm",
+      "sound": "koh(n)-feer-MAY",
+      "exampleFr": "Je confirme la date.",
+      "exampleEn": "I confirm the date."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "déplacer",
+      "en": "to move, reschedule",
+      "sound": "day-plah-SAY",
+      "exampleFr": "Je déplace le rendez-vous à jeudi.",
+      "exampleEn": "I move the appointment to Thursday."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "disponible",
+      "en": "available",
+      "sound": "dee-spoh-NEEBL",
+      "exampleFr": "Je suis disponible mercredi.",
+      "exampleEn": "I am available on Wednesday."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "en avance",
+      "en": "early, ahead of time",
+      "sound": "ah(n) nah-VAHNS",
+      "exampleFr": "Sam arrive cinq minutes en avance.",
+      "exampleEn": "Sam arrives five minutes early."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "en retard",
+      "en": "late",
+      "sound": "ah(n) ruh-TAHR",
+      "exampleFr": "Le bus est en retard.",
+      "exampleEn": "The bus is late."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un rendez-vous",
+      "options": [
+        "reception desk",
+        "appointment",
+        "to move, reschedule",
+        "late"
+      ],
+      "answer": 1,
+      "explain": "un rendez-vous means appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "prendre rendez-vous",
+      "options": [
+        "waiting room",
+        "available",
+        "reception desk",
+        "to make an appointment"
+      ],
+      "answer": 3,
+      "explain": "prendre rendez-vous means to make an appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "téléphoner",
+      "options": [
+        "to confirm",
+        "to phone, to call",
+        "early, ahead of time",
+        "to make an appointment"
+      ],
+      "answer": 1,
+      "explain": "téléphoner means to phone, to call."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la réception",
+      "options": [
+        "to move, reschedule",
+        "late",
+        "to phone, to call",
+        "reception desk"
+      ],
+      "answer": 3,
+      "explain": "la réception means reception desk."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la salle d'attente",
+      "options": [
+        "available",
+        "waiting room",
+        "appointment",
+        "reception desk"
+      ],
+      "answer": 1,
+      "explain": "la salle d'attente means waiting room."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "confirmer",
+      "options": [
+        "early, ahead of time",
+        "to make an appointment",
+        "waiting room",
+        "to confirm"
+      ],
+      "answer": 3,
+      "explain": "confirmer means to confirm."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "prendre rendez-vous",
+      "question": "Which word did you hear?",
+      "options": [
+        "la réception",
+        "prendre rendez-vous",
+        "déplacer",
+        "en avance"
+      ],
+      "answer": 1,
+      "explain": "You heard prendre rendez-vous: to make an appointment."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "confirmer",
+      "question": "Which word did you hear?",
+      "options": [
+        "disponible",
+        "confirmer",
+        "en retard",
+        "prendre rendez-vous"
+      ],
+      "answer": 1,
+      "explain": "You heard confirmer: to confirm."
+    }
+  ]
+}

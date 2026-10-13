@@ -1,0 +1,167 @@
+{
+  "id": "a1-u06-phrases",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Phrases",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Practise the whole question and answer. First cover the French and say the idea in English. Then say the French line without stopping between words."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Quel jour ?",
+      "en": "What day?",
+      "tip": "Say it: kehl zhoor"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Quelle date ?",
+      "en": "What date?",
+      "tip": "Say it: kehl daht"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "À quelle heure ?",
+      "en": "At what time?",
+      "tip": "Say it: ah kehl uhr"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je téléphone pour prendre rendez-vous.",
+      "en": "I am calling to make an appointment.",
+      "tip": "Say it: zhuh tay-lay-fohn poor pra(n)dr rah(n)-day-VOO"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je suis disponible mardi.",
+      "en": "I am available on Tuesday.",
+      "tip": "Say it: zhuh swee dee-spoh-NEEBL mahr-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Mon rendez-vous est mardi, le 14 avril.",
+      "en": "My appointment is Tuesday, April 14.",
+      "tip": "Say it: moh(n) rah(n)-day-VOO eh mahr-DEE luh kah-TOHRZ ah-VREEL"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Mon rendez-vous est à 9 h 30.",
+      "en": "My appointment is at 9:30.",
+      "tip": "Say it: moh(n) rah(n)-day-VOO eh ah nuhf uhr trah(n)t"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "C'est confirmé.",
+      "en": "It is confirmed.",
+      "tip": "Say it: seh koh(n)-feer-MAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Je suis en avance.",
+      "en": "I am early.",
+      "tip": "Say it: zhuh swee ah(n) nah-VAHNS"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "La clinique est ouverte de 8 h à 16 h.",
+      "en": "The clinic is open from 8 a.m. to 4 p.m.",
+      "tip": "Say it: lah klee-NEEK eh oo-VEHRT duh weet uhr ah sehZ uhr"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Quel jour ?",
+      "options": [
+        "I am calling to make an appointment.",
+        "What day?",
+        "My appointment is at 9:30.",
+        "The clinic is open from 8 a.m. to 4 p.m."
+      ],
+      "answer": 1,
+      "explain": "Quel jour ? means What day?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "À quelle heure ?",
+      "options": [
+        "My appointment is Tuesday, April 14.",
+        "At what time?",
+        "I am early.",
+        "I am available on Tuesday."
+      ],
+      "answer": 1,
+      "explain": "À quelle heure ? means At what time?."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis disponible mardi.",
+      "options": [
+        "It is confirmed.",
+        "I am available on Tuesday.",
+        "What day?",
+        "I am calling to make an appointment."
+      ],
+      "answer": 1,
+      "explain": "Je suis disponible mardi. means I am available on Tuesday.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Mon rendez-vous est à 9 h 30.",
+      "options": [
+        "The clinic is open from 8 a.m. to 4 p.m.",
+        "My appointment is at 9:30.",
+        "At what time?",
+        "I am early."
+      ],
+      "answer": 1,
+      "explain": "Mon rendez-vous est à 9 h 30. means My appointment is at 9:30.."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "In a written schedule, you may see 9 h 30. When you speak, say neuf heures trente. In conversation, people may also say neuf heures et demie. Both tell you 9:30."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Speaking: Say your appointment clearly",
+      "body": "Choose a day, a date and a time. Say the day first, the date, then the time. Repeat the full appointment once, as if you were confirming it by phone.\n\n• Pause briefly between the day, date and time.\n• If you do not understand, use the phrase from Unit 2: Pardon ? Plus lentement, s'il vous plaît."
+    },
+    {
+      "type": "phrase",
+      "id": "p11",
+      "fr": "Bonjour. Mon rendez-vous est mardi, le 14 avril, à 9 h 30. C'est bien ça ? Merci.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

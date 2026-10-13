@@ -1,0 +1,232 @@
+{
+  "id": "a1-u06-words-2",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Words: the calendar and seasons",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la date",
+      "en": "date",
+      "sound": "lah daht",
+      "exampleFr": "La date est le 14 avril.",
+      "exampleEn": "The date is April 14."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le calendrier",
+      "en": "calendar",
+      "sound": "luh kah-lah(n)-DRYAY",
+      "exampleFr": "Le calendrier est sur la table.",
+      "exampleEn": "The calendar is on the table."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "l'année (f.)",
+      "en": "year",
+      "say": "l'année",
+      "sound": "lah-NAY",
+      "exampleFr": "L'année a douze mois.",
+      "exampleEn": "The year has twelve months."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la saison",
+      "en": "season",
+      "sound": "lah seh-ZOH(N)",
+      "exampleFr": "Quelle est la saison ?",
+      "exampleEn": "What is the season?"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le printemps",
+      "en": "spring",
+      "sound": "luh pra(n)-TAH(N)",
+      "exampleFr": "Le printemps commence en mars.",
+      "exampleEn": "Spring begins in March."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "l'été (m.)",
+      "en": "summer",
+      "say": "l'été",
+      "sound": "lay-TAY",
+      "exampleFr": "L'été commence en juin.",
+      "exampleEn": "Summer begins in June."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "l'automne (m.)",
+      "en": "autumn, fall",
+      "say": "l'automne",
+      "sound": "loh-TOHN",
+      "exampleFr": "L'automne commence en septembre.",
+      "exampleEn": "Autumn begins in September."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "l'hiver (m.)",
+      "en": "winter",
+      "say": "l'hiver",
+      "sound": "lee-VEHR",
+      "exampleFr": "L'hiver est froid au Canada.",
+      "exampleEn": "Winter is cold in Canada."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la semaine prochaine",
+      "en": "next week",
+      "sound": "lah suh-MEHN proh-SHEN",
+      "exampleFr": "Mon rendez-vous est la semaine prochaine.",
+      "exampleEn": "My appointment is next week."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "prochain / prochaine",
+      "en": "next",
+      "say": "prochain, prochaine",
+      "sound": "proh-SHA(N) / proh-SHEN",
+      "exampleFr": "Mon prochain rendez-vous est mardi.",
+      "exampleEn": "My next appointment is on Tuesday."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "aujourd'hui",
+      "en": "today",
+      "sound": "oh-zhoor-DWEE",
+      "exampleFr": "Aujourd'hui, c'est mardi.",
+      "exampleEn": "Today is Tuesday."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la date",
+      "options": [
+        "season",
+        "date",
+        "autumn, fall",
+        "next"
+      ],
+      "answer": 1,
+      "explain": "la date means date."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le calendrier",
+      "options": [
+        "spring",
+        "winter",
+        "today",
+        "calendar"
+      ],
+      "answer": 3,
+      "explain": "le calendrier means calendar."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "l'année (f.)",
+      "options": [
+        "summer",
+        "year",
+        "next week",
+        "date"
+      ],
+      "answer": 1,
+      "explain": "l'année (f.) means year."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la saison",
+      "options": [
+        "autumn, fall",
+        "next",
+        "calendar",
+        "season"
+      ],
+      "answer": 3,
+      "explain": "la saison means season."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le printemps",
+      "options": [
+        "winter",
+        "spring",
+        "today",
+        "year"
+      ],
+      "answer": 1,
+      "explain": "le printemps means spring."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "l'été (m.)",
+      "options": [
+        "next week",
+        "date",
+        "season",
+        "summer"
+      ],
+      "answer": 3,
+      "explain": "l'été (m.) means summer."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le calendrier",
+      "question": "Which word did you hear?",
+      "options": [
+        "la saison",
+        "le calendrier",
+        "l'été",
+        "l'hiver"
+      ],
+      "answer": 1,
+      "explain": "You heard le calendrier: calendar."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le printemps",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'automne",
+        "le printemps",
+        "aujourd'hui",
+        "le calendrier"
+      ],
+      "answer": 1,
+      "explain": "You heard le printemps: spring."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: the calendar and seasons",
+      "body": "Clock time. You already know numbers from Unit 5 and le matin and le soir from Unit 4. Learn these time words, then use the clock table in the grammar section."
+    }
+  ]
+}

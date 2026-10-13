@@ -15,6 +15,8 @@ STORY_META = {
                    keywords=["famille", "fils", "fille", "travaille", "étudie", "grand-mère"]),
     "a1-u05": dict(id="a1-combien", minutes=3, summary="Julie buys milk and bread at the corner store and pays by card.",
                    keywords=["dépanneur", "lait", "pain", "taxes", "total", "carte"]),
+    "a1-u06": dict(id="a1-rendez-vous", minutes=3, summary="Priya checks the date and arrives early for her clinic appointment.",
+                   keywords=["calendrier", "rendez-vous", "date", "réception", "avance"]),
 }
 
 STORY_GLOSS = {
@@ -72,5 +74,23 @@ STORY_GLOSS = {
         "c'est": ("it is, that is",), "quatre-vingt-treize": ("ninety-three",), "cents": ("cents",), "total": ("total", "noun, masculine"), "de": ("of",), "sept": ("seven",),
         "dix-huit": ("eighteen",), "paie": ("pays (payer)", "verb", "peh"), "avec": ("with",), "sa": ("her",), "carte": ("card", "noun, feminine"), "débit": ("debit",),
         "merci": ("thank you",), "bonne": ("good (feminine)",), "soirée": ("evening", "noun, feminine", "swah-RAY"), "combien ça coûte": ("how much does it cost",),
+    },
+    "a1-rendez-vous": {
+        "priya": ("Priya (a woman's name)",), "regarde": ("looks at (regarder)", "verb", "Ruh-GAHRD"),
+        "son": ("her", "possessive"), "calendrier": ("calendar", "noun, masculine"), "le": ("the",),
+        "matin": ("morning", "noun, masculine"), "rendez-vous": ("appointment", "noun, masculine"),
+        "à": ("at, to",), "la": ("the",), "clinique": ("clinic", "noun, feminine", "klee-NEEK"),
+        "est": ("is (être)", "verb"), "mardi": ("Tuesday", "noun, masculine", "mahr-DEE"),
+        "14": ("fourteen", "number"), "avril": ("April", "month", "ah-VREEL"),
+        "9": ("nine", "number"), "h": ("hour symbol in a written time", "symbol"),
+        "30": ("thirty", "number"), "les": ("the",), "heures": ("hours, o'clock", "noun, feminine"),
+        "d'ouverture": ("of opening",), "sont": ("are (être)", "verb"), "de": ("from, of",),
+        "8": ("eight", "number"), "16": ("sixteen", "number"), "arrive": ("arrives (arriver)", "verb", "ah-REEV"),
+        "25": ("twenty-five", "number"), "cinq": ("five", "number"), "minutes": ("minutes", "noun, feminine"),
+        "en": ("in (part of the phrase en avance)",), "avance": ("early, ahead of time",),
+        "elle": ("she", "pronoun"), "confirme": ("confirms (confirmer)", "verb", "koh(n)-FEERM"),
+        "date": ("date", "noun, feminine"), "réception": ("reception desk", "noun, feminine", "ray-sehp-SYOH(N)"),
+        "prochain": ("next", "adjective"), "1er": ("first (of the month)", "ordinal", "pruh-MYAY"),
+        "mai": ("May", "month", "may"), "10": ("ten", "number"),
     },
 }

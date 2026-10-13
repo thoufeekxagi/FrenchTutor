@@ -1,0 +1,185 @@
+{
+  "id": "a1-u06-words-4",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Words: office hours",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "l'horaire (m.)",
+      "en": "schedule",
+      "say": "l'horaire",
+      "sound": "loh-REHR",
+      "exampleFr": "Voici l'horaire de la clinique.",
+      "exampleEn": "Here is the clinic schedule."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'ouverture (f.)",
+      "en": "opening",
+      "say": "l'ouverture",
+      "sound": "loo-vehr-TÜR",
+      "exampleFr": "L'ouverture est à huit heures.",
+      "exampleEn": "Opening time is eight o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la fermeture",
+      "en": "closing",
+      "sound": "lah fehr-muh-TÜR",
+      "exampleFr": "La fermeture est à seize heures.",
+      "exampleEn": "Closing time is four o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "ouvert / ouverte",
+      "en": "open",
+      "say": "ouvert, ouverte",
+      "sound": "oo-VEHR / oo-VEHRT",
+      "exampleFr": "Le bureau est ouvert mardi.",
+      "exampleEn": "The office is open on Tuesday."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "fermé / fermée",
+      "en": "closed",
+      "say": "fermé, fermée",
+      "sound": "fehr-MAY",
+      "exampleFr": "La clinique est fermée dimanche.",
+      "exampleEn": "The clinic is closed on Sunday."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la pause",
+      "en": "break",
+      "sound": "lah pohz",
+      "exampleFr": "La pause est à midi.",
+      "exampleEn": "The break is at noon."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le début",
+      "en": "beginning, start",
+      "sound": "luh day-BÜ",
+      "exampleFr": "Le début est à neuf heures.",
+      "exampleEn": "The start is at nine o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la fin",
+      "en": "end",
+      "sound": "lah fa(n)",
+      "exampleFr": "La fin est à seize heures.",
+      "exampleEn": "The end is at four o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "les heures d'ouverture",
+      "en": "opening hours",
+      "sound": "lay zuhr doo-vehr-TÜR",
+      "exampleFr": "Les heures d'ouverture sont ici.",
+      "exampleEn": "The opening hours are here."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "l'horaire (m.)",
+      "options": [
+        "open",
+        "schedule",
+        "beginning, start",
+        "opening"
+      ],
+      "answer": 1,
+      "explain": "l'horaire (m.) means schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "l'ouverture (f.)",
+      "options": [
+        "closed",
+        "end",
+        "closing",
+        "opening"
+      ],
+      "answer": 3,
+      "explain": "l'ouverture (f.) means opening."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la fermeture",
+      "options": [
+        "break",
+        "closing",
+        "opening hours",
+        "open"
+      ],
+      "answer": 1,
+      "explain": "la fermeture means closing."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "ouvert / ouverte",
+      "options": [
+        "beginning, start",
+        "schedule",
+        "closed",
+        "open"
+      ],
+      "answer": 3,
+      "explain": "ouvert / ouverte means open."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "fermé / fermée",
+      "options": [
+        "end",
+        "closed",
+        "opening",
+        "break"
+      ],
+      "answer": 1,
+      "explain": "fermé / fermée means closed."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la pause",
+      "options": [
+        "opening hours",
+        "closing",
+        "beginning, start",
+        "break"
+      ],
+      "answer": 3,
+      "explain": "la pause means break."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: office hours",
+      "body": "Making an appointment. You heard rendez-vous in Stage 0. Now use it to ask for a time and understand a confirmation. With a receptionist or an official, begin with vous."
+    }
+  ]
+}

@@ -88,6 +88,21 @@
     "a1-u05-write-speak.json",
     "a1-u05-tcf.json",
     "a1-u05-checkpoint.json",
+    "a1-u06-words-1.json",
+    "a1-u06-words-2.json",
+    "a1-u06-words-3.json",
+    "a1-u06-words-4.json",
+    "a1-u06-words-5.json",
+    "a1-u06-phrases.json",
+    "a1-u06-grammar-a.json",
+    "a1-u06-grammar-b.json",
+    "a1-u06-grammar-c.json",
+    "a1-u06-dialogues.json",
+    "a1-u06-listening.json",
+    "a1-u06-reading.json",
+    "a1-u06-write-speak.json",
+    "a1-u06-tcf.json",
+    "a1-u06-checkpoint.json",
     "dev_sample.json"
   ]
 }

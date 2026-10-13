@@ -1,0 +1,140 @@
+{
+  "id": "a1-u06-checkpoint",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Checkpoint",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which word means Tuesday?",
+      "options": [
+        "lundi",
+        "mardi",
+        "jeudi",
+        "samedi"
+      ],
+      "answer": 1,
+      "explain": "Mardi means Tuesday."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does la semaine prochaine mean?",
+      "options": [
+        "last week",
+        "next week",
+        "every day",
+        "this morning"
+      ],
+      "answer": 1,
+      "explain": "Prochaine means next."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How do you write the first day of May?",
+      "options": [
+        "le 1 mai",
+        "le 1er mai",
+        "mai le premier",
+        "le mai 1er"
+      ],
+      "answer": 1,
+      "explain": "The first day is le premier, written le 1er."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does 14 h mean?",
+      "options": [
+        "2 p.m.",
+        "4 p.m.",
+        "12 p.m.",
+        "2 a.m."
+      ],
+      "answer": 0,
+      "explain": "14 h is 2 p.m. on a 24-hour clock."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does midi mean?",
+      "options": [
+        "midnight",
+        "noon",
+        "morning",
+        "evening"
+      ],
+      "answer": 1,
+      "explain": "Midi means noon."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Which phrase asks for an appointment time?",
+      "options": [
+        "Quel jour ?",
+        "Quelle date ?",
+        "À quelle heure ?",
+        "Quelle saison ?"
+      ],
+      "answer": 2,
+      "explain": "À quelle heure ? means At what time?"
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "The clinic is open from 8 h to 16 h. Which pattern fits?",
+      "options": [
+        "de 8 h à 16 h",
+        "à 8 h le 16 h",
+        "le 8 h de 16 h",
+        "de 8 h le 16 h"
+      ],
+      "answer": 0,
+      "explain": "Use de ... à ... for a time range."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What does en avance mean?",
+      "options": [
+        "early",
+        "late",
+        "closed",
+        "next week"
+      ],
+      "answer": 0,
+      "explain": "En avance means early or ahead of time."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which date is written correctly in French?",
+      "options": [
+        "April 14",
+        "14 avril",
+        "avril 14",
+        "14 Avril"
+      ],
+      "answer": 1,
+      "explain": "The day comes before the lower-case month."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "In Canada, what is a common phrase for the weekend?",
+      "options": [
+        "la fin de semaine",
+        "la fin de mois",
+        "le jour ouvrable",
+        "l'heure d'ouverture"
+      ],
+      "answer": 0,
+      "explain": "Fin de semaine is common in Canada."
+    }
+  ]
+}

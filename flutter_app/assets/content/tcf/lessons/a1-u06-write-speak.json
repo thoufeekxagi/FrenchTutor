@@ -1,0 +1,35 @@
+{
+  "id": "a1-u06-write-speak",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Write and speak",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a confirmation",
+      "body": "Write a short message to the clinic. Confirm the day, date and time: Tuesday, April 14 at 9:30. End politely.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour. Je confirme mon rendez-vous : mardi, le 14 avril, à 9 h 30. Merci. Bonne journée.\n\nCheck:\n• Put the day before the date.\n• Use à before the time.\n• Check that your date and time match the appointment card."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: At the clinic",
+      "body": "Answer the receptionist's questions. Give your preferred day, date and time. Then repeat the full appointment to confirm it. Use vous with the receptionist.\n\n• Say the time slowly and clearly.\n• Repeat the date and time once to catch a possible mistake.\n• If you do not understand, ask the person to repeat, as you practised in Unit 2."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Mardi, le 14 avril, à 9 h 30, s'il vous plaît. Oui, je confirme : mardi, le 14 avril, à 9 h 30. Merci.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

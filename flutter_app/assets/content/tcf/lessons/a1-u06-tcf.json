@@ -1,0 +1,114 @@
+{
+  "id": "a1-u06-tcf",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "TCF corner",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Votre rendez-vous est le mercredi 8 juillet à onze heures quinze.",
+      "question": "When is the appointment?",
+      "options": [
+        "Wednesday, July 8 at 11:15",
+        "Wednesday, July 8 at 11:50",
+        "Thursday, July 8 at 11:15",
+        "Wednesday, June 8 at 11:15"
+      ],
+      "answer": 0,
+      "explain": "Mercredi 8 juillet, onze heures quinze."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Le bureau est ouvert de neuf heures à dix-sept heures, du lundi au jeudi.",
+      "question": "On which days is the office open?",
+      "options": [
+        "Monday to Thursday",
+        "Monday to Friday",
+        "Tuesday to Thursday",
+        "Saturday and Sunday"
+      ],
+      "answer": 0,
+      "explain": "Du lundi au jeudi means Monday through Thursday."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La secrétaire confirme le rendez-vous pour vendredi, à midi.",
+      "question": "What time is the appointment?",
+      "options": [
+        "10:00",
+        "11:00",
+        "12:00",
+        "14:00"
+      ],
+      "answer": 2,
+      "explain": "Midi means noon."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Samedi, la réception ferme à treize heures.",
+      "question": "When does reception close on Saturday?",
+      "options": [
+        "12:00",
+        "13:00",
+        "14:00",
+        "15:00"
+      ],
+      "answer": 1,
+      "explain": "Treize heures is 13:00."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What time is the appointment?",
+      "options": [
+        "9:03",
+        "9:13",
+        "9:30",
+        "14:30"
+      ],
+      "answer": 2,
+      "explain": "9 h 30 means 9:30.",
+      "promptFr": "MARDI 14 AVRIL · 9 h 30 · Clinique Sainte-Anne"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is this place open?",
+      "options": [
+        "Wednesday to Friday, 10:00 to 18:00",
+        "Wednesday to Saturday, 10:00 to 18:00",
+        "Monday to Friday, 10:00 to 18:00",
+        "Wednesday to Friday, 8:00 to 18:00"
+      ],
+      "answer": 0,
+      "explain": "Mercredi au vendredi means Wednesday through Friday.",
+      "promptFr": "Horaire : mercredi au vendredi, de 10 h à 18 h"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When does the place open?",
+      "options": [
+        "Sunday at 8:00",
+        "Monday at 8:00",
+        "Monday at 18:00",
+        "Friday at 8:00"
+      ],
+      "answer": 1,
+      "explain": "Ouvert le lundi à 8 h.",
+      "promptFr": "Fermé le dimanche. Ouvert le lundi à 8 h."
+    }
+  ]
+}

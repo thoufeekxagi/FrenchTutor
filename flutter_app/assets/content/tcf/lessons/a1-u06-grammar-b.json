@@ -1,0 +1,64 @@
+{
+  "id": "a1-u06-grammar-b",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Grammar: Read a clock time",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Read a clock time",
+      "body": "A schedule often uses the 24-hour clock. In French, write a space, the lower-case symbol h, another space, then the minutes: 9 h 30. Do not write a period after h. In speech, you can say the number of hours directly."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Written and spoken times",
+      "headers": [
+        "On a schedule",
+        "Say it",
+        "Time of day"
+      ],
+      "rows": [
+        [
+          "9 h",
+          "neuf heures",
+          "9 a.m."
+        ],
+        [
+          "9 h 30",
+          "neuf heures trente / neuf heures et demie",
+          "9:30 a.m."
+        ],
+        [
+          "12 h",
+          "midi",
+          "noon"
+        ],
+        [
+          "14 h",
+          "quatorze heures / deux heures de l'après-midi",
+          "2 p.m."
+        ],
+        [
+          "16 h 15",
+          "seize heures quinze / quatre heures quinze de l'après-midi",
+          "4:15 p.m."
+        ],
+        [
+          "0 h",
+          "minuit",
+          "midnight"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "12 h means midi (noon); 0 h means minuit (midnight). For a time on a schedule, use h. In a sentence, use à: Le rendez-vous est à 9 h 30."
+    }
+  ]
+}

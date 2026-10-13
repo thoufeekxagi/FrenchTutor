@@ -1,0 +1,94 @@
+{
+  "id": "a1-u06-reading",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Reading practice",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When does the clinic open on Saturday?",
+      "options": [
+        "8:00",
+        "9:00",
+        "12:00",
+        "16:00"
+      ],
+      "answer": 1,
+      "explain": "Samedi : de 9 h à 12 h.",
+      "promptFr": "CLINIQUE SAINTE-ANNE · Lundi au vendredi : 8 h à 16 h · Samedi : 9 h à 12 h · Dimanche : fermé"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is the clinic closed?",
+      "options": [
+        "Monday",
+        "Wednesday",
+        "Saturday afternoon",
+        "Sunday"
+      ],
+      "answer": 3,
+      "explain": "Dimanche : fermé.",
+      "promptFr": "CLINIQUE SAINTE-ANNE · Lundi au vendredi : 8 h à 16 h · Samedi : 9 h à 12 h · Dimanche : fermé"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What are the weekday hours?",
+      "options": [
+        "8:00 to 16:00",
+        "8:00 to 12:00",
+        "9:00 to 16:00",
+        "9:00 to 17:00"
+      ],
+      "answer": 0,
+      "explain": "Lundi au vendredi : de 8 h à 16 h.",
+      "promptFr": "CLINIQUE SAINTE-ANNE · Lundi au vendredi : 8 h à 16 h · Samedi : 9 h à 12 h · Dimanche : fermé"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What day is the appointment?",
+      "options": [
+        "Monday",
+        "Tuesday",
+        "Thursday",
+        "Friday"
+      ],
+      "answer": 1,
+      "explain": "Mardi means Tuesday.",
+      "promptFr": "RENDEZ-VOUS · Mardi 14 avril · 9 h 30 · Arriver cinq minutes avant."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What time is the appointment?",
+      "options": [
+        "9:03",
+        "9:13",
+        "9:30",
+        "10:30"
+      ],
+      "answer": 2,
+      "explain": "9 h 30 is 9:30.",
+      "promptFr": "RENDEZ-VOUS · Mardi 14 avril · 9 h 30 · Arriver cinq minutes avant."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "When should the person arrive?",
+      "options": [
+        "Five minutes early",
+        "Five minutes late",
+        "At noon",
+        "At 9:30 the next day"
+      ],
+      "answer": 0,
+      "explain": "Arriver cinq minutes avant means arrive five minutes early.",
+      "promptFr": "RENDEZ-VOUS · Mardi 14 avril · 9 h 30 · Arriver cinq minutes avant."
+    }
+  ]
+}

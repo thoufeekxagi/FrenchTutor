@@ -1,0 +1,161 @@
+{
+  "id": "a1-u06-grammar-c",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Grammar: Put a day, date and time together",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Put a day, date and time together",
+      "body": "Use le before a date, and à before a clock time. A schedule that shows opening and closing uses de ... à ...."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "A simple schedule",
+      "headers": [
+        "What you mean",
+        "French pattern"
+      ],
+      "rows": [
+        [
+          "on Tuesday",
+          "mardi"
+        ],
+        [
+          "on Tuesday every week",
+          "le mardi"
+        ],
+        [
+          "on April 14",
+          "le 14 avril"
+        ],
+        [
+          "at 9:30",
+          "à 9 h 30"
+        ],
+        [
+          "from 8:00 to 16:00",
+          "de 8 h à 16 h"
+        ],
+        [
+          "the appointment is Tuesday, April 14, at 9:30",
+          "Le rendez-vous est mardi, le 14 avril, à 9 h 30."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Put a day, date and time together",
+      "body": "• Without le, mardi can name one Tuesday: Le rendez-vous est mardi. With le, le mardi can mean every Tuesday: La clinique est ouverte le mardi.\n• Read a schedule from left to right: first the day or date, then the time. Repeat all three when you confirm an appointment.\n• Use de ... à ... for a time range: La réception est ouverte de 8 h à 16 h."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write each date in French words.  April 14",
+      "options": [
+        "le premier mai",
+        "le quatorze avril",
+        "le trois mars",
+        "le deux juin"
+      ],
+      "answer": 1,
+      "explain": "The answer is le quatorze avril."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write each date in French words.  May 1",
+      "options": [
+        "le quatorze avril",
+        "le trois mars",
+        "le deux juin",
+        "le premier mai"
+      ],
+      "answer": 3,
+      "explain": "The answer is le premier mai."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write each date in French words.  March 3",
+      "options": [
+        "le trois mars",
+        "le quatorze avril",
+        "le premier mai",
+        "le deux juin"
+      ],
+      "answer": 0,
+      "explain": "The answer is le trois mars."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write each date in French words.  June 2",
+      "options": [
+        "le quatorze avril",
+        "le premier mai",
+        "le deux juin",
+        "le trois mars"
+      ],
+      "answer": 2,
+      "explain": "The answer is le deux juin."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write each schedule time in French words.  9 h 30",
+      "options": [
+        "neuf heures trente",
+        "quatorze heures",
+        "midi",
+        "seize heures quinze"
+      ],
+      "answer": 0,
+      "explain": "The answer is neuf heures trente."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write each schedule time in French words.  14 h",
+      "options": [
+        "neuf heures trente",
+        "midi",
+        "seize heures quinze",
+        "quatorze heures"
+      ],
+      "answer": 3,
+      "explain": "The answer is quatorze heures."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Write each schedule time in French words.  12 h",
+      "options": [
+        "midi",
+        "neuf heures trente",
+        "quatorze heures",
+        "seize heures quinze"
+      ],
+      "answer": 0,
+      "explain": "The answer is midi."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Write each schedule time in French words.  16 h 15",
+      "options": [
+        "neuf heures trente",
+        "quatorze heures",
+        "seize heures quinze",
+        "midi"
+      ],
+      "answer": 2,
+      "explain": "The answer is seize heures quinze."
+    }
+  ]
+}

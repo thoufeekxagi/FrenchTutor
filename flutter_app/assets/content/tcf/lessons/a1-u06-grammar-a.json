@@ -1,0 +1,98 @@
+{
+  "id": "a1-u06-grammar-a",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Grammar: Say and write the date",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Say and write the date",
+      "body": "You learned the months and date of birth in Unit 3. Use the same order for any date: day number + month. The first day of a month is special: say le premier and write 1er. Other dates use the regular number."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Dates in French",
+      "headers": [
+        "Written date",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "le 3 mars",
+          "le trois mars"
+        ],
+        [
+          "le 14 avril",
+          "le quatorze avril"
+        ],
+        [
+          "le 1er mai",
+          "le premier mai"
+        ],
+        [
+          "mardi 14 avril",
+          "mardi, le quatorze avril"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Review: the twelve months",
+      "headers": [
+        "Month",
+        "Say it",
+        "Month",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "janvier",
+          "zhah(n)-VYAY",
+          "juillet",
+          "zhwee-YEH"
+        ],
+        [
+          "février",
+          "fay-vree-AY",
+          "août",
+          "oot"
+        ],
+        [
+          "mars",
+          "mahrs",
+          "septembre",
+          "sehp-TAH(N)br"
+        ],
+        [
+          "avril",
+          "ah-VREEL",
+          "octobre",
+          "ohk-TOHbr"
+        ],
+        [
+          "mai",
+          "may",
+          "novembre",
+          "noh-VAH(N)br"
+        ],
+        [
+          "juin",
+          "zhwa(n)",
+          "décembre",
+          "day-SAH(N)br"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Tip",
+      "body": "The names of weekdays and months are normally lower-case in French: mardi 14 avril. Use a capital only at the start of a sentence or in a proper name."
+    }
+  ]
+}

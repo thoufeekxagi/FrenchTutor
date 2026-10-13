@@ -1,0 +1,86 @@
+{
+  "id": "a1-u06-listening",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Listening practice",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Votre rendez-vous est jeudi, le 12 mars, à quatorze heures trente.",
+      "question": "When is the appointment?",
+      "options": [
+        "Thursday, March 12 at 14:30",
+        "Thursday, March 12 at 14:13",
+        "Tuesday, March 12 at 14:30",
+        "Thursday, May 12 at 14:30"
+      ],
+      "answer": 0,
+      "explain": "Jeudi, le 12 mars, à quatorze heures trente."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La réception est ouverte du lundi au vendredi, de huit heures à seize heures.",
+      "question": "When is reception open?",
+      "options": [
+        "Monday to Friday, 8:00 to 16:00",
+        "Monday to Friday, 8:00 to 18:00",
+        "Tuesday to Saturday, 8:00 to 16:00",
+        "Monday to Friday, 9:00 to 16:00"
+      ],
+      "answer": 0,
+      "explain": "Du lundi au vendredi, de 8 h à 16 h."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Bonjour, madame. Je confirme votre rendez-vous pour mardi, le premier juin, à midi.",
+      "question": "What time is the appointment?",
+      "options": [
+        "10:00",
+        "12:00",
+        "13:00",
+        "14:00"
+      ],
+      "answer": 1,
+      "explain": "À midi means at noon."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Le bureau ferme à dix-sept heures trente aujourd'hui.",
+      "question": "When does the office close today?",
+      "options": [
+        "16:30",
+        "17:00",
+        "17:30",
+        "18:30"
+      ],
+      "answer": 2,
+      "explain": "Dix-sept heures trente is 17:30."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le prochain rendez-vous est vendredi, à quinze heures quinze.",
+      "question": "What day and time is the next appointment?",
+      "options": [
+        "Friday at 15:15",
+        "Friday at 15:50",
+        "Thursday at 15:15",
+        "Friday at 5:15 in the morning"
+      ],
+      "answer": 0,
+      "explain": "Vendredi, à quinze heures quinze."
+    }
+  ]
+}

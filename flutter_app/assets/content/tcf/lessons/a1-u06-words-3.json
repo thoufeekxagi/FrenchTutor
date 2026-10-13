@@ -1,0 +1,210 @@
+{
+  "id": "a1-u06-words-3",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Words: time words",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "l'heure (f.)",
+      "en": "hour; time on a clock",
+      "say": "l'heure",
+      "sound": "luhR",
+      "exampleFr": "Quelle heure est-il ?",
+      "exampleEn": "What time is it?"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la minute",
+      "en": "minute",
+      "sound": "lah mee-NÜT",
+      "exampleFr": "Une minute, s'il vous plaît.",
+      "exampleEn": "One minute, please."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "midi",
+      "en": "noon",
+      "sound": "mee-DEE",
+      "exampleFr": "Le rendez-vous est à midi.",
+      "exampleEn": "The appointment is at noon."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "minuit",
+      "en": "midnight",
+      "sound": "mee-NWEE",
+      "exampleFr": "Le bus arrive à minuit.",
+      "exampleEn": "The bus arrives at midnight."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un quart d'heure",
+      "en": "a quarter of an hour",
+      "sound": "uh(n) kahr-duhR",
+      "exampleFr": "La pause dure un quart d'heure.",
+      "exampleEn": "The break lasts a quarter of an hour."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une demi-heure",
+      "en": "half an hour",
+      "sound": "ün duh-mee-uhr",
+      "exampleFr": "Le rendez-vous dure une demi-heure.",
+      "exampleEn": "The appointment lasts half an hour."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "tôt",
+      "en": "early",
+      "sound": "toh",
+      "exampleFr": "La clinique ouvre tôt.",
+      "exampleEn": "The clinic opens early."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "tard",
+      "en": "late",
+      "sound": "tahr",
+      "exampleFr": "Le bureau ferme tard.",
+      "exampleEn": "The office closes late."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "à l'heure",
+      "en": "on time",
+      "sound": "ah luhR",
+      "exampleFr": "Sam arrive à l'heure.",
+      "exampleEn": "Sam arrives on time."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "l'heure (f.)",
+      "options": [
+        "midnight",
+        "hour; time on a clock",
+        "early",
+        "minute"
+      ],
+      "answer": 1,
+      "explain": "l'heure (f.) means hour; time on a clock."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la minute",
+      "options": [
+        "a quarter of an hour",
+        "late",
+        "noon",
+        "minute"
+      ],
+      "answer": 3,
+      "explain": "la minute means minute."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "midi",
+      "options": [
+        "half an hour",
+        "noon",
+        "on time",
+        "midnight"
+      ],
+      "answer": 1,
+      "explain": "midi means noon."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "minuit",
+      "options": [
+        "early",
+        "hour; time on a clock",
+        "a quarter of an hour",
+        "midnight"
+      ],
+      "answer": 3,
+      "explain": "minuit means midnight."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un quart d'heure",
+      "options": [
+        "late",
+        "a quarter of an hour",
+        "minute",
+        "early"
+      ],
+      "answer": 1,
+      "explain": "un quart d'heure means a quarter of an hour."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une demi-heure",
+      "options": [
+        "on time",
+        "noon",
+        "early",
+        "half an hour"
+      ],
+      "answer": 3,
+      "explain": "une demi-heure means half an hour."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "la minute",
+      "question": "Which word did you hear?",
+      "options": [
+        "minuit",
+        "la minute",
+        "tôt",
+        "à l'heure"
+      ],
+      "answer": 1,
+      "explain": "You heard la minute: minute."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "minuit",
+      "question": "Which word did you hear?",
+      "options": [
+        "minuit",
+        "tôt",
+        "à l'heure",
+        "la minute"
+      ],
+      "answer": 0,
+      "explain": "You heard minuit: midnight."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: time words",
+      "body": "Reading a schedule. A schedule tells you when a place opens, closes, or takes a break. Look for the first time, the last time, and the days listed."
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "id": "a1-u06-dialogues",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Dialogues",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la secrétaire",
+      "en": "receptionist, secretary",
+      "sound": "lah suh-kray-TEHR",
+      "exampleFr": "La secrétaire confirme la date.",
+      "exampleEn": "The receptionist confirms the date."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un changement",
+      "en": "a change",
+      "sound": "uh(n) shahnzh-MAH(N)",
+      "exampleFr": "Il y a un changement d'horaire.",
+      "exampleEn": "There is a schedule change."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "jusqu'à",
+      "en": "until, up to",
+      "sound": "zhüs-kah",
+      "exampleFr": "La réception est ouverte jusqu'à 16 h.",
+      "exampleEn": "The reception desk is open until 4 p.m."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "By phone",
+      "body": "Priya calls Clinique Sainte-Anne to book an appointment. She uses vous with the receptionist.",
+      "examples": [
+        {
+          "fr": "Clinique Sainte-Anne, bonjour.",
+          "en": "Secrétaire: Clinique Sainte-Anne, hello."
+        },
+        {
+          "fr": "Bonjour. Je téléphone pour prendre rendez-vous.",
+          "en": "Priya: Hello. I am calling to make an appointment."
+        },
+        {
+          "fr": "Quel jour êtes-vous disponible ?",
+          "en": "Secrétaire: What day are you available?"
+        },
+        {
+          "fr": "Mardi, le 14 avril.",
+          "en": "Priya: Tuesday, April 14."
+        },
+        {
+          "fr": "À 9 h 30 ou à 10 h ?",
+          "en": "Secrétaire: At 9:30 or at 10:00?"
+        },
+        {
+          "fr": "À 9 h 30, s'il vous plaît.",
+          "en": "Priya: At 9:30, please."
+        },
+        {
+          "fr": "C'est confirmé : mardi, le 14 avril, à 9 h 30.",
+          "en": "Secrétaire: It is confirmed: Tuesday, April 14, at 9:30."
+        },
+        {
+          "fr": "Merci. Bonne journée.",
+          "en": "Priya: Thank you. Have a good day."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "At reception",
+      "body": "Sam arrives early for an appointment and checks the time at the desk.",
+      "examples": [
+        {
+          "fr": "Bonjour, monsieur. Votre nom, s'il vous plaît ?",
+          "en": "Secrétaire: Hello, sir. Your name, please?"
+        },
+        {
+          "fr": "Sam Tremblay. J'ai un rendez-vous à 14 h.",
+          "en": "Sam: Sam Tremblay. I have an appointment at 2 p.m."
+        },
+        {
+          "fr": "Oui, monsieur. Le rendez-vous est à 14 h.",
+          "en": "Secrétaire: Yes, sir. The appointment is at 2 p.m."
+        },
+        {
+          "fr": "Je suis en avance.",
+          "en": "Sam: I am early."
+        },
+        {
+          "fr": "La salle d'attente est ici. La réception est ouverte jusqu'à 16 h.",
+          "en": "Secrétaire: The waiting room is here. The reception desk is open until 4 p.m."
+        },
+        {
+          "fr": "Merci beaucoup.",
+          "en": "Sam: Thank you very much."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When is Priya's appointment?",
+      "options": [
+        "Tuesday, April 14 at 9:30",
+        "Tuesday, April 14 at 10:00",
+        "Thursday, April 14 at 9:30",
+        "Tuesday, May 14 at 9:30"
+      ],
+      "answer": 0,
+      "explain": "Priya chooses 9 h 30 on Tuesday, April 14."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is Sam's appointment time?",
+      "options": [
+        "12:00",
+        "14:00",
+        "16:00",
+        "9:30"
+      ],
+      "answer": 1,
+      "explain": "He says 14 h, or 2 p.m."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where does the secretary tell Sam to wait?",
+      "options": [
+        "In the waiting room",
+        "At home",
+        "At the bus stop",
+        "At the office"
+      ],
+      "answer": 0,
+      "explain": "La salle d'attente means the waiting room."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Until what time is reception open?",
+      "options": [
+        "12:00",
+        "14:00",
+        "16:00",
+        "18:00"
+      ],
+      "answer": 2,
+      "explain": "Jusqu'à 16 h means until 4 p.m."
+    }
+  ]
+}

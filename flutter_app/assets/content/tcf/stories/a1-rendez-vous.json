@@ -1,0 +1,228 @@
+{
+  "id": "a1-rendez-vous",
+  "title": "Le rendez-vous de Priya",
+  "titleEn": "Priya's appointment",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Priya checks the date and arrives early for her clinic appointment.",
+  "unit": "a1-u06",
+  "sentences": [
+    {
+      "fr": "Priya regarde son calendrier le matin.",
+      "en": "Priya looks at her calendar in the morning."
+    },
+    {
+      "fr": "Son rendez-vous est mardi, le 14 avril, à 9 h 30.",
+      "en": "Her appointment is Tuesday, April 14, at 9:30.",
+      "note": "Read the number before the month: le 14 avril is April 14."
+    },
+    {
+      "fr": "Les heures d'ouverture sont de 8 h à 16 h.",
+      "en": "The opening hours are from 8 a.m. to 4 p.m."
+    },
+    {
+      "fr": "Priya arrive à 9 h 25, cinq minutes en avance.",
+      "en": "Priya arrives at 9:25, five minutes early.",
+      "note": "9 h 25 is five minutes before 9 h 30."
+    },
+    {
+      "fr": "Elle confirme la date à la réception.",
+      "en": "She confirms the date at reception."
+    },
+    {
+      "fr": "Son prochain rendez-vous est le 1er mai, à 10 h.",
+      "en": "Her next appointment is May 1 at 10 a.m."
+    }
+  ],
+  "words": {
+    "priya": {
+      "en": "Priya (a woman's name)"
+    },
+    "regarde": {
+      "en": "looks at (regarder)",
+      "pos": "verb",
+      "sound": "Ruh-GAHRD"
+    },
+    "son": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "calendrier": {
+      "en": "calendar",
+      "pos": "noun, masculine"
+    },
+    "le": {
+      "en": "the"
+    },
+    "matin": {
+      "en": "morning",
+      "pos": "noun, masculine"
+    },
+    "rendez-vous": {
+      "en": "appointment",
+      "pos": "noun, masculine"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "mardi": {
+      "en": "Tuesday",
+      "pos": "noun, masculine",
+      "sound": "mahr-DEE"
+    },
+    "14": {
+      "en": "fourteen",
+      "pos": "number"
+    },
+    "avril": {
+      "en": "April",
+      "pos": "month",
+      "sound": "ah-VREEL"
+    },
+    "à": {
+      "en": "at, to"
+    },
+    "9": {
+      "en": "nine",
+      "pos": "number"
+    },
+    "h": {
+      "en": "hour symbol in a written time",
+      "pos": "symbol"
+    },
+    "30": {
+      "en": "thirty",
+      "pos": "number"
+    },
+    "les": {
+      "en": "the"
+    },
+    "heures": {
+      "en": "hours, o'clock",
+      "pos": "noun, feminine"
+    },
+    "d'ouverture": {
+      "en": "of opening"
+    },
+    "sont": {
+      "en": "are (être)",
+      "pos": "verb"
+    },
+    "de": {
+      "en": "from, of"
+    },
+    "8": {
+      "en": "eight",
+      "pos": "number"
+    },
+    "16": {
+      "en": "sixteen",
+      "pos": "number"
+    },
+    "arrive": {
+      "en": "arrives (arriver)",
+      "pos": "verb",
+      "sound": "ah-REEV"
+    },
+    "25": {
+      "en": "twenty-five",
+      "pos": "number"
+    },
+    "cinq": {
+      "en": "five",
+      "pos": "number"
+    },
+    "minutes": {
+      "en": "minutes",
+      "pos": "noun, feminine"
+    },
+    "en": {
+      "en": "in (part of the phrase en avance)"
+    },
+    "avance": {
+      "en": "early, ahead of time"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "confirme": {
+      "en": "confirms (confirmer)",
+      "pos": "verb",
+      "sound": "koh(n)-FEERM"
+    },
+    "la": {
+      "en": "the"
+    },
+    "date": {
+      "en": "date",
+      "pos": "noun, feminine"
+    },
+    "réception": {
+      "en": "reception desk",
+      "pos": "noun, feminine",
+      "sound": "ray-sehp-SYOH(N)"
+    },
+    "prochain": {
+      "en": "next",
+      "pos": "adjective"
+    },
+    "1er": {
+      "en": "first (of the month)",
+      "pos": "ordinal",
+      "sound": "pruh-MYAY"
+    },
+    "mai": {
+      "en": "May",
+      "pos": "month",
+      "sound": "may"
+    },
+    "10": {
+      "en": "ten",
+      "pos": "number"
+    }
+  },
+  "keywords": [
+    "calendrier",
+    "rendez-vous",
+    "date",
+    "réception",
+    "avance"
+  ],
+  "quiz": [
+    {
+      "prompt": "What time is Priya's first appointment?",
+      "options": [
+        "8:00",
+        "9:25",
+        "9:30",
+        "10:00"
+      ],
+      "answer": 2,
+      "explain": "Son rendez-vous est à 9 h 30."
+    },
+    {
+      "prompt": "How early does Priya arrive?",
+      "options": [
+        "Five minutes",
+        "Ten minutes",
+        "Twenty-five minutes",
+        "Thirty minutes"
+      ],
+      "answer": 0,
+      "explain": "She arrives at 9 h 25 for 9 h 30."
+    },
+    {
+      "prompt": "When is her next appointment?",
+      "options": [
+        "April 14",
+        "May 1",
+        "May 10",
+        "June 1"
+      ],
+      "answer": 1,
+      "explain": "Le 1er mai is May 1."
+    }
+  ]
+}

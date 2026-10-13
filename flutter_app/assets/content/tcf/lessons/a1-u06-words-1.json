@@ -1,0 +1,215 @@
+{
+  "id": "a1-u06-words-1",
+  "unit": "a1-u06",
+  "unitTitle": "Days, time and appointments",
+  "title": "Words: the days of the week",
+  "subtitle": "Unit 6: Days, time and appointments",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "lundi",
+      "en": "Monday",
+      "sound": "luh(n)-DEE",
+      "exampleFr": "Le lundi, je travaille.",
+      "exampleEn": "On Mondays, I work."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "mardi",
+      "en": "Tuesday",
+      "sound": "mahr-DEE",
+      "exampleFr": "Mardi, je suis à Ottawa.",
+      "exampleEn": "On Tuesday, I am in Ottawa."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "mercredi",
+      "en": "Wednesday",
+      "sound": "mehr-kruh-DEE",
+      "exampleFr": "Mercredi, Sam étudie.",
+      "exampleEn": "On Wednesday, Sam studies."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "jeudi",
+      "en": "Thursday",
+      "sound": "zhuh-DEE",
+      "exampleFr": "Jeudi, la clinique est ouverte.",
+      "exampleEn": "On Thursday, the clinic is open."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "vendredi",
+      "en": "Friday",
+      "sound": "vah(n)-druh-DEE",
+      "exampleFr": "Vendredi, je téléphone.",
+      "exampleEn": "On Friday, I make a phone call."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "samedi",
+      "en": "Saturday",
+      "sound": "sahm-DEE",
+      "exampleFr": "Samedi, le rendez-vous est à 9 h.",
+      "exampleEn": "On Saturday, the appointment is at 9 a.m."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "dimanche",
+      "en": "Sunday",
+      "sound": "dee-MAH(N)SH",
+      "exampleFr": "Le dimanche, je suis à la maison.",
+      "exampleEn": "On Sunday, I am at home."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la semaine",
+      "en": "week, weekday period",
+      "sound": "lah suh-MEHN",
+      "exampleFr": "La semaine a sept jours.",
+      "exampleEn": "The week has seven days."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un jour ouvrable",
+      "en": "a business day",
+      "sound": "uh(n) zhoor oo-VRAHBL",
+      "exampleFr": "Lundi est souvent un jour ouvrable.",
+      "exampleEn": "Monday is often a business day."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "lundi",
+      "options": [
+        "Thursday",
+        "Monday",
+        "Sunday",
+        "Tuesday"
+      ],
+      "answer": 1,
+      "explain": "lundi means Monday."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "mardi",
+      "options": [
+        "Friday",
+        "week, weekday period",
+        "Wednesday",
+        "Tuesday"
+      ],
+      "answer": 3,
+      "explain": "mardi means Tuesday."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "mercredi",
+      "options": [
+        "Saturday",
+        "Wednesday",
+        "a business day",
+        "Thursday"
+      ],
+      "answer": 1,
+      "explain": "mercredi means Wednesday."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "jeudi",
+      "options": [
+        "Sunday",
+        "Monday",
+        "Friday",
+        "Thursday"
+      ],
+      "answer": 3,
+      "explain": "jeudi means Thursday."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "vendredi",
+      "options": [
+        "week, weekday period",
+        "Friday",
+        "Tuesday",
+        "Saturday"
+      ],
+      "answer": 1,
+      "explain": "vendredi means Friday."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "samedi",
+      "options": [
+        "a business day",
+        "Wednesday",
+        "Sunday",
+        "Saturday"
+      ],
+      "answer": 3,
+      "explain": "samedi means Saturday."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "mardi",
+      "question": "Which word did you hear?",
+      "options": [
+        "jeudi",
+        "mardi",
+        "samedi",
+        "la semaine"
+      ],
+      "answer": 1,
+      "explain": "You heard mardi: Tuesday."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "jeudi",
+      "question": "Which word did you hear?",
+      "options": [
+        "jeudi",
+        "samedi",
+        "la semaine",
+        "mardi"
+      ],
+      "answer": 0,
+      "explain": "You heard jeudi: Thursday."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "Use fin de semaine for the weekend in Canada, especially in Québec. It is common and standard here. Week-end is also understood. The word fin means end; semaine means week."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Words: the days of the week",
+      "body": "Dates and seasons. The months appeared in Unit 3. Here you will use them to read full dates and talk about the seasons. French month names are written with a lower-case first letter."
+    }
+  ]
+}
