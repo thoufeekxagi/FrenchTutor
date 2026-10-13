@@ -33,6 +33,8 @@ class V3LessonPlayer extends ConsumerStatefulWidget {
     super.key,
     required this.lesson,
     this.startAt = 0,
+    this.frontier = 0,
+    this.reviewAll = false,
     @visibleForTesting this.marie,
   });
 
@@ -40,6 +42,20 @@ class V3LessonPlayer extends ConsumerStatefulWidget {
 
   /// Step to start from when the learner left this lesson half way.
   final int startAt;
+
+  /// The furthest step the learner has really reached (real progress). Going
+  /// back to review never lowers it.
+  final int frontier;
+
+  /// True when the lesson is already finished: every step can be revisited
+  /// freely and nothing here changes the learner's progress.
+  final bool reviewAll;
+
+  /// A second tap on Continue inside this window is ignored, so a double tap
+  /// can never skip a step. Tests shorten it because they cannot move the real
+  /// clock.
+  @visibleForTesting
+  static Duration advanceGuard = const Duration(milliseconds: 450);
 
   /// Tests pass a scripted Marie. Production builds the real one.
   final V3MarieSession? marie;
@@ -91,6 +107,15 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
   }
 
   late int _index = widget.startAt.clamp(0, widget.lesson.steps.length - 1);
+
+  /// Furthest step reached. Review (going back) never lowers it.
+  late int _frontier = widget.reviewAll
+      ? widget.lesson.steps.length - 1
+      : widget.frontier.clamp(_index, widget.lesson.steps.length - 1);
+
+  /// What the learner chose on each question this visit, so going back shows
+  /// the answer again instead of asking twice.
+  final _answers = <String, int>{};
   var _lastAdvance = DateTime.fromMillisecondsSinceEpoch(0);
   int? _selected;
   var _checked = false;
@@ -124,6 +149,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     _lastAdvance = DateTime.now();
     final correct = _selected == _answer;
     _results[_step.id] = correct;
+    _answers[_step.id] = _selected!;
     if (!correct) {
       _missed.add(switch (_step) {
         V3ChooseStep s => s.promptFr.isNotEmpty ? s.promptFr : s.prompt,
@@ -139,9 +165,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
   void _next() {
     // A double tap must never skip a step: ignore a second tap right away.
     final now = DateTime.now();
-    if (now.difference(_lastAdvance) < const Duration(milliseconds: 450)) {
-      return;
-    }
+    if (now.difference(_lastAdvance) < V3LessonPlayer.advanceGuard) return;
     _lastAdvance = now;
     if (_index == _lesson.steps.length - 1) {
       unawaited(V3Progress.markDone(_lesson.id));
@@ -151,12 +175,42 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     }
     setState(() {
       _index += 1;
-      _selected = null;
-      _checked = false;
+      if (_index > _frontier) _frontier = _index;
+      _restoreStepState();
     });
-    unawaited(V3Progress.savePosition(_lesson.id, _index));
+    unawaited(V3Progress.advanceFrontier(_lesson.id, _index));
     _marie.screenChanged();
   }
+
+  /// Back to the step before, to look again. Real progress is untouched: the
+  /// frontier stays where it was, so Resume still returns there.
+  void _back() {
+    if (_index == 0) return;
+    setState(() {
+      _index -= 1;
+      _restoreStepState();
+    });
+    _marie.screenChanged();
+  }
+
+  void _jumpToFrontier() {
+    if (_index >= _frontier) return;
+    setState(() {
+      _index = _frontier;
+      _restoreStepState();
+    });
+    _marie.screenChanged();
+  }
+
+  /// A step the learner already answered shows that answer; anything else is
+  /// fresh.
+  void _restoreStepState() {
+    final answered = _answers[_step.id];
+    _selected = answered;
+    _checked = answered != null;
+  }
+
+  bool get _reviewing => !widget.reviewAll && _index < _frontier;
 
   /// What Marie knows about the screen, replaced on every step. Small on
   /// purpose: it is re-sent whenever the step changes.
@@ -263,6 +317,34 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
             ],
           ),
         ),
+        if (_reviewing)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 6, 24, 0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Reviewing. Your progress is at step ${_frontier + 1}.',
+                    style: V3Type.body(13.5, DesignTokens.inkSoft),
+                  ),
+                ),
+                V3Pressable(
+                  key: const ValueKey('lesson.jumpToFrontier'),
+                  label: 'Go to step ${_frontier + 1}',
+                  onTap: _jumpToFrontier,
+                  child: Container(
+                    constraints: const BoxConstraints(minHeight: 44),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.only(left: 12),
+                    child: Text(
+                      'Go to step ${_frontier + 1}',
+                      style: V3Type.strong(14, DesignTokens.primary),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         Expanded(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 260),
@@ -560,11 +642,48 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
 
   // ---- Bottom bar --------------------------------------------------------
 
+  Widget _backButton() {
+    return V3Pressable(
+      key: const ValueKey('lesson.back'),
+      label: 'Previous step',
+      onTap: _back,
+      child: Container(
+        width: 58,
+        height: 58,
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: DesignTokens.hairline),
+        ),
+        child: Icon(
+          CupertinoIcons.chevron_left,
+          size: 22,
+          color: DesignTokens.ink,
+        ),
+      ),
+    );
+  }
+
+  /// The main button, with a Previous button beside it once there is a step to
+  /// go back to. Continue stays the one dominant action.
+  Widget _withBack(Widget main) {
+    if (_index == 0) return main;
+    return Row(
+      children: [
+        _backButton(),
+        const SizedBox(width: 12),
+        Expanded(child: main),
+      ],
+    );
+  }
+
   Widget _bottomBar() {
     // The bar owns the bottom inset so the feedback colour reaches the edge.
     final safeBottom = MediaQuery.paddingOf(context).bottom;
     if (_isQuestion && _checked) {
-      final correct = _results[_step.id] == true;
+      final correct =
+          _results[_step.id] == true ||
+          (!_results.containsKey(_step.id) && _answers[_step.id] == _answer);
       final tone = correct ? DesignTokens.success : DesignTokens.danger;
       return Container(
         width: double.infinity,
@@ -593,28 +712,54 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
               Text(_explain, style: V3Type.body(15, DesignTokens.ink)),
             ],
             const SizedBox(height: 16),
-            V3Button(
-              key: const ValueKey('lesson.continue'),
-              label: 'Continue',
-              onTap: _next,
+            _withBack(
+              V3Button(
+                key: const ValueKey('lesson.continue'),
+                label: 'Continue',
+                onTap: _next,
+              ),
             ),
           ],
         ),
       );
     }
+    // Looking again at a question from earlier: answering is optional.
+    final skippable =
+        _isQuestion && !_checked && (_reviewing || widget.reviewAll);
     return Padding(
       padding: EdgeInsets.fromLTRB(24, 8, 24, 16 + safeBottom),
-      child: _isQuestion
-          ? V3Button(
-              key: const ValueKey('lesson.check'),
-              label: 'Check',
-              onTap: _selected == null ? null : _check,
-            )
-          : V3Button(
-              key: const ValueKey('lesson.continue'),
-              label: 'Continue',
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _withBack(
+            _isQuestion
+                ? V3Button(
+                    key: const ValueKey('lesson.check'),
+                    label: 'Check',
+                    onTap: _selected == null ? null : _check,
+                  )
+                : V3Button(
+                    key: const ValueKey('lesson.continue'),
+                    label: 'Continue',
+                    onTap: _next,
+                  ),
+          ),
+          if (skippable)
+            V3Pressable(
+              key: const ValueKey('lesson.skipQuestion'),
+              label: 'Skip this question',
               onTap: _next,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 44),
+                alignment: Alignment.center,
+                child: Text(
+                  'Skip this question',
+                  style: V3Type.strong(14.5, DesignTokens.primary),
+                ),
+              ),
             ),
+        ],
+      ),
     );
   }
 

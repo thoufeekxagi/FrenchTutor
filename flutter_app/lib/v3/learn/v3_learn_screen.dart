@@ -43,6 +43,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   List<V3Lesson> _course = const [];
   Set<String> _done = const {};
   Map<String, int> _pos = const {};
+  String? _active;
+  String? _lastDone;
   List<V3Story> _stories = const [];
   Set<String> _storiesDone = const {};
   String? _openUnit;
@@ -58,6 +60,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     final course = await V3Course.load();
     final done = await V3Progress.completed();
     final pos = await V3Progress.positions();
+    final active = await V3Progress.lastActive();
+    final lastDone = await V3Progress.lastCompleted();
     final stories = await V3Stories.load();
     final storiesDone = await V3StoryProgress.done();
     final prefs = await SharedPreferences.getInstance();
@@ -67,6 +71,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       _course = course;
       _done = done;
       _pos = pos;
+      _active = active;
+      _lastDone = lastDone;
       _stories = stories;
       _storiesDone = storiesDone;
       _examDate = raw == null ? null : DateTime.tryParse(raw);
@@ -74,20 +80,99 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     });
   }
 
-  V3Lesson? get _next {
-    for (final lesson in _course) {
-      if (!_done.contains(lesson.id)) return lesson;
-    }
-    return null;
-  }
+  /// Where Resume goes. One rule, kept in [V3Progress.pickNext].
+  V3Lesson? get _next => V3Progress.pickNext(
+    _course,
+    _done,
+    _pos,
+    active: _active,
+    lastCompleted: _lastDone,
+  );
 
-  Future<void> _openLesson(V3Lesson lesson) async {
+  /// [review] opens from the first step to look again. It never lowers real
+  /// progress: the furthest step reached is kept and Resume still returns to it.
+  Future<void> _openLesson(V3Lesson lesson, {bool review = false}) async {
+    final reached = _pos[lesson.id] ?? 0;
+    final finished = _done.contains(lesson.id);
     await AppRouter.push<bool>(
       context,
-      (_) => V3LessonPlayer(lesson: lesson, startAt: _pos[lesson.id] ?? 0),
+      (_) => V3LessonPlayer(
+        lesson: lesson,
+        startAt: review || finished ? 0 : reached,
+        frontier: reached,
+        reviewAll: finished,
+      ),
       fullscreenDialog: true,
     );
     if (mounted) unawaited(_load());
+  }
+
+  /// A lesson row. Unfinished with progress: resume or look again. Finished:
+  /// replay. Not started: start.
+  Future<void> _tapLesson(V3Lesson lesson) async {
+    final reached = _pos[lesson.id] ?? 0;
+    if (_done.contains(lesson.id) || reached == 0) {
+      return _openLesson(lesson);
+    }
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => V3Width(
+        child: Container(
+          key: const ValueKey('learn.sheet'),
+          padding: EdgeInsets.fromLTRB(
+            24,
+            12,
+            24,
+            20 + MediaQuery.paddingOf(context).bottom,
+          ),
+          decoration: BoxDecoration(
+            color: DesignTokens.canvas,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: DesignTokens.hairline,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(lesson.title, style: V3Type.title(24)),
+              const SizedBox(height: 4),
+              Text(
+                'You reached step ${reached + 1} of ${lesson.steps.length}.',
+                style: V3Type.body(15),
+              ),
+              const SizedBox(height: 18),
+              V3Button(
+                key: const ValueKey('learn.sheet.resume'),
+                label: 'Resume at step ${reached + 1}',
+                onTap: () => Navigator.of(context).pop('resume'),
+              ),
+              const SizedBox(height: 10),
+              V3Button(
+                key: const ValueKey('learn.sheet.review'),
+                label: 'Review from the start',
+                kind: V3ButtonKind.ghost,
+                trailingArrow: false,
+                onTap: () => Navigator.of(context).pop('review'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    await _openLesson(lesson, review: choice == 'review');
   }
 
   Future<void> _openStory(V3Story story) async {
@@ -509,7 +594,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     return V3Pressable(
       key: ValueKey('learn.lesson.${l.id}'),
       label: 'Lesson, ${l.title}',
-      onTap: () => _openLesson(l),
+      onTap: () => _tapLesson(l),
       child: Container(
         padding: const EdgeInsets.fromLTRB(38, 12, 18, 12),
         decoration: BoxDecoration(
@@ -524,8 +609,10 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                   Text(l.title, style: V3Type.strong(15)),
                   const SizedBox(height: 2),
                   Text(
-                    at > 0 && !done
-                        ? '${l.minutes} min  ·  in progress'
+                    done
+                        ? '${l.minutes} min  ·  tap to replay'
+                        : at > 0
+                        ? '${l.minutes} min  ·  in progress, step ${at + 1}'
                         : '${l.minutes} min',
                     style: V3Type.body(12.5),
                   ),
@@ -535,6 +622,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
             Icon(
               done
                   ? CupertinoIcons.checkmark_circle_fill
+                  : at > 0
+                  ? CupertinoIcons.play_circle_fill
                   : CupertinoIcons.play_circle,
               color: done ? DesignTokens.success : DesignTokens.inkSoft,
               size: 24,

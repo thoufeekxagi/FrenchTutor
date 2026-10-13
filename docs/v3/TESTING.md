@@ -155,3 +155,8 @@ removal passes it.
 3. For behavior: one on-device test drives it end to end.
 4. `git status` is understood. Nothing unrelated was reformatted. If a
    formatter or generator touched an unrelated file, revert that file.
+
+## Progress and navigation
+
+`test/v3_progress_test.dart` (frontier only moves forward, finished lessons get none, `pickNext` order) and `test/v3_lesson_navigation_test.dart` (Previous, Go to step N, review does not rewrite progress, replay changes nothing, answered questions persist, skip when reviewing). `integration_test/v3_resume_test.dart` also goes back a step before leaving and checks Resume still offers the furthest step.
+

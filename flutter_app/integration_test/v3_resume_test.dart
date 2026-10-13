@@ -64,14 +64,27 @@ void main() {
     expect(t, contains(fifth.fr), reason: 'double tap should move one step');
     expect(t, isNot(contains(sixth.fr)), reason: 'double tap skipped a step');
 
+    // Look back one step: progress must not move backwards.
+    await press(tester, 'Previous step');
+    final t2 = await texts(tester);
+    expect(t2, contains(fourth.fr), reason: 'Previous did not go back a step');
+    expect(
+      t2.any((e) => e.toString().contains('Your progress is at step 5')),
+      isTrue,
+      reason: 'review must say where real progress is',
+    );
+    await probe.capture(tester, '00b_reviewing');
+
     // Leave, and come back.
     await press(tester, 'Close lesson');
     await probe.waitForLabel(tester, 'Resume lesson');
     await probe.settle(tester, timeout: const Duration(seconds: 6));
     await probe.capture(tester, '01_resume_offered');
     expect(
-      (await texts(tester)).any((e) => e.toString().startsWith('RESUME')),
+      (await texts(tester)).any((e) => e.toString().contains('STEP 5 OF')),
       isTrue,
+      reason:
+          'Resume must offer the furthest step reached, not the step reviewed',
     );
     await press(tester, 'Resume lesson');
     await probe.capture(tester, '02_resumed');

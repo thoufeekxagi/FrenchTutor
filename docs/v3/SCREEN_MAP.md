@@ -485,17 +485,22 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/v3/learn/v3_learn_screen.dart`
 - widgets: V3LearnScreen
-- opens: SpeakCourseActivityScreen, SpeakReviewScreen, V3LessonPlayer
-- tap handlers: 5
-- keys: `learn.lesson.${s.contentKey}`, `learn.review`, `learn.segment.${label.toLowerCase()}`, `learn.startLesson`, `learn.unit.$unit`
-- labels: 'Start lesson', 'Time to review'
+- opens: V3LessonPlayer, V3StoryReader
+- tap handlers: 8
+- keys: `learn.lesson.${l.id}`, `learn.readStory`, `learn.segment.${label.toLowerCase()}`, `learn.sheet`, `learn.sheet.resume`, `learn.sheet.review`, `learn.startLesson`, `learn.story.${s.id}`, `learn.unit.$unit`
+- labels: 'Read a story', 'Review from the start'
 
 ## `lib/v3/lesson/v3_lesson_player.dart`
 - widgets: V3LessonPlayer, V3Speaker
-- opens: SpeakingPracticeScreen
+- tap handlers: 11
+- keys: `lesson.back`, `lesson.check`, `lesson.close`, `lesson.continue`, `lesson.done`, `lesson.jumpToFrontier`, `lesson.option.$i`, `lesson.skipQuestion`, `step-${_step.id}`
+- labels: 'Check', 'Close lesson', 'Continue', 'Done', 'Previous step', 'Skip this question'
+
+## `lib/v3/marie/v3_marie_dock.dart`
+- widgets: V3MarieCallButton, V3MarieDock
 - tap handlers: 8
-- keys: `lesson.askMarie`, `lesson.check`, `lesson.close`, `lesson.continue`, `lesson.done`, `lesson.option.$i`, `step-${_step.id}`
-- labels: 'Ask Marie', 'Check', 'Close lesson', 'Continue', 'Done'
+- keys: `lesson.askMarie`, `marie.dock`, `marie.end`, `marie.mute`, `marie.pill`, `marie.retry`, `marie.sheet`, `marie.skip`
+- labels: 'Close', 'End call', 'Try again'
 
 ## `lib/v3/marie/v3_marie_screen.dart`
 - widgets: V3MarieScreen
@@ -522,6 +527,18 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - tap handlers: 1
 - keys: `shell.tab.$id`
 
+## `lib/v3/story/v3_stories_panel.dart`
+- widgets: V3StoriesPanel
+- opens: V3StoryReader
+- tap handlers: 3
+- keys: `stories.card.${s.id}`, `stories.featured`, `stories.level.$level`
+
+## `lib/v3/story/v3_story_reader.dart`
+- widgets: V3StoryReader, _WordPopover, _SettingsSheet
+- tap handlers: 19
+- keys: `story.back`, `story.dock.play`, `story.dock.rate`, `story.dock.replay`, `story.dock.stop`, `story.finish`, `story.popover`, `story.popover.dismiss`, `story.popover.hear`, `story.quiz.check`, `story.quiz.next`, `story.quiz.option.$i`, `story.settings`, `story.settings.$id`, `story.settings.$id.${it.$2}`, `story.tab.${names[i].toLowerCase()}`, `story.textSize`, `story.translate`, `story.words.hear.$key`, `story.words.save.$key`
+- labels: 'Check', 'Done', 'Hear word'
+
 ## `lib/v3/tests/v3_tests_screen.dart`
 - widgets: V3TestsScreen
 - opens: ExamReadinessScreen
@@ -529,7 +546,7 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - keys: `tests.section.${s.$1.toLowerCase()}`
 
 ## `lib/v3/ui/v3_ui.dart`
-- widgets: V3Pressable, V3Button, V3TextAction, V3OptionCard, V3Segments, V3FadeIn, V3Screen
+- widgets: V3Pressable, V3Button, V3TextAction, V3OptionCard, V3Segments, V3FadeIn, V3Screen, V3Width
 - tap handlers: 6
 
 ## `lib/widgets/adaptive/adaptive.dart`

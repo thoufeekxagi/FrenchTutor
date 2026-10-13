@@ -86,3 +86,14 @@ model to notice. A tutor that praises her own voice is a bug.
 - **The server resets a connection about every ten minutes** (goAway). For the lesson coach the swap waits until she finishes her sentence, and up to three bounded reconnects are allowed.
 - **An unanswered listening line is heard but never shown** (`speak(reveal: false)`), so the pill cannot give the answer away.
 - **Every word the learner studies has an example sentence.** `check_book.py` fails the build otherwise.
+
+## 9. Real progress versus looking around (one rule for Resume)
+
+- `V3Progress` (`lib/v3/lesson/v3_course.dart`) is the only place that knows where Resume goes. Do not add a second progress store.
+- **Frontier** = the furthest step reached in an unfinished lesson. It only moves forward (`advanceFrontier`). Going back, reviewing, replaying or reopening never lowers it.
+- **Review** is free: the lesson player has a Previous button, a "Reviewing. Your progress is at step N" line with "Go to step N", and earlier questions can be skipped. An answered question shows its answer again when you come back.
+- **Replay** of a finished lesson (`reviewAll`) changes nothing. Finished lessons never get a frontier, and replaying does not move the path (`lastCompleted` is set only the first time).
+- **Resume order** (`V3Progress.pickNext`): the unfinished lesson last moved forward in, else the first unfinished lesson after the one finished last, else any left behind.
+- **Path rows:** unfinished with progress asks "Resume at step N" or "Review from the start". Finished says "tap to replay".
+- Stories keep their own free-reading position and are not part of this rule.
+

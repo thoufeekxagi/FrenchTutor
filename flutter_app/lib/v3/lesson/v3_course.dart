@@ -39,26 +39,61 @@ abstract final class V3Course {
   }
 }
 
-/// Which authored lessons the learner has finished, and where they stopped in
-/// the one they left half way. Local to this device.
+/// Real progress, kept apart from where the learner is looking.
+///
+/// - **completed**: lessons finished.
+/// - **frontier** (`positions`): the furthest step reached in a lesson that is
+///   not finished. It only ever moves forward. Going back to review, replaying,
+///   or reopening never lowers it, so Resume always means "where I really got
+///   to".
+/// - **active**: the unfinished lesson the learner last moved forward in.
+/// - **lastCompleted**: the lesson finished most recently, so the path carries
+///   on from there.
+///
+/// Local to this device. This is the single place that knows where Resume goes.
 abstract final class V3Progress {
   static String get _doneKey => v3Key('v3_completed_lessons');
   static String get _posKey => v3Key('v3_lesson_position');
+  static String get _activeKey => v3Key('v3_last_active_lesson');
+  static String get _lastDoneKey => v3Key('v3_last_completed_lesson');
 
   static Future<Set<String>> completed() async {
     final prefs = await SharedPreferences.getInstance();
     return (prefs.getStringList(_doneKey) ?? const []).toSet();
   }
 
-  static Future<void> markDone(String lessonId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final set = (prefs.getStringList(_doneKey) ?? const []).toSet()
-      ..add(lessonId);
-    await prefs.setStringList(_doneKey, set.toList());
-    await savePosition(lessonId, 0);
+  // Every change is a read, change, write. Two quick ones must never
+  // interleave, or the later write could undo the earlier one.
+  static Future<void> _tail = Future<void>.value();
+  static Future<void> _serial(Future<void> Function() change) {
+    final next = _tail.then((_) => change());
+    _tail = next.catchError((_) {});
+    return next;
   }
 
-  /// Step to resume from, by lesson id. Missing or zero means start at the top.
+  /// Tests run each case in its own fake-time zone; a write left unfinished by
+  /// one case must not hold up the next.
+  @visibleForTesting
+  static void resetQueueForTest() => _tail = Future<void>.value();
+
+  static Future<String?> lastActive() async =>
+      (await SharedPreferences.getInstance()).getString(_activeKey);
+
+  static Future<String?> lastCompleted() async =>
+      (await SharedPreferences.getInstance()).getString(_lastDoneKey);
+
+  static Future<void> markDone(String lessonId) => _serial(() async {
+    final prefs = await SharedPreferences.getInstance();
+    final set = (prefs.getStringList(_doneKey) ?? const []).toSet();
+    final firstTime = set.add(lessonId);
+    await prefs.setStringList(_doneKey, set.toList());
+    await _savePosition(lessonId, 0);
+    // Replaying a finished lesson must not move the path.
+    if (firstTime) await prefs.setString(_lastDoneKey, lessonId);
+    if (prefs.getString(_activeKey) == lessonId) await prefs.remove(_activeKey);
+  });
+
+  /// Furthest step reached, by lesson id. Missing means nothing real yet.
   static Future<Map<String, int>> positions() async {
     final prefs = await SharedPreferences.getInstance();
     final out = <String, int>{};
@@ -71,7 +106,29 @@ abstract final class V3Progress {
     return out;
   }
 
-  static Future<void> savePosition(String lessonId, int step) async {
+  /// The learner moved forward to [step]. Only moves progress forward, never
+  /// for a finished lesson (a replay is practice, not progress).
+  static Future<void> advanceFrontier(String lessonId, int step) =>
+      _serial(() async {
+        if (step <= 0) return;
+        final prefs = await SharedPreferences.getInstance();
+        if ((prefs.getStringList(_doneKey) ?? const []).contains(lessonId)) {
+          return;
+        }
+        final map = await positions();
+        if ((map[lessonId] ?? 0) < step) {
+          map[lessonId] = step;
+          await _write(prefs, map);
+        }
+        await prefs.setString(_activeKey, lessonId);
+      });
+
+  /// Raw write. Prefer [advanceFrontier]; this exists so finishing a lesson can
+  /// clear its position.
+  static Future<void> savePosition(String lessonId, int step) =>
+      _serial(() => _savePosition(lessonId, step));
+
+  static Future<void> _savePosition(String lessonId, int step) async {
     final prefs = await SharedPreferences.getInstance();
     final map = await positions();
     if (step > 0) {
@@ -79,8 +136,43 @@ abstract final class V3Progress {
     } else {
       map.remove(lessonId);
     }
-    await prefs.setStringList(_posKey, [
-      for (final e in map.entries) '${e.key}:${e.value}',
-    ]);
+    await _write(prefs, map);
+  }
+
+  static Future<void> _write(SharedPreferences prefs, Map<String, int> map) =>
+      prefs.setStringList(_posKey, [
+        for (final e in map.entries) '${e.key}:${e.value}',
+      ]);
+
+  /// The one lesson the Learn tab offers as "next".
+  ///
+  /// 1. The unfinished lesson the learner last moved forward in.
+  /// 2. Otherwise the first unfinished lesson after the one finished last, so
+  ///    the path flows on from where they are.
+  /// 3. Otherwise the first unfinished lesson anywhere.
+  static V3Lesson? pickNext(
+    List<V3Lesson> course,
+    Set<String> done,
+    Map<String, int> frontier, {
+    String? active,
+    String? lastCompleted,
+  }) {
+    if (active != null &&
+        !done.contains(active) &&
+        (frontier[active] ?? 0) > 0) {
+      for (final l in course) {
+        if (l.id == active) return l;
+      }
+    }
+    final from = lastCompleted == null
+        ? -1
+        : course.indexWhere((l) => l.id == lastCompleted);
+    for (var i = from + 1; i < course.length; i++) {
+      if (!done.contains(course[i].id)) return course[i];
+    }
+    for (final l in course) {
+      if (!done.contains(l.id)) return l;
+    }
+    return null;
   }
 }
