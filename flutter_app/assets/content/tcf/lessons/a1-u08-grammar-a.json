@@ -1,0 +1,115 @@
+{
+  "id": "a1-u08-grammar-a",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Grammar: ne...pas and pas de",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "ne...pas and pas de",
+      "body": "You can already ask for food and items. Now learn how to say what you do not have, and how to identify the exact item you mean.\n\nTo make a simple sentence negative, put ne before the conjugated verb and pas after it. Before a vowel, ne shortens to n'."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Put ne before the verb and pas after it",
+      "headers": [
+        "Positive",
+        "Negative"
+      ],
+      "rows": [
+        [
+          "Je cherche le rayon.",
+          "Je ne cherche pas le rayon."
+        ],
+        [
+          "J'achète une chemise.",
+          "Je n'achète pas de chemise."
+        ],
+        [
+          "J'ai des pommes.",
+          "Je n'ai pas de pommes."
+        ],
+        [
+          "J'ai un sac.",
+          "Je n'ai pas de sac."
+        ],
+        [
+          "Je voudrais de l'eau.",
+          "Je ne voudrais pas d'eau."
+        ],
+        [
+          "L'article est en solde.",
+          "L'article n'est pas en solde."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "ne...pas and pas de",
+      "body": "• Put ne before the verb and pas after it: Je ne trouve pas le rayon.\n• If the next word begins with a vowel, write n': Je n'achète pas...\n• After pas, un, une, des, du, de la often become de or d': Je n'ai pas de sac; je n'achète pas de pommes; je ne demande pas d'eau.\n• A specific item keeps its article: Je ne cherche pas le rayon; je ne veux pas ce pantalon."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Watch out",
+      "body": "The pas de change is for a direct object with an indefinite or partitive article. With être, keep un or une: Ce n'est pas un sac."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "I do not have a bag.",
+      "options": [
+        "Je n'ai pas de sac.",
+        "Je ne pas ai un sac.",
+        "Je n'ai pas un sac.",
+        "Je pas n'ai de sac."
+      ],
+      "answer": 0,
+      "explain": "Put ne before ai, pas after it, and use de before sac."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "I cannot find any apples.",
+      "options": [
+        "Je ne trouve pas de pommes.",
+        "Je trouve ne pas des pommes.",
+        "Je n'ai pas pommes.",
+        "Je ne trouve de pas pommes."
+      ],
+      "answer": 0,
+      "explain": "After pas, use de with the plural item."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "I do not buy a shirt.",
+      "options": [
+        "Je n'achète pas de chemise.",
+        "Je ne achète pas une chemise.",
+        "Je achète n'pas de chemise.",
+        "Je n'achète une pas chemise."
+      ],
+      "answer": 0,
+      "explain": "Before the vowel in achète, use n'; une changes to de."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "I am not looking for this aisle.",
+      "options": [
+        "Je ne cherche pas ce rayon.",
+        "Je ne cherche pas de rayon.",
+        "Je cherche ne pas ce rayon.",
+        "Je ne pas cherche ce rayon."
+      ],
+      "answer": 0,
+      "explain": "A specific item introduced by ce keeps its demonstrative."
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "a1-u08-write-speak",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Write and speak",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a short shopping message",
+      "body": "Write 3 or 4 short lines. Say what you would like, give one quantity, and say what you do not have.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour. Je voudrais un kilo de pommes et un litre de lait. Je n'ai pas de sac réutilisable. Merci.\n\nCheck:\n• Put ne...pas around the conjugated verb.\n• After pas, use de before the item: pas de sac.\n• Check the quantity and the item name."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: At a shop",
+      "body": "Ask a clerk where one item is. Then point to a specific item of clothing, ask for a size, and say politely if you do not want it.\n\n• Use où est...? to ask where an item is.\n• Use ce or cette to identify the exact item.\n• Say the negative around the verb: je ne veux pas."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Où est le dentifrice ? Merci. Je cherche ce chandail. Vous avez cette taille ? Non ? D'accord, je ne veux pas ce chandail.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

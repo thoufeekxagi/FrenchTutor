@@ -1,0 +1,140 @@
+{
+  "id": "a1-u08-checkpoint",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Checkpoint",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which sentence means “I do not have a reusable bag”?",
+      "options": [
+        "Je n'ai pas de sac réutilisable.",
+        "Je ne pas ai un sac réutilisable.",
+        "Je n'ai pas un sac réutilisable.",
+        "Je ne ai pas de sac réutilisable."
+      ],
+      "answer": 0,
+      "explain": "Use ne...pas around ai, then de before the item."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the correct negative: J'ai des pommes.",
+      "options": [
+        "Je n'ai pas de pommes.",
+        "Je n'ai pas des pommes.",
+        "Je ne pas ai des pommes.",
+        "Je n'ai de pas pommes."
+      ],
+      "answer": 0,
+      "explain": "After pas, the plural article des becomes de."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which word is the short form of ne before a vowel?",
+      "options": [
+        "n'",
+        "ne",
+        "pas",
+        "de"
+      ],
+      "answer": 0,
+      "explain": "Before a vowel, ne becomes n': je n'achète pas."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "___ panier (this/that basket)",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 0,
+      "explain": "Panier is masculine singular before a consonant."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "___ article (this/that item)",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 1,
+      "explain": "Article is masculine singular before a vowel."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "___ robe (this/that dress)",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 2,
+      "explain": "Robe is feminine singular."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "___ chaussettes (these/those socks)",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 3,
+      "explain": "Chaussettes is plural."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What is a dépanneur in a Québec shopping context?",
+      "options": [
+        "A small convenience store",
+        "A pharmacy",
+        "A cashier",
+        "A supermarket aisle"
+      ],
+      "answer": 0,
+      "explain": "A dépanneur is a small convenience store."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "In Québec, what does magasiner mean?",
+      "options": [
+        "To shop in stores",
+        "To pay by card",
+        "To ask for a receipt",
+        "To look for a pharmacy"
+      ],
+      "answer": 0,
+      "explain": "Magasiner is commonly used in Québec for shopping in stores."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which phrase asks for a kilogram of apples?",
+      "options": [
+        "un kilo de pommes",
+        "un litre de pommes",
+        "une boîte de pommes",
+        "un paquet de pommes"
+      ],
+      "answer": 0,
+      "explain": "A kilo is a kilogram; a litre measures liquid."
+    }
+  ]
+}

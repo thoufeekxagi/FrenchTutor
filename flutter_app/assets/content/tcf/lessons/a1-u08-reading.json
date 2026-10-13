@@ -1,0 +1,80 @@
+{
+  "id": "a1-u08-reading",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Reading practice",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What quantity of apples is on the list?",
+      "options": [
+        "One kilogram",
+        "One litre",
+        "One box",
+        "One packet"
+      ],
+      "answer": 0,
+      "explain": "The list says un kilo de pommes.",
+      "promptFr": "LISTE · Un kilo de pommes · Une boîte de céréales · Un litre de lait"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Where are the apples?",
+      "options": [
+        "In the fruit aisle",
+        "At the checkout",
+        "In the pharmacy",
+        "In the clothing section"
+      ],
+      "answer": 0,
+      "explain": "The sign says rayon des fruits.",
+      "promptFr": "ÉPICERIE · RAYON DES FRUITS · Pommes : 3,00 $ / kilo"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which item costs $20?",
+      "options": [
+        "This shirt",
+        "This dress",
+        "These shoes",
+        "This sweater"
+      ],
+      "answer": 0,
+      "explain": "The sign lists cette chemise at 20 dollars.",
+      "promptFr": "Cette chemise : 20 $"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "How much is the discount?",
+      "options": [
+        "$1",
+        "$2",
+        "$10",
+        "$20"
+      ],
+      "answer": 1,
+      "explain": "The coupon offers a 2-dollar reduction.",
+      "promptFr": "COUPON DE RÉDUCTION · 2 $ de réduction sur cet article"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is closed?",
+      "options": [
+        "The checkout",
+        "The pharmacy",
+        "The fruit aisle",
+        "The supermarket"
+      ],
+      "answer": 0,
+      "explain": "The sign says la caisse est fermée.",
+      "promptFr": "La caisse est fermée. Merci d'utiliser cette caisse."
+    }
+  ]
+}

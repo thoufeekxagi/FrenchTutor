@@ -1,0 +1,211 @@
+{
+  "id": "a1-u08-words-1",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Words: stores and asking for help",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "l'épicerie (f.)",
+      "en": "grocery store",
+      "say": "l'épicerie",
+      "sound": "lay-payz-REE",
+      "exampleFr": "L'épicerie est ouverte.",
+      "exampleEn": "The grocery store is open."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le supermarché",
+      "en": "supermarket",
+      "sound": "soo-pehr-mahr-SHAY",
+      "exampleFr": "Le supermarché est grand.",
+      "exampleEn": "The supermarket is big."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la pharmacie",
+      "en": "pharmacy",
+      "sound": "lah fahr-mah-SEE",
+      "exampleFr": "La pharmacie est ici.",
+      "exampleEn": "The pharmacy is here."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le rayon",
+      "en": "aisle, section of a store",
+      "sound": "luh reh-YOH(N)",
+      "exampleFr": "Le rayon est ici.",
+      "exampleEn": "The aisle is here."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la liste",
+      "en": "list",
+      "sound": "lah leest",
+      "exampleFr": "Voici ma liste.",
+      "exampleEn": "Here is my list."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "chercher",
+      "en": "to look for",
+      "sound": "shehr-SHAY",
+      "exampleFr": "Je cherche la pharmacie.",
+      "exampleEn": "I am looking for the pharmacy."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "trouver",
+      "en": "to find",
+      "sound": "troo-VAY",
+      "exampleFr": "Je trouve une épicerie.",
+      "exampleEn": "I find a grocery store."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le commis / la commise",
+      "en": "store clerk",
+      "say": "le commis, la commise",
+      "sound": "luh koh-MEE / lah koh-MEEZ",
+      "exampleFr": "Le commis est ici.",
+      "exampleEn": "The store clerk is here."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "magasiner",
+      "en": "to shop in stores (common in Québec)",
+      "sound": "mah-gah-zee-NAY",
+      "exampleFr": "Je magasine à l'épicerie.",
+      "exampleEn": "I shop at the grocery store."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "l'épicerie (f.)",
+      "options": [
+        "to find",
+        "grocery store",
+        "supermarket",
+        "pharmacy"
+      ],
+      "answer": 1,
+      "explain": "l'épicerie (f.) means grocery store."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le supermarché",
+      "options": [
+        "list",
+        "store clerk",
+        "pharmacy",
+        "supermarket"
+      ],
+      "answer": 3,
+      "explain": "le supermarché means supermarket."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la pharmacie",
+      "options": [
+        "to look for",
+        "pharmacy",
+        "to shop in stores (common in Québec)",
+        "aisle, section of a store"
+      ],
+      "answer": 1,
+      "explain": "la pharmacie means pharmacy."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le rayon",
+      "options": [
+        "to find",
+        "list",
+        "to look for",
+        "aisle, section of a store"
+      ],
+      "answer": 3,
+      "explain": "le rayon means aisle, section of a store."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la liste",
+      "options": [
+        "store clerk",
+        "list",
+        "supermarket",
+        "to look for"
+      ],
+      "answer": 1,
+      "explain": "la liste means list."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "chercher",
+      "options": [
+        "to shop in stores (common in Québec)",
+        "pharmacy",
+        "to find",
+        "to look for"
+      ],
+      "answer": 3,
+      "explain": "chercher means to look for."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le supermarché",
+      "question": "Which word did you hear?",
+      "options": [
+        "le rayon",
+        "le supermarché",
+        "chercher",
+        "magasiner"
+      ],
+      "answer": 1,
+      "explain": "You heard le supermarché: supermarket."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le rayon",
+      "question": "Which word did you hear?",
+      "options": [
+        "le rayon",
+        "chercher",
+        "magasiner",
+        "le supermarché"
+      ],
+      "answer": 0,
+      "explain": "You heard le rayon: aisle, section of a store."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "The dépanneur from Unit 5 is a small shop with everyday items and extended hours. An épicerie or supermarché is where you usually buy a wider range of groceries."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "a1-u08-listening",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Listening practice",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je ne trouve pas de dentifrice.",
+      "question": "What item cannot the customer find?",
+      "options": [
+        "Toothpaste",
+        "Soap",
+        "Shampoo",
+        "A toothbrush"
+      ],
+      "answer": 0,
+      "explain": "Je ne trouve pas de dentifrice means I cannot find toothpaste."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Cette chemise est en solde.",
+      "question": "Which item is on sale?",
+      "options": [
+        "This shirt",
+        "These shoes",
+        "This sweater",
+        "This skirt"
+      ],
+      "answer": 0,
+      "explain": "Cette chemise means this shirt."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je voudrais un litre de lait.",
+      "question": "How much milk does the customer want?",
+      "options": [
+        "One litre",
+        "One kilo",
+        "One box",
+        "One packet"
+      ],
+      "answer": 0,
+      "explain": "The customer asks for un litre de lait."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Vous avez un coupon de réduction ?",
+      "question": "What does the cashier ask about?",
+      "options": [
+        "A discount coupon",
+        "A paper bag",
+        "The shoe size",
+        "The shopping list"
+      ],
+      "answer": 0,
+      "explain": "The cashier asks whether the customer has a coupon."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Vous payez quarante dollars pour ces chaussures.",
+      "question": "How much do you pay for these shoes?",
+      "options": [
+        "$14",
+        "$40",
+        "$44",
+        "$400"
+      ],
+      "answer": 1,
+      "explain": "Quarante dollars is $40."
+    }
+  ]
+}

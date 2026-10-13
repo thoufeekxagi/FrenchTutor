@@ -1,0 +1,153 @@
+{
+  "id": "a1-u08-grammar-b",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Grammar: ce, cet, cette, ces",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "ce, cet, cette, ces",
+      "body": "Use a demonstrative before a noun when you point to something or identify which thing you mean. In English, these forms can mean this, that, these or those; the situation shows whether the item is near or farther away."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "This / that / these / those",
+      "headers": [
+        "Form",
+        "Use it before",
+        "Example"
+      ],
+      "rows": [
+        [
+          "ce",
+          "masculine singular noun starting with a consonant",
+          "ce pantalon"
+        ],
+        [
+          "cet",
+          "masculine singular noun starting with a vowel or silent h",
+          "cet article"
+        ],
+        [
+          "cette",
+          "feminine singular noun",
+          "cette chemise"
+        ],
+        [
+          "ces",
+          "plural noun, masculine or feminine",
+          "ces chaussures"
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "ce, cet, cette, ces",
+      "headers": [
+        "What you point to",
+        "French phrase"
+      ],
+      "rows": [
+        [
+          "this / that sweater",
+          "ce chandail"
+        ],
+        [
+          "this / that item",
+          "cet article"
+        ],
+        [
+          "this / that skirt",
+          "cette jupe"
+        ],
+        [
+          "these / those socks",
+          "ces chaussettes"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "ce, cet, cette, ces",
+      "body": "• Choose the form from the noun, not the English word this or that.\n• Use cet only with a masculine singular noun that begins with a vowel sound: cet article.\n• ce + noun is different from c'est: Ce pantalon est bleu (this/that pair of pants); C'est un pantalon bleu (It is blue pants)."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Watch out",
+      "body": "Cet and cette sound alike in standard French. Listen for the noun and its gender: cet article is masculine; cette étiquette is feminine."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "___ panier",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 0,
+      "explain": "Panier is masculine singular and starts with a consonant: ce panier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "___ article",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 1,
+      "explain": "Article is masculine singular and starts with a vowel: cet article."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "___ chemise",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 2,
+      "explain": "Chemise is feminine singular: cette chemise."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "___ chaussures",
+      "options": [
+        "ce",
+        "cet",
+        "cette",
+        "ces"
+      ],
+      "answer": 3,
+      "explain": "Chaussures is plural: ces chaussures."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which sentence means “this shirt is on sale”?",
+      "options": [
+        "Cette chemise est en solde.",
+        "Ce chemise est en solde.",
+        "Cet chemise est en solde.",
+        "Ces chemise est en solde."
+      ],
+      "answer": 0,
+      "explain": "Chemise is feminine singular, so use cette."
+    }
+  ]
+}

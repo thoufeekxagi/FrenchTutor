@@ -1,0 +1,140 @@
+{
+  "id": "a1-u08-dialogues",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Dialogues",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for ce, cette and ces, then notice where ne...pas sits around the verb. The customer and clerk use vous."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Looking for a sweater",
+      "body": "A customer asks about a size in a clothing store.",
+      "examples": [
+        {
+          "fr": "Bonjour. Je cherche un chandail.",
+          "en": "Client: Hello. I am looking for a sweater."
+        },
+        {
+          "fr": "Ce chandail est en solde.",
+          "en": "Commis: This sweater is on sale."
+        },
+        {
+          "fr": "Vous avez cette taille en noir ?",
+          "en": "Client: Do you have this size in black?"
+        },
+        {
+          "fr": "Non, je n'ai pas cette taille.",
+          "en": "Commis: No, I do not have this size."
+        },
+        {
+          "fr": "D'accord. Je ne veux pas ce chandail.",
+          "en": "Client: Okay. I do not want this sweater."
+        },
+        {
+          "fr": "Cette chemise est aussi en solde.",
+          "en": "Commis: This shirt is also on sale."
+        },
+        {
+          "fr": "Merci. Je regarde.",
+          "en": "Client: Thank you. I will look."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "At the grocery checkout",
+      "body": "Julie buys apples and asks for a bag.",
+      "examples": [
+        {
+          "fr": "Bonjour. Je voudrais un kilo de pommes.",
+          "en": "Julie: Hello. I would like a kilogram of apples."
+        },
+        {
+          "fr": "Vous avez un sac réutilisable ?",
+          "en": "Caissière: Do you have a reusable bag?"
+        },
+        {
+          "fr": "Non, je n'ai pas de sac.",
+          "en": "Julie: No, I do not have a bag."
+        },
+        {
+          "fr": "Voici ce sac en papier.",
+          "en": "Caissière: Here is this paper bag."
+        },
+        {
+          "fr": "Merci. J'ai un coupon de réduction.",
+          "en": "Julie: Thank you. I have a discount coupon."
+        },
+        {
+          "fr": "D'accord. Voici le reçu.",
+          "en": "Caissière: Okay. Here is the receipt."
+        },
+        {
+          "fr": "Je paie par carte.",
+          "en": "Julie: I pay by card."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What size does the customer ask about?",
+      "options": [
+        "This size",
+        "A larger size",
+        "Shoe size 38",
+        "A small size"
+      ],
+      "answer": 0,
+      "explain": "She asks, Vous avez cette taille en noir ?"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why does the customer not take the sweater?",
+      "options": [
+        "The clerk does not have that size",
+        "The sweater is too expensive",
+        "The store is closed",
+        "The customer has no money"
+      ],
+      "answer": 0,
+      "explain": "The clerk says, je n'ai pas cette taille."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What quantity of apples does Julie ask for?",
+      "options": [
+        "One kilogram",
+        "One litre",
+        "One box",
+        "One packet"
+      ],
+      "answer": 0,
+      "explain": "Julie asks for un kilo de pommes."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "How does Julie pay?",
+      "options": [
+        "By card",
+        "In cash",
+        "With a coupon only",
+        "She does not pay"
+      ],
+      "answer": 0,
+      "explain": "She says, Je paie par carte."
+    }
+  ]
+}

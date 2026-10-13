@@ -1,0 +1,205 @@
+{
+  "id": "a1-u08-words-3",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Words: clothes and sizes",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un pantalon",
+      "en": "pair of trousers, pants",
+      "sound": "uh(n) pahn-tah-LOH(N)",
+      "exampleFr": "Le pantalon est noir.",
+      "exampleEn": "The pants are black."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un chandail",
+      "en": "sweater (common in Québec)",
+      "sound": "uh(n) shah(n)-DAHY",
+      "exampleFr": "Le chandail est bleu.",
+      "exampleEn": "The sweater is blue."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une chemise",
+      "en": "shirt",
+      "sound": "ün shuh-MEEZ",
+      "exampleFr": "La chemise est blanche.",
+      "exampleEn": "The shirt is white."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une jupe",
+      "en": "skirt",
+      "sound": "ün zhüp",
+      "exampleFr": "La jupe est rouge.",
+      "exampleEn": "The skirt is red."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une robe",
+      "en": "dress",
+      "sound": "ün rohb",
+      "exampleFr": "La robe est verte.",
+      "exampleEn": "The dress is green."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "les chaussettes (f. pl.)",
+      "en": "socks",
+      "say": "les chaussettes",
+      "sound": "lay shoh-SEHT",
+      "exampleFr": "Les chaussettes sont ici.",
+      "exampleEn": "The socks are here."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "les chaussures (f. pl.)",
+      "en": "shoes",
+      "say": "les chaussures",
+      "sound": "lay shoh-SÜR",
+      "exampleFr": "Les chaussures sont là.",
+      "exampleEn": "The shoes are there."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la taille",
+      "en": "size (for clothes)",
+      "sound": "lah tahy",
+      "exampleFr": "La taille est grande.",
+      "exampleEn": "The size is large."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la pointure",
+      "en": "shoe size",
+      "sound": "lah pwa(n)-TÜR",
+      "exampleFr": "Ma pointure est trente-huit.",
+      "exampleEn": "My shoe size is 38."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un pantalon",
+      "options": [
+        "skirt",
+        "pair of trousers, pants",
+        "shoes",
+        "sweater (common in Québec)"
+      ],
+      "answer": 1,
+      "explain": "un pantalon means pair of trousers, pants."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un chandail",
+      "options": [
+        "dress",
+        "size (for clothes)",
+        "shirt",
+        "sweater (common in Québec)"
+      ],
+      "answer": 3,
+      "explain": "un chandail means sweater (common in Québec)."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une chemise",
+      "options": [
+        "socks",
+        "shirt",
+        "shoe size",
+        "skirt"
+      ],
+      "answer": 1,
+      "explain": "une chemise means shirt."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une jupe",
+      "options": [
+        "shoes",
+        "pair of trousers, pants",
+        "dress",
+        "skirt"
+      ],
+      "answer": 3,
+      "explain": "une jupe means skirt."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une robe",
+      "options": [
+        "size (for clothes)",
+        "dress",
+        "sweater (common in Québec)",
+        "socks"
+      ],
+      "answer": 1,
+      "explain": "une robe means dress."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "les chaussettes (f. pl.)",
+      "options": [
+        "shoe size",
+        "shirt",
+        "shoes",
+        "socks"
+      ],
+      "answer": 3,
+      "explain": "les chaussettes (f. pl.) means socks."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un chandail",
+      "question": "Which word did you hear?",
+      "options": [
+        "une jupe",
+        "un chandail",
+        "les chaussettes",
+        "la taille"
+      ],
+      "answer": 1,
+      "explain": "You heard un chandail: sweater (common in Québec)."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une robe",
+      "question": "Which word did you hear?",
+      "options": [
+        "les chaussures",
+        "une robe",
+        "la pointure",
+        "un chandail"
+      ],
+      "answer": 1,
+      "explain": "You heard une robe: dress."
+    }
+  ]
+}

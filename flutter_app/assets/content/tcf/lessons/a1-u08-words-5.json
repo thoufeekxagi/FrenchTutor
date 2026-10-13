@@ -1,0 +1,206 @@
+{
+  "id": "a1-u08-words-5",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Words: at the checkout",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la caisse",
+      "en": "checkout, cash register",
+      "sound": "lah kehs",
+      "exampleFr": "Je paie à la caisse.",
+      "exampleEn": "I pay at the checkout."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le caissier / la caissière",
+      "en": "cashier",
+      "say": "le caissier, la caissière",
+      "sound": "luh keh-SYAY / lah keh-SYEHR",
+      "exampleFr": "La caissière est ici.",
+      "exampleEn": "The cashier is here."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la file",
+      "en": "line, queue",
+      "sound": "lah feel",
+      "exampleFr": "Je suis dans la file.",
+      "exampleEn": "I am in the line."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un coupon de réduction",
+      "en": "discount coupon",
+      "sound": "uh(n) koo-POH(N) duh ray-dük-SYOH(N)",
+      "exampleFr": "J'ai un coupon de réduction.",
+      "exampleEn": "I have a discount coupon."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "l'article (m.)",
+      "en": "item, product",
+      "say": "l'article",
+      "sound": "lahr-TEEKL",
+      "exampleFr": "L'article est ici.",
+      "exampleEn": "The item is here."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la marque",
+      "en": "brand",
+      "sound": "lah mark",
+      "exampleFr": "Je regarde la marque.",
+      "exampleEn": "I look at the brand."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "l'étiquette (f.)",
+      "en": "label, price tag",
+      "say": "l'étiquette",
+      "sound": "lay-tee-KEHT",
+      "exampleFr": "L'étiquette est sur le chandail.",
+      "exampleEn": "The label is on the sweater."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la réduction",
+      "en": "discount, reduction",
+      "sound": "lah ray-dük-SYOH(N)",
+      "exampleFr": "La réduction est de deux dollars.",
+      "exampleEn": "The discount is two dollars."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un échange",
+      "en": "exchange, exchange of an item",
+      "sound": "uh(n) nay-SHA(N)ZH",
+      "exampleFr": "Je demande un échange.",
+      "exampleEn": "I ask for an exchange."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la caisse",
+      "options": [
+        "discount coupon",
+        "checkout, cash register",
+        "label, price tag",
+        "cashier"
+      ],
+      "answer": 1,
+      "explain": "la caisse means checkout, cash register."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le caissier / la caissière",
+      "options": [
+        "item, product",
+        "discount, reduction",
+        "line, queue",
+        "cashier"
+      ],
+      "answer": 3,
+      "explain": "le caissier / la caissière means cashier."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la file",
+      "options": [
+        "brand",
+        "line, queue",
+        "exchange, exchange of an item",
+        "discount coupon"
+      ],
+      "answer": 1,
+      "explain": "la file means line, queue."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un coupon de réduction",
+      "options": [
+        "label, price tag",
+        "checkout, cash register",
+        "item, product",
+        "discount coupon"
+      ],
+      "answer": 3,
+      "explain": "un coupon de réduction means discount coupon."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "l'article (m.)",
+      "options": [
+        "discount, reduction",
+        "item, product",
+        "cashier",
+        "brand"
+      ],
+      "answer": 1,
+      "explain": "l'article (m.) means item, product."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la marque",
+      "options": [
+        "exchange, exchange of an item",
+        "line, queue",
+        "label, price tag",
+        "brand"
+      ],
+      "answer": 3,
+      "explain": "la marque means brand."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "la file",
+      "question": "Which word did you hear?",
+      "options": [
+        "la marque",
+        "la file",
+        "la réduction",
+        "la caisse"
+      ],
+      "answer": 1,
+      "explain": "You heard la file: line, queue."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "la marque",
+      "question": "Which word did you hear?",
+      "options": [
+        "la marque",
+        "la réduction",
+        "la caisse",
+        "l'article"
+      ],
+      "answer": 0,
+      "explain": "You heard la marque: brand."
+    }
+  ]
+}

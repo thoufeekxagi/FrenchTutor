@@ -1,0 +1,204 @@
+{
+  "id": "a1-u08-words-4",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Words: household and personal-care items",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le savon",
+      "en": "soap",
+      "sound": "luh sah-VOH(N)",
+      "exampleFr": "Le savon est ici.",
+      "exampleEn": "The soap is here."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le shampoing",
+      "en": "shampoo",
+      "sound": "luh shah(n)-PWA(N)",
+      "exampleFr": "Le shampoing est ici.",
+      "exampleEn": "The shampoo is here."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la brosse à dents",
+      "en": "toothbrush",
+      "sound": "lah brohs ah dah(n)",
+      "exampleFr": "La brosse à dents est ici.",
+      "exampleEn": "The toothbrush is here."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le dentifrice",
+      "en": "toothpaste",
+      "sound": "luh dah(n)-tee-FREES",
+      "exampleFr": "Le dentifrice est dans le panier.",
+      "exampleEn": "The toothpaste is in the basket."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le papier hygiénique",
+      "en": "toilet paper",
+      "sound": "luh pah-PYAY ee-zhyay-NEEK",
+      "exampleFr": "Le papier hygiénique est ici.",
+      "exampleEn": "The toilet paper is here."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "l'essuie-tout (m.)",
+      "en": "paper towel (common Canadian term)",
+      "say": "l'essuie-tout",
+      "sound": "leh-SWEE-too",
+      "exampleFr": "L'essuie-tout est ici.",
+      "exampleEn": "The paper towel is here."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une éponge",
+      "en": "sponge",
+      "sound": "ün ay-PO(N)ZH",
+      "exampleFr": "L'éponge est dans le panier.",
+      "exampleEn": "The sponge is in the basket."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le détergent",
+      "en": "detergent",
+      "sound": "luh day-tehr-ZHA(N)",
+      "exampleFr": "Le détergent est ici.",
+      "exampleEn": "The detergent is here."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une pile",
+      "en": "battery",
+      "sound": "ün peel",
+      "exampleFr": "Je demande une pile.",
+      "exampleEn": "I ask for a battery."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le savon",
+      "options": [
+        "toothpaste",
+        "soap",
+        "sponge",
+        "shampoo"
+      ],
+      "answer": 1,
+      "explain": "le savon means soap."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le shampoing",
+      "options": [
+        "toilet paper",
+        "detergent",
+        "toothbrush",
+        "shampoo"
+      ],
+      "answer": 3,
+      "explain": "le shampoing means shampoo."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la brosse à dents",
+      "options": [
+        "paper towel (common Canadian term)",
+        "toothbrush",
+        "battery",
+        "toothpaste"
+      ],
+      "answer": 1,
+      "explain": "la brosse à dents means toothbrush."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le dentifrice",
+      "options": [
+        "sponge",
+        "soap",
+        "toilet paper",
+        "toothpaste"
+      ],
+      "answer": 3,
+      "explain": "le dentifrice means toothpaste."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le papier hygiénique",
+      "options": [
+        "detergent",
+        "toilet paper",
+        "shampoo",
+        "sponge"
+      ],
+      "answer": 1,
+      "explain": "le papier hygiénique means toilet paper."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "l'essuie-tout (m.)",
+      "options": [
+        "battery",
+        "toothbrush",
+        "sponge",
+        "paper towel (common Canadian term)"
+      ],
+      "answer": 3,
+      "explain": "l'essuie-tout (m.) means paper towel (common Canadian term)."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le shampoing",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'essuie-tout",
+        "le shampoing",
+        "le détergent",
+        "le savon"
+      ],
+      "answer": 1,
+      "explain": "You heard le shampoing: shampoo."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "l'essuie-tout",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'essuie-tout",
+        "le détergent",
+        "le savon",
+        "le dentifrice"
+      ],
+      "answer": 0,
+      "explain": "You heard l'essuie-tout: paper towel (common Canadian term)."
+    }
+  ]
+}

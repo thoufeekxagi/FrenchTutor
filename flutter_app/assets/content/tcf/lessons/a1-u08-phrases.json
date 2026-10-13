@@ -1,0 +1,148 @@
+{
+  "id": "a1-u08-phrases",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Phrases",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Start with the item you need. Ask where it is, say what you do not have, then make a clear request. You already know polite vous from earlier units."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Où est le rayon des fruits ?",
+      "en": "Where is the fruit aisle?",
+      "tip": "Say it: oo eh luh reh-YOH(N) day frwee"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je cherche une boîte de céréales.",
+      "en": "I am looking for a box of cereal.",
+      "tip": "Say it: zhuh shehrsh ün bwaht duh say-ray-AHL"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je ne trouve pas de pommes.",
+      "en": "I cannot find any apples.",
+      "tip": "Say it: zhuh nuh troov pah duh pom"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je n'ai pas de sac.",
+      "en": "I do not have a bag.",
+      "tip": "Say it: zhuh nay pah duh sahk"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je voudrais un kilo de pommes.",
+      "en": "I would like a kilogram of apples.",
+      "tip": "Say it: zhuh voo-DREH uh(n) kee-LOH duh pom"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Vous avez cette taille en noir ?",
+      "en": "Do you have this size in black?",
+      "tip": "Say it: voo zah-VAY seht tahy ah(n) nwahr"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Ce pantalon est en solde.",
+      "en": "These pants are on sale.",
+      "tip": "Say it: suh pahn-tah-LOH(N) eh ah(n) sohd"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Je paie à la caisse.",
+      "en": "I pay at the checkout.",
+      "tip": "Say it: zhuh peh ah lah kehs"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "J'ai un coupon de réduction.",
+      "en": "I have a discount coupon.",
+      "tip": "Say it: zhay uh(n) koo-POH(N) duh ray-dük-SYOH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Je demande un échange.",
+      "en": "I ask for an exchange.",
+      "tip": "Say it: zhuh duh-MAH(N)d uh(n) nay-SHA(N)ZH"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Où est le rayon des fruits ?",
+      "options": [
+        "I do not have a bag.",
+        "Where is the fruit aisle?",
+        "These pants are on sale.",
+        "I ask for an exchange."
+      ],
+      "answer": 1,
+      "explain": "Où est le rayon des fruits ? means Where is the fruit aisle?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je ne trouve pas de pommes.",
+      "options": [
+        "Do you have this size in black?",
+        "I cannot find any apples.",
+        "I have a discount coupon.",
+        "I am looking for a box of cereal."
+      ],
+      "answer": 1,
+      "explain": "Je ne trouve pas de pommes. means I cannot find any apples.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je voudrais un kilo de pommes.",
+      "options": [
+        "I pay at the checkout.",
+        "I would like a kilogram of apples.",
+        "Where is the fruit aisle?",
+        "I do not have a bag."
+      ],
+      "answer": 1,
+      "explain": "Je voudrais un kilo de pommes. means I would like a kilogram of apples.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Ce pantalon est en solde.",
+      "options": [
+        "I ask for an exchange.",
+        "These pants are on sale.",
+        "I cannot find any apples.",
+        "Do you have this size in black?"
+      ],
+      "answer": 1,
+      "explain": "Ce pantalon est en solde. means These pants are on sale.."
+    }
+  ]
+}

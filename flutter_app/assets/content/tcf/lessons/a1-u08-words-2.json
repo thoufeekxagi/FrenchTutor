@@ -1,0 +1,203 @@
+{
+  "id": "a1-u08-words-2",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "Words: quantities, containers and groceries",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le panier",
+      "en": "shopping basket",
+      "sound": "luh pah-NYAY",
+      "exampleFr": "Le panier est ici.",
+      "exampleEn": "The basket is here."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le chariot",
+      "en": "shopping cart",
+      "sound": "luh shah-RYOH",
+      "exampleFr": "Le chariot est grand.",
+      "exampleEn": "The shopping cart is big."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un sac réutilisable",
+      "en": "reusable bag",
+      "sound": "uh(n) sahk ray-ü-tee-lee-ZAHBL",
+      "exampleFr": "J'ai un sac réutilisable.",
+      "exampleEn": "I have a reusable bag."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un sac en papier",
+      "en": "paper bag",
+      "sound": "uh(n) sahk ah(n) pah-PYAY",
+      "exampleFr": "J'ai un sac en papier.",
+      "exampleEn": "I have a paper bag."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une boîte",
+      "en": "box, carton",
+      "sound": "ün bwaht",
+      "exampleFr": "Je demande une boîte de céréales.",
+      "exampleEn": "I ask for a box of cereal."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un paquet",
+      "en": "packet, package",
+      "sound": "uh(n) pah-KAY",
+      "exampleFr": "Je demande un paquet de riz.",
+      "exampleEn": "I ask for a packet of rice."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un kilo",
+      "en": "a kilogram",
+      "sound": "uh(n) kee-LOH",
+      "exampleFr": "Je demande un kilo de pommes.",
+      "exampleEn": "I ask for a kilogram of apples."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un litre",
+      "en": "a litre",
+      "sound": "uh(n) leetR",
+      "exampleFr": "Je demande un litre de lait.",
+      "exampleEn": "I ask for a litre of milk."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une pomme",
+      "en": "apple",
+      "sound": "ün pom",
+      "exampleFr": "La pomme est rouge.",
+      "exampleEn": "The apple is red."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le panier",
+      "options": [
+        "paper bag",
+        "shopping basket",
+        "a kilogram",
+        "reusable bag"
+      ],
+      "answer": 1,
+      "explain": "le panier means shopping basket."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le chariot",
+      "options": [
+        "box, carton",
+        "a litre",
+        "reusable bag",
+        "shopping cart"
+      ],
+      "answer": 3,
+      "explain": "le chariot means shopping cart."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un sac réutilisable",
+      "options": [
+        "packet, package",
+        "reusable bag",
+        "apple",
+        "box, carton"
+      ],
+      "answer": 1,
+      "explain": "un sac réutilisable means reusable bag."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un sac en papier",
+      "options": [
+        "a kilogram",
+        "shopping basket",
+        "box, carton",
+        "paper bag"
+      ],
+      "answer": 3,
+      "explain": "un sac en papier means paper bag."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une boîte",
+      "options": [
+        "a litre",
+        "box, carton",
+        "shopping cart",
+        "packet, package"
+      ],
+      "answer": 1,
+      "explain": "une boîte means box, carton."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un paquet",
+      "options": [
+        "apple",
+        "reusable bag",
+        "a kilogram",
+        "packet, package"
+      ],
+      "answer": 3,
+      "explain": "un paquet means packet, package."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le chariot",
+      "question": "Which word did you hear?",
+      "options": [
+        "un paquet",
+        "le chariot",
+        "un litre",
+        "le panier"
+      ],
+      "answer": 1,
+      "explain": "You heard le chariot: shopping cart."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un paquet",
+      "question": "Which word did you hear?",
+      "options": [
+        "un paquet",
+        "un litre",
+        "le panier",
+        "une boîte"
+      ],
+      "answer": 0,
+      "explain": "You heard un paquet: packet, package."
+    }
+  ]
+}

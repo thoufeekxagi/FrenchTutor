@@ -1,0 +1,114 @@
+{
+  "id": "a1-u08-tcf",
+  "unit": "a1-u08",
+  "unitTitle": "Groceries and shopping",
+  "title": "TCF corner",
+  "subtitle": "Unit 8: Groceries and shopping",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je ne trouve pas de savon dans ce rayon.",
+      "question": "What is the customer looking for?",
+      "options": [
+        "Soap",
+        "Toothpaste",
+        "A shirt",
+        "A discount coupon"
+      ],
+      "answer": 0,
+      "explain": "The customer is looking for savon."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je voudrais une boîte de céréales et un litre de lait.",
+      "question": "What does the customer ask for?",
+      "options": [
+        "A box of cereal and a litre of milk",
+        "A packet of rice and a kilo of apples",
+        "A paper bag and a shopping cart",
+        "A shirt and a pair of shoes"
+      ],
+      "answer": 0,
+      "explain": "The order is une boîte de céréales et un litre de lait."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Ce pantalon coûte trente-cinq dollars.",
+      "question": "How much is this pair of pants?",
+      "options": [
+        "$25",
+        "$30",
+        "$35",
+        "$53"
+      ],
+      "answer": 2,
+      "explain": "Trente-cinq is 35."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "La caissière demande : « Vous avez un coupon de réduction ? »",
+      "question": "What does the cashier ask for?",
+      "options": [
+        "A discount coupon",
+        "A reusable bag",
+        "A shopping list",
+        "A shoe size"
+      ],
+      "answer": 0,
+      "explain": "She asks whether the customer has a coupon."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What kind of bag does the customer request?",
+      "options": [
+        "A paper bag",
+        "A reusable bag",
+        "A shopping cart",
+        "A basket"
+      ],
+      "answer": 0,
+      "explain": "The message asks for un sac en papier.",
+      "promptFr": "MESSAGE · Je n'ai pas de sac. Je voudrais un sac en papier, s'il vous plaît."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which item costs $24?",
+      "options": [
+        "This sweater",
+        "This shirt",
+        "These shoes",
+        "This skirt"
+      ],
+      "answer": 0,
+      "explain": "The 24-dollar price is beside ce chandail.",
+      "promptFr": "RAYON · Ce chandail : 24 $ · Cette chemise : 20 $"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which item is on the list?",
+      "options": [
+        "A battery",
+        "A sweater",
+        "A kilogram of apples",
+        "A discount coupon"
+      ],
+      "answer": 0,
+      "explain": "The list includes une pile.",
+      "promptFr": "LISTE · Dentifrice · Savon · Une pile"
+    }
+  ]
+}

@@ -4,106 +4,182 @@
   "titleEn": "At the convenience store",
   "level": "A1",
   "minutes": 3,
-  "summary": "Julie buys milk and bread at the corner store and pays by card.",
-  "unit": "a1-u01",
+  "summary": "Julie finds groceries at a Québec convenience store and asks for a paper bag.",
+  "unit": "a1-u08",
   "sentences": [
     {
-      "fr": "Julie entre dans le dépanneur.",
-      "en": "Julie goes into the convenience store.",
-      "note": "In Québec, a dépanneur (or dép) is a corner store. In France you would say épicerie or supérette."
+      "fr": "Julie est au dépanneur avec sa liste.",
+      "en": "Julie is at the convenience store with her list.",
+      "note": "In Québec, a dépanneur is a small convenience store. The word has another meaning in other contexts."
     },
     {
-      "fr": "Il y a du lait, du pain et des pommes.",
-      "en": "There is milk, bread and apples."
+      "fr": "Elle cherche une boîte de céréales et des pommes.",
+      "en": "She is looking for a box of cereal and apples."
     },
     {
-      "fr": "Elle prend du lait.",
-      "en": "She takes some milk."
+      "fr": "Elle ne trouve pas de pommes.",
+      "en": "She cannot find any apples."
     },
     {
-      "fr": "Elle prend aussi du pain.",
-      "en": "She also takes some bread."
+      "fr": "Elle demande : « Où sont les pommes ? »",
+      "en": "She asks, “Where are the apples?”"
     },
     {
-      "fr": "À la caisse, le monsieur dit : « Bonjour ! »",
-      "en": "At the cash register, the man says: \"Hello!\""
+      "fr": "Le commis dit : « Ces pommes sont ici. »",
+      "en": "The clerk says, “These apples are here.”"
     },
     {
-      "fr": "« Ça fait quatre dollars. »",
-      "en": "\"That's four dollars.\""
+      "fr": "Julie veut cette boîte de céréales et un kilo de pommes.",
+      "en": "Julie wants this box of cereal and a kilogram of apples."
     },
     {
-      "fr": "Julie paie avec sa carte.",
-      "en": "Julie pays with her card."
+      "fr": "Elle n'a pas de sac; elle demande un sac en papier.",
+      "en": "She does not have a bag; she asks for a paper bag."
     },
     {
-      "fr": "« Merci ! Bonne soirée ! »",
-      "en": "\"Thank you! Have a nice evening!\""
+      "fr": "À la caisse, elle paie par carte.",
+      "en": "At the checkout, she pays by card."
     }
   ],
   "words": {
     "julie": {
       "en": "Julie (a woman's name)"
     },
-    "entre": {
-      "en": "goes in (entrer)",
+    "est": {
+      "en": "is (être)",
       "pos": "verb"
     },
-    "dans": {
-      "en": "in, into"
-    },
-    "le": {
-      "en": "the"
+    "au": {
+      "en": "at the; at (à + le)"
     },
     "dépanneur": {
-      "en": "convenience store (Québec)",
+      "en": "small convenience store in Québec",
       "pos": "noun, masculine",
-      "sound": "day-pa-NUHR"
+      "sound": "day-pah-NÖR"
     },
-    "il": {
-      "en": "he, it",
-      "pos": "pronoun"
+    "avec": {
+      "en": "with"
     },
-    "y": {
-      "en": "there"
+    "sa": {
+      "en": "her"
     },
-    "a": {
-      "en": "has (avoir)",
-      "pos": "verb"
-    },
-    "du": {
-      "en": "some, of the"
-    },
-    "lait": {
-      "en": "milk",
-      "pos": "noun, masculine",
-      "sound": "lay"
-    },
-    "pain": {
-      "en": "bread",
-      "pos": "noun, masculine",
-      "sound": "pan"
-    },
-    "et": {
-      "en": "and"
-    },
-    "des": {
-      "en": "some"
-    },
-    "pommes": {
-      "en": "apples",
-      "pos": "noun, feminine"
+    "liste": {
+      "en": "list",
+      "pos": "noun, feminine",
+      "sound": "LEEST"
     },
     "elle": {
       "en": "she",
       "pos": "pronoun"
     },
-    "prend": {
-      "en": "takes (prendre)",
+    "cherche": {
+      "en": "looks for (chercher)",
+      "pos": "verb",
+      "sound": "shehrsh"
+    },
+    "une": {
+      "en": "a, one"
+    },
+    "boîte": {
+      "en": "box",
+      "pos": "noun, feminine",
+      "sound": "bwaht"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "céréales": {
+      "en": "cereal",
+      "pos": "noun, feminine plural",
+      "sound": "say-ray-AHL"
+    },
+    "et": {
+      "en": "and"
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "pommes": {
+      "en": "apples",
+      "pos": "noun, feminine plural",
+      "sound": "pom"
+    },
+    "ne": {
+      "en": "not (part of ne...pas)"
+    },
+    "trouve": {
+      "en": "finds (trouver)",
+      "pos": "verb",
+      "sound": "troov"
+    },
+    "pas": {
+      "en": "not"
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d"
+    },
+    "où": {
+      "en": "where"
+    },
+    "sont": {
+      "en": "are (être)",
       "pos": "verb"
     },
-    "aussi": {
-      "en": "also"
+    "les": {
+      "en": "the (plural)"
+    },
+    "le": {
+      "en": "the"
+    },
+    "commis": {
+      "en": "store clerk",
+      "pos": "noun, masculine",
+      "sound": "koh-MEE"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "ces": {
+      "en": "these; those"
+    },
+    "ici": {
+      "en": "here"
+    },
+    "veut": {
+      "en": "wants (vouloir)",
+      "pos": "verb",
+      "sound": "vø"
+    },
+    "cette": {
+      "en": "this; that (feminine)"
+    },
+    "un": {
+      "en": "a, one"
+    },
+    "kilo": {
+      "en": "kilogram",
+      "pos": "noun, masculine",
+      "sound": "kee-LOH"
+    },
+    "n'a": {
+      "en": "does not have (ne...a)",
+      "pos": "verb"
+    },
+    "sac": {
+      "en": "bag",
+      "pos": "noun, masculine",
+      "sound": "sahk"
+    },
+    "en": {
+      "en": "in; made of"
+    },
+    "papier": {
+      "en": "paper",
+      "pos": "noun, masculine",
+      "sound": "pah-PYAY"
     },
     "à": {
       "en": "at, to"
@@ -112,102 +188,66 @@
       "en": "the"
     },
     "caisse": {
-      "en": "cash register",
+      "en": "checkout",
       "pos": "noun, feminine",
-      "sound": "kess"
-    },
-    "monsieur": {
-      "en": "man, sir, Mr.",
-      "pos": "noun, masculine"
-    },
-    "dit": {
-      "en": "says (dire)",
-      "pos": "verb"
-    },
-    "bonjour": {
-      "en": "hello"
-    },
-    "ça": {
-      "en": "that, it"
-    },
-    "fait": {
-      "en": "makes, is (faire)",
-      "pos": "verb"
-    },
-    "quatre": {
-      "en": "four"
-    },
-    "dollars": {
-      "en": "dollars",
-      "pos": "noun, masculine"
+      "sound": "kehs"
     },
     "paie": {
       "en": "pays (payer)",
-      "pos": "verb"
+      "pos": "verb",
+      "sound": "peh"
     },
-    "avec": {
-      "en": "with"
-    },
-    "sa": {
-      "en": "her"
+    "par": {
+      "en": "by"
     },
     "carte": {
       "en": "card",
       "pos": "noun, feminine"
-    },
-    "merci": {
-      "en": "thank you"
-    },
-    "bonne": {
-      "en": "good, nice (feminine)"
-    },
-    "soirée": {
-      "en": "evening (the whole evening)",
-      "pos": "noun, feminine",
-      "sound": "swa-RAY"
     }
   },
   "keywords": [
     "dépanneur",
-    "lait",
-    "pain",
-    "caisse",
-    "dollars",
-    "carte"
+    "liste",
+    "céréales",
+    "pommes",
+    "commis",
+    "boîte",
+    "sac",
+    "caisse"
   ],
   "quiz": [
     {
-      "prompt": "What does Julie buy?",
+      "prompt": "What does Julie look for?",
       "options": [
-        "Milk and bread",
-        "Apples and milk",
-        "Bread and apples",
-        "Only milk"
+        "Cereal and apples",
+        "Soap and shampoo",
+        "A sweater and a shirt",
+        "Rice and milk"
       ],
       "answer": 0,
-      "explain": "Elle prend du lait. Elle prend aussi du pain. She takes milk and also bread."
+      "explain": "She looks for a box of cereal and apples."
     },
     {
-      "prompt": "How much does she pay?",
+      "prompt": "Why does Julie ask where the apples are?",
       "options": [
-        "Two dollars",
-        "Four dollars",
-        "Five dollars",
-        "Fourteen dollars"
+        "She cannot find them",
+        "She has too many",
+        "She wants to return them",
+        "The cashier asks her"
       ],
-      "answer": 1,
-      "explain": "Ça fait quatre dollars means that's four dollars."
+      "answer": 0,
+      "explain": "She says, Elle ne trouve pas de pommes."
     },
     {
-      "prompt": "How does Julie pay?",
+      "prompt": "What kind of bag does Julie ask for?",
       "options": [
-        "With cash",
-        "With her card",
-        "With her phone",
-        "She does not pay"
+        "A paper bag",
+        "A reusable bag",
+        "A basket",
+        "A shopping cart"
       ],
-      "answer": 1,
-      "explain": "Julie paie avec sa carte: Julie pays with her card."
+      "answer": 0,
+      "explain": "She asks for un sac en papier."
     }
   ]
 }

@@ -19,6 +19,8 @@ STORY_META = {
                    keywords=["calendrier", "rendez-vous", "date", "réception", "avance"]),
     "a1-u07": dict(id="a1-diner-montreal", minutes=3, summary="Nadia orders lunch at a Montréal restaurant and pays by card.",
                    keywords=["dîner", "restaurant", "carte", "poulet", "légumes", "l'eau", "serveuse", "l'addition"]),
+    "a1-u08": dict(id="a1-au-depanneur", minutes=3, summary="Julie finds groceries at a Québec convenience store and asks for a paper bag.",
+                   keywords=["dépanneur", "liste", "céréales", "pommes", "commis", "boîte", "sac", "caisse"]),
 }
 
 STORY_GLOSS = {
@@ -108,6 +110,27 @@ STORY_GLOSS = {
         "apporte": ("brings (apporter)", "verb", "ah-POHRT"), "le": ("the",), "plat": ("dish", "noun, masculine"),
         "dit": ("says (dire)", "verb"), "c'est": ("it is, that is",), "très": ("very",),
         "bon": ("good, tasty", "adjective", "boh(n)"), "addition": ("bill, check", "noun, feminine"),
+        "paie": ("pays (payer)", "verb", "peh"), "par": ("by",), "carte": ("card", "noun, feminine"),
+    },
+    "a1-au-depanneur": {
+        "au": ("at the; at (à + le)",), "julie": ("Julie (a woman's name)",),
+        "dépanneur": ("small convenience store in Québec", "noun, masculine", "day-pah-NÖR"),
+        "avec": ("with",), "sa": ("her",), "liste": ("list", "noun, feminine", "LEEST"),
+        "elle": ("she", "pronoun"), "cherche": ("looks for (chercher)", "verb", "shehrsh"),
+        "une": ("a, one",), "boîte": ("box", "noun, feminine", "bwaht"),
+        "de": ("of; some",), "céréales": ("cereal", "noun, feminine plural", "say-ray-AHL"),
+        "et": ("and",), "des": ("some; of the",), "pommes": ("apples", "noun, feminine plural", "pom"),
+        "ne": ("not (part of ne...pas)",), "trouve": ("finds (trouver)", "verb", "troov"),
+        "pas": ("not",), "demande": ("asks (demander)", "verb", "duh-MAH(N)d"),
+        "où": ("where",), "sont": ("are (être)", "verb"), "les": ("the (plural)",),
+        "le": ("the",), "commis": ("store clerk", "noun, masculine", "koh-MEE"),
+        "est": ("is (être)", "verb"),
+        "dit": ("says (dire)", "verb"), "ces": ("these; those",), "ici": ("here",),
+        "veut": ("wants (vouloir)", "verb", "vø"), "cette": ("this; that (feminine)",),
+        "un": ("a, one",), "kilo": ("kilogram", "noun, masculine", "kee-LOH"),
+        "n'a": ("does not have (ne...a)", "verb"), "sac": ("bag", "noun, masculine", "sahk"),
+        "en": ("in; made of",), "papier": ("paper", "noun, masculine", "pah-PYAY"),
+        "à": ("at, to",), "la": ("the",), "caisse": ("checkout", "noun, feminine", "kehs"),
         "paie": ("pays (payer)", "verb", "peh"), "par": ("by",), "carte": ("card", "noun, feminine"),
     },
 }
