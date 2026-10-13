@@ -12,7 +12,7 @@ Owner decisions are in bold. This file is the single place for the plan. Update 
 | Marie live inside lessons (Ask Marie) | button exists, opens the live tutor with step context. The "check my pronunciation" switch is not built |
 | Review (spaced repetition) | **not built.** Learn has no review card until it is |
 | Tests tab (mock exams) | opens the old exam screen. A real TCF mock engine is not built |
-| Shared audio catalog (generate once for all users) | not built. Each user generates and saves on first tap |
+| Lesson audio | **Decision: speaker buttons ask live Marie (the chosen tutor) to say the exact line, on one warm connection, exactly like the old vocabulary lessons.** No saved clips for lesson words, so changing tutor changes every voice |
 | iPad layout | **not started. Must be done, see below** |
 | Progress sync between devices | **not built. Progress is saved on the device only** |
 
@@ -68,7 +68,7 @@ The book is the master. The app lessons and stories are produced from it so the 
 - **Writing and speaking feedback**: Marie checks a short text or a spoken answer with one concise correction, one better version, one reason. No invented scores.
 - **Marie "check my pronunciation" switch** in lessons (live, optional, billed).
 - **TCF mock engine**: real timers, one-play audio, 39-question sets per level, estimate labelled as an estimate.
-- **Shared audio catalog**: generate each fixed line once with Gemini Live in each tutor voice and store it publicly, so users do not each pay for the same clip. Needs the final text first.
+- **Lesson audio is live tutor speech** (see the table above). Revisit a pre-made clip catalog only if live cost becomes a problem, and then per tutor voice.
 - **Progress sync**: today progress lives on the device. Reinstalling erases it. Add account sync before real users.
 - **Free vs paid**: decide the free lessons and gate the rest. Paywall redesign (Vocabulary.com trial timeline pattern).
 - **A fluent French speaker must review** the book and the baked audio before it is sold (`content/tcf/REVIEW_NEEDED.md`). Pronunciation guides are approximations.

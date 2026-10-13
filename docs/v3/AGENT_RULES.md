@@ -77,3 +77,12 @@ model to notice. A tutor that praises her own voice is a bug.
   That is a second line of defence, never the first.
 - Keep `test/mic_echo_gate_test.dart` green. Do not shorten the tail to make the
   app feel faster. Learners get a Skip button instead.
+
+## 8. Speaker buttons and Marie's memory (how the old app did it, and why)
+
+- **A speaker button asks the tutor to say the exact line** (`V3MarieSession.speak`). It does not play a saved clip and never builds one on tap. The old vocabulary lessons worked this way: one warm Live connection, a tiny "say exactly this" command, always the voice the learner chose. A tap connects her muted with no hello, so a speaker tap never opens the microphone.
+- **The screen she knows about must never be frozen.** `GeminiLiveService.lessonContextBuilder` is read on every setup and reconnect. A fixed string made her describe an old word after a reconnect.
+- **A reconnect must keep the conversation.** `V3LiveMarieSession` adds the last six lines (`CALL MEMORY`) on every connect, and the prompt says the call is continuing, so she never greets again.
+- **The server resets a connection about every ten minutes** (goAway). For the lesson coach the swap waits until she finishes her sentence, and up to three bounded reconnects are allowed.
+- **An unanswered listening line is heard but never shown** (`speak(reveal: false)`), so the pill cannot give the answer away.
+- **Every word the learner studies has an example sentence.** `check_book.py` fails the build otherwise.
