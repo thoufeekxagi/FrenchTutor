@@ -6,9 +6,9 @@ Owner decisions are in bold. This file is the single place for the plan. Update 
 
 | Area | Status |
 |---|---|
-| A1 book (PDF), master text | **Stage 0 and Units 1 to 5 done and checked.** Units 6 to 14 to write |
+| A1 master chapters | **Stage 0 and Units 1 to 14 authored.** Units 6 to 14 pass the book ledger; app lessons are exported. The PDF remains a reference and was not rebuilt in this pass. |
 | App shell, onboarding, Learn, Stories, lesson player | built, tested on the phone |
-| Book to app lessons | **Stage 0 and Units 1 to 5 are in the app** (87 lessons, 5 stories), produced by `export_app.py` |
+| Book to app lessons | **Stage 0 and Units 1 to 14 are in the app export** (219 authored lessons, 14 stories), produced by `export_app.py` |
 | Marie live inside lessons | **built, inline**: phone button, panel (Mute, End, Skip), response pill, speaker taps say the exact line in the chosen voice. Story reader does not have it yet. See `MARIE_TUTOR.md` |
 | Progress and review | **built**: furthest step is real progress, Previous, review, replay, Resume. See `AGENT_RULES.md` section 9 |
 | Review (spaced repetition) | **not built.** Learn has no review card until it is |
@@ -17,7 +17,7 @@ Owner decisions are in bold. This file is the single place for the plan. Update 
 | iPad layout | **partly done**: universal build, readable column, checked on iPad portrait and landscape, Split View safe for calls. Still to do: keyboard and Pencil friendly writing areas |
 | Progress sync between devices | **not built. Progress is saved on the device only** |
 
-## The A1 book: remaining units (write by hand, in this order)
+## A1 course units (hand-authored master chapters)
 
 Each unit follows the same path: words (5 groups), phrases, grammar, 2 dialogues, story, listening (5), reading (5), writing, speaking, TCF corner (4 listening, 3 reading), 10-question checkpoint. Run `python3 content/tcf/book/check_book.py` after each unit: it blocks any French word used before it was taught.
 
@@ -33,9 +33,11 @@ Each unit follows the same path: words (5 groups), phrases, grammar, 2 dialogues
 | 13 | Health and services | g21 avoir mal à + contractions | body, symptoms, pharmacy, clinic, emergencies | health card, 811, 911, *sans rendez-vous* clinics |
 | 14 | Free time and simple plans | g22 aimer, préférer | hobbies, inviting, accepting, refusing, weekend plans | hockey, skating, *cabane à sucre*, parks |
 
-**Stories to reuse** (already written, in `flutter_app/assets/content/tcf/stories/`): *Mon premier jour* (Unit 12), *Un rendez-vous à la clinique* (Unit 13), *Au dépanneur* (Unit 8). They are held back from the app until their unit exists, so a story never uses words you have not met.
+**Units 6 to 14 are authored and exported.** Their master chapters are in `content/tcf/book/chapters/06_unit06.py` through `14_unit14.py`; the final content pass reported 0 book-ledger warnings and 0 app-validation errors.
 
-**A1 mini mocks** (after Units 5, 10 and 14): 10 listening and 10 reading questions in the real order and format, from that unit range only. Unit 5 mock is still to write.
+**Planned stories now assigned to their units:** *Au dépanneur* (Unit 8), *Mon premier jour* (Unit 12), and *Un rendez-vous à la clinique* (Unit 13). They are authored with their units and included in the app export.
+
+**A1 mini mocks** remain separate work: the syllabus calls for timed, one-play sets of 12/12 questions after Unit 5, 15/15 after Unit 10, and 20/20 after Unit 14. No mini-mock content is currently in the app export, and the mock engine is not built.
 
 **Book front and back matter still to add:** A1 grammar summary (all conjugations on two pages), numbers and dates reference, Canadian French mini-dictionary, study calendar (14 to 18 weeks), a printable progress sheet.
 
