@@ -1,0 +1,80 @@
+{
+  "id": "a1-u09-reading",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Reading practice",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where does the line go?",
+      "options": [
+        "From downtown to the museum",
+        "From the museum to the airport",
+        "From the bank to the park",
+        "From the station to city hall"
+      ],
+      "answer": 0,
+      "explain": "The arrow shows the direction from downtown to the museum.",
+      "promptFr": "LIGNE 4 · Centre-ville → Musée · Arrêt : Banque"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which route has a detour?",
+      "options": [
+        "Route 2",
+        "Route 4",
+        "The train",
+        "The taxi"
+      ],
+      "answer": 0,
+      "explain": "The detour notice names ligne 2.",
+      "promptFr": "DÉTOUR · Ligne 2 · Rue du Parc"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How far is the museum from the bank?",
+      "options": [
+        "Two minutes on foot",
+        "Two hours by train",
+        "One bus stop",
+        "Far across town"
+      ],
+      "answer": 0,
+      "explain": "The sign says à deux minutes à pied.",
+      "promptFr": "MUSÉE · En face de la banque · À deux minutes à pied"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where can a passenger buy a ticket?",
+      "options": [
+        "At the machine",
+        "At the museum",
+        "On the train platform",
+        "At the bank"
+      ],
+      "answer": 0,
+      "explain": "The sign says billet à la machine.",
+      "promptFr": "AUTOBUS · Arrêt devant la station · Billet à la machine"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which platform is listed for the train?",
+      "options": [
+        "Platform 2",
+        "Platform 10",
+        "Stop 15",
+        "Gate 10"
+      ],
+      "answer": 0,
+      "explain": "Quai 2 means platform 2.",
+      "promptFr": "TRAIN · Quai 2 · 10 h 15"
+    }
+  ]
+}

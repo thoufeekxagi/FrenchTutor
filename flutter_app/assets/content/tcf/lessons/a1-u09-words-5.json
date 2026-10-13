@@ -1,0 +1,212 @@
+{
+  "id": "a1-u09-words-5",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Words: landmarks and distance",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "près de",
+      "en": "near",
+      "sound": "preh duh",
+      "exampleFr": "La banque est près du musée.",
+      "exampleEn": "The bank is near the museum."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "loin de",
+      "en": "far from",
+      "sound": "lwa(n) duh",
+      "exampleFr": "La gare est loin du parc.",
+      "exampleEn": "The station is far from the park."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "au coin de",
+      "en": "at the corner of",
+      "sound": "oh kwa(n) duh",
+      "exampleFr": "Le café est au coin de la rue.",
+      "exampleEn": "The café is at the corner of the street."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "tout près",
+      "en": "very close, nearby",
+      "sound": "too preh",
+      "exampleFr": "La station est tout près.",
+      "exampleEn": "The station is very close."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "à deux minutes",
+      "en": "two minutes away",
+      "sound": "ah duh mee-NÜT",
+      "exampleFr": "Le parc est à deux minutes.",
+      "exampleEn": "The park is two minutes away."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le feu rouge",
+      "en": "traffic light",
+      "sound": "luh fuh roozh",
+      "exampleFr": "Je traverse au feu rouge.",
+      "exampleEn": "I cross at the traffic light."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le pont",
+      "en": "bridge",
+      "sound": "luh poh(n)",
+      "exampleFr": "Le pont est devant le musée.",
+      "exampleEn": "The bridge is in front of the museum."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le trottoir",
+      "en": "sidewalk",
+      "sound": "luh troh-TWAHR",
+      "exampleFr": "Je marche sur le trottoir.",
+      "exampleEn": "I walk on the sidewalk."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un détour",
+      "en": "detour",
+      "sound": "uh(n) day-TOOR",
+      "exampleFr": "Il y a un détour aujourd'hui.",
+      "exampleEn": "There is a detour today."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "un panneau",
+      "en": "sign, signboard",
+      "sound": "uh(n) pah-NOH",
+      "exampleFr": "Le panneau indique la station.",
+      "exampleEn": "The sign shows the station."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "près de",
+      "options": [
+        "very close, nearby",
+        "near",
+        "bridge",
+        "sign, signboard"
+      ],
+      "answer": 1,
+      "explain": "près de means near."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "loin de",
+      "options": [
+        "two minutes away",
+        "sidewalk",
+        "near",
+        "far from"
+      ],
+      "answer": 3,
+      "explain": "loin de means far from."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "au coin de",
+      "options": [
+        "traffic light",
+        "at the corner of",
+        "detour",
+        "far from"
+      ],
+      "answer": 1,
+      "explain": "au coin de means at the corner of."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "tout près",
+      "options": [
+        "bridge",
+        "sign, signboard",
+        "at the corner of",
+        "very close, nearby"
+      ],
+      "answer": 3,
+      "explain": "tout près means very close, nearby."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "à deux minutes",
+      "options": [
+        "sidewalk",
+        "two minutes away",
+        "near",
+        "very close, nearby"
+      ],
+      "answer": 1,
+      "explain": "à deux minutes means two minutes away."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le feu rouge",
+      "options": [
+        "detour",
+        "far from",
+        "two minutes away",
+        "traffic light"
+      ],
+      "answer": 3,
+      "explain": "le feu rouge means traffic light."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "loin de",
+      "question": "Which word did you hear?",
+      "options": [
+        "le pont",
+        "loin de",
+        "un détour",
+        "près de"
+      ],
+      "answer": 1,
+      "explain": "You heard loin de: far from."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le pont",
+      "question": "Which word did you hear?",
+      "options": [
+        "le pont",
+        "un détour",
+        "près de",
+        "tout près"
+      ],
+      "answer": 0,
+      "explain": "You heard le pont: bridge."
+    }
+  ]
+}

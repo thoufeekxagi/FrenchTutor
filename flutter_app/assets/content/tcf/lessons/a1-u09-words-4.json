@@ -1,0 +1,212 @@
+{
+  "id": "a1-u09-words-4",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Words: tickets and the trip",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un billet",
+      "en": "ticket",
+      "sound": "uh(n) bee-YAY",
+      "exampleFr": "J'achète un billet.",
+      "exampleEn": "I buy a ticket."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un titre de transport",
+      "en": "transit fare or pass",
+      "sound": "uh(n) tee-tr duh trah(n)-SPOR",
+      "exampleFr": "J'ai un titre de transport.",
+      "exampleEn": "I have a transit fare or pass."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une carte OPUS",
+      "en": "OPUS transit card in Montréal",
+      "sound": "ün kart oh-PÜS",
+      "exampleFr": "J'ai une carte OPUS.",
+      "exampleEn": "I have an OPUS card."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une correspondance",
+      "en": "transfer, connection",
+      "sound": "ün koh-rehs-pohn-DAH(N)s",
+      "exampleFr": "La correspondance est à la station.",
+      "exampleEn": "The transfer is at the station."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un aller simple",
+      "en": "one-way trip",
+      "sound": "uh(n) ah-lay sa(n)pl",
+      "exampleFr": "Je prends un aller simple.",
+      "exampleEn": "I take a one-way trip."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un aller-retour",
+      "en": "round trip",
+      "sound": "uh(n) ah-lay ruh-TOOR",
+      "exampleFr": "Je prends un aller-retour.",
+      "exampleEn": "I take a round trip."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "monter",
+      "en": "to get on, board",
+      "sound": "mohn-TAY",
+      "exampleFr": "Il monte dans l'autobus.",
+      "exampleEn": "He gets on the bus."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "descendre",
+      "en": "to get off, go down",
+      "sound": "day-SAH(N)dr",
+      "exampleFr": "Il descend à la station.",
+      "exampleEn": "He gets off at the station."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la machine",
+      "en": "ticket machine",
+      "sound": "lah mah-SHEEN",
+      "exampleFr": "La machine est près de l'entrée.",
+      "exampleEn": "The machine is near the entrance."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "attendre",
+      "en": "to wait",
+      "sound": "ah-TAH(N)dr",
+      "exampleFr": "Il attend l'autobus.",
+      "exampleEn": "He waits for the bus."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un billet",
+      "options": [
+        "transfer, connection",
+        "ticket",
+        "to get on, board",
+        "to wait"
+      ],
+      "answer": 1,
+      "explain": "un billet means ticket."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un titre de transport",
+      "options": [
+        "one-way trip",
+        "to get off, go down",
+        "ticket",
+        "transit fare or pass"
+      ],
+      "answer": 3,
+      "explain": "un titre de transport means transit fare or pass."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une carte OPUS",
+      "options": [
+        "round trip",
+        "OPUS transit card in Montréal",
+        "ticket machine",
+        "one-way trip"
+      ],
+      "answer": 1,
+      "explain": "une carte OPUS means OPUS transit card in Montréal."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une correspondance",
+      "options": [
+        "to get on, board",
+        "to wait",
+        "OPUS transit card in Montréal",
+        "transfer, connection"
+      ],
+      "answer": 3,
+      "explain": "une correspondance means transfer, connection."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un aller simple",
+      "options": [
+        "to get off, go down",
+        "one-way trip",
+        "ticket",
+        "transfer, connection"
+      ],
+      "answer": 1,
+      "explain": "un aller simple means one-way trip."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un aller-retour",
+      "options": [
+        "ticket machine",
+        "transit fare or pass",
+        "to get off, go down",
+        "round trip"
+      ],
+      "answer": 3,
+      "explain": "un aller-retour means round trip."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une correspondance",
+      "question": "Which word did you hear?",
+      "options": [
+        "monter",
+        "une correspondance",
+        "la machine",
+        "un billet"
+      ],
+      "answer": 1,
+      "explain": "You heard une correspondance: transfer, connection."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "monter",
+      "question": "Which word did you hear?",
+      "options": [
+        "monter",
+        "la machine",
+        "un billet",
+        "un aller-retour"
+      ],
+      "answer": 0,
+      "explain": "You heard monter: to get on, board."
+    }
+  ]
+}

@@ -1,0 +1,214 @@
+{
+  "id": "a1-u09-words-1",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Words: places in a city",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le centre-ville",
+      "en": "downtown",
+      "sound": "luh sah(n)tr-VEEL",
+      "exampleFr": "Le centre-ville est grand.",
+      "exampleEn": "Downtown is big."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le quartier",
+      "en": "neighbourhood",
+      "sound": "luh kahr-TYAY",
+      "exampleFr": "Le quartier est calme.",
+      "exampleEn": "The neighbourhood is quiet."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la rue",
+      "en": "street",
+      "sound": "lah rü",
+      "exampleFr": "La rue est longue.",
+      "exampleEn": "The street is long."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "l'avenue (f.)",
+      "en": "avenue",
+      "say": "l'avenue",
+      "sound": "lah-vuh-NÜ",
+      "exampleFr": "L'avenue est près du parc.",
+      "exampleEn": "The avenue is near the park."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la place",
+      "en": "square, plaza",
+      "sound": "lah plahs",
+      "exampleFr": "La place est au centre-ville.",
+      "exampleEn": "The square is downtown."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le parc",
+      "en": "park",
+      "sound": "luh park",
+      "exampleFr": "Le parc est derrière la banque.",
+      "exampleEn": "The park is behind the bank."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "la banque",
+      "en": "bank",
+      "sound": "lah bah(n)k",
+      "exampleFr": "La banque est dans ce quartier.",
+      "exampleEn": "The bank is in this neighbourhood."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le bureau de poste",
+      "en": "post office",
+      "sound": "luh bü-roh duh pohst",
+      "exampleFr": "Le bureau de poste est sur la rue.",
+      "exampleEn": "The post office is on the street."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le musée",
+      "en": "museum",
+      "sound": "luh mü-ZAY",
+      "exampleFr": "Le musée est près de la place.",
+      "exampleEn": "The museum is near the square."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "l'hôtel de ville (m.)",
+      "en": "city hall",
+      "say": "l'hôtel de ville",
+      "sound": "loh-tehl duh veel",
+      "exampleFr": "L'hôtel de ville est au centre-ville.",
+      "exampleEn": "City hall is downtown."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le centre-ville",
+      "options": [
+        "avenue",
+        "downtown",
+        "bank",
+        "city hall"
+      ],
+      "answer": 1,
+      "explain": "le centre-ville means downtown."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le quartier",
+      "options": [
+        "square, plaza",
+        "post office",
+        "downtown",
+        "neighbourhood"
+      ],
+      "answer": 3,
+      "explain": "le quartier means neighbourhood."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la rue",
+      "options": [
+        "park",
+        "street",
+        "museum",
+        "neighbourhood"
+      ],
+      "answer": 1,
+      "explain": "la rue means street."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "l'avenue (f.)",
+      "options": [
+        "bank",
+        "city hall",
+        "street",
+        "avenue"
+      ],
+      "answer": 3,
+      "explain": "l'avenue (f.) means avenue."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la place",
+      "options": [
+        "post office",
+        "square, plaza",
+        "downtown",
+        "avenue"
+      ],
+      "answer": 1,
+      "explain": "la place means square, plaza."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le parc",
+      "options": [
+        "museum",
+        "neighbourhood",
+        "square, plaza",
+        "park"
+      ],
+      "answer": 3,
+      "explain": "le parc means park."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le quartier",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'avenue",
+        "le quartier",
+        "le parc",
+        "le musée"
+      ],
+      "answer": 1,
+      "explain": "You heard le quartier: neighbourhood."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "l'avenue",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'avenue",
+        "le parc",
+        "le musée",
+        "le quartier"
+      ],
+      "answer": 0,
+      "explain": "You heard l'avenue: avenue."
+    }
+  ]
+}

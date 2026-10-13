@@ -1,0 +1,148 @@
+{
+  "id": "a1-u09-phrases",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Phrases",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Use où est...? to ask where a place is. Listen for the landmark and direction. For a short plan, say je vais + verb; the second verb stays in its infinitive form."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Où est la station de métro ?",
+      "en": "Where is the metro station?",
+      "tip": "Say it: oo eh lah stah-SYOH(N) duh may-TROH"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Comment aller au musée ?",
+      "en": "How do I get to the museum?",
+      "tip": "Say it: koh-ma(n) ah-lay oh mü-ZAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Continuez tout droit, s'il vous plaît.",
+      "en": "Continue straight ahead, please.",
+      "tip": "Say it: kohn-tee-nü-AY too drwah seel voo pleh"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Tournez à gauche au feu rouge.",
+      "en": "Turn left at the traffic light.",
+      "tip": "Say it: toor-NAY ah gohsh oh fuh roozh"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Traversez la rue et tournez à droite.",
+      "en": "Cross the street and turn right.",
+      "tip": "Say it: trah-vehr-SAY lah rü ay toor-NAY ah drwaht"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Je vais prendre le métro.",
+      "en": "I am going to take the metro.",
+      "tip": "Say it: zhuh veh pra(n)dr luh may-TROH"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je vais descendre à la prochaine station.",
+      "en": "I am going to get off at the next station.",
+      "tip": "Say it: zhuh veh day-SAH(N)dr ah lah proh-SHEN stah-SYOH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Où est l'arrêt d'autobus ?",
+      "en": "Where is the bus stop?",
+      "tip": "Say it: oo eh lah-reh doh-toh-BÜS"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Je voudrais un billet, s'il vous plaît.",
+      "en": "I would like a ticket, please.",
+      "tip": "Say it: zhuh voo-DREH uh(n) bee-YAY seel voo pleh"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Il y a un détour sur la ligne.",
+      "en": "There is a detour on the route.",
+      "tip": "Say it: eel yah uh(n) day-TOOR sür lah leen-yuh"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Où est la station de métro ?",
+      "options": [
+        "Turn left at the traffic light.",
+        "Where is the metro station?",
+        "There is a detour on the route.",
+        "Continue straight ahead, please."
+      ],
+      "answer": 1,
+      "explain": "Où est la station de métro ? means Where is the metro station?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Continuez tout droit, s'il vous plaît.",
+      "options": [
+        "I am going to take the metro.",
+        "Continue straight ahead, please.",
+        "How do I get to the museum?",
+        "Cross the street and turn right."
+      ],
+      "answer": 1,
+      "explain": "Continuez tout droit, s'il vous plaît. means Continue straight ahead, please.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Traversez la rue et tournez à droite.",
+      "options": [
+        "Where is the bus stop?",
+        "Cross the street and turn right.",
+        "Where is the metro station?",
+        "I am going to get off at the next station."
+      ],
+      "answer": 1,
+      "explain": "Traversez la rue et tournez à droite. means Cross the street and turn right.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je vais descendre à la prochaine station.",
+      "options": [
+        "There is a detour on the route.",
+        "I am going to get off at the next station.",
+        "Continue straight ahead, please.",
+        "I would like a ticket, please."
+      ],
+      "answer": 1,
+      "explain": "Je vais descendre à la prochaine station. means I am going to get off at the next station.."
+    }
+  ]
+}

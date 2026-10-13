@@ -1,0 +1,227 @@
+{
+  "id": "a1-trajet-montreal",
+  "title": "Un trajet au centre-ville",
+  "titleEn": "A trip downtown",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Sam follows city directions and takes the bus to a museum in Montréal.",
+  "unit": "a1-u09",
+  "sentences": [
+    {
+      "fr": "Sam est au centre-ville de Montréal.",
+      "en": "Sam is downtown in Montréal."
+    },
+    {
+      "fr": "Il cherche le musée sur une carte.",
+      "en": "He looks for the museum on a map."
+    },
+    {
+      "fr": "Le musée est près de la banque.",
+      "en": "The museum is near the bank."
+    },
+    {
+      "fr": "Sam va traverser la place à pied.",
+      "en": "Sam is going to cross the square on foot."
+    },
+    {
+      "fr": "Il tourne à gauche au coin de la rue.",
+      "en": "He turns left at the corner of the street."
+    },
+    {
+      "fr": "Il traverse la rue.",
+      "en": "He crosses the street."
+    },
+    {
+      "fr": "Il attend l'autobus à l'arrêt.",
+      "en": "He waits for the bus at the stop."
+    },
+    {
+      "fr": "Il monte dans l'autobus et descend près du musée.",
+      "en": "He gets on the bus and gets off near the museum."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a man's name)"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "at the; at (à + le)"
+    },
+    "centre-ville": {
+      "en": "downtown",
+      "pos": "noun, masculine",
+      "sound": "sah(n)tr-VEEL"
+    },
+    "de": {
+      "en": "of; from"
+    },
+    "montréal": {
+      "en": "Montréal"
+    },
+    "il": {
+      "en": "he",
+      "pos": "pronoun"
+    },
+    "cherche": {
+      "en": "looks for (chercher)",
+      "pos": "verb",
+      "sound": "shehrsh"
+    },
+    "le": {
+      "en": "the"
+    },
+    "musée": {
+      "en": "museum",
+      "pos": "noun, masculine",
+      "sound": "mü-ZAY"
+    },
+    "sur": {
+      "en": "on"
+    },
+    "une": {
+      "en": "a, one"
+    },
+    "carte": {
+      "en": "map",
+      "pos": "noun, feminine",
+      "sound": "kahrt"
+    },
+    "près": {
+      "en": "near"
+    },
+    "la": {
+      "en": "the"
+    },
+    "banque": {
+      "en": "bank",
+      "pos": "noun, feminine",
+      "sound": "bah(n)k"
+    },
+    "va": {
+      "en": "is going (aller)",
+      "pos": "verb"
+    },
+    "traverser": {
+      "en": "to cross",
+      "pos": "verb",
+      "sound": "trah-vehr-SAY"
+    },
+    "place": {
+      "en": "square, plaza",
+      "pos": "noun, feminine",
+      "sound": "plahs"
+    },
+    "à": {
+      "en": "to; at"
+    },
+    "pied": {
+      "en": "foot",
+      "pos": "noun, masculine",
+      "sound": "pyay"
+    },
+    "tourne": {
+      "en": "turns (tourner)",
+      "pos": "verb",
+      "sound": "toorn"
+    },
+    "gauche": {
+      "en": "left"
+    },
+    "coin": {
+      "en": "corner",
+      "pos": "noun, masculine",
+      "sound": "kwa(n)"
+    },
+    "rue": {
+      "en": "street",
+      "pos": "noun, feminine",
+      "sound": "rü"
+    },
+    "traverse": {
+      "en": "crosses (traverser)",
+      "pos": "verb",
+      "sound": "trah-vehrs"
+    },
+    "attend": {
+      "en": "waits for (attendre)",
+      "pos": "verb",
+      "sound": "ah-tah(n)"
+    },
+    "l'autobus": {
+      "en": "the bus",
+      "pos": "noun, masculine",
+      "sound": "loh-toh-BÜS"
+    },
+    "l'arrêt": {
+      "en": "the stop",
+      "pos": "noun, masculine",
+      "sound": "lah-reh"
+    },
+    "monte": {
+      "en": "gets on (monter)",
+      "pos": "verb",
+      "sound": "mohnt"
+    },
+    "dans": {
+      "en": "in, into"
+    },
+    "et": {
+      "en": "and"
+    },
+    "descend": {
+      "en": "gets off (descendre)",
+      "pos": "verb",
+      "sound": "day-sah(n)"
+    },
+    "du": {
+      "en": "near the (de + le)"
+    }
+  },
+  "keywords": [
+    "centre-ville",
+    "musée",
+    "banque",
+    "place",
+    "l'autobus",
+    "l'arrêt"
+  ],
+  "quiz": [
+    {
+      "prompt": "Where is Sam at the start?",
+      "options": [
+        "Downtown Montréal",
+        "At the airport",
+        "In a park in Ottawa",
+        "At home"
+      ],
+      "answer": 0,
+      "explain": "He is au centre-ville de Montréal."
+    },
+    {
+      "prompt": "What landmark is near the museum?",
+      "options": [
+        "The bank",
+        "The train",
+        "The post office",
+        "The bridge"
+      ],
+      "answer": 0,
+      "explain": "The museum is près de la banque."
+    },
+    {
+      "prompt": "How does Sam travel for part of the trip?",
+      "options": [
+        "By bus",
+        "By taxi",
+        "By train",
+        "By bicycle"
+      ],
+      "answer": 0,
+      "explain": "He waits for and gets off the autobus."
+    }
+  ]
+}

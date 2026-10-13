@@ -1,0 +1,122 @@
+{
+  "id": "a1-u09-grammar-c",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Grammar: say where a place is",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "say where a place is",
+      "body": "A preposition tells the listener how two places are related. Point to a familiar landmark so the other person can picture the route."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Place words with a landmark",
+      "headers": [
+        "Position",
+        "Example"
+      ],
+      "rows": [
+        [
+          "in",
+          "La banque est dans le quartier."
+        ],
+        [
+          "on",
+          "Le billet est sur la table."
+        ],
+        [
+          "under",
+          "Le sac est sous la table."
+        ],
+        [
+          "in front of",
+          "L'arrêt est devant la banque."
+        ],
+        [
+          "behind",
+          "Le parc est derrière le musée."
+        ],
+        [
+          "across from",
+          "La station est en face de la place."
+        ],
+        [
+          "next to",
+          "Le café est à côté du musée."
+        ],
+        [
+          "at someone's home / place",
+          "Je vais chez Sam."
+        ],
+        [
+          "near / far from",
+          "La banque est près du musée; la gare est loin du parc."
+        ]
+      ],
+      "hear": 1
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "say where a place is",
+      "body": "• Use dans for inside an area or place: dans le quartier.\n• Use sur for on a surface, sous for under it, devant for in front, and derrière for behind.\n• Use en face de for opposite and à côté de for next to. After de + le, say du: à côté du musée.\n• Use chez before a person's name or home: chez Sam; use près de / loin de for distance."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "The café is across from the bank. Le café est ___ la banque.",
+      "options": [
+        "en face de",
+        "sous",
+        "derrière",
+        "dans"
+      ],
+      "answer": 0,
+      "explain": "En face de means across from."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "The stop is in front of the museum. L'arrêt est ___ le musée.",
+      "options": [
+        "devant",
+        "sur",
+        "chez",
+        "loin de"
+      ],
+      "answer": 0,
+      "explain": "Devant means in front of."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "I am at Sam's place. Je suis ___.",
+      "options": [
+        "chez Sam",
+        "sous Sam",
+        "en face Sam",
+        "dans Sam"
+      ],
+      "answer": 0,
+      "explain": "Use chez before a person's name or home."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "The park is behind the bank. Le parc est ___ la banque.",
+      "options": [
+        "derrière",
+        "devant",
+        "à côté",
+        "sur"
+      ],
+      "answer": 0,
+      "explain": "Derrière means behind."
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "id": "a1-u09-tcf",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "TCF corner",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Pour aller à la banque, vous traversez la rue et vous tournez à droite.",
+      "question": "What should the listener do?",
+      "options": [
+        "Cross the street and turn right",
+        "Cross the bridge and turn left",
+        "Continue to the station",
+        "Take the bus to the park"
+      ],
+      "answer": 0,
+      "explain": "The route says vous traversez la rue et vous tournez à droite."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La station de métro est près de l'hôtel de ville.",
+      "question": "What is near city hall?",
+      "options": [
+        "The metro station",
+        "The museum",
+        "The bus ticket",
+        "The bank"
+      ],
+      "answer": 0,
+      "explain": "The station is près de l'hôtel de ville."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je vais acheter un aller-retour pour Ottawa.",
+      "question": "What kind of ticket does the speaker want?",
+      "options": [
+        "A round trip",
+        "A one-way trip",
+        "A bus pass",
+        "A bicycle ticket"
+      ],
+      "answer": 0,
+      "explain": "Un aller-retour is a round trip."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "L'autobus arrive au quai numéro trois.",
+      "question": "Where does the bus arrive?",
+      "options": [
+        "Platform 3",
+        "Platform 2",
+        "Stop 13",
+        "Gate 30"
+      ],
+      "answer": 0,
+      "explain": "It arrives at quai numéro trois."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where is the museum?",
+      "options": [
+        "Behind the bank",
+        "In the station",
+        "Across from the park",
+        "Beside city hall"
+      ],
+      "answer": 0,
+      "explain": "The message says derrière la banque.",
+      "promptFr": "MESSAGE · Je suis à la station. Le musée est derrière la banque. Je vais au musée à pied."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Where is the stop?",
+      "options": [
+        "At the corner of the street",
+        "At the museum",
+        "At the city hall",
+        "At the train platform"
+      ],
+      "answer": 0,
+      "explain": "The stop is au coin de la rue.",
+      "promptFr": "DÉTOUR · Ligne 2 : détour aujourd'hui. Arrêt au coin de la rue."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When does the train leave?",
+      "options": [
+        "8:40",
+        "8:14",
+        "9:40",
+        "10:08"
+      ],
+      "answer": 0,
+      "explain": "The schedule says départ 8 h 40.",
+      "promptFr": "HORAIRE · Train pour le centre-ville : quai 1, 8 h 40."
+    }
+  ]
+}

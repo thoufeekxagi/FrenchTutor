@@ -1,0 +1,140 @@
+{
+  "id": "a1-u09-dialogues",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Dialogues",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Follow the route one instruction at a time. Listen for the landmark first, then the direction or transit choice."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Finding the museum",
+      "body": "Sam asks a passerby for directions downtown.",
+      "examples": [
+        {
+          "fr": "Excusez-moi. Où est le musée ?",
+          "en": "Sam: Excuse me. Where is the museum?"
+        },
+        {
+          "fr": "Continuez tout droit.",
+          "en": "Passante: Continue straight ahead."
+        },
+        {
+          "fr": "À gauche ?",
+          "en": "Sam: To the left?"
+        },
+        {
+          "fr": "Oui. Tournez à gauche au feu rouge. Le musée est en face de la banque.",
+          "en": "Passante: Yes. Turn left at the traffic light. The museum is across from the bank."
+        },
+        {
+          "fr": "C'est loin d'ici ?",
+          "en": "Sam: Is it far from here?"
+        },
+        {
+          "fr": "Non, c'est à deux minutes à pied.",
+          "en": "Passante: No, it is two minutes away on foot."
+        },
+        {
+          "fr": "Merci beaucoup !",
+          "en": "Sam: Thank you very much!"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "At the bus stop",
+      "body": "Sam checks whether the bus goes to the station.",
+      "examples": [
+        {
+          "fr": "Bonjour. Où est l'arrêt d'autobus ?",
+          "en": "Sam: Hello. Where is the bus stop?"
+        },
+        {
+          "fr": "Il est devant la station, à droite.",
+          "en": "Employé: It is in front of the station, on the right."
+        },
+        {
+          "fr": "Je vais au musée. Cette ligne va au centre-ville ?",
+          "en": "Sam: I am going to the museum. Does this route go downtown?"
+        },
+        {
+          "fr": "Oui. Vous allez descendre à la station du musée.",
+          "en": "Employé: Yes. You are going to get off at the museum station."
+        },
+        {
+          "fr": "Je peux acheter un billet ici ?",
+          "en": "Sam: Can I buy a ticket here?"
+        },
+        {
+          "fr": "Oui, à la machine, près de l'entrée.",
+          "en": "Employé: Yes, at the machine, near the entrance."
+        },
+        {
+          "fr": "Merci. Je vais attendre à l'arrêt.",
+          "en": "Sam: Thank you. I am going to wait at the stop."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where is the museum?",
+      "options": [
+        "Across from the bank",
+        "Behind the park",
+        "Inside the station",
+        "Beside the bus stop"
+      ],
+      "answer": 0,
+      "explain": "The passerby says the museum is en face de la banque."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How long does it take to walk there?",
+      "options": [
+        "Two minutes",
+        "Ten minutes",
+        "One hour",
+        "All day"
+      ],
+      "answer": 0,
+      "explain": "It is à deux minutes à pied."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where is the bus stop?",
+      "options": [
+        "In front of the station, on the right",
+        "Behind the museum",
+        "On the left of the bank",
+        "Inside the post office"
+      ],
+      "answer": 0,
+      "explain": "The employee says devant la station, à droite."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where can Sam buy a ticket?",
+      "options": [
+        "At the machine near the entrance",
+        "At the museum",
+        "On the sidewalk",
+        "At the city hall"
+      ],
+      "answer": 0,
+      "explain": "The employee points to the machine near the entrance."
+    }
+  ]
+}

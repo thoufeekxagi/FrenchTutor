@@ -1,0 +1,212 @@
+{
+  "id": "a1-u09-words-2",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Words: ask and follow directions",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "tout droit",
+      "en": "straight ahead",
+      "sound": "too drwah",
+      "exampleFr": "Allez tout droit.",
+      "exampleEn": "Go straight ahead."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "à gauche",
+      "en": "to the left",
+      "sound": "ah gohsh",
+      "exampleFr": "La banque est à gauche.",
+      "exampleEn": "The bank is on the left."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "à droite",
+      "en": "to the right",
+      "sound": "ah drwaht",
+      "exampleFr": "Le musée est à droite.",
+      "exampleEn": "The museum is on the right."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "tourner",
+      "en": "to turn",
+      "sound": "toor-NAY",
+      "exampleFr": "Je tourne à gauche.",
+      "exampleEn": "I turn left."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "traverser",
+      "en": "to cross",
+      "sound": "trah-vehr-SAY",
+      "exampleFr": "Je traverse la rue.",
+      "exampleEn": "I cross the street."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "continuer",
+      "en": "to continue",
+      "sound": "kohn-tee-nü-AY",
+      "exampleFr": "Je continue tout droit.",
+      "exampleEn": "I continue straight ahead."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "devant",
+      "en": "in front of",
+      "sound": "duh-VAH(N)",
+      "exampleFr": "L'arrêt est devant la banque.",
+      "exampleEn": "The stop is in front of the bank."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "derrière",
+      "en": "behind",
+      "sound": "deh-RYEHR",
+      "exampleFr": "Le parc est derrière le musée.",
+      "exampleEn": "The park is behind the museum."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "en face de",
+      "en": "across from, opposite",
+      "sound": "ah(n) fahs duh",
+      "exampleFr": "La station est en face de la place.",
+      "exampleEn": "The station is across from the square."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "à côté de",
+      "en": "beside, next to",
+      "sound": "ah koh-TAY duh",
+      "exampleFr": "Le café est à côté du musée.",
+      "exampleEn": "The café is beside the museum."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "tout droit",
+      "options": [
+        "to turn",
+        "straight ahead",
+        "in front of",
+        "beside, next to"
+      ],
+      "answer": 1,
+      "explain": "tout droit means straight ahead."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "à gauche",
+      "options": [
+        "to cross",
+        "behind",
+        "straight ahead",
+        "to the left"
+      ],
+      "answer": 3,
+      "explain": "à gauche means to the left."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "à droite",
+      "options": [
+        "to continue",
+        "to the right",
+        "across from, opposite",
+        "to the left"
+      ],
+      "answer": 1,
+      "explain": "à droite means to the right."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "tourner",
+      "options": [
+        "in front of",
+        "beside, next to",
+        "to the right",
+        "to turn"
+      ],
+      "answer": 3,
+      "explain": "tourner means to turn."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "traverser",
+      "options": [
+        "behind",
+        "to cross",
+        "straight ahead",
+        "to turn"
+      ],
+      "answer": 1,
+      "explain": "traverser means to cross."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "continuer",
+      "options": [
+        "across from, opposite",
+        "to the left",
+        "to cross",
+        "to continue"
+      ],
+      "answer": 3,
+      "explain": "continuer means to continue."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "à gauche",
+      "question": "Which word did you hear?",
+      "options": [
+        "tourner",
+        "à gauche",
+        "continuer",
+        "derrière"
+      ],
+      "answer": 1,
+      "explain": "You heard à gauche: to the left."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "tourner",
+      "question": "Which word did you hear?",
+      "options": [
+        "tourner",
+        "continuer",
+        "derrière",
+        "à gauche"
+      ],
+      "answer": 0,
+      "explain": "You heard tourner: to turn."
+    }
+  ]
+}

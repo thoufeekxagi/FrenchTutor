@@ -1,0 +1,140 @@
+{
+  "id": "a1-u09-checkpoint",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Checkpoint",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je vais ___ parc.",
+      "options": [
+        "au",
+        "à la",
+        "à l'",
+        "aux"
+      ],
+      "answer": 0,
+      "explain": "Parc is masculine singular: use au."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Nous allons ___ musée.",
+      "options": [
+        "à la",
+        "au",
+        "aux",
+        "à les"
+      ],
+      "answer": 1,
+      "explain": "Musée is masculine singular: à + le becomes au."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the correct plan: She is going to take the metro.",
+      "options": [
+        "Elle va prendre le métro.",
+        "Elle vas prendre le métro.",
+        "Elle va prends le métro.",
+        "Elle prend va le métro."
+      ],
+      "answer": 0,
+      "explain": "Use elle va plus the infinitive prendre."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "After nous allons, choose the infinitive.",
+      "options": [
+        "marcher",
+        "marchons",
+        "marchez",
+        "marchent"
+      ],
+      "answer": 0,
+      "explain": "The second verb stays in the infinitive."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does à gauche mean?",
+      "options": [
+        "To the left",
+        "To the right",
+        "Straight ahead",
+        "Behind"
+      ],
+      "answer": 0,
+      "explain": "À gauche means to the left."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "The museum is across from the bank. Choose the phrase.",
+      "options": [
+        "Le musée est en face de la banque.",
+        "Le musée est sous la banque.",
+        "Le musée est chez la banque.",
+        "Le musée est dans la banque."
+      ],
+      "answer": 0,
+      "explain": "En face de means across from."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "What is un billet?",
+      "options": [
+        "A ticket",
+        "A platform",
+        "A route",
+        "A detour"
+      ],
+      "answer": 0,
+      "explain": "Un billet is a ticket."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What does descendre à la station mean?",
+      "options": [
+        "Get off at the station",
+        "Board at the station",
+        "Wait at the station",
+        "Turn at the station"
+      ],
+      "answer": 0,
+      "explain": "Descendre means to get off in this travel context."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What does un détour mean?",
+      "options": [
+        "A detour",
+        "A one-way ticket",
+        "A bus stop",
+        "A square"
+      ],
+      "answer": 0,
+      "explain": "Un détour is a detour."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which word is a common Canadian term for bus?",
+      "options": [
+        "autobus",
+        "voiture",
+        "train",
+        "vélo"
+      ],
+      "answer": 0,
+      "explain": "Autobus is a common Canadian French word for bus."
+    }
+  ]
+}

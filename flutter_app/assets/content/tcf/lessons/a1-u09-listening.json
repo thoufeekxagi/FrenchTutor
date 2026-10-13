@@ -1,0 +1,86 @@
+{
+  "id": "a1-u09-listening",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Listening practice",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le musée est en face de la banque.",
+      "question": "Where is the museum?",
+      "options": [
+        "Across from the bank",
+        "Behind the bank",
+        "Inside the bank",
+        "Far from the bank"
+      ],
+      "answer": 0,
+      "explain": "En face de means across from."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je vais prendre l'autobus au coin de la rue.",
+      "question": "Where will the speaker take the bus?",
+      "options": [
+        "At the corner of the street",
+        "At the museum",
+        "At the train station",
+        "In the park"
+      ],
+      "answer": 0,
+      "explain": "The speaker says au coin de la rue."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La prochaine station est le musée.",
+      "question": "What is the next station?",
+      "options": [
+        "The museum",
+        "The bank",
+        "The city hall",
+        "The airport"
+      ],
+      "answer": 0,
+      "explain": "The speaker says la prochaine station est le musée."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Détour sur la ligne 4 aujourd'hui.",
+      "question": "What is happening on route 4?",
+      "options": [
+        "There is a detour today",
+        "The route is free",
+        "The train is early",
+        "The station is closed"
+      ],
+      "answer": 0,
+      "explain": "The message announces a detour today."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "La station est tout près du parc.",
+      "question": "Where is the station?",
+      "options": [
+        "Very close to the park",
+        "Far from the park",
+        "Under the park",
+        "Behind the park"
+      ],
+      "answer": 0,
+      "explain": "Tout près de means very close to."
+    }
+  ]
+}

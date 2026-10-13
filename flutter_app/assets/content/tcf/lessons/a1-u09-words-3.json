@@ -1,0 +1,220 @@
+{
+  "id": "a1-u09-words-3",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Words: ways to travel",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "l'autobus (m.)",
+      "en": "bus (common Canadian term)",
+      "say": "l'autobus",
+      "sound": "loh-toh-BÜS",
+      "exampleFr": "Je prends l'autobus.",
+      "exampleEn": "I take the bus."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le métro",
+      "en": "subway, metro",
+      "sound": "luh may-TROH",
+      "exampleFr": "Le métro est près d'ici.",
+      "exampleEn": "The metro is nearby."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le taxi",
+      "en": "taxi",
+      "sound": "luh tahk-SEE",
+      "exampleFr": "Le taxi est devant l'hôtel.",
+      "exampleEn": "The taxi is in front of the hotel."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le train",
+      "en": "train",
+      "sound": "luh tra(n)",
+      "exampleFr": "Le train arrive à la gare.",
+      "exampleEn": "The train arrives at the station."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le vélo",
+      "en": "bicycle",
+      "sound": "luh vay-LOH",
+      "exampleFr": "Je vais au parc à vélo.",
+      "exampleEn": "I go to the park by bicycle."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la station",
+      "en": "station",
+      "sound": "lah stah-SYOH(N)",
+      "exampleFr": "La station est ici.",
+      "exampleEn": "The station is here."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "l'arrêt d'autobus (m.)",
+      "en": "bus stop",
+      "say": "l'arrêt d'autobus",
+      "sound": "lah-reh doh-toh-BÜS",
+      "exampleFr": "L'arrêt d'autobus est près de la place.",
+      "exampleEn": "The bus stop is near the square."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la ligne",
+      "en": "line, route",
+      "sound": "lah leen-yuh",
+      "exampleFr": "La ligne va au centre-ville.",
+      "exampleEn": "The route goes downtown."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le quai",
+      "en": "platform",
+      "sound": "luh keh",
+      "exampleFr": "Le train est au quai.",
+      "exampleEn": "The train is at the platform."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "à pied",
+      "en": "on foot",
+      "sound": "ah pyay",
+      "exampleFr": "Je vais au musée à pied.",
+      "exampleEn": "I go to the museum on foot."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "l'autobus (m.)",
+      "options": [
+        "train",
+        "bus (common Canadian term)",
+        "on foot",
+        "taxi"
+      ],
+      "answer": 1,
+      "explain": "l'autobus (m.) means bus (common Canadian term)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le métro",
+      "options": [
+        "bicycle",
+        "line, route",
+        "bus (common Canadian term)",
+        "subway, metro"
+      ],
+      "answer": 3,
+      "explain": "le métro means subway, metro."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le taxi",
+      "options": [
+        "station",
+        "taxi",
+        "platform",
+        "subway, metro"
+      ],
+      "answer": 1,
+      "explain": "le taxi means taxi."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le train",
+      "options": [
+        "bus stop",
+        "on foot",
+        "taxi",
+        "train"
+      ],
+      "answer": 3,
+      "explain": "le train means train."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le vélo",
+      "options": [
+        "line, route",
+        "bicycle",
+        "bus (common Canadian term)",
+        "train"
+      ],
+      "answer": 1,
+      "explain": "le vélo means bicycle."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la station",
+      "options": [
+        "platform",
+        "subway, metro",
+        "bicycle",
+        "station"
+      ],
+      "answer": 3,
+      "explain": "la station means station."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le métro",
+      "question": "Which word did you hear?",
+      "options": [
+        "le train",
+        "le métro",
+        "la station",
+        "la ligne"
+      ],
+      "answer": 1,
+      "explain": "You heard le métro: subway, metro."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le vélo",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'arrêt d'autobus",
+        "le vélo",
+        "le quai",
+        "l'autobus"
+      ],
+      "answer": 1,
+      "explain": "You heard le vélo: bicycle."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "In Montréal, the subway is called le métro and the city's transit agency is the STM. Other cities use different systems and transit cards. The word autobus is useful across Canada; look for arrêt when you need a bus stop."
+    }
+  ]
+}

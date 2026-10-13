@@ -1,0 +1,116 @@
+{
+  "id": "a1-u09-grammar-b",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Grammar: aller + infinitive: a plan for soon",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "aller + infinitive: a plan for soon",
+      "body": "Use the present of aller plus another verb in its infinitive to say what you are going to do. It is a common way to talk about a planned or near-future action."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "aller + a verb in its infinitive",
+      "headers": [
+        "Person",
+        "aller",
+        "Plan"
+      ],
+      "rows": [
+        [
+          "je",
+          "vais",
+          "je vais prendre le métro"
+        ],
+        [
+          "tu",
+          "vas",
+          "tu vas prendre le métro"
+        ],
+        [
+          "il / elle / on",
+          "va",
+          "elle va prendre le métro"
+        ],
+        [
+          "nous",
+          "allons",
+          "nous allons prendre le métro"
+        ],
+        [
+          "vous",
+          "allez",
+          "vous allez prendre le métro"
+        ],
+        [
+          "ils / elles",
+          "vont",
+          "ils vont prendre le métro"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "aller + infinitive: a plan for soon",
+      "body": "• Conjugate aller for the person: je vais, tu vas, elle va, nous allons, vous allez, ils vont.\n• Keep the next verb in its infinitive form: Je vais prendre (not je vais prends).\n• The infinitive names the planned action: On va marcher; nous allons acheter un billet."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je ___ prendre le métro.",
+      "options": [
+        "vais",
+        "vas",
+        "allez",
+        "vont"
+      ],
+      "answer": 0,
+      "explain": "With je, use vais: je vais prendre."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Vous ___ acheter un billet.",
+      "options": [
+        "va",
+        "vas",
+        "allez",
+        "vont"
+      ],
+      "answer": 2,
+      "explain": "With vous, use allez."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Elle va ___ à pied.",
+      "options": [
+        "marcher",
+        "marche",
+        "marches",
+        "marchons"
+      ],
+      "answer": 0,
+      "explain": "After va, use the infinitive marcher."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Nous allons ___ l'autobus.",
+      "options": [
+        "attendre",
+        "attendons",
+        "attendez",
+        "attendent"
+      ],
+      "answer": 0,
+      "explain": "The second verb stays in its infinitive form: attendre."
+    }
+  ]
+}

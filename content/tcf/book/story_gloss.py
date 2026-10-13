@@ -21,6 +21,8 @@ STORY_META = {
                    keywords=["dîner", "restaurant", "carte", "poulet", "légumes", "l'eau", "serveuse", "l'addition"]),
     "a1-u08": dict(id="a1-au-depanneur", minutes=3, summary="Julie finds groceries at a Québec convenience store and asks for a paper bag.",
                    keywords=["dépanneur", "liste", "céréales", "pommes", "commis", "boîte", "sac", "caisse"]),
+    "a1-u09": dict(id="a1-trajet-montreal", minutes=3, summary="Sam follows city directions and takes the bus to a museum in Montréal.",
+                   keywords=["centre-ville", "musée", "banque", "place", "l'autobus", "l'arrêt"]),
 }
 
 STORY_GLOSS = {
@@ -132,5 +134,23 @@ STORY_GLOSS = {
         "en": ("in; made of",), "papier": ("paper", "noun, masculine", "pah-PYAY"),
         "à": ("at, to",), "la": ("the",), "caisse": ("checkout", "noun, feminine", "kehs"),
         "paie": ("pays (payer)", "verb", "peh"), "par": ("by",), "carte": ("card", "noun, feminine"),
+    },
+    "a1-trajet-montreal": {
+        "sam": ("Sam (a man's name)",), "est": ("is (être)", "verb"),
+        "au": ("at the; at (à + le)",), "centre-ville": ("downtown", "noun, masculine", "sah(n)tr-VEEL"),
+        "de": ("of; from",), "montréal": ("Montréal",), "il": ("he", "pronoun"),
+        "cherche": ("looks for (chercher)", "verb", "shehrsh"), "le": ("the",),
+        "musée": ("museum", "noun, masculine", "mü-ZAY"), "sur": ("on",),
+        "une": ("a, one",), "carte": ("map", "noun, feminine", "kahrt"),
+        "près": ("near",), "la": ("the",), "banque": ("bank", "noun, feminine", "bah(n)k"),
+        "va": ("is going (aller)", "verb"), "traverser": ("to cross", "verb", "trah-vehr-SAY"),
+        "place": ("square, plaza", "noun, feminine", "plahs"), "à": ("to; at",),
+        "pied": ("foot", "noun, masculine", "pyay"), "tourne": ("turns (tourner)", "verb", "toorn"),
+        "gauche": ("left",), "coin": ("corner", "noun, masculine", "kwa(n)"),
+        "rue": ("street", "noun, feminine", "rü"), "traverse": ("crosses (traverser)", "verb", "trah-vehrs"),
+        "attend": ("waits for (attendre)", "verb", "ah-tah(n)"), "l'arrêt": ("the stop", "noun, masculine", "lah-reh"),
+        "monte": ("gets on (monter)", "verb", "mohnt"), "dans": ("in, into",),
+        "l'autobus": ("the bus", "noun, masculine", "loh-toh-BÜS"), "et": ("and",),
+        "descend": ("gets off (descendre)", "verb", "day-sah(n)"), "du": ("near the (de + le)",),
     },
 }

@@ -1,0 +1,35 @@
+{
+  "id": "a1-u09-write-speak",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Write and speak",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a short route message",
+      "body": "Write 3 or 4 short lines. Say where the place is, name one landmark, and tell the person how to get there.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour. Le musée est en face de la banque. Allez tout droit et tournez à gauche au feu rouge. C'est à deux minutes à pied. Merci.\n\nCheck:\n• Use a landmark with en face de, près de or à côté de.\n• Put the directions in the order someone follows them.\n• Check the destination and left/right words."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Ask for directions",
+      "body": "Ask how to get to a place. Listen to the route, then repeat the landmark and say what transport you are going to take.\n\n• Begin with Excusez-moi or Bonjour.\n• Ask Où est...? or Comment aller à...?.\n• Repeat the landmark and use je vais + infinitive for your plan."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Comment aller au musée ? Est-ce loin ? Merci. Je vais prendre l'autobus et descendre à la station du musée.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

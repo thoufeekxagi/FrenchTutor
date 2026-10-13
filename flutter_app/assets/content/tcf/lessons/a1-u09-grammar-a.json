@@ -1,0 +1,113 @@
+{
+  "id": "a1-u09-grammar-a",
+  "unit": "a1-u09",
+  "unitTitle": "Getting around",
+  "title": "Grammar: à + le / les",
+  "subtitle": "Unit 9: Getting around",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "à + le / les",
+      "body": "The destination, the travel plan and the location are three separate pieces of a route. Learn the small words first, then say the whole trip."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use au and aux before masculine and plural places",
+      "headers": [
+        "Before the place",
+        "Use",
+        "Example"
+      ],
+      "rows": [
+        [
+          "masculine singular: le parc",
+          "à + le = au",
+          "Je vais au parc."
+        ],
+        [
+          "feminine singular: la banque",
+          "à la",
+          "Je vais à la banque."
+        ],
+        [
+          "vowel: l'hôtel",
+          "à l'",
+          "Je vais à l'hôtel."
+        ],
+        [
+          "plural: les musées",
+          "à + les = aux",
+          "Je vais aux musées."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "à + le / les",
+      "body": "• Au is the joined form of à + le: au parc, au musée. Do not say à le parc.\n• Aux is the joined form of à + les: aux musées. Before la and l', keep the two words: à la banque, à l'hôtel.\n• With aller, these forms show the destination: Je vais au musée. A place where something is can also use à: La banque est à côté du musée."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Watch out",
+      "body": "The word du has more than one job. In Unit 7, du riz meant some rice. Here, du musée joins de + le and means of/from the museum: près du musée (near the museum)."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je vais ___ parc.",
+      "options": [
+        "au",
+        "à la",
+        "à l'",
+        "aux"
+      ],
+      "answer": 0,
+      "explain": "Parc is masculine singular: à + le becomes au."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Elle va ___ banque.",
+      "options": [
+        "au",
+        "à la",
+        "à l'",
+        "aux"
+      ],
+      "answer": 1,
+      "explain": "Banque is feminine: use à la."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Nous allons ___ hôtel.",
+      "options": [
+        "au",
+        "à la",
+        "à l'",
+        "aux"
+      ],
+      "answer": 2,
+      "explain": "Hôtel starts with a silent h, so use à l'."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Vous allez ___ musées.",
+      "options": [
+        "au",
+        "à la",
+        "à l'",
+        "aux"
+      ],
+      "answer": 3,
+      "explain": "Musées is plural: à + les becomes aux."
+    }
+  ]
+}
