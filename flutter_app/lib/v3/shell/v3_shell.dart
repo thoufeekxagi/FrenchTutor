@@ -34,14 +34,16 @@ class _V3ShellState extends State<V3Shell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
-      body: IndexedStack(
-        index: _index,
-        children: const [
-          V3LearnScreen(),
-          V3MarieScreen(),
-          V3TestsScreen(),
-          V3MeScreen(),
-        ],
+      body: V3Width(
+        child: IndexedStack(
+          index: _index,
+          children: const [
+            V3LearnScreen(),
+            V3MarieScreen(),
+            V3TestsScreen(),
+            V3MeScreen(),
+          ],
+        ),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

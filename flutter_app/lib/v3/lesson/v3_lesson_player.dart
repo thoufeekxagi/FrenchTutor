@@ -166,9 +166,11 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
-      body: SafeArea(
-        bottom: false,
-        child: _complete ? _completeView() : _lessonView(),
+      body: V3Width(
+        child: SafeArea(
+          bottom: false,
+          child: _complete ? _completeView() : _lessonView(),
+        ),
       ),
     );
   }
@@ -218,6 +220,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
                       const SizedBox(width: 6),
                       Text(
                         'Ask Marie',
+                        textScaler: const TextScaler.linear(1),
                         style: V3Type.strong(13.5, DesignTokens.primary),
                       ),
                     ],

@@ -255,18 +255,20 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
         backgroundColor: onBlue
             ? AppearanceColors.blueLight
             : DesignTokens.canvas,
-        body: PageView(
-          controller: _controller,
-          physics: const NeverScrollableScrollPhysics(),
-          onPageChanged: (page) => setState(() => _page = page),
-          children: [
-            _launch(),
-            _welcome(),
-            _levelStep(),
-            _marieStep(),
-            _planStep(),
-            _readyStep(),
-          ],
+        body: V3Width(
+          child: PageView(
+            controller: _controller,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: (page) => setState(() => _page = page),
+            children: [
+              _launch(),
+              _welcome(),
+              _levelStep(),
+              _marieStep(),
+              _planStep(),
+              _readyStep(),
+            ],
+          ),
         ),
       ),
     );

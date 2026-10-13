@@ -294,44 +294,46 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _topBar(),
-                Expanded(
-                  child: NotificationListener<ScrollStartNotification>(
-                    onNotification: (_) {
-                      _dismissPopover();
-                      return false;
-                    },
-                    child: ListView(
-                      padding: EdgeInsets.fromLTRB(
-                        24,
-                        4,
-                        24,
-                        _tab == 0 ? 190 : 40,
+      body: V3Width(
+        child: SafeArea(
+          bottom: false,
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _topBar(),
+                  Expanded(
+                    child: NotificationListener<ScrollStartNotification>(
+                      onNotification: (_) {
+                        _dismissPopover();
+                        return false;
+                      },
+                      child: ListView(
+                        padding: EdgeInsets.fromLTRB(
+                          24,
+                          4,
+                          24,
+                          _tab == 0 ? 190 : 40,
+                        ),
+                        children: [
+                          _header(),
+                          _tabs(),
+                          const SizedBox(height: 10),
+                          ...switch (_tab) {
+                            0 => _storyTab(),
+                            1 => _quizTab(),
+                            _ => _wordsTab(),
+                          },
+                        ],
                       ),
-                      children: [
-                        _header(),
-                        _tabs(),
-                        const SizedBox(height: 10),
-                        ...switch (_tab) {
-                          0 => _storyTab(),
-                          1 => _quizTab(),
-                          _ => _wordsTab(),
-                        },
-                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-            if (_tab == 0) _dock(),
-          ],
+                ],
+              ),
+              if (_tab == 0) _dock(),
+            ],
+          ),
         ),
       ),
     );

@@ -77,7 +77,8 @@ void main() {
         switch (step) {
           case V3ChooseStep s:
             await probe.waitForLabel(tester, s.options[s.answer]);
-            await probe.capture(tester, '${tag}_question');
+            if (step == lesson.steps.first)
+              await probe.capture(tester, '${tag}_question');
             await press(tester, s.options[s.answer]);
             await press(tester, 'Check');
             expect(
@@ -87,7 +88,8 @@ void main() {
             );
           case V3ListenStep s:
             await probe.waitForLabel(tester, s.options[s.answer]);
-            await probe.capture(tester, '${tag}_question');
+            if (step == lesson.steps.first)
+              await probe.capture(tester, '${tag}_question');
             await press(tester, s.options[s.answer]);
             await press(tester, 'Check');
             expect(
@@ -97,7 +99,9 @@ void main() {
             );
           default:
             await probe.waitForLabel(tester, 'Continue');
-            await probe.capture(tester, tag);
+            if (step == lesson.steps.first || step == lesson.steps.last) {
+              await probe.capture(tester, tag);
+            }
         }
         await press(tester, 'Continue');
       }

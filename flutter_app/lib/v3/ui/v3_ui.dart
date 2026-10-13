@@ -322,6 +322,19 @@ class V3Segments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Many steps do not fit as separate segments on a small screen, so long
+    // lessons get one smooth bar instead.
+    if (count > 12) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(2),
+        child: LinearProgressIndicator(
+          value: (current + 1) / count,
+          minHeight: 4,
+          backgroundColor: DesignTokens.hairline,
+          color: DesignTokens.primary,
+        ),
+      );
+    }
     return Row(
       children: [
         for (var i = 0; i < count; i++) ...[
@@ -424,4 +437,23 @@ class V3Screen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// On wide screens (iPad, landscape) keeps content in a readable column at the
+/// top, instead of stretching lines across 1 000+ points. On a phone it adds
+/// nothing. Content stays left-aligned inside the column.
+class V3Width extends StatelessWidget {
+  const V3Width({super.key, required this.child, this.maxWidth = 680});
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) => Align(
+    alignment: Alignment.topCenter,
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: child,
+    ),
+  );
 }
