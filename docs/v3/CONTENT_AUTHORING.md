@@ -1,5 +1,12 @@
 # V3 content authoring (how lessons get written, fast and correct)
 
+> **Current method (read `LESSON_PIPELINE.md` first).** Lessons are written in the book
+> chapter files and exported; do not hand-write the app JSON as described in the older
+> workflow below. Lesson audio is now live tutor speech through the speaker buttons, not
+> a baked catalog. The sections below remain correct for sources, the non-negotiables and
+> review gates.
+
+
 The agent (Devin/Claude) writes all lessons directly as files. No GPT or
 OpenRouter generation, no TTS. The audience is a true beginner learning for
 TCF Canada. Gemini Live (Marie, Julien, Camille, Mathieu) voices every French

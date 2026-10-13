@@ -26,3 +26,5 @@ AirPods. Everything goes through `lib/services/mic_echo_gate.dart` and
 `AudioStreamingService.blockMicUntil`. Any new audio path that can play while a
 call is open must close the mic for its length plus the tail. See
 `docs/v3/AGENT_RULES.md` section 7.
+
+Start here: `docs/v3/README.md` (index, handoff, how to test fast, how to author units).

@@ -1,5 +1,7 @@
 # V3 testing and fast iteration rules
 
+> Start with `FAST_ITERATION_TESTING.md` (how tests are chosen and designed, iPhone and iPad). This file is the reference for the on-device scripts and probe.
+
 Goal: no assumptions, no trial and error. Every claim about the app (a screen
 exists, a button is called X, a tap does Y) must come from a tool result in the
 current session: the probe, a screenshot, the screen map, or the source.
@@ -136,6 +138,7 @@ removal passes it.
 | Tap changes the wrong thing | tapped an oversized semantics node | probe marks it `oversized`, `tapLabel` falls back to the text |
 | Test passes but captured "Restoring your progress..." | settled before async startup ended | use `probe.settle` (content-based) |
 | Log says `You may be prompted to give access to control Xcode`, then VM service not found, and Xcode.app opens by itself | Flutter's LLDB launch failed, usually because a previous (interrupted) run left ParleSprint running under a debugger on the phone, so it fell back to driving Xcode | `xcrun devicectl device info apps --device <id> --bundle-id com.thoufeekx.frenchtutor --verbose` shows the app's bundle path. `xcrun devicectl device info processes --device <id> \| grep Runner` lists pids. Match the path, then `xcrun devicectl device process terminate --device <id> --pid <pid> --kill` (a plain terminate did not stop it). Never kill the other Runner (a different app). SIGTERM the Xcode.app and `lldb-rpc-server` that your own failed run launched, then retry once |
+| `Timed out waiting for CONFIGURATION_BUILD_DIR to update` / `Error starting debug session in Xcode`, then `VM service never discovered` | Xcode.app is open on the Mac and Flutter's launch drives Xcode | quit Xcode, retry once. Two failures: stop and report |
 | Orphaned `flutter drive` or `lldb` after an aborted run | parent died | `ps -axo pid,ppid,etime,command | grep -E "dartvm|lldb"`, SIGTERM the orphans |
 
 ## Unit and widget tests

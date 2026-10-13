@@ -51,3 +51,5 @@ Cold device build ~72s, warm 23 to 33s, whole e2e run 90 to 145s, analyze ~7s.
 Probe rects are physical pixels (about 3x logical on kodekarbon).
 
 **Echo rule:** the tutor must never hear herself. Any audio the app plays while a call can be open must close the mic through `MicEchoGate` / `AudioStreamingService.blockMicUntil` (see docs/v3/AGENT_RULES.md section 7).
+
+Full playbooks: `docs/v3/README.md` (index), `docs/v3/FAST_ITERATION_TESTING.md` (which test for which change, iPhone and iPad), `docs/v3/LESSON_PIPELINE.md` (units), `docs/v3/MARIE_TUTOR.md` (tutor).

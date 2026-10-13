@@ -85,7 +85,7 @@ the tokens. They keep their own layouts until they are rebuilt.
    `settings.darkMode`). Default is light for every install. Changing it
    rebuilds the whole app tree (the MaterialApp is keyed by mode), so DesignTokens'
    static reads stay correct.
-4. Typography: Plus Jakarta Sans for headings, Inter for everything else.
+4. Typography: Inter only, headings included (see "One design everywhere").
 5. Hardcoded `Colors.white/black/Color(0x...)` in screens is a bug waiting for
    the other appearance. About 270 exist today. Replace them with tokens when
    a screen is touched, and check both modes with `E2E_DARK`.

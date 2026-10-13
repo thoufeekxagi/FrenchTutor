@@ -41,7 +41,7 @@ Put the contract as a comment at the top of the screen file.
 | Onboarding (7) | goal, target level, exam date, start level, daily time, tutor voice, plan | Speak (level picker), existing flow |
 | Today | one next action with reason and time, reviews due, exam countdown, level vs target | new |
 | Path | stage and unit list with states, what each unit lets you do | Babbel course list |
-| Lesson player | one instruction per step, big answers, bottom feedback bar, Ask Marie always visible | Speak lesson skeleton |
+| Lesson player | one instruction per step, big answers, bottom feedback bar, Previous beside Continue, Marie phone button and inline panel | Speak lesson skeleton |
 | Marie | practise this lesson, exam examiner, ask anything, correction cards | Speak roleplay and corrections |
 | Mocks | timed sections and full mocks, results with per-skill level and fix plan | new |
 | Progress | per-skill estimated level vs target, weak topics, countdown | Babbel profile |
@@ -53,7 +53,7 @@ Reference screenshots live in `references/extracted/` (local only, not in git).
 
 word, phrase repeat, grammar card, multiple choice, listen once (TCF style),
 arrange the sentence, speak and compare. Every French string has a speaker
-button. Every step has Ask Marie.
+button (it asks the tutor to say it). Every step has the Marie phone button.
 
 ## Rules for building v3 UI
 

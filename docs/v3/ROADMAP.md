@@ -9,11 +9,12 @@ Owner decisions are in bold. This file is the single place for the plan. Update 
 | A1 book (PDF), master text | **Stage 0 and Units 1 to 5 done and checked.** Units 6 to 14 to write |
 | App shell, onboarding, Learn, Stories, lesson player | built, tested on the phone |
 | Book to app lessons | **Stage 0 and Units 1 to 5 are in the app** (87 lessons, 5 stories), produced by `export_app.py` |
-| Marie live inside lessons (Ask Marie) | button exists, opens the live tutor with step context. The "check my pronunciation" switch is not built |
+| Marie live inside lessons | **built, inline**: phone button, panel (Mute, End, Skip), response pill, speaker taps say the exact line in the chosen voice. Story reader does not have it yet. See `MARIE_TUTOR.md` |
+| Progress and review | **built**: furthest step is real progress, Previous, review, replay, Resume. See `AGENT_RULES.md` section 9 |
 | Review (spaced repetition) | **not built.** Learn has no review card until it is |
 | Tests tab (mock exams) | opens the old exam screen. A real TCF mock engine is not built |
 | Lesson audio | **Decision: speaker buttons ask live Marie (the chosen tutor) to say the exact line, on one warm connection, exactly like the old vocabulary lessons.** No saved clips for lesson words, so changing tutor changes every voice |
-| iPad layout | **not started. Must be done, see below** |
+| iPad layout | **partly done**: universal build, readable column, checked on iPad portrait and landscape, Split View safe for calls. Still to do: keyboard and Pencil friendly writing areas |
 | Progress sync between devices | **not built. Progress is saved on the device only** |
 
 ## The A1 book: remaining units (write by hand, in this order)
