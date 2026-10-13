@@ -78,6 +78,9 @@ abstract class V3MarieSession extends ChangeNotifier {
   Future<void> end();
   Future<void> toggleMute();
 
+  /// Cuts off what she is saying right now. The call stays open.
+  Future<void> skip();
+
   /// A new step is on screen: cut any old reply, silently tell her the new
   /// step. She does not speak unless the learner does.
   void screenChanged();
@@ -251,6 +254,15 @@ class V3LiveMarieSession extends V3MarieSession {
   Future<void> toggleMute() async => _callInstance?.toggleMute();
 
   @override
+  Future<void> skip() async {
+    final call = _callInstance;
+    if (call == null || !call.active) return;
+    await call.interruptTutorReply();
+    clearCaption();
+    notifyListeners();
+  }
+
+  @override
   void screenChanged() {
     final call = _callInstance;
     if (call == null || !call.active) return;
@@ -359,6 +371,16 @@ class V3FakeMarieSession extends V3MarieSession {
     if (!isLive) return;
     _muted = !_muted;
     V3MarieSession.debugLog.add(_muted ? 'mute' : 'unmute');
+    notifyListeners();
+  }
+
+  @override
+  Future<void> skip() async {
+    if (!isLive) return;
+    V3MarieSession.debugLog.add('skip');
+    _generation++;
+    _sayTimer?.cancel();
+    clearCaption();
     notifyListeners();
   }
 

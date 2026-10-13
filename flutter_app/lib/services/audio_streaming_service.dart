@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:audio_session/audio_session.dart';
+import 'mic_echo_gate.dart';
 import 'package:flutter/foundation.dart'
     show TargetPlatform, debugPrint, defaultTargetPlatform;
 import 'package:flutter_sound/flutter_sound.dart';
@@ -135,7 +136,15 @@ class AudioStreamingService {
   /// it pick up the tail of the tutor's own still-playing voice as if it were fresh user
   /// speech. This tracks the real end of the scheduled playback queue as an independent gate.
   DateTime _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
-  static const _playbackTailGraceSeconds = 0.35;
+  final _echoGate = MicEchoGate();
+
+  /// Closes the microphone until [time]. Used for sound the app plays itself
+  /// through the speaker while a call is open (a lesson's speaker button), so
+  /// the model never hears it as the learner. See MicEchoGate.
+  void blockMicUntil(DateTime time) {
+    _echoGate.blockUntil(time);
+    _resetBargeInDetector();
+  }
 
   /// Timeline for the currently queued output utterance. Gemini delivers PCM
   /// in bursts, while the native player drains it at the device's playback
@@ -413,6 +422,11 @@ class AudioStreamingService {
 
   void _handleMicChunk(Uint8List chunk) {
     if (isAwaitingTutorResponse) return;
+    // Sound the app itself is playing (a lesson clip) is never the learner.
+    if (_echoGate.clipBlocks()) {
+      _resetBargeInDetector();
+      return;
+    }
     // While tutor audio is pending, use the conservative barge-in detector
     // below instead of the cheaper speech gate. The raw mic can still contain
     // a small amount of speaker bleed even with iOS voice processing enabled;
@@ -424,13 +438,10 @@ class AudioStreamingService {
       return;
     }
     if (!allowBargeIn) {
-      final blockedByOutput = isOutputActive;
-      final withinTailGrace = DateTime.now().isBefore(
-        _scheduledPlaybackEndTime.add(
-          Duration(milliseconds: (_playbackTailGraceSeconds * 1000).round()),
-        ),
-      );
-      if (blockedByOutput || withinTailGrace) {
+      if (_echoGate.blocks(
+        outputActive: isOutputActive,
+        playbackEnd: _scheduledPlaybackEndTime,
+      )) {
         _resetBargeInDetector();
         return;
       }

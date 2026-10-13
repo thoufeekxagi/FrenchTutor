@@ -136,6 +136,9 @@ class WebAudioStreamingService implements AudioStreamingService {
   bool isOutputActive = false;
 
   @override
+  /// The web build keeps its own simple gate. Present so shared code can call it.
+  void blockMicUntil(DateTime time) {}
+
   bool allowBargeIn = false;
 
   @override

@@ -89,6 +89,15 @@ void main() {
     await probe.capture(tester, '03_long_reply_pill');
     expect(await labels(tester), contains('Mute microphone'));
 
+    // While she talks the learner can cut her off, and the call stays up.
+    V3FakeMarieSession.current!.debugSay(long);
+    await tester.pump(const Duration(milliseconds: 300));
+    await press(tester, 'Stop $name talking');
+    expect(V3MarieSession.debugLog, contains('skip'));
+    await probe.capture(tester, '03b_after_skip');
+    V3FakeMarieSession.current!.debugSay(long);
+    await tester.pump(const Duration(seconds: 4));
+
     // Tap the pill: the whole conversation.
     await press(tester, '$name said', startsWith: true);
     await probe.capture(tester, '04_conversation_sheet');

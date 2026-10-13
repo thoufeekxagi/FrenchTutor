@@ -243,6 +243,7 @@ class InlineCallController {
     await LessonSpeechService.shared.deactivate();
     if (!_isCurrentGeneration(generation)) return;
     audio ??= AudioStreamingService();
+    _watchAppClips();
     final microphoneReady = await audio!.requestPermission();
     if (!_isCurrentGeneration(generation)) return;
     if (!microphoneReady) {
@@ -808,6 +809,27 @@ class InlineCallController {
 
   Future<void> end() => _end(notify: true);
 
+  // A lesson's speaker button plays through the same speaker the microphone is
+  // next to. While it sounds, nothing may reach the model as learner speech.
+  bool _watchingClips = false;
+
+  void _onAppClip() {
+    audio?.blockMicUntil(LessonSpeechService.clipEndsAt.value);
+  }
+
+  void _watchAppClips() {
+    if (_watchingClips) return;
+    _watchingClips = true;
+    LessonSpeechService.clipEndsAt.addListener(_onAppClip);
+    _onAppClip();
+  }
+
+  void _unwatchAppClips() {
+    if (!_watchingClips) return;
+    _watchingClips = false;
+    LessonSpeechService.clipEndsAt.removeListener(_onAppClip);
+  }
+
   Future<void> _end({required bool notify}) {
     final existing = _ending;
     if (existing != null) return existing;
@@ -884,6 +906,7 @@ class InlineCallController {
   /// the host is unmounting.
   void dispose() {
     _disposed = true;
+    _unwatchAppClips();
     _manualIdleTimer?.cancel();
     _manualIdleTimer = null;
     unawaited(_end(notify: false));

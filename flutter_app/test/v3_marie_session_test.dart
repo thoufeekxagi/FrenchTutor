@@ -181,4 +181,29 @@ void main() {
       reason: 'late connect must not revive',
     );
   });
+
+  live('skip cuts what she is saying and keeps the call', (tester) async {
+    await pumpHost(tester);
+    await connect(tester);
+    await tester.pump(const Duration(seconds: 2));
+    marie.debugSay('A long answer that the learner does not want to wait for');
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(marie.marieSpeaking, isTrue);
+    await marie.skip();
+    expect(marie.caption, isEmpty);
+    expect(marie.marieSpeaking, isFalse);
+    expect(marie.phase, V3MariePhase.live);
+    await tester.pump(const Duration(seconds: 3));
+    expect(
+      marie.caption,
+      isEmpty,
+      reason: 'the rest of the reply must not return',
+    );
+  });
+
+  live('skip with no call does nothing', (tester) async {
+    await pumpHost(tester);
+    await marie.skip();
+    expect(V3MarieSession.debugLog, isEmpty);
+  });
 }

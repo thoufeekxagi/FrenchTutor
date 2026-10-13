@@ -58,3 +58,22 @@ dominant on the paywall. See BUILD_STRUCTURE.md.
 - Content: `content/tcf/`. Validator: `content/tcf/tools/validate.py`.
 - Old design skill `parlesprint-product-design` predates v3. Where it
   conflicts with `UI_STRUCTURE.md` (palette), v3 wins.
+
+## 7. A tutor must never hear herself (hard rule, everywhere)
+
+The microphone must send **nothing** to a model while the phone is making sound:
+the tutor's voice, the tail after it, and any clip the app plays itself (a
+lesson speaker button, story narration). This holds on the loudspeaker, the
+earpiece, AirPods and wired headsets alike. Do not rely on the route or on the
+model to notice. A tutor that praises her own voice is a bug.
+
+- All of it goes through `lib/services/mic_echo_gate.dart` (`MicEchoGate`, tail
+  900 ms) and `AudioStreamingService.blockMicUntil`.
+- Anything that plays audio while a call can be open must close the mic for the
+  clip's length plus the tail. `LessonSpeechService.playBytes` already does, and
+  `InlineCallController` listens (`LessonSpeechService.clipEndsAt`). A new audio
+  path must do the same, or use the controller's external-playback bridge.
+- Prompts say it too (`compactLessonCoach`: "your own voice is not the learner").
+  That is a second line of defence, never the first.
+- Keep `test/mic_echo_gate_test.dart` green. Do not shorten the tail to make the
+  app feel faster. Learners get a Skip button instead.

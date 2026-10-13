@@ -78,6 +78,24 @@ void main() {
         await tester.pump(const Duration(seconds: 4));
         expect(tester.takeException(), isNull, reason: 'settled');
 
+        // While she is speaking there is a way to cut her off.
+        marie.debugSay(longReply);
+        await tester.pump(const Duration(milliseconds: 200));
+        final skip = find.byKey(const ValueKey('marie.skip'));
+        expect(skip, findsOneWidget, reason: 'Skip must show while she talks');
+        expect(tester.getSize(skip).shortestSide, greaterThanOrEqualTo(44));
+        await tester.tap(skip);
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(marie.caption, isEmpty);
+        expect(find.byKey(const ValueKey('marie.skip')), findsNothing);
+        marie.debugSay(longReply);
+        await tester.pump(const Duration(seconds: 4));
+        expect(
+          find.byKey(const ValueKey('marie.skip')),
+          findsNothing,
+          reason: 'nothing to skip once she has finished',
+        );
+
         // The pill never shows more than three lines.
         final pillText = tester.widget<Text>(
           find

@@ -19,3 +19,10 @@ Fast commands (from `flutter_app/`): `tool/check.sh --quick`,
 Hard rules: evidence before action (no assumed buttons or screens), one heavy
 job at a time, two failed attempts then stop and ask, never commit secrets,
 never push unless asked, never delete files you did not create.
+
+Echo rule (hard): the microphone sends nothing to a model while the phone is
+making sound (tutor voice, its tail, any app clip), on every route including
+AirPods. Everything goes through `lib/services/mic_echo_gate.dart` and
+`AudioStreamingService.blockMicUntil`. Any new audio path that can play while a
+call is open must close the mic for its length plus the tail. See
+`docs/v3/AGENT_RULES.md` section 7.

@@ -117,6 +117,27 @@ class V3MarieDock extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(child: _status()),
+                      if (session.phase == V3MariePhase.live &&
+                          session.marieSpeaking) ...[
+                        V3Pressable(
+                          key: const ValueKey('marie.skip'),
+                          label:
+                              'Stop ${ActiveTutor.current.displayName} talking',
+                          onTap: session.skip,
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minHeight: 44,
+                              minWidth: 52,
+                            ),
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(
+                              'Skip',
+                              style: V3Type.strong(14.5, DesignTokens.primary),
+                            ),
+                          ),
+                        ),
+                      ],
                       if (session.phase == V3MariePhase.live) ...[
                         _round(
                           key: const ValueKey('marie.mute'),

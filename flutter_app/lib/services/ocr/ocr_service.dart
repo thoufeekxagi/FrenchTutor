@@ -4,4 +4,5 @@
 /// web branch yet: `master` predates the web app shell (see CLAUDE.md).
 library;
 
-export 'ocr_service_unsupported.dart' if (dart.library.io) 'ocr_service_native.dart';
+export 'ocr_service_unsupported.dart'
+    if (dart.library.io) 'ocr_service_native.dart';

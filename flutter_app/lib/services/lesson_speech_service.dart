@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show ValueNotifier, debugPrint;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +16,7 @@ import 'audio_streaming_service.dart';
 import 'ai_cost_tracker.dart';
 import 'gemini_live_audio_service.dart';
 import 'lesson_agent_service.dart';
+import 'mic_echo_gate.dart';
 
 class SpeechItem {
   SpeechItem({
@@ -691,10 +692,23 @@ class LessonSpeechService {
   /// Plays already-resolved PCM16 bytes through this service's own audio
   /// session — for callers that want to play a single clip on demand (a
   /// speaker button) without going through the queued narration path above.
+  /// When the clip being played right now will be fully over, tail included.
+  /// Open calls listen and keep their microphone closed until then.
+  static final ValueNotifier<DateTime> clipEndsAt = ValueNotifier(
+    DateTime.fromMillisecondsSinceEpoch(0),
+  );
+
   Future<void> playBytes(List<int> bytes) async {
     if (bytes.isEmpty || bytes.length.isOdd) {
       throw StateError('Invalid PCM16 playback buffer');
     }
+    // A live call's microphone must not hear this clip as the learner. Tell
+    // every open call when the sound will be over (24 kHz PCM16 mono), plus the
+    // usual tail for audio still buffered in the speaker.
+    final length = Duration(
+      microseconds: (bytes.length / 2 / 24000 * 1000000).round(),
+    );
+    clipEndsAt.value = DateTime.now().add(length + MicEchoGate.tail);
 
     // Pronunciation clips are independent one-shot buffers. Hard-reset the
     // shared player before feeding the selected clip so a live-call timeline
