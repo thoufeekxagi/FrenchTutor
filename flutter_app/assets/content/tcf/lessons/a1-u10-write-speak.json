@@ -1,0 +1,35 @@
+{
+  "id": "a1-u10-write-speak",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Write and speak",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a short message to a landlord",
+      "body": "Write 3 or 4 short lines. Ask to view an apartment and ask one question about a room or included service.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour. Je voudrais visiter l'appartement. Est-ce qu'il y a une laveuse ? Le chauffage est inclus ? Merci.\n\nCheck:\n• Begin with a greeting.\n• Use est-ce qu'il y a...? to ask whether something exists.\n• Keep each question about one clear detail."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Ask about an apartment",
+      "body": "Imagine that you are speaking with a landlord. Ask if there is a bedroom and an elevator, ask whether heating is included, and say when you can visit.\n\n• Use il y a to ask what is there.\n• Use est-ce que...? or intonation to ask about the heating.\n• Say the day and time clearly; review Unit 6 if needed."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Est-ce qu'il y a une chambre et un ascenseur ? Le chauffage est inclus ? Je peux visiter mardi à 17 h. Merci.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

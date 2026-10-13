@@ -23,6 +23,8 @@ STORY_META = {
                    keywords=["dépanneur", "liste", "céréales", "pommes", "commis", "boîte", "sac", "caisse"]),
     "a1-u09": dict(id="a1-trajet-montreal", minutes=3, summary="Sam follows city directions and takes the bus to a museum in Montréal.",
                    keywords=["centre-ville", "musée", "banque", "place", "l'autobus", "l'arrêt"]),
+    "a1-u10": dict(id="a1-logement-julie", minutes=3, summary="Julie reads a rental ad, visits a furnished 3 ½ and signs a lease.",
+                   keywords=["annonce", "appartement", "chambre", "chauffage", "clé", "bail"]),
 }
 
 STORY_GLOSS = {
@@ -152,5 +154,27 @@ STORY_GLOSS = {
         "monte": ("gets on (monter)", "verb", "mohnt"), "dans": ("in, into",),
         "l'autobus": ("the bus", "noun, masculine", "loh-toh-BÜS"), "et": ("and",),
         "descend": ("gets off (descendre)", "verb", "day-sah(n)"), "du": ("near the (de + le)",),
+    },
+    "a1-logement-julie": {
+        "julie": ("Julie (a woman's name)",), "lit": ("reads (lire)", "verb", "lee"),
+        "une": ("a, one",), "annonce": ("rental listing", "noun, feminine", "ah-NOH(N)S"),
+        "pour": ("for",), "un": ("a, one",), "appartement": ("apartment", "noun, masculine", "ah-pahr-tuh-MAH(N)"),
+        "à": ("for; to",), "louer": ("to rent", "verb", "loo-AY"),
+        "l'appartement": ("the apartment", "noun, masculine", "lah-pahr-tuh-MAH(N)"),
+        "est": ("is (être)", "verb"), "3": ("three", "number"), "½": ("a half", "number"),
+        "près": ("near",), "du": ("near the (de + le)",), "centre-ville": ("downtown",),
+        "il": ("he, it", "pronoun"), "y": ("there (in il y a)",), "a": ("has (avoir)", "verb"),
+        "chambre": ("bedroom", "noun, feminine", "shah(n)br"),
+        "et": ("and",), "balcon": ("balcony", "noun, masculine", "bahl-KOH(N)"),
+        "le": ("the",), "logement": ("home, dwelling", "noun, masculine", "lozh-MAH(N)"),
+        "meublé": ("furnished", "adjective", "muh-BLAY"), "chauffage": ("heating", "noun, masculine", "shoh-FAHZH"),
+        "inclus": ("included (masculine)", "adjective", "a(n)-KLÜ"),
+        "visite": ("views (visiter)", "verb", "vee-ZEET"),
+        "avec": ("with",), "propriétaire": ("landlord, owner", "noun", "proh-pree-ay-TEHR"),
+        "laveuse": ("washing machine", "noun, feminine", "lah-VUHZ"), "sécheuse": ("clothes dryer", "noun, feminine", "say-SHUHZ"),
+        "dans": ("in",), "donne": ("gives (donner)", "verb", "dohn"), "la": ("the",),
+        "clé": ("key", "noun, feminine", "klay"), "signe": ("signs (signer)", "verb", "seen-YAY"),
+        "bail": ("lease", "noun, masculine", "bahy"), "elle": ("she", "pronoun"),
+        "déménage": ("moves house (déménager)", "verb", "day-may-nahzh"), "juillet": ("July", "month", "zhwee-YEH"),
     },
 }

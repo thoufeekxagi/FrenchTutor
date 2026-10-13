@@ -1,0 +1,114 @@
+{
+  "id": "a1-u10-tcf",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "TCF corner",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "L'annonce dit : appartement à louer, un 3 ½, libre le premier juillet.",
+      "question": "What is available on July 1?",
+      "options": [
+        "A 3½ apartment",
+        "A hotel room",
+        "A house for sale",
+        "A room at the station"
+      ],
+      "answer": 0,
+      "explain": "The ad says a 3½ apartment is for rent and available July 1."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il y a un réfrigérateur et une cuisinière dans la cuisine.",
+      "question": "Which items are in the kitchen?",
+      "options": [
+        "A refrigerator and a stove",
+        "A bed and a dresser",
+        "A washer and a dryer",
+        "A table and a sofa"
+      ],
+      "answer": 0,
+      "explain": "The speaker names un réfrigérateur et une cuisinière."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le logement est non meublé.",
+      "question": "What does the home come with?",
+      "options": [
+        "No furniture",
+        "A furnished bedroom",
+        "A washing machine",
+        "Included electricity"
+      ],
+      "answer": 0,
+      "explain": "Non meublé means unfurnished."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "La visite est jeudi à dix-huit heures trente.",
+      "question": "When is the viewing?",
+      "options": [
+        "Thursday at 6:30 p.m.",
+        "Tuesday at 6:30 p.m.",
+        "Thursday at 8:30 p.m.",
+        "Friday at 6:13 p.m."
+      ],
+      "answer": 0,
+      "explain": "Dix-huit heures trente is 18:30, or 6:30 p.m."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is included?",
+      "options": [
+        "Heating",
+        "Electricity",
+        "A moving truck",
+        "A parking pass"
+      ],
+      "answer": 0,
+      "explain": "The ad says chauffage inclus.",
+      "promptFr": "À LOUER · 3 ½ meublé · Chauffage inclus · Libre le 1er juillet"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the person want to do?",
+      "options": [
+        "View the home on Tuesday at 5 p.m.",
+        "Sign the lease on Monday",
+        "Move into a house at 7 p.m.",
+        "Visit the bank on Tuesday"
+      ],
+      "answer": 0,
+      "explain": "The message asks to visit Tuesday at 17 h.",
+      "promptFr": "MESSAGE · Bonjour. Je suis locataire. Je voudrais visiter mardi à 17 h."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where is the elevator?",
+      "options": [
+        "To the left",
+        "To the right",
+        "At the end of the street",
+        "Behind the house"
+      ],
+      "answer": 0,
+      "explain": "The notice says à gauche.",
+      "promptFr": "ENTRÉE · L'escalier est à droite. L'ascenseur est à gauche."
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "id": "a1-u10-checkpoint",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Checkpoint",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the sentence meaning “There is a balcony.”",
+      "options": [
+        "Il y a un balcon.",
+        "C'est un balcon.",
+        "Il est un balcon.",
+        "Il y a est un balcon."
+      ],
+      "answer": 0,
+      "explain": "Use il y a to say that something exists."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the correct question: Is there an elevator?",
+      "options": [
+        "Est-ce qu'il y a un ascenseur ?",
+        "Est-ce qu'il est un ascenseur ?",
+        "Il y a est un ascenseur ?",
+        "C'est un ascenseur ?"
+      ],
+      "answer": 0,
+      "explain": "Use est-ce qu'il y a to ask if something exists."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How do you identify an apartment?",
+      "options": [
+        "C'est un appartement.",
+        "Il est un appartement.",
+        "C'est appartement.",
+        "Il y a appartement."
+      ],
+      "answer": 0,
+      "explain": "Use c'est + un + noun to identify it."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "L'appartement est grand. Choose the correct short description.",
+      "options": [
+        "Il est grand.",
+        "Elle est grande.",
+        "C'est un grand.",
+        "Il y a grand."
+      ],
+      "answer": 0,
+      "explain": "Appartement is masculine, so refer to it with il."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "La chambre est grande. Choose the correct short description.",
+      "options": [
+        "Elle est grande.",
+        "Il est grand.",
+        "C'est une grande.",
+        "Il y a grande."
+      ],
+      "answer": 0,
+      "explain": "Chambre is feminine, so use elle."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does un bail mean?",
+      "options": [
+        "A lease",
+        "A hallway",
+        "A mattress",
+        "A neighbour"
+      ],
+      "answer": 0,
+      "explain": "Un bail is a lease."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "What does meublé mean in a rental ad?",
+      "options": [
+        "Furnished",
+        "Available",
+        "Noisy",
+        "Near downtown"
+      ],
+      "answer": 0,
+      "explain": "Meublé means furnished."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What is a laveuse?",
+      "options": [
+        "A washing machine",
+        "A refrigerator",
+        "A key",
+        "A bedroom"
+      ],
+      "answer": 0,
+      "explain": "Une laveuse is a washing machine in Canadian French."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "In a common Québec rental notation, what does the ½ in 3 ½ usually represent?",
+      "options": [
+        "The bathroom",
+        "A second bedroom",
+        "The balcony",
+        "The hallway"
+      ],
+      "answer": 0,
+      "explain": "The half usually represents the bathroom."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which date is a familiar Québec moving date?",
+      "options": [
+        "July 1",
+        "May 1",
+        "September 1",
+        "December 1"
+      ],
+      "answer": 0,
+      "explain": "Many Québec leases end June 30, so July 1 is a familiar moving date; dates vary by lease."
+    }
+  ]
+}

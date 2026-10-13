@@ -1,0 +1,106 @@
+{
+  "id": "a1-u10-grammar-a",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Grammar: il y a: there is / there are",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "il y a: there is / there are",
+      "body": "When you talk about a home, you may first say what is there and then identify or describe it. These are three different patterns."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use il y a to say that something exists",
+      "headers": [
+        "Meaning",
+        "French",
+        "What it tells you"
+      ],
+      "rows": [
+        [
+          "There is a balcony.",
+          "Il y a un balcon.",
+          "One item exists."
+        ],
+        [
+          "There are two bedrooms.",
+          "Il y a deux chambres.",
+          "Two items exist."
+        ],
+        [
+          "Is there an elevator?",
+          "Est-ce qu'il y a un ascenseur ?",
+          "Ask if something exists."
+        ],
+        [
+          "There is no balcony.",
+          "Il n'y a pas de balcon.",
+          "Negative form from Unit 8."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "il y a: there is / there are",
+      "body": "• Use il y a for both one and more than one: Il y a une chambre; il y a deux chambres.\n• To ask, add est-ce que at the beginning: Est-ce qu'il y a un ascenseur ?\n• For a negative, use il n'y a pas de: Il n'y a pas de balcon. This brings back Unit 8's ne...pas de."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "There is a balcony.",
+      "options": [
+        "Il y a un balcon.",
+        "C'est un balcon.",
+        "Il est un balcon.",
+        "Il y a est un balcon."
+      ],
+      "answer": 0,
+      "explain": "Use il y a to say something exists: Il y a un balcon."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "There are two bedrooms.",
+      "options": [
+        "Il y a deux chambres.",
+        "Il sont deux chambres.",
+        "C'est deux chambres.",
+        "Il y a deux chambre."
+      ],
+      "answer": 0,
+      "explain": "Il y a stays the same with a plural noun; chambres is plural."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Is there an elevator?",
+      "options": [
+        "Est-ce qu'il y a un ascenseur ?",
+        "Est-ce qu'il est un ascenseur ?",
+        "Est-ce que c'est ascenseur ?",
+        "Il y a est un ascenseur ?"
+      ],
+      "answer": 0,
+      "explain": "Use est-ce qu'il y a to ask whether something exists."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "There is no balcony.",
+      "options": [
+        "Il n'y a pas de balcon.",
+        "Il n'y a pas un balcon.",
+        "Il ne y a pas balcon.",
+        "Il n'y a de pas balcon."
+      ],
+      "answer": 0,
+      "explain": "Use ne...pas around a and de before the item."
+    }
+  ]
+}

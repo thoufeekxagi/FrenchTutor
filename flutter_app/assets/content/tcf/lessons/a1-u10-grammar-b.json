@@ -1,0 +1,92 @@
+{
+  "id": "a1-u10-grammar-b",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Grammar: c'est: identify or introduce something",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "C'est + a noun phrase or a general description",
+      "headers": [
+        "Use c'est",
+        "Example"
+      ],
+      "rows": [
+        [
+          "to say what something is",
+          "C'est un appartement."
+        ],
+        [
+          "to introduce a place with an adjective",
+          "C'est un appartement calme."
+        ],
+        [
+          "to give a general comment",
+          "C'est grand !"
+        ]
+      ],
+      "hear": 1
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "c'est: identify or introduce something",
+      "body": "Use c'est + a noun with its article: C'est un appartement; c'est une chambre. You can also use c'est for a general reaction: C'est grand !"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "It is an apartment.",
+      "options": [
+        "C'est un appartement.",
+        "Il est un appartement.",
+        "C'est appartement.",
+        "Il y a un appartement."
+      ],
+      "answer": 0,
+      "explain": "Use c'est + un + noun to identify something."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "It is a bedroom.",
+      "options": [
+        "C'est une chambre.",
+        "Elle est une chambre.",
+        "C'est chambre.",
+        "Il y a chambre."
+      ],
+      "answer": 0,
+      "explain": "Use c'est + une + noun to identify the room."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "You look around and say, “It's big!”",
+      "options": [
+        "C'est grand !",
+        "Il est un grand !",
+        "C'est un grand !",
+        "Il y a grand !"
+      ],
+      "answer": 0,
+      "explain": "C'est grand ! is a general comment about the place."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which sentence says “It is a furnished apartment”?",
+      "options": [
+        "C'est un appartement meublé.",
+        "Il est appartement meublé.",
+        "C'est appartement meublé.",
+        "Il y a meublé appartement."
+      ],
+      "answer": 0,
+      "explain": "Use c'est + un + noun, then the adjective."
+    }
+  ]
+}

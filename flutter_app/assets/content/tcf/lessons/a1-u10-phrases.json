@@ -1,0 +1,148 @@
+{
+  "id": "a1-u10-phrases",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Phrases",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "A rental listing gives short facts. Use a full question when you need one detail confirmed. Start with the number of rooms, then ask what is included."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Il y a un balcon.",
+      "en": "There is a balcony.",
+      "tip": "Say it: eel yah uh(n) bahl-KOH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Est-ce qu'il y a une laveuse ?",
+      "en": "Is there a washing machine?",
+      "tip": "Say it: ehs-keel yah ün lah-VUHZ"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "C'est un appartement meublé.",
+      "en": "It is a furnished apartment.",
+      "tip": "Say it: seh-tuh(n) ah-pahr-tuh-MAH(N) muh-BLAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Il est près du centre-ville.",
+      "en": "It is near downtown.",
+      "tip": "Say it: eel eh preh dü sah(n)tr-VEEL"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Le chauffage est inclus ?",
+      "en": "Is heating included?",
+      "tip": "Say it: luh shoh-FAHZH eh a(n)-KLÜ"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Je voudrais visiter l'appartement.",
+      "en": "I would like to view the apartment.",
+      "tip": "Say it: zhuh voo-DREH vee-zee-TAY lah-pahr-tuh-MAH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Le logement est libre le 1er juillet.",
+      "en": "The home is available on July 1.",
+      "tip": "Say it: luh lozh-MAH(N) eh leebr luh pruh-MYAY zhwee-YEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Quand est-ce que je peux visiter ?",
+      "en": "When can I view it?",
+      "tip": "Say it: kah(n) ehs-kuh zhuh puh vee-zee-TAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Je signe le bail en juillet.",
+      "en": "I sign the lease in July.",
+      "tip": "Say it: zhuh seen-yuh luh bahy ah(n) zhwee-YEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Est-ce que les charges sont comprises ?",
+      "en": "Are the fees included?",
+      "tip": "Say it: ehs-kuh lay shahrzh soh(n) kohn-PREEZ"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Il y a un balcon.",
+      "options": [
+        "It is near downtown.",
+        "There is a balcony.",
+        "The home is available on July 1.",
+        "Are the fees included?"
+      ],
+      "answer": 1,
+      "explain": "Il y a un balcon. means There is a balcony.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "C'est un appartement meublé.",
+      "options": [
+        "I sign the lease in July.",
+        "It is a furnished apartment.",
+        "Is there a washing machine?",
+        "Is heating included?"
+      ],
+      "answer": 1,
+      "explain": "C'est un appartement meublé. means It is a furnished apartment.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Le chauffage est inclus ?",
+      "options": [
+        "When can I view it?",
+        "Is heating included?",
+        "There is a balcony.",
+        "It is near downtown."
+      ],
+      "answer": 1,
+      "explain": "Le chauffage est inclus ? means Is heating included?."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Le logement est libre le 1er juillet.",
+      "options": [
+        "Are the fees included?",
+        "The home is available on July 1.",
+        "It is a furnished apartment.",
+        "I would like to view the apartment."
+      ],
+      "answer": 1,
+      "explain": "Le logement est libre le 1er juillet. means The home is available on July 1.."
+    }
+  ]
+}

@@ -1,0 +1,263 @@
+{
+  "id": "a1-logement-julie",
+  "title": "L'annonce de logement",
+  "titleEn": "The rental listing",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Julie reads a rental ad, visits a furnished 3 ½ and signs a lease.",
+  "unit": "a1-u10",
+  "sentences": [
+    {
+      "fr": "Julie lit une annonce pour un appartement à louer.",
+      "en": "Julie reads a listing for an apartment for rent.",
+      "note": "In Québec rental ads, 3 ½ is a common way to describe the main rooms and bathroom. Check what each individual listing includes."
+    },
+    {
+      "fr": "L'appartement est un 3 ½, près du centre-ville.",
+      "en": "The apartment is a 3½ near downtown."
+    },
+    {
+      "fr": "Il y a une chambre et un balcon.",
+      "en": "There is a bedroom and a balcony."
+    },
+    {
+      "fr": "Le logement est meublé; le chauffage est inclus.",
+      "en": "The home is furnished; heating is included."
+    },
+    {
+      "fr": "Julie visite l'appartement avec le propriétaire.",
+      "en": "Julie views the apartment with the landlord."
+    },
+    {
+      "fr": "Il y a une laveuse et une sécheuse dans le logement.",
+      "en": "There is a washing machine and a dryer in the home."
+    },
+    {
+      "fr": "Le propriétaire donne la clé et Julie signe le bail.",
+      "en": "The landlord gives the key and Julie signs the lease."
+    },
+    {
+      "fr": "Elle déménage le premier juillet.",
+      "en": "She moves on July 1."
+    }
+  ],
+  "words": {
+    "julie": {
+      "en": "Julie (a woman's name)"
+    },
+    "lit": {
+      "en": "reads (lire)",
+      "pos": "verb",
+      "sound": "lee"
+    },
+    "une": {
+      "en": "a, one"
+    },
+    "annonce": {
+      "en": "rental listing",
+      "pos": "noun, feminine",
+      "sound": "ah-NOH(N)S"
+    },
+    "pour": {
+      "en": "for"
+    },
+    "un": {
+      "en": "a, one"
+    },
+    "appartement": {
+      "en": "apartment",
+      "pos": "noun, masculine",
+      "sound": "ah-pahr-tuh-MAH(N)"
+    },
+    "à": {
+      "en": "for; to"
+    },
+    "louer": {
+      "en": "to rent",
+      "pos": "verb",
+      "sound": "loo-AY"
+    },
+    "l'appartement": {
+      "en": "the apartment",
+      "pos": "noun, masculine",
+      "sound": "lah-pahr-tuh-MAH(N)"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "3": {
+      "en": "three",
+      "pos": "number"
+    },
+    "½": {
+      "en": "a half",
+      "pos": "number"
+    },
+    "près": {
+      "en": "near"
+    },
+    "du": {
+      "en": "near the (de + le)"
+    },
+    "centre-ville": {
+      "en": "downtown"
+    },
+    "il": {
+      "en": "he, it",
+      "pos": "pronoun"
+    },
+    "y": {
+      "en": "there (in il y a)"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "chambre": {
+      "en": "bedroom",
+      "pos": "noun, feminine",
+      "sound": "shah(n)br"
+    },
+    "et": {
+      "en": "and"
+    },
+    "balcon": {
+      "en": "balcony",
+      "pos": "noun, masculine",
+      "sound": "bahl-KOH(N)"
+    },
+    "le": {
+      "en": "the"
+    },
+    "logement": {
+      "en": "home, dwelling",
+      "pos": "noun, masculine",
+      "sound": "lozh-MAH(N)"
+    },
+    "meublé": {
+      "en": "furnished",
+      "pos": "adjective",
+      "sound": "muh-BLAY"
+    },
+    "chauffage": {
+      "en": "heating",
+      "pos": "noun, masculine",
+      "sound": "shoh-FAHZH"
+    },
+    "inclus": {
+      "en": "included (masculine)",
+      "pos": "adjective",
+      "sound": "a(n)-KLÜ"
+    },
+    "visite": {
+      "en": "views (visiter)",
+      "pos": "verb",
+      "sound": "vee-ZEET"
+    },
+    "avec": {
+      "en": "with"
+    },
+    "propriétaire": {
+      "en": "landlord, owner",
+      "pos": "noun",
+      "sound": "proh-pree-ay-TEHR"
+    },
+    "laveuse": {
+      "en": "washing machine",
+      "pos": "noun, feminine",
+      "sound": "lah-VUHZ"
+    },
+    "sécheuse": {
+      "en": "clothes dryer",
+      "pos": "noun, feminine",
+      "sound": "say-SHUHZ"
+    },
+    "dans": {
+      "en": "in"
+    },
+    "donne": {
+      "en": "gives (donner)",
+      "pos": "verb",
+      "sound": "dohn"
+    },
+    "la": {
+      "en": "the"
+    },
+    "clé": {
+      "en": "key",
+      "pos": "noun, feminine",
+      "sound": "klay"
+    },
+    "signe": {
+      "en": "signs (signer)",
+      "pos": "verb",
+      "sound": "seen-YAY"
+    },
+    "bail": {
+      "en": "lease",
+      "pos": "noun, masculine",
+      "sound": "bahy"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "déménage": {
+      "en": "moves house (déménager)",
+      "pos": "verb",
+      "sound": "day-may-nahzh"
+    },
+    "premier": {
+      "en": "the first"
+    },
+    "juillet": {
+      "en": "July",
+      "pos": "month",
+      "sound": "zhwee-YEH"
+    }
+  },
+  "keywords": [
+    "annonce",
+    "appartement",
+    "chambre",
+    "chauffage",
+    "clé",
+    "bail"
+  ],
+  "quiz": [
+    {
+      "prompt": "What is Julie looking for?",
+      "options": [
+        "An apartment for rent",
+        "A job in downtown",
+        "A hotel room",
+        "A house in Ottawa"
+      ],
+      "answer": 0,
+      "explain": "She reads an ad for un appartement à louer."
+    },
+    {
+      "prompt": "What is included?",
+      "options": [
+        "Heating",
+        "Electricity",
+        "The moving truck",
+        "A parking space"
+      ],
+      "answer": 0,
+      "explain": "The story says le chauffage est inclus."
+    },
+    {
+      "prompt": "What does Julie do after she gets the key?",
+      "options": [
+        "She signs the lease",
+        "She calls the station",
+        "She buys furniture",
+        "She visits the bank"
+      ],
+      "answer": 0,
+      "explain": "She signs le bail."
+    }
+  ]
+}

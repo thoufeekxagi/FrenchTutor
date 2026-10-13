@@ -1,0 +1,204 @@
+{
+  "id": "a1-u10-words-1",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Words: rooms and spaces",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un logement",
+      "en": "home, dwelling",
+      "sound": "uh(n) lozh-MAH(N)",
+      "exampleFr": "Le logement est près du centre-ville.",
+      "exampleEn": "The home is near downtown."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un appartement",
+      "en": "apartment",
+      "sound": "uh(n) ah-pahr-tuh-MAH(N)",
+      "exampleFr": "L'appartement est au deuxième étage.",
+      "exampleEn": "The apartment is on the second floor."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une maison",
+      "en": "house",
+      "sound": "ün meh-ZOH(N)",
+      "exampleFr": "La maison a un balcon.",
+      "exampleEn": "The house has a balcony."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une chambre",
+      "en": "bedroom",
+      "sound": "ün shah(n)br",
+      "exampleFr": "La chambre est grande.",
+      "exampleEn": "The bedroom is large."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le salon",
+      "en": "living room",
+      "sound": "luh sah-LOH(N)",
+      "exampleFr": "Le salon est près de la cuisine.",
+      "exampleEn": "The living room is near the kitchen."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la salle de bain",
+      "en": "bathroom",
+      "sound": "lah sahl duh ba(n)",
+      "exampleFr": "La salle de bain est ici.",
+      "exampleEn": "The bathroom is here."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un balcon",
+      "en": "balcony",
+      "sound": "uh(n) bahl-KOH(N)",
+      "exampleFr": "Il y a un balcon.",
+      "exampleEn": "There is a balcony."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "l'entrée (f.)",
+      "en": "entrance, entryway",
+      "say": "l'entrée",
+      "sound": "lah(n)-TRAY",
+      "exampleFr": "L'entrée est près du salon.",
+      "exampleEn": "The entryway is near the living room."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le couloir",
+      "en": "hallway",
+      "sound": "luh koo-LWAHR",
+      "exampleFr": "Le couloir est long.",
+      "exampleEn": "The hallway is long."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un logement",
+      "options": [
+        "bedroom",
+        "home, dwelling",
+        "balcony",
+        "apartment"
+      ],
+      "answer": 1,
+      "explain": "un logement means home, dwelling."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un appartement",
+      "options": [
+        "living room",
+        "entrance, entryway",
+        "house",
+        "apartment"
+      ],
+      "answer": 3,
+      "explain": "un appartement means apartment."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une maison",
+      "options": [
+        "bathroom",
+        "house",
+        "hallway",
+        "bedroom"
+      ],
+      "answer": 1,
+      "explain": "une maison means house."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une chambre",
+      "options": [
+        "balcony",
+        "home, dwelling",
+        "living room",
+        "bedroom"
+      ],
+      "answer": 3,
+      "explain": "une chambre means bedroom."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le salon",
+      "options": [
+        "entrance, entryway",
+        "living room",
+        "apartment",
+        "bathroom"
+      ],
+      "answer": 1,
+      "explain": "le salon means living room."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la salle de bain",
+      "options": [
+        "hallway",
+        "house",
+        "balcony",
+        "bathroom"
+      ],
+      "answer": 3,
+      "explain": "la salle de bain means bathroom."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un appartement",
+      "question": "Which word did you hear?",
+      "options": [
+        "une chambre",
+        "un appartement",
+        "un balcon",
+        "le couloir"
+      ],
+      "answer": 1,
+      "explain": "You heard un appartement: apartment."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une chambre",
+      "question": "Which word did you hear?",
+      "options": [
+        "une chambre",
+        "un balcon",
+        "le couloir",
+        "un appartement"
+      ],
+      "answer": 0,
+      "explain": "You heard une chambre: bedroom."
+    }
+  ]
+}

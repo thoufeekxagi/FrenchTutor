@@ -1,0 +1,184 @@
+{
+  "id": "a1-u10-words-3",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Words: words in a rental ad",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une annonce",
+      "en": "advertisement, listing",
+      "sound": "ün ah-NOH(N)S",
+      "exampleFr": "Je lis une annonce.",
+      "exampleEn": "I read a listing."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "à louer",
+      "en": "for rent",
+      "sound": "ah loo-AY",
+      "exampleFr": "Appartement à louer.",
+      "exampleEn": "Apartment for rent."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un bail",
+      "en": "lease",
+      "sound": "uh(n) bahy",
+      "exampleFr": "Le bail est sur la table.",
+      "exampleEn": "The lease is on the table."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le locataire / la locataire",
+      "en": "tenant",
+      "say": "le locataire, la locataire",
+      "sound": "luh loh-kah-TEHR / lah loh-kah-TEHR",
+      "exampleFr": "La locataire visite le logement.",
+      "exampleEn": "The tenant visits the home."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le colocataire / la colocataire",
+      "en": "roommate",
+      "say": "le colocataire, la colocataire",
+      "sound": "luh koh-loh-kah-TEHR / lah koh-loh-kah-TEHR",
+      "exampleFr": "Mon colocataire est ici.",
+      "exampleEn": "My roommate is here."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "meublé / meublée",
+      "en": "furnished",
+      "say": "meublé, meublée",
+      "sound": "muh-BLAY / muh-BLAY",
+      "exampleFr": "L'appartement est meublé.",
+      "exampleEn": "The apartment is furnished."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "non meublé",
+      "en": "unfurnished",
+      "sound": "noh(n) muh-BLAY",
+      "exampleFr": "Le logement est non meublé.",
+      "exampleEn": "The home is unfurnished."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "semi-meublé",
+      "en": "partly furnished",
+      "sound": "suh-mee muh-BLAY",
+      "exampleFr": "L'appartement est semi-meublé.",
+      "exampleEn": "The apartment is partly furnished."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "charges comprises",
+      "en": "utilities or fees included",
+      "sound": "shahrzh kohn-PREEZ",
+      "exampleFr": "L'annonce dit : charges comprises.",
+      "exampleEn": "The listing says: fees included."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une annonce",
+      "options": [
+        "tenant",
+        "advertisement, listing",
+        "unfurnished",
+        "for rent"
+      ],
+      "answer": 1,
+      "explain": "une annonce means advertisement, listing."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "à louer",
+      "options": [
+        "roommate",
+        "partly furnished",
+        "lease",
+        "for rent"
+      ],
+      "answer": 3,
+      "explain": "à louer means for rent."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un bail",
+      "options": [
+        "furnished",
+        "lease",
+        "utilities or fees included",
+        "tenant"
+      ],
+      "answer": 1,
+      "explain": "un bail means lease."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le locataire / la locataire",
+      "options": [
+        "unfurnished",
+        "advertisement, listing",
+        "roommate",
+        "tenant"
+      ],
+      "answer": 3,
+      "explain": "le locataire / la locataire means tenant."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le colocataire / la colocataire",
+      "options": [
+        "partly furnished",
+        "roommate",
+        "for rent",
+        "furnished"
+      ],
+      "answer": 1,
+      "explain": "le colocataire / la colocataire means roommate."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "meublé / meublée",
+      "options": [
+        "utilities or fees included",
+        "lease",
+        "unfurnished",
+        "furnished"
+      ],
+      "answer": 3,
+      "explain": "meublé / meublée means furnished."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "In an ad, charges comprises tells you that some charges are included in the advertised amount, but the exact list matters. Ask whether heat, electricity or appliances are included instead of guessing."
+    }
+  ]
+}

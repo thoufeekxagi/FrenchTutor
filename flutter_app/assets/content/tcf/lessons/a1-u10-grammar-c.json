@@ -1,0 +1,101 @@
+{
+  "id": "a1-u10-grammar-c",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Grammar: il / elle est: describe a known noun",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "The pronoun refers back to the noun",
+      "headers": [
+        "Noun",
+        "Describe it"
+      ],
+      "rows": [
+        [
+          "l'appartement (masculine)",
+          "Il est grand."
+        ],
+        [
+          "la chambre (feminine)",
+          "Elle est grande."
+        ],
+        [
+          "les chambres (plural)",
+          "Elles sont grandes."
+        ],
+        [
+          "le salon (masculine)",
+          "Il est calme."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "il / elle est: describe a known noun",
+      "body": "• Use il est / elle est when you are describing a noun you already named: L'appartement ? Il est grand.\n• Use il for a masculine noun and elle for a feminine noun. The adjective agrees: un salon est calme; une chambre est calme; une chambre est grande.\n• Do not put un / une after il est to identify an ordinary thing. Say C'est un appartement; to describe it, say Il est grand."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "C'est un appartement; il est grand. In the first part you identify it. In the second part il points back to appartement. Use c'est grand ! for a general reaction, not il est un appartement."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "The apartment is large.",
+      "options": [
+        "L'appartement est grand.",
+        "L'appartement est grande.",
+        "L'appartement est un grand.",
+        "L'appartement a grand."
+      ],
+      "answer": 0,
+      "explain": "Appartement is masculine: use grand."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "The bedroom is large.",
+      "options": [
+        "La chambre est grande.",
+        "La chambre est grand.",
+        "La chambre est une grande.",
+        "La chambre a grande."
+      ],
+      "answer": 0,
+      "explain": "Chambre is feminine: use grande."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "The living room is quiet.",
+      "options": [
+        "Le salon ? Il est calme.",
+        "Le salon ? Elle est calme.",
+        "Le salon ? C'est un calme.",
+        "Le salon ? Il y a calme."
+      ],
+      "answer": 0,
+      "explain": "Salon is masculine, so refer to it with il."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which sentence identifies and then describes the home?",
+      "options": [
+        "C'est un appartement. Il est meublé.",
+        "Il est un appartement. C'est meublé.",
+        "Il y a un appartement. Elle est meublé.",
+        "C'est appartement. Il y a meublé."
+      ],
+      "answer": 0,
+      "explain": "First identify it with c'est un appartement, then describe it with il est."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "a1-u10-reading",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Reading practice",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When is the apartment available?",
+      "options": [
+        "July 1",
+        "June 1",
+        "August 1",
+        "October 1"
+      ],
+      "answer": 0,
+      "explain": "The ad says Libre le 1er juillet.",
+      "promptFr": "À LOUER · 3 ½, une chambre, balcon · Chauffage inclus · Libre le 1er juillet"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which detail is not included?",
+      "options": [
+        "Electricity",
+        "Furniture",
+        "The apartment",
+        "The listing"
+      ],
+      "answer": 0,
+      "explain": "Électricité non incluse means electricity is not included.",
+      "promptFr": "ANNONCE · Appartement semi-meublé · Électricité non incluse"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does the person want to do?",
+      "options": [
+        "View the home",
+        "Sign the lease today",
+        "Move on Monday",
+        "Buy the apartment"
+      ],
+      "answer": 0,
+      "explain": "The message asks to visiter le logement.",
+      "promptFr": "MESSAGE · Bonjour. Je voudrais visiter le logement. Est-ce libre lundi ?"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does the ½ usually represent in this Québec listing?",
+      "options": [
+        "The bathroom",
+        "The balcony",
+        "The living room",
+        "The hallway"
+      ],
+      "answer": 0,
+      "explain": "In Québec listings, the half usually represents the bathroom.",
+      "promptFr": "3 ½ · Salon, chambre, cuisine + salle de bain"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Where is the elevator?",
+      "options": [
+        "To the right of the entrance",
+        "To the left of the entrance",
+        "On the balcony",
+        "Inside the bedroom"
+      ],
+      "answer": 0,
+      "explain": "The sign says ascenseur à droite.",
+      "promptFr": "ENTRÉE · Ascenseur à droite · Escalier à gauche"
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "id": "a1-u10-words-5",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Words: comfort and included services",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le chauffage",
+      "en": "heating",
+      "sound": "luh shoh-FAHZH",
+      "exampleFr": "Le chauffage est inclus.",
+      "exampleEn": "Heating is included."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'eau chaude (f.)",
+      "en": "hot water",
+      "say": "l'eau chaude",
+      "sound": "loh shohd",
+      "exampleFr": "L'eau chaude est incluse.",
+      "exampleEn": "Hot water is included."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une fenêtre",
+      "en": "window",
+      "sound": "ün fuh-NEHTR",
+      "exampleFr": "La fenêtre est dans la chambre.",
+      "exampleEn": "The window is in the bedroom."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une porte",
+      "en": "door",
+      "sound": "ün port",
+      "exampleFr": "La porte est près de l'entrée.",
+      "exampleEn": "The door is near the entrance."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un voisin / une voisine",
+      "en": "neighbour",
+      "say": "un voisin, une voisine",
+      "sound": "uh(n) vwah-ZA(N) / ün vwah-ZEEN",
+      "exampleFr": "La voisine est dans le couloir.",
+      "exampleEn": "The neighbour is in the hallway."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le bruit",
+      "en": "noise",
+      "sound": "luh brwee",
+      "exampleFr": "Il y a du bruit dans la rue.",
+      "exampleEn": "There is noise in the street."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "inclus / incluse",
+      "en": "included (masculine / feminine)",
+      "say": "inclus, incluse",
+      "sound": "a(n)-KLÜ / a(n)-KLÜZ",
+      "exampleFr": "Le chauffage est inclus. L'eau chaude est incluse.",
+      "exampleEn": "Heating is included. Hot water is included."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "les meubles (m. pl.)",
+      "en": "furniture",
+      "say": "les meubles",
+      "sound": "lay muhl",
+      "exampleFr": "Les meubles sont dans le salon.",
+      "exampleEn": "The furniture is in the living room."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un 3 ½",
+      "en": "a Québec apartment listing with three main rooms plus a bathroom",
+      "sound": "uh(n) trwah ay duh-MEE",
+      "exampleFr": "Je cherche un 3 ½.",
+      "exampleEn": "I am looking for a 3½ apartment."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le chauffage",
+      "options": [
+        "door",
+        "heating",
+        "included (masculine / feminine)",
+        "hot water"
+      ],
+      "answer": 1,
+      "explain": "le chauffage means heating."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "l'eau chaude (f.)",
+      "options": [
+        "neighbour",
+        "furniture",
+        "window",
+        "hot water"
+      ],
+      "answer": 3,
+      "explain": "l'eau chaude (f.) means hot water."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une fenêtre",
+      "options": [
+        "noise",
+        "window",
+        "a Québec apartment listing with three main rooms plus a bathroom",
+        "door"
+      ],
+      "answer": 1,
+      "explain": "une fenêtre means window."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une porte",
+      "options": [
+        "included (masculine / feminine)",
+        "heating",
+        "neighbour",
+        "door"
+      ],
+      "answer": 3,
+      "explain": "une porte means door."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un voisin / une voisine",
+      "options": [
+        "furniture",
+        "neighbour",
+        "hot water",
+        "noise"
+      ],
+      "answer": 1,
+      "explain": "un voisin / une voisine means neighbour."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le bruit",
+      "options": [
+        "a Québec apartment listing with three main rooms plus a bathroom",
+        "window",
+        "included (masculine / feminine)",
+        "noise"
+      ],
+      "answer": 3,
+      "explain": "le bruit means noise."
+    }
+  ]
+}

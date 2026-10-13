@@ -1,0 +1,203 @@
+{
+  "id": "a1-u10-words-2",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Words: furniture and appliances",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un lit",
+      "en": "bed",
+      "sound": "uh(n) lee",
+      "exampleFr": "Le lit est dans la chambre.",
+      "exampleEn": "The bed is in the bedroom."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un canapé",
+      "en": "sofa, couch",
+      "sound": "uh(n) kah-nah-PAY",
+      "exampleFr": "Le canapé est dans le salon.",
+      "exampleEn": "The sofa is in the living room."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une table de chevet",
+      "en": "bedside table",
+      "sound": "ün tahbl duh shuh-VAY",
+      "exampleFr": "La table de chevet est près du lit.",
+      "exampleEn": "The bedside table is near the bed."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une commode",
+      "en": "dresser",
+      "sound": "ün koh-MOHD",
+      "exampleFr": "La commode est dans la chambre.",
+      "exampleEn": "The dresser is in the bedroom."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une armoire",
+      "en": "wardrobe, cupboard",
+      "sound": "ün ahr-MWAHR",
+      "exampleFr": "L'armoire est dans la chambre.",
+      "exampleEn": "The wardrobe is in the bedroom."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un réfrigérateur",
+      "en": "refrigerator",
+      "sound": "uh(n) ray-free-zhay-rah-TEHR",
+      "exampleFr": "Le réfrigérateur est dans la cuisine.",
+      "exampleEn": "The refrigerator is in the kitchen."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une cuisinière",
+      "en": "stove, cooker",
+      "sound": "ün kwee-zee-NYEHR",
+      "exampleFr": "La cuisinière est dans la cuisine.",
+      "exampleEn": "The stove is in the kitchen."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une laveuse",
+      "en": "washing machine (common Canadian term)",
+      "sound": "ün lah-VUHZ",
+      "exampleFr": "La laveuse est dans le logement.",
+      "exampleEn": "The washing machine is in the home."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une sécheuse",
+      "en": "clothes dryer (common Canadian term)",
+      "sound": "ün say-SHUHZ",
+      "exampleFr": "La sécheuse est près de la laveuse.",
+      "exampleEn": "The dryer is near the washing machine."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un lit",
+      "options": [
+        "dresser",
+        "bed",
+        "stove, cooker",
+        "sofa, couch"
+      ],
+      "answer": 1,
+      "explain": "un lit means bed."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un canapé",
+      "options": [
+        "wardrobe, cupboard",
+        "washing machine (common Canadian term)",
+        "bedside table",
+        "sofa, couch"
+      ],
+      "answer": 3,
+      "explain": "un canapé means sofa, couch."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une table de chevet",
+      "options": [
+        "refrigerator",
+        "bedside table",
+        "clothes dryer (common Canadian term)",
+        "dresser"
+      ],
+      "answer": 1,
+      "explain": "une table de chevet means bedside table."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une commode",
+      "options": [
+        "stove, cooker",
+        "bed",
+        "wardrobe, cupboard",
+        "dresser"
+      ],
+      "answer": 3,
+      "explain": "une commode means dresser."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une armoire",
+      "options": [
+        "washing machine (common Canadian term)",
+        "wardrobe, cupboard",
+        "sofa, couch",
+        "refrigerator"
+      ],
+      "answer": 1,
+      "explain": "une armoire means wardrobe, cupboard."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un réfrigérateur",
+      "options": [
+        "clothes dryer (common Canadian term)",
+        "bedside table",
+        "stove, cooker",
+        "refrigerator"
+      ],
+      "answer": 3,
+      "explain": "un réfrigérateur means refrigerator."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un canapé",
+      "question": "Which word did you hear?",
+      "options": [
+        "une armoire",
+        "un canapé",
+        "une cuisinière",
+        "une sécheuse"
+      ],
+      "answer": 1,
+      "explain": "You heard un canapé: sofa, couch."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une armoire",
+      "question": "Which word did you hear?",
+      "options": [
+        "une armoire",
+        "une cuisinière",
+        "une sécheuse",
+        "un canapé"
+      ],
+      "answer": 0,
+      "explain": "You heard une armoire: wardrobe, cupboard."
+    }
+  ]
+}

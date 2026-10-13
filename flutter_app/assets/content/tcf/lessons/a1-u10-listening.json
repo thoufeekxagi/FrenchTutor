@@ -1,0 +1,86 @@
+{
+  "id": "a1-u10-listening",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Listening practice",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Il y a deux chambres et un balcon.",
+      "question": "How many bedrooms are there?",
+      "options": [
+        "Two",
+        "One",
+        "Three",
+        "Four"
+      ],
+      "answer": 0,
+      "explain": "The speaker says deux chambres."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "L'appartement est meublé.",
+      "question": "What is the apartment like?",
+      "options": [
+        "Furnished",
+        "Unfurnished",
+        "Very noisy",
+        "Not available"
+      ],
+      "answer": 0,
+      "explain": "Meublé means furnished."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le chauffage est inclus, mais l'électricité n'est pas incluse.",
+      "question": "Which service is included?",
+      "options": [
+        "Heating",
+        "Electricity",
+        "Internet",
+        "Parking"
+      ],
+      "answer": 0,
+      "explain": "The speaker says heating is included and electricity is not."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "La visite est mardi, le 14 avril, à 17 h.",
+      "question": "When is the viewing?",
+      "options": [
+        "Tuesday, April 14 at 5 p.m.",
+        "Tuesday, April 14 at 7 p.m.",
+        "Thursday, April 14 at 5 p.m.",
+        "Tuesday, May 14 at 5 p.m."
+      ],
+      "answer": 0,
+      "explain": "The appointment is Tuesday, April 14 at 17 h."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "L'ascenseur est à gauche de l'entrée.",
+      "question": "Where is the elevator?",
+      "options": [
+        "To the left of the entrance",
+        "To the right of the balcony",
+        "Behind the bedroom",
+        "In the living room"
+      ],
+      "answer": 0,
+      "explain": "It is à gauche de l'entrée."
+    }
+  ]
+}

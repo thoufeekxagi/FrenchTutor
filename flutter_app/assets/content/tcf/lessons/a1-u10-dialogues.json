@@ -1,0 +1,148 @@
+{
+  "id": "a1-u10-dialogues",
+  "unit": "a1-u10",
+  "unitTitle": "Housing and the lease",
+  "title": "Dialogues",
+  "subtitle": "Unit 10: Housing and the lease",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "A listing is only a starting point. Ask a landlord about one concrete detail, and check the move-in date."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Calling about a listing",
+      "body": "Julie calls to ask about a furnished apartment.",
+      "examples": [
+        {
+          "fr": "Bonjour. Je téléphone pour l'appartement à louer.",
+          "en": "Julie: Hello. I am calling about the apartment for rent."
+        },
+        {
+          "fr": "Bonjour. C'est un 3 ½ près du centre-ville.",
+          "en": "Propriétaire: Hello. It is a 3½ near downtown."
+        },
+        {
+          "fr": "Est-ce qu'il y a une chambre et un balcon ?",
+          "en": "Julie: Is there a bedroom and a balcony?"
+        },
+        {
+          "fr": "Oui. Il y a une chambre. Le balcon est près du salon.",
+          "en": "Propriétaire: Yes. There is a bedroom. The balcony is near the living room."
+        },
+        {
+          "fr": "Le chauffage est inclus ?",
+          "en": "Julie: Is heating included?"
+        },
+        {
+          "fr": "Oui, le chauffage est inclus. L'électricité n'est pas incluse.",
+          "en": "Propriétaire: Yes, heating is included. Electricity is not included."
+        },
+        {
+          "fr": "Je voudrais visiter l'appartement. Est-ce libre le 1er juillet ?",
+          "en": "Julie: I would like to view the apartment. Is it available on July 1?"
+        },
+        {
+          "fr": "Oui. C'est libre le 1er juillet.",
+          "en": "Propriétaire: Yes. It is available on July 1."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "During a visit",
+      "body": "Julie checks the appliances and asks about the lease.",
+      "examples": [
+        {
+          "fr": "C'est un appartement calme.",
+          "en": "Julie: It is a quiet apartment."
+        },
+        {
+          "fr": "Merci. Il est meublé et il y a un réfrigérateur.",
+          "en": "Propriétaire: Thank you. It is furnished and there is a refrigerator."
+        },
+        {
+          "fr": "Est-ce qu'il y a une laveuse ?",
+          "en": "Julie: Is there a washing machine?"
+        },
+        {
+          "fr": "Oui. La laveuse et la sécheuse sont dans le logement.",
+          "en": "Propriétaire: Yes. The washing machine and dryer are in the home."
+        },
+        {
+          "fr": "Les charges sont comprises ?",
+          "en": "Julie: Are the fees included?"
+        },
+        {
+          "fr": "Le chauffage est inclus. Voici le bail.",
+          "en": "Propriétaire: Heating is included. Here is the lease."
+        },
+        {
+          "fr": "Merci. Je vais regarder le bail.",
+          "en": "Julie: Thank you. I am going to look at the lease."
+        },
+        {
+          "fr": "Bien sûr. Voici la clé pour la porte d'entrée.",
+          "en": "Propriétaire: Of course. Here is the key for the entry door."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What kind of apartment is in the first ad?",
+      "options": [
+        "A 3½ near downtown",
+        "A house far from the city",
+        "A room in a hotel",
+        "A furnished studio downtown"
+      ],
+      "answer": 0,
+      "explain": "The landlord says C'est un 3 ½ près du centre-ville."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is included in the rent?",
+      "options": [
+        "Heating",
+        "Electricity",
+        "Internet",
+        "Parking"
+      ],
+      "answer": 0,
+      "explain": "The landlord says heating is included and electricity is not."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When is the apartment available?",
+      "options": [
+        "July 1",
+        "June 1",
+        "September 1",
+        "Next Monday"
+      ],
+      "answer": 0,
+      "explain": "Julie asks about le 1er juillet and the landlord confirms."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where are the washing machine and dryer?",
+      "options": [
+        "In the home",
+        "In the hallway",
+        "In the parking area",
+        "At the landlord's home"
+      ],
+      "answer": 0,
+      "explain": "The landlord says they are dans le logement."
+    }
+  ]
+}
