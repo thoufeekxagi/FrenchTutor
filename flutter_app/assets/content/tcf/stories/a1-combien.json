@@ -1,0 +1,243 @@
+{
+  "id": "a1-combien",
+  "title": "Combien ça coûte ?",
+  "titleEn": "How much does it cost?",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Julie buys milk and bread at the corner store and pays by card.",
+  "unit": "a1-u05",
+  "sentences": [
+    {
+      "fr": "Julie est au dépanneur.",
+      "en": "Julie is at the convenience store.",
+      "note": "In Québec, a dépanneur (or dép) is a corner store. In France you would say épicerie or supérette."
+    },
+    {
+      "fr": "Elle regarde les prix.",
+      "en": "She looks at the prices."
+    },
+    {
+      "fr": "Le lait coûte trois dollars cinquante.",
+      "en": "The milk costs $3.50."
+    },
+    {
+      "fr": "Le pain coûte deux dollars soixante-quinze.",
+      "en": "The bread costs $2.75."
+    },
+    {
+      "fr": "« Ça fait combien ? » demande Julie.",
+      "en": "“How much is that?” asks Julie."
+    },
+    {
+      "fr": "« Ça fait six dollars vingt-cinq, plus les taxes. »",
+      "en": "“That is $6.25, plus taxes.”"
+    },
+    {
+      "fr": "Les taxes, c'est quatre-vingt-treize cents.",
+      "en": "The taxes are 93 cents.",
+      "note": "In Québec: TPS (5 %) + TVQ (9,975 %) is about 15 %. 6,25 $ gives roughly 0,93 $ of tax."
+    },
+    {
+      "fr": "Le total est de sept dollars dix-huit.",
+      "en": "The total is $7.18."
+    },
+    {
+      "fr": "Julie paie avec sa carte de débit.",
+      "en": "Julie pays with her debit card."
+    },
+    {
+      "fr": "« Merci ! Bonne soirée ! »",
+      "en": "“Thank you! Have a nice evening!”",
+      "note": "Bonne soirée is the usual evening goodbye."
+    }
+  ],
+  "words": {
+    "julie": {
+      "en": "Julie (a woman's name)"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "at the"
+    },
+    "dépanneur": {
+      "en": "convenience store (Québec)",
+      "pos": "noun, masculine",
+      "sound": "day-pa-NUHR"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "regarde": {
+      "en": "looks at (regarder)",
+      "pos": "verb",
+      "sound": "Ruh-GAHRD"
+    },
+    "les": {
+      "en": "the"
+    },
+    "prix": {
+      "en": "prices",
+      "pos": "noun, masculine",
+      "sound": "pree"
+    },
+    "le": {
+      "en": "the"
+    },
+    "lait": {
+      "en": "milk",
+      "pos": "noun, masculine",
+      "sound": "lay"
+    },
+    "coûte": {
+      "en": "costs (coûter)",
+      "pos": "verb",
+      "sound": "koot"
+    },
+    "trois": {
+      "en": "three"
+    },
+    "dollars": {
+      "en": "dollars",
+      "pos": "noun, masculine"
+    },
+    "cinquante": {
+      "en": "fifty"
+    },
+    "pain": {
+      "en": "bread",
+      "pos": "noun, masculine",
+      "sound": "pa(n)"
+    },
+    "deux": {
+      "en": "two"
+    },
+    "soixante-quinze": {
+      "en": "seventy-five"
+    },
+    "ça": {
+      "en": "that, it"
+    },
+    "fait": {
+      "en": "makes, comes to (faire)",
+      "pos": "verb"
+    },
+    "combien": {
+      "en": "how much"
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb"
+    },
+    "six": {
+      "en": "six"
+    },
+    "vingt-cinq": {
+      "en": "twenty-five"
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "taxes": {
+      "en": "taxes",
+      "pos": "noun, feminine"
+    },
+    "c'est": {
+      "en": "it is, that is"
+    },
+    "quatre-vingt-treize": {
+      "en": "ninety-three"
+    },
+    "cents": {
+      "en": "cents"
+    },
+    "total": {
+      "en": "total",
+      "pos": "noun, masculine"
+    },
+    "de": {
+      "en": "of"
+    },
+    "sept": {
+      "en": "seven"
+    },
+    "dix-huit": {
+      "en": "eighteen"
+    },
+    "paie": {
+      "en": "pays (payer)",
+      "pos": "verb",
+      "sound": "peh"
+    },
+    "avec": {
+      "en": "with"
+    },
+    "sa": {
+      "en": "her"
+    },
+    "carte": {
+      "en": "card",
+      "pos": "noun, feminine"
+    },
+    "débit": {
+      "en": "debit"
+    },
+    "merci": {
+      "en": "thank you"
+    },
+    "bonne": {
+      "en": "good (feminine)"
+    },
+    "soirée": {
+      "en": "evening",
+      "pos": "noun, feminine",
+      "sound": "swah-RAY"
+    }
+  },
+  "keywords": [
+    "dépanneur",
+    "lait",
+    "pain",
+    "taxes",
+    "total",
+    "carte"
+  ],
+  "quiz": [
+    {
+      "prompt": "What is the total?",
+      "options": [
+        "$6.25",
+        "$7.18",
+        "$8.18",
+        "$6.93"
+      ],
+      "answer": 1,
+      "explain": "Sept dollars dix-huit."
+    },
+    {
+      "prompt": "How much is the milk?",
+      "options": [
+        "$2.75",
+        "$3.50",
+        "$3.75",
+        "$6.25"
+      ],
+      "answer": 1,
+      "explain": "Trois dollars cinquante."
+    },
+    {
+      "prompt": "How does Julie pay?",
+      "options": [
+        "Cash",
+        "Debit card",
+        "Credit card",
+        "Transfer"
+      ],
+      "answer": 1,
+      "explain": "Carte de débit."
+    }
+  ]
+}

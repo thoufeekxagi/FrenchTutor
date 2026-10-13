@@ -1,0 +1,126 @@
+{
+  "id": "s0-13",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Hear it in Canada: a first listening",
+  "subtitle": "Stage 0, lesson 13",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Hear it in Canada: a first listening",
+      "body": "Time to put it together. Listen to each message once, as in the real test. Then answer. Remember: never leave a question empty."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Two vocabularies, one language",
+      "headers": [
+        "France",
+        "Canada"
+      ],
+      "rows": [
+        [
+          "mail, e-mail",
+          "courriel"
+        ],
+        [
+          "week-end",
+          "fin de semaine (also week-end)"
+        ],
+        [
+          "épicerie, supérette",
+          "dépanneur (Québec)"
+        ],
+        [
+          "petit déjeuner, déjeuner, dîner",
+          "déjeuner, dîner, souper"
+        ],
+        [
+          "de rien",
+          "bienvenue (you're welcome)"
+        ],
+        [
+          "faire les courses",
+          "faire l'épicerie, magasiner (to shop)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Tip",
+      "body": "Do not panic if a word is different. Both are French. The test accepts standard French and uses both accents in the audio."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Bonjour, ici la clinique Sainte-Anne. Votre rendez-vous est lundi à neuf heures trente. Merci et bonne journée.",
+      "question": "When is the appointment?",
+      "options": [
+        "Monday at 9:30",
+        "Monday at 9:13",
+        "Tuesday at 9:30",
+        "Monday at 3:30"
+      ],
+      "answer": 0,
+      "explain": "Lundi (Monday), neuf heures trente (9:30)."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Votre attention, s'il vous plaît. Le train pour Lyon part à quatorze heures dix, quai numéro trois.",
+      "question": "Which platform?",
+      "options": [
+        "Platform 2",
+        "Platform 3",
+        "Platform 13",
+        "Platform 4"
+      ],
+      "answer": 1,
+      "explain": "Quai numéro trois: platform 3."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Bonsoir ! Le dépanneur est ouvert jusqu'à vingt-trois heures.",
+      "question": "When does the store close?",
+      "options": [
+        "At 11 pm",
+        "At 10 pm",
+        "At 2 pm",
+        "It is closed"
+      ],
+      "answer": 0,
+      "explain": "Vingt-trois heures is 23:00, 11 pm. Dépanneur is a Québec corner store."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Salut ! C'est Marc. Mon numéro est le cinq, un, quatre, cinq, cinq, cinq, zéro, un, deux, trois.",
+      "question": "What is the area code?",
+      "options": [
+        "416",
+        "514",
+        "613",
+        "911"
+      ],
+      "answer": 1,
+      "explain": "Cinq, un, quatre is 514, the Montréal area code."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Your first Canadian phone message",
+      "body": "Record a short message: say your name, spell your family name, say your phone number in groups. For example: Bonjour, je m'appelle Sam Tremblay. T-R-E-M-B-L-A-Y. Mon numéro est le cinq, un, quatre...\n\n• Speak slowly. Leave a short pause between groups of digits."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je m'appelle Sam Tremblay. Ça s'écrit T-R-E-M-B-L-A-Y. Mon numéro est le cinq, un, quatre, cinq, cinq, cinq, zéro, un, deux, trois. Merci.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

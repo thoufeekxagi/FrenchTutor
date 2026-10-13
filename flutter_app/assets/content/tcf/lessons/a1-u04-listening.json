@@ -1,0 +1,86 @@
+{
+  "id": "a1-u04-listening",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Listening practice",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Voici mon frère. Il s'appelle Ali. Il est grand et il a les cheveux noirs.",
+      "question": "What colour is Ali's hair?",
+      "options": [
+        "Black",
+        "Brown",
+        "Blond",
+        "Red"
+      ],
+      "answer": 0,
+      "explain": "Les cheveux noirs."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Ma mère travaille à l'hôpital. Mon père travaille à la maison.",
+      "question": "Who works at the hospital?",
+      "options": [
+        "His father",
+        "His mother",
+        "His sister",
+        "His uncle"
+      ],
+      "answer": 1,
+      "explain": "Ma mère."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Nous avons trois enfants : deux filles et un fils.",
+      "question": "How many daughters?",
+      "options": [
+        "One",
+        "Two",
+        "Three",
+        "None"
+      ],
+      "answer": 1,
+      "explain": "Deux filles."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Elle est mariée. Son mari s'appelle Marc.",
+      "question": "What is her husband's name?",
+      "options": [
+        "Marc",
+        "Karim",
+        "Sam",
+        "Omar"
+      ],
+      "answer": 0,
+      "explain": "Son mari: Marc."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Mes grands-parents habitent à Gatineau. Ils ont quatre-vingts ans.",
+      "question": "How old are the grandparents?",
+      "options": [
+        "60",
+        "70",
+        "80",
+        "90"
+      ],
+      "answer": 2,
+      "explain": "Quatre-vingts: 80."
+    }
+  ]
+}

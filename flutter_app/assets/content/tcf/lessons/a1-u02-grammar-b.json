@@ -1,0 +1,271 @@
+{
+  "id": "a1-u02-grammar-b",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Grammar: Asking questions",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Asking questions",
+      "body": "There are three ways to ask a yes/no question. You use the first two. You recognise the third."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Yes/no questions",
+      "headers": [
+        "Way",
+        "Example",
+        "Use"
+      ],
+      "rows": [
+        [
+          "1. Voice goes up ↗",
+          "Vous parlez français ?",
+          "Everyday, easiest. Same words as the statement."
+        ],
+        [
+          "2. est-ce que",
+          "Est-ce que vous parlez français ?",
+          "Clear, polite, works everywhere."
+        ],
+        [
+          "3. Inversion (verb first)",
+          "Parlez-vous français ?",
+          "Formal and written. Recognise it."
+        ]
+      ],
+      "hear": 1
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Asking questions",
+      "body": "Question words go at the start (or at the end in casual speech): Où habitez-vous ? Comment vous appelez-vous ? Quel âge avez-vous ? Quand ? Pourquoi ? Combien ? Answer pourquoi with parce que."
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Questions and answers",
+      "headers": [
+        "Question",
+        "Answer"
+      ],
+      "rows": [
+        [
+          "Comment vous appelez-vous ?",
+          "Je m'appelle Sam."
+        ],
+        [
+          "Où habitez-vous ?",
+          "J'habite à Ottawa."
+        ],
+        [
+          "Quel âge avez-vous ?",
+          "J'ai trente ans."
+        ],
+        [
+          "Pourquoi vous parlez français ?",
+          "Parce que j'habite au Canada."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Tip",
+      "body": "When you are unsure, add est-ce que and keep the rest of the sentence unchanged: Est-ce que + normal sentence ? It is never wrong."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "In Canada",
+      "body": "In Québec you will often hear -tu added at the end of a question: Tu viens-tu ? It is informal Québec speech. Understand it, but in the exam use est-ce que or rising intonation."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write the right form of avoir.  J'___ trente ans.",
+      "options": [
+        "as",
+        "a",
+        "avons",
+        "ai"
+      ],
+      "answer": 3,
+      "explain": "The answer is ai."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write the right form of avoir.  Tu ___ un courriel ?",
+      "options": [
+        "ai",
+        "a",
+        "as",
+        "avons"
+      ],
+      "answer": 2,
+      "explain": "The answer is as."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write the right form of avoir.  Elle ___ vingt ans.",
+      "options": [
+        "a",
+        "ai",
+        "as",
+        "avons"
+      ],
+      "answer": 0,
+      "explain": "The answer is a."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write the right form of avoir.  Nous ___ une question.",
+      "options": [
+        "ai",
+        "as",
+        "a",
+        "avons"
+      ],
+      "answer": 3,
+      "explain": "The answer is avons."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write the right form of avoir.  Vous ___ une carte ?",
+      "options": [
+        "avez",
+        "ai",
+        "as",
+        "a"
+      ],
+      "answer": 0,
+      "explain": "The answer is avez."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write the right form of avoir.  Ils ___ un cellulaire.",
+      "options": [
+        "ai",
+        "ont",
+        "as",
+        "a"
+      ],
+      "answer": 1,
+      "explain": "The answer is ont."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Choose: où, comment, quel, combien, pourquoi.  ___ âge avez-vous ?",
+      "options": [
+        "Comment",
+        "Où",
+        "Pourquoi",
+        "Quel"
+      ],
+      "answer": 3,
+      "explain": "The answer is Quel."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Choose: où, comment, quel, combien, pourquoi.  ___ vous appelez-vous ?",
+      "options": [
+        "Quel",
+        "Où",
+        "Comment",
+        "Pourquoi"
+      ],
+      "answer": 2,
+      "explain": "The answer is Comment."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Choose: où, comment, quel, combien, pourquoi.  ___ habitez-vous ?",
+      "options": [
+        "Où",
+        "Quel",
+        "Comment",
+        "Pourquoi"
+      ],
+      "answer": 0,
+      "explain": "The answer is Où."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Choose: où, comment, quel, combien, pourquoi.  ___ vous parlez français ? — Parce que j'habite au Canada.",
+      "options": [
+        "Quel",
+        "Comment",
+        "Pourquoi",
+        "Où"
+      ],
+      "answer": 2,
+      "explain": "The answer is Pourquoi."
+    },
+    {
+      "type": "choose",
+      "id": "c11",
+      "prompt": "Write the answer to Quel âge avez-vous ? with these ages.  25",
+      "options": [
+        "J'ai trente-deux ans.",
+        "J'ai quarante et un ans.",
+        "J'ai vingt-cinq ans.",
+        "J'ai soixante ans."
+      ],
+      "answer": 2,
+      "explain": "The answer is J'ai vingt-cinq ans.."
+    },
+    {
+      "type": "choose",
+      "id": "c12",
+      "prompt": "Write the answer to Quel âge avez-vous ? with these ages.  32",
+      "options": [
+        "J'ai vingt-cinq ans.",
+        "J'ai quarante et un ans.",
+        "J'ai soixante ans.",
+        "J'ai trente-deux ans."
+      ],
+      "answer": 3,
+      "explain": "The answer is J'ai trente-deux ans.."
+    },
+    {
+      "type": "choose",
+      "id": "c13",
+      "prompt": "Write the answer to Quel âge avez-vous ? with these ages.  41",
+      "options": [
+        "J'ai vingt-cinq ans.",
+        "J'ai trente-deux ans.",
+        "J'ai quarante et un ans.",
+        "J'ai soixante ans."
+      ],
+      "answer": 2,
+      "explain": "The answer is J'ai quarante et un ans.."
+    },
+    {
+      "type": "choose",
+      "id": "c14",
+      "prompt": "Write the answer to Quel âge avez-vous ? with these ages.  60",
+      "options": [
+        "J'ai soixante ans.",
+        "J'ai vingt-cinq ans.",
+        "J'ai trente-deux ans.",
+        "J'ai quarante et un ans."
+      ],
+      "answer": 0,
+      "explain": "The answer is J'ai soixante ans.."
+    }
+  ]
+}

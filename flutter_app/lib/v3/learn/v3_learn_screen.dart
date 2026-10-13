@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,25 +9,27 @@ import '../../design/app_router.dart';
 import '../../design/appearance_colors.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
-import '../../screens/speak/speak_course_activity_screen.dart';
-import '../../screens/speak/speak_review_screen.dart';
-import '../../services/course_generation_test_harness.dart';
-import '../../services/speak_roadmap_service.dart';
 import '../lesson/v3_course.dart';
 import '../lesson/v3_lesson.dart';
 import '../lesson/v3_lesson_player.dart';
+import '../story/v3_stories_panel.dart';
+import '../story/v3_story.dart';
+import '../story/v3_story_reader.dart';
+import '../story/v3_story_store.dart';
 import '../ui/v3_ui.dart';
 
 /// Learn tab. Screen contract:
 ///
 /// User arrived to: open the app to study.
-/// They must understand: what to do next, how long it takes, how far the exam is.
-/// Primary action: Start lesson (exactly one).
-/// Secondary: Review, and Path to browse units.
-/// Success state: a lesson opened, or "all caught up" when nothing is ready.
-/// Must not contain: tiles of skills, streak pressure, a photo hero, fake data.
+/// They must understand: what to do next, how long it takes, how far along
+/// they are, and how far the exam is.
+/// Primary action: Start (or resume) the next lesson. Exactly one.
+/// Secondary: Path to pick any lesson, Stories to read.
+/// Success state: a lesson opens at the right step and finishing it moves the
+/// "next" card on.
+/// Must not contain: AI-generated lessons, fake progress, photo heroes.
 ///
-/// Data is real: the existing roadmap and adaptive plan. Nothing is invented.
+/// Everything comes from the bundled authored course. Progress is local.
 class V3LearnScreen extends ConsumerStatefulWidget {
   const V3LearnScreen({super.key});
 
@@ -36,30 +39,42 @@ class V3LearnScreen extends ConsumerStatefulWidget {
 
 class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   var _tab = 0;
-  int? _openUnit;
-  DateTime? _examDate;
+  var _loaded = false;
   List<V3Lesson> _course = const [];
   Set<String> _done = const {};
+  Map<String, int> _pos = const {};
+  List<V3Story> _stories = const [];
+  Set<String> _storiesDone = const {};
+  String? _openUnit;
+  DateTime? _examDate;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_loadCourse());
-    unawaited(_loadExamDate());
-    unawaited(_ensureUpcomingMedia());
+    unawaited(_load());
   }
 
-  Future<void> _loadCourse() async {
+  Future<void> _load() async {
     final course = await V3Course.load();
     final done = await V3Progress.completed();
+    final pos = await V3Progress.positions();
+    final stories = await V3Stories.load();
+    final storiesDone = await V3StoryProgress.done();
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString('tcf_exam_date');
     if (!mounted) return;
     setState(() {
       _course = course;
       _done = done;
+      _pos = pos;
+      _stories = stories;
+      _storiesDone = storiesDone;
+      _examDate = raw == null ? null : DateTime.tryParse(raw);
+      _loaded = true;
     });
   }
 
-  V3Lesson? get _nextAuthored {
+  V3Lesson? get _next {
     for (final lesson in _course) {
       if (!_done.contains(lesson.id)) return lesson;
     }
@@ -69,71 +84,32 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   Future<void> _openLesson(V3Lesson lesson) async {
     await AppRouter.push<bool>(
       context,
-      (_) => V3LessonPlayer(lesson: lesson),
+      (_) => V3LessonPlayer(lesson: lesson, startAt: _pos[lesson.id] ?? 0),
       fullscreenDialog: true,
     );
-    if (mounted) unawaited(_loadCourse());
+    if (mounted) unawaited(_load());
   }
 
-  Future<void> _loadExamDate() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('tcf_exam_date');
+  Future<void> _openStory(V3Story story) async {
+    final storyPos = (await V3StoryProgress.positions())[story.id] ?? 0;
     if (!mounted) return;
-    setState(() => _examDate = raw == null ? null : DateTime.tryParse(raw));
-  }
-
-  /// Keeps the next lessons prepared. Idempotent and guarded by SyncService's
-  /// single in-flight generation gate (same work the old Home did).
-  Future<void> _ensureUpcomingMedia() async {
-    if (CourseGenerationTestHarness.current.active) return;
-    final sync = ref.read(syncServiceProvider);
-    try {
-      await sync.hydrateAdaptiveCourses();
-      if (!mounted) return;
-      final profile = ref.read(learningStoreProvider).profile();
-      final store = ref.read(adaptiveCourseStoreProvider);
-      var plan = store.ensureMediaBuffer(profile);
-      await sync.syncAdaptiveCoursePlan(plan);
-      for (var attempt = 0; attempt < 3; attempt++) {
-        if (!mounted) return;
-        final prepared = await sync.prepareAdaptiveCourseLessons();
-        if (prepared == 0) break;
-        await sync.hydrateAdaptiveCourses();
-        plan = store.ensureMediaBuffer(profile);
-      }
-      if (mounted) setState(() {});
-    } catch (error, stackTrace) {
-      debugPrint('Learn media buffer preparation failed: $error\n$stackTrace');
-    }
-  }
-
-  Future<void> _open(SpeakRoadmapSession session) async {
-    await AppRouter.push(
+    await AppRouter.push<bool>(
       context,
-      (_) => SpeakCourseActivityScreen(session: session),
+      (_) => V3StoryReader(story: story, startAt: storyPos),
     );
-    if (mounted) {
-      setState(() {});
-      unawaited(_ensureUpcomingMedia());
-    }
+    if (mounted) unawaited(_load());
   }
 
   @override
   Widget build(BuildContext context) {
-    final profile = ref.watch(learningStoreProvider).profile();
-    final completed = ref.watch(storageServiceProvider).completedContentKeys();
-    final store = ref.read(adaptiveCourseStoreProvider);
-    final plan = store.currentPlan(profile) ?? store.ensureCurrentPlan(profile);
-    final roadmap = SpeakRoadmapService.build(
-      profile,
-      completedContentKeys: completed,
-      adaptiveSessions: plan.sessions,
-    );
-    final level = profile.level.toLowerCase();
-    final levelChip = const {'a1', 'a2', 'b1', 'b2'}.contains(level)
+    final level = ref
+        .watch(learningStoreProvider)
+        .profile()
+        .level
+        .toLowerCase();
+    final chip = const {'a1', 'a2', 'b1', 'b2'}.contains(level)
         ? level.toUpperCase()
         : 'A1';
-
     return SafeArea(
       bottom: false,
       child: ListView(
@@ -163,7 +139,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  levelChip,
+                  chip,
                   style: V3Type.strong(14, DesignTokens.primary),
                 ),
               ),
@@ -175,10 +151,19 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
               _segment('Today', 0),
               const SizedBox(width: 24),
               _segment('Path', 1),
+              const SizedBox(width: 24),
+              _segment('Stories', 2),
             ],
           ),
           const SizedBox(height: 20),
-          if (_tab == 0) ..._today(roadmap) else ..._path(roadmap),
+          if (!_loaded)
+            const SizedBox(height: 240)
+          else if (_tab == 0)
+            ..._today()
+          else if (_tab == 1)
+            ..._path()
+          else
+            const V3StoriesPanel(),
         ],
       ),
     );
@@ -191,6 +176,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       label: label,
       onTap: () => setState(() => _tab = index),
       child: Container(
+        constraints: const BoxConstraints(minHeight: 44),
+        alignment: Alignment.bottomLeft,
         padding: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
           border: Border(
@@ -213,8 +200,9 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
 
   // ---- Today -------------------------------------------------------------
 
-  List<Widget> _today(SpeakRoadmap roadmap) {
-    final next = roadmap.nextSession;
+  List<Widget> _today() {
+    final real = _course.where((l) => !l.dev).toList();
+    final doneCount = real.where((l) => _done.contains(l.id)).length;
     final days = _examDate?.difference(DateTime.now()).inDays;
     return [
       if (days != null && days >= 0) ...[
@@ -253,73 +241,96 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
         ),
         const SizedBox(height: 14),
       ],
-      _heroFor(next),
-      const SizedBox(height: 14),
-      V3Pressable(
-        key: const ValueKey('learn.review'),
-        label: 'Time to review',
-        onTap: () => AppRouter.push(context, (_) => const SpeakReviewScreen()),
-        child: Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: DesignTokens.surface,
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: DesignTokens.hairline),
-            boxShadow: DesignTokens.surfaceShadow,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Time to review', style: V3Type.strong(18)),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Words and mistakes from your lessons',
-                      style: V3Type.body(14),
-                    ),
-                  ],
+      _hero(),
+      if (real.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: LinearProgressIndicator(
+                  value: doneCount / real.length,
+                  minHeight: 5,
+                  backgroundColor: DesignTokens.hairline,
+                  color: DesignTokens.primary,
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_rounded,
-                color: DesignTokens.inkSoft,
-                size: 22,
-              ),
-            ],
+            ),
+            const SizedBox(width: 12),
+            Text(
+              '$doneCount of ${real.length} lessons',
+              style: V3Type.body(13),
+            ),
+          ],
+        ),
+      ],
+      if (_stories.isNotEmpty) ...[
+        const SizedBox(height: 22),
+        V3Pressable(
+          key: const ValueKey('learn.readStory'),
+          label: 'Read a story',
+          onTap: () => setState(() => _tab = 2),
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: DesignTokens.surface,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: DesignTokens.hairline),
+              boxShadow: DesignTokens.surfaceShadow,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Read a story', style: V3Type.strong(18)),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Short, tap any word, hear any line',
+                        style: V3Type.body(14),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  CupertinoIcons.arrow_right,
+                  color: DesignTokens.inkSoft,
+                  size: 20,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+      ],
     ];
   }
 
-  /// The authored TCF course comes first. The legacy adaptive course fills in
-  /// until authored lessons cover it.
-  Widget _heroFor(SpeakRoadmapSession? legacyNext) {
-    final authored = _nextAuthored;
-    if (authored != null) {
+  Widget _hero() {
+    final next = _next;
+    if (next == null) {
       return _heroCard(
-        eyebrow: 'NEXT  ·  ${authored.minutes} MIN',
-        title: authored.title,
-        subtitle: authored.subtitle.isEmpty
-            ? 'TCF Canada course'
-            : authored.subtitle,
-        onStart: () => _openLesson(authored),
+        eyebrow: _course.isEmpty ? 'LESSONS' : 'ALL DONE FOR NOW',
+        title: _course.isEmpty
+            ? 'No lessons found'
+            : 'You finished every lesson',
+        subtitle: _course.isEmpty
+            ? 'Close and reopen the app. If this stays, contact support.'
+            : 'More units are coming. Replay any lesson from Path or read a story.',
       );
     }
-    if (legacyNext == null) {
-      return _heroCard(
-        eyebrow: 'ALL CAUGHT UP',
-        title: 'You are all caught up',
-        subtitle: 'New lessons appear here as soon as they are ready.',
-      );
-    }
+    final at = _pos[next.id] ?? 0;
     return _heroCard(
-      eyebrow: 'NEXT  ·  ${legacyNext.estimatedMinutes} MIN',
-      title: legacyNext.title,
-      subtitle: 'Unit ${legacyNext.unit}: ${legacyNext.unitTitle}',
-      onStart: () => _open(legacyNext),
+      eyebrow: at > 0
+          ? 'RESUME  ·  STEP ${at + 1} OF ${next.steps.length}'
+          : 'NEXT  ·  ${next.minutes} MIN',
+      title: next.title,
+      subtitle: next.unit.isEmpty
+          ? next.subtitle
+          : '${next.unitLabel}: ${next.unitTitle}',
+      action: at > 0 ? 'Resume lesson' : 'Start lesson',
+      onStart: () => _openLesson(next),
     );
   }
 
@@ -327,6 +338,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     required String eyebrow,
     required String title,
     required String subtitle,
+    String action = 'Start lesson',
     VoidCallback? onStart,
   }) {
     // Brand-blue hero in both appearances: white text on the fixed blue keeps
@@ -358,7 +370,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
             const SizedBox(height: 22),
             V3Pressable(
               key: const ValueKey('learn.startLesson'),
-              label: 'Start lesson',
+              label: action,
               onTap: onStart,
               child: Container(
                 height: 54,
@@ -371,13 +383,13 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Start lesson',
+                      action,
                       style: V3Type.strong(16, AppearanceColors.blueLight),
                     ),
                     const SizedBox(width: 10),
                     Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 20,
+                      CupertinoIcons.arrow_right,
+                      size: 18,
                       color: AppearanceColors.blueLight,
                     ),
                   ],
@@ -392,30 +404,36 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
 
   // ---- Path --------------------------------------------------------------
 
-  List<Widget> _path(SpeakRoadmap roadmap) {
-    final byUnit = <int, List<SpeakRoadmapSession>>{};
-    for (final s in roadmap.sessions) {
-      byUnit.putIfAbsent(s.unit, () => []).add(s);
+  List<Widget> _path() {
+    final groups = <String, List<V3Lesson>>{};
+    for (final l in _course) {
+      groups.putIfAbsent(l.unit, () => []).add(l);
     }
-    final units = byUnit.keys.toList()..sort();
-    final currentUnit = roadmap.nextSession?.unit;
+    final nextUnit = _next?.unit;
     return [
-      for (final unit in units) ...[
-        _unitRow(unit, byUnit[unit]!, unit == currentUnit),
+      for (final entry in groups.entries) ...[
+        _unitCard(entry.key, entry.value, entry.key == (_openUnit ?? nextUnit)),
         const SizedBox(height: 10),
       ],
     ];
   }
 
-  Widget _unitRow(int unit, List<SpeakRoadmapSession> sessions, bool current) {
-    final done = sessions.where((s) => s.completed).length;
-    final finished = done == sessions.length;
-    final open = _openUnit == unit;
+  Widget _unitCard(String unit, List<V3Lesson> lessons, bool open) {
+    final first = lessons.first;
+    final done = lessons.where((l) => _done.contains(l.id)).length;
+    final finished = done == lessons.length;
+    final current = _next?.unit == unit;
     final stateColor = finished
         ? DesignTokens.success
         : current
         ? DesignTokens.primary
         : DesignTokens.hairline;
+    final label = unit.isEmpty ? 'Dev' : first.unitLabel;
+    final title = unit.isEmpty ? 'Test lessons' : first.unitTitle;
+    final stories = [
+      for (final s in _stories)
+        if (s.unit == unit) s,
+    ];
     return Container(
       decoration: BoxDecoration(
         color: DesignTokens.surface,
@@ -427,8 +445,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
         children: [
           V3Pressable(
             key: ValueKey('learn.unit.$unit'),
-            label: 'Unit $unit, ${sessions.first.unitTitle}',
-            onTap: () => setState(() => _openUnit = open ? null : unit),
+            label: '$label, $title',
+            onTap: () => setState(() => _openUnit = open ? '' : unit),
             child: Padding(
               padding: const EdgeInsets.all(18),
               child: Row(
@@ -447,19 +465,19 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'UNIT $unit',
+                          label.toUpperCase(),
                           style: V3Type.eyebrow(DesignTokens.inkSoft),
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          sessions.first.unitTitle,
+                          title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: V3Type.strong(17),
                         ),
                         const SizedBox(height: 3),
                         Text(
-                          '$done of ${sessions.length} lessons',
+                          '$done of ${lessons.length} lessons',
                           style: V3Type.body(13),
                         ),
                       ],
@@ -467,58 +485,103 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                   ),
                   Icon(
                     open
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
+                        ? CupertinoIcons.chevron_up
+                        : CupertinoIcons.chevron_down,
+                    size: 18,
                     color: DesignTokens.inkSoft,
                   ),
                 ],
               ),
             ),
           ),
-          if (open)
-            for (final s in sessions)
-              V3Pressable(
-                key: ValueKey('learn.lesson.${s.contentKey}'),
-                label: 'Lesson, ${s.title}',
-                onTap: s.unlocked && s.contentReady ? () => _open(s) : null,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(38, 12, 18, 12),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: DesignTokens.hairline),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(s.title, style: V3Type.strong(15)),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${s.estimatedMinutes} min',
-                              style: V3Type.body(12.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        s.completed
-                            ? Icons.check_circle_rounded
-                            : (s.unlocked && s.contentReady)
-                            ? Icons.play_circle_outline_rounded
-                            : Icons.lock_outline_rounded,
-                        color: s.completed
-                            ? DesignTokens.success
-                            : DesignTokens.inkSoft,
-                        size: 22,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          if (open) ...[
+            for (final l in lessons) _lessonRow(l),
+            for (final s in stories) _storyRow(s),
+          ],
         ],
+      ),
+    );
+  }
+
+  Widget _lessonRow(V3Lesson l) {
+    final done = _done.contains(l.id);
+    final at = _pos[l.id] ?? 0;
+    return V3Pressable(
+      key: ValueKey('learn.lesson.${l.id}'),
+      label: 'Lesson, ${l.title}',
+      onTap: () => _openLesson(l),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(38, 12, 18, 12),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: DesignTokens.hairline)),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l.title, style: V3Type.strong(15)),
+                  const SizedBox(height: 2),
+                  Text(
+                    at > 0 && !done
+                        ? '${l.minutes} min  ·  in progress'
+                        : '${l.minutes} min',
+                    style: V3Type.body(12.5),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              done
+                  ? CupertinoIcons.checkmark_circle_fill
+                  : CupertinoIcons.play_circle,
+              color: done ? DesignTokens.success : DesignTokens.inkSoft,
+              size: 24,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _storyRow(V3Story s) {
+    final done = _storiesDone.contains(s.id);
+    return V3Pressable(
+      key: ValueKey('learn.story.${s.id}'),
+      label: 'Story, ${s.titleEn}',
+      onTap: () => _openStory(s),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(38, 12, 18, 12),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: DesignTokens.hairline)),
+        ),
+        child: Row(
+          children: [
+            Icon(CupertinoIcons.book, size: 18, color: DesignTokens.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Story: ${s.title}', style: V3Type.strong(15)),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${s.minutes} min  ·  ${s.titleEn}',
+                    style: V3Type.body(12.5),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              done
+                  ? CupertinoIcons.checkmark_circle_fill
+                  : CupertinoIcons.chevron_right,
+              color: done ? DesignTokens.success : DesignTokens.inkSoft,
+              size: done ? 24 : 18,
+            ),
+          ],
+        ),
       ),
     );
   }

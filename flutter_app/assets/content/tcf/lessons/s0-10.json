@@ -1,0 +1,296 @@
+{
+  "id": "s0-10",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Numbers 0 to 20",
+  "subtitle": "Stage 0, lesson 10",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Numbers 0 to 20",
+      "body": "Numbers are the heart of the first TCF questions: platform numbers, prices, phone numbers, times. Learn them by ear first. Say each one aloud."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "0 to 20",
+      "headers": [
+        "#",
+        "French",
+        "Say it",
+        "#",
+        "French",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "0",
+          "zéro",
+          "zay-ROH",
+          "11",
+          "onze",
+          "oh(n)z"
+        ],
+        [
+          "1",
+          "un, une",
+          "uh(n), ün",
+          "12",
+          "douze",
+          "dooz"
+        ],
+        [
+          "2",
+          "deux",
+          "duh",
+          "13",
+          "treize",
+          "trehz"
+        ],
+        [
+          "3",
+          "trois",
+          "trwah",
+          "14",
+          "quatorze",
+          "kah-TOHRZ"
+        ],
+        [
+          "4",
+          "quatre",
+          "KAHtr",
+          "15",
+          "quinze",
+          "ka(n)z"
+        ],
+        [
+          "5",
+          "cinq",
+          "sa(n)k",
+          "16",
+          "seize",
+          "sehz"
+        ],
+        [
+          "6",
+          "six",
+          "sees",
+          "17",
+          "dix-sept",
+          "dee-SET"
+        ],
+        [
+          "7",
+          "sept",
+          "set",
+          "18",
+          "dix-huit",
+          "dee-ZWEET"
+        ],
+        [
+          "8",
+          "huit",
+          "weet",
+          "19",
+          "dix-neuf",
+          "deez-NUHF"
+        ],
+        [
+          "9",
+          "neuf",
+          "nuhf",
+          "20",
+          "vingt",
+          "va(n)"
+        ],
+        [
+          "10",
+          "dix",
+          "dees",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "Before a word that starts with a consonant, six, dix and huit lose their last sound: six livres (see LEEvr), dix livres (dee LEEvr), huit jours (wee ZHOOR). Before a vowel they link: six ans (see-ZAH(N)), dix ans (dee-ZAH(N)), neuf ans (nuh-VAH(N))."
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "In real Canadian life",
+      "headers": [
+        "What",
+        "How you say it"
+      ],
+      "rows": [
+        [
+          "911",
+          "neuf, un, un (nuhf, uh(n), uh(n))"
+        ],
+        [
+          "Phone 514 555 0143",
+          "cinq-un-quatre, cinq-cinq-cinq, zéro-un-quatre-trois"
+        ],
+        [
+          "Bus 24",
+          "l'autobus vingt-quatre"
+        ],
+        [
+          "Postal code H2X 1Y4",
+          "H, deux, X, un, Y, quatre (letters and digits)"
+        ],
+        [
+          "$5",
+          "cinq dollars"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "In Canada, phone numbers are said in short groups. You will hear cinq-un-quatre for 514 (Montréal), six-un-trois for 613 (Ottawa), quatre-un-six for 416 (Toronto). Postal codes mix letters and digits, so your alphabet from 0.2 is useful here."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write each number in French words.  3",
+      "options": [
+        "sept",
+        "douze",
+        "trois",
+        "quinze"
+      ],
+      "answer": 2,
+      "explain": "The answer is trois."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write each number in French words.  7",
+      "options": [
+        "trois",
+        "sept",
+        "douze",
+        "quinze"
+      ],
+      "answer": 1,
+      "explain": "The answer is sept."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write each number in French words.  12",
+      "options": [
+        "trois",
+        "sept",
+        "quinze",
+        "douze"
+      ],
+      "answer": 3,
+      "explain": "The answer is douze."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write each number in French words.  15",
+      "options": [
+        "quinze",
+        "trois",
+        "sept",
+        "douze"
+      ],
+      "answer": 0,
+      "explain": "The answer is quinze."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write each number in French words.  18",
+      "options": [
+        "trois",
+        "sept",
+        "dix-huit",
+        "douze"
+      ],
+      "answer": 2,
+      "explain": "The answer is dix-huit."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write each number in French words.  20",
+      "options": [
+        "trois",
+        "sept",
+        "douze",
+        "vingt"
+      ],
+      "answer": 3,
+      "explain": "The answer is vingt."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le train part du quai numéro huit.",
+      "question": "Which platform?",
+      "options": [
+        "Platform 5",
+        "Platform 8",
+        "Platform 18",
+        "Platform 3"
+      ],
+      "answer": 1,
+      "explain": "Huit is 8."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Ça fait quatorze dollars.",
+      "question": "How much?",
+      "options": [
+        "$4",
+        "$14",
+        "$40",
+        "$44"
+      ],
+      "answer": 1,
+      "explain": "Quatorze is 14."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "L'autobus seize arrive.",
+      "question": "Which bus?",
+      "options": [
+        "Bus 6",
+        "Bus 16",
+        "Bus 60",
+        "Bus 17"
+      ],
+      "answer": 1,
+      "explain": "Seize is 16."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Mon numéro est le cinq, un, quatre, deux, zéro, neuf, un.",
+      "question": "What are the first three digits?",
+      "options": [
+        "5-4-1",
+        "5-1-4",
+        "4-1-5",
+        "5-1-1"
+      ],
+      "answer": 1,
+      "explain": "Cinq, un, quatre is 5-1-4."
+    }
+  ]
+}

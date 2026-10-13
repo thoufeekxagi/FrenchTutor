@@ -1,0 +1,266 @@
+{
+  "id": "s0-07",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Consonants and silent letters",
+  "subtitle": "Stage 0, lesson 7",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Consonants and silent letters",
+      "body": "Most French consonants are like English ones. The surprises are the silent final letters and a few letter groups."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "The big rule: the last consonant is usually silent",
+      "body": "petit (puh-TEE), grand (grah(n)), vous (voo), Paris (pah-REE), trop (troh), beaucoup (boh-KOO), chez (shay). The c, r, f, l are often said at the end, so remember CaReFuL: avec (ah-VEK), bonjour (boh(n)-ZHOOR), neuf (nuhf), sel (sel). There are exceptions: -er verbs end in ay (parler is pahR-LAY) and -ier words too."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Letters that surprise English speakers",
+      "headers": [
+        "Letters",
+        "Say it",
+        "Example",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "c before a, o, u",
+          "k",
+          "café, copie, cuisine",
+          "coffee, copy, kitchen"
+        ],
+        [
+          "c before e, i, y; ç",
+          "s",
+          "ceci (suh-SEE), ça (sah), garçon",
+          "this, that, boy"
+        ],
+        [
+          "g before a, o, u",
+          "g (hard)",
+          "gare (gahR), gommer",
+          "station"
+        ],
+        [
+          "g before e, i, y",
+          "zh",
+          "girafe (zhee-RAHF), âge (ahzh)",
+          "giraffe, age"
+        ],
+        [
+          "gu before e, i",
+          "g (hard)",
+          "guitare (gee-TAHR)",
+          "guitar"
+        ],
+        [
+          "qu",
+          "k",
+          "qui (kee), quatre (KAHtr)",
+          "who, four"
+        ],
+        [
+          "ch",
+          "sh",
+          "chat (shah), chose (shohz)",
+          "cat, thing"
+        ],
+        [
+          "gn",
+          "ny",
+          "montagne (moh(n)-TAHNY)",
+          "mountain"
+        ],
+        [
+          "j",
+          "zh",
+          "jour (zhoor), je (zhuh)",
+          "day, I"
+        ],
+        [
+          "s between two vowels",
+          "z",
+          "rose (rohz), poison (pwah-ZOH(N))",
+          "rose, poison"
+        ],
+        [
+          "ss",
+          "s",
+          "poisson (pwah-SOH(N))",
+          "fish"
+        ],
+        [
+          "h",
+          "silent",
+          "homme (ohm), heure (uhR), hôtel",
+          "man, hour, hotel"
+        ],
+        [
+          "th",
+          "t",
+          "thé (tay)",
+          "tea"
+        ],
+        [
+          "ph",
+          "f",
+          "photo (foh-TOH), pharmacie",
+          "photo, pharmacy"
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Watch out",
+      "body": "poisson (fish, double s, pwah-SOH(N)) and poison (poison, single s between vowels, pwah-ZOH(N)) differ by one letter. Double s is s. Single s between two vowels is z."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "In Canada",
+      "body": "In Québec, t and d before i or u are often said with a small hiss: tu sounds close to “tsü” and dire close to “dzeer”. That is a normal Québec feature. In your own speech, the standard t and d are always understood, and that is what you practise for the exam."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write how each word is said.  chat",
+      "options": [
+        "shah",
+        "KAHtr",
+        "gahR",
+        "zhee-RAHF"
+      ],
+      "answer": 0,
+      "explain": "The answer is shah."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write how each word is said.  quatre",
+      "options": [
+        "shah",
+        "gahR",
+        "zhee-RAHF",
+        "KAHtr"
+      ],
+      "answer": 3,
+      "explain": "The answer is KAHtr."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write how each word is said.  gare",
+      "options": [
+        "gahR",
+        "shah",
+        "KAHtr",
+        "zhee-RAHF"
+      ],
+      "answer": 0,
+      "explain": "The answer is gahR."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write how each word is said.  girafe",
+      "options": [
+        "shah",
+        "KAHtr",
+        "gahR",
+        "zhee-RAHF"
+      ],
+      "answer": 3,
+      "explain": "The answer is zhee-RAHF."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write how each word is said.  montagne",
+      "options": [
+        "moh(n)-TAHNY",
+        "shah",
+        "KAHtr",
+        "gahR"
+      ],
+      "answer": 0,
+      "explain": "The answer is moh(n)-TAHNY."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write how each word is said.  thé",
+      "options": [
+        "shah",
+        "KAHtr",
+        "tay",
+        "gahR"
+      ],
+      "answer": 2,
+      "explain": "The answer is tay."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "poisson",
+      "question": "Which word?",
+      "options": [
+        "poison",
+        "poisson",
+        "possible",
+        "passion"
+      ],
+      "answer": 1,
+      "explain": "Poisson is pwah-SOH(N) (fish)."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "chat",
+      "question": "Which word?",
+      "options": [
+        "chat",
+        "chaud",
+        "chez",
+        "chose"
+      ],
+      "answer": 0,
+      "explain": "Chat is shah (cat)."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "garçon",
+      "question": "Which word?",
+      "options": [
+        "gars",
+        "garçon",
+        "gaz",
+        "gare"
+      ],
+      "answer": 1,
+      "explain": "Garçon is gahR-SOH(N) (boy)."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "quatre",
+      "question": "Which number?",
+      "options": [
+        "cent",
+        "quatre",
+        "cinq",
+        "quinze"
+      ],
+      "answer": 1,
+      "explain": "Quatre is KAHtr (four)."
+    }
+  ]
+}

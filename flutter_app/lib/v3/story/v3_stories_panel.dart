@@ -1,0 +1,300 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import '../../design/app_router.dart';
+import '../../design/appearance_colors.dart';
+import '../../design/tokens.dart';
+import '../ui/v3_ui.dart';
+import 'v3_story.dart';
+import 'v3_story_reader.dart';
+import 'v3_story_store.dart';
+
+/// Stories list, shown as the third segment of the Learn tab. Screen contract:
+///
+/// User arrived to: read something real in French.
+/// They must understand: stories are short, sorted by level, and their place is
+/// remembered.
+/// Primary action: Resume or start the featured story.
+/// Success state: a story opens in the reader; finished ones are ticked.
+/// Must not contain: photos, a second font, levels with fake content. A level
+/// with no stories is shown as coming soon and cannot be tapped.
+class V3StoriesPanel extends StatefulWidget {
+  const V3StoriesPanel({super.key});
+
+  @override
+  State<V3StoriesPanel> createState() => _V3StoriesPanelState();
+}
+
+class _V3StoriesPanelState extends State<V3StoriesPanel> {
+  static const _levels = ['A1', 'A2', 'B1', 'B2'];
+
+  List<V3Story> _stories = const [];
+  Set<String> _done = const {};
+  Map<String, int> _pos = const {};
+  var _level = 'A1';
+  var _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_load());
+  }
+
+  Future<void> _load() async {
+    final stories = await V3Stories.load();
+    final done = await V3StoryProgress.done();
+    final pos = await V3StoryProgress.positions();
+    if (!mounted) return;
+    setState(() {
+      _stories = stories;
+      _done = done;
+      _pos = pos;
+      _loaded = true;
+    });
+  }
+
+  Future<void> _open(V3Story story) async {
+    await AppRouter.push<bool>(
+      context,
+      (_) => V3StoryReader(story: story, startAt: _pos[story.id] ?? 0),
+    );
+    if (mounted) unawaited(_load());
+  }
+
+  V3Story? _featured(List<V3Story> atLevel) {
+    for (final s in atLevel) {
+      if (!_done.contains(s.id) && (_pos[s.id] ?? 0) > 0) return s;
+    }
+    for (final s in atLevel) {
+      if (!_done.contains(s.id)) return s;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) return const SizedBox(height: 200);
+    final atLevel = [
+      for (final s in _stories)
+        if (s.level == _level) s,
+    ];
+    final featured = _featured(atLevel);
+    final rest = [
+      for (final s in atLevel)
+        if (s != featured) s,
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Short stories at your level. Tap any word, hear any line.',
+          style: V3Type.body(15),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            for (final l in _levels) ...[_chip(l), const SizedBox(width: 8)],
+          ],
+        ),
+        const SizedBox(height: 18),
+        if (atLevel.isEmpty)
+          Text('Stories for $_level are coming soon.', style: V3Type.body(15)),
+        if (featured != null) ...[
+          _featuredCard(featured),
+          const SizedBox(height: 22),
+        ],
+        if (rest.isNotEmpty) ...[
+          Text(
+            featured == null ? 'ALL $_level STORIES' : 'MORE $_level STORIES',
+            style: V3Type.eyebrow(DesignTokens.inkSoft),
+          ),
+          const SizedBox(height: 10),
+          for (var i = 0; i < rest.length; i++) ...[
+            _storyCard(rest[i], i),
+            const SizedBox(height: 10),
+          ],
+        ],
+      ],
+    );
+  }
+
+  Widget _chip(String level) {
+    final has = _stories.any((s) => s.level == level);
+    final on = _level == level;
+    return V3Pressable(
+      key: ValueKey('stories.level.$level'),
+      label: has ? level : '$level, coming soon',
+      onTap: has ? () => setState(() => _level = level) : null,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 44, minWidth: 56),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: on ? DesignTokens.ink : Colors.transparent,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: on ? DesignTokens.ink : DesignTokens.hairline,
+          ),
+        ),
+        child: Text(
+          level,
+          style: V3Type.strong(
+            15,
+            on
+                ? DesignTokens.canvas
+                : (has ? DesignTokens.ink : DesignTokens.muted),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _featuredCard(V3Story s) {
+    final at = _pos[s.id] ?? 0;
+    final started = at > 0;
+    const onBlue = Colors.white;
+    final dim = onBlue.withValues(alpha: 0.82);
+    return V3Pressable(
+      key: const ValueKey('stories.featured'),
+      label: '${started ? 'Resume' : 'Start'} ${s.title}',
+      onTap: () => _open(s),
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(26),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppearanceColors.blueLight,
+              Color.lerp(AppearanceColors.blueLight, Colors.black, 0.3)!,
+            ],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${started ? 'CONTINUE' : 'START HERE'}  ·  ${s.minutes} MIN',
+              style: V3Type.eyebrow(dim),
+            ),
+            const SizedBox(height: 12),
+            Text(s.title, style: V3Type.title(30, color: onBlue)),
+            const SizedBox(height: 6),
+            Text(s.titleEn, style: V3Type.body(15, dim)),
+            if (started) ...[
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: LinearProgressIndicator(
+                  value: (at + 1) / s.sentences.length,
+                  minHeight: 5,
+                  backgroundColor: onBlue.withValues(alpha: 0.28),
+                  color: onBlue,
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+            Container(
+              height: 54,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: onBlue,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    started ? 'Resume reading' : 'Start reading',
+                    style: V3Type.strong(16, AppearanceColors.blueLight),
+                  ),
+                  const SizedBox(width: 10),
+                  Icon(
+                    CupertinoIcons.arrow_right,
+                    size: 18,
+                    color: AppearanceColors.blueLight,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _storyCard(V3Story s, int index) {
+    final done = _done.contains(s.id);
+    final tints = [
+      DesignTokens.primarySoft,
+      DesignTokens.masterySoft,
+      DesignTokens.successSoft,
+    ];
+    return V3Pressable(
+      key: ValueKey('stories.card.${s.id}'),
+      label:
+          '${s.title}, ${s.titleEn}, ${s.minutes} minutes${done ? ', read' : ''}',
+      onTap: () => _open(s),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: DesignTokens.hairline),
+          boxShadow: DesignTokens.surfaceShadow,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 62,
+              height: 78,
+              alignment: Alignment.bottomLeft,
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 8),
+              decoration: BoxDecoration(
+                color: tints[index % tints.length],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                s.title.characters.first,
+                style: V3Type.title(34, color: DesignTokens.ink),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(s.title, style: V3Type.strong(18)),
+                  const SizedBox(height: 2),
+                  Text(s.titleEn, style: V3Type.body(14)),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${s.level}  ·  ${s.minutes} min  ·  ${s.sentences.length} lines',
+                    style: V3Type.body(12.5),
+                  ),
+                ],
+              ),
+            ),
+            if (done)
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: DesignTokens.successSoft,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  CupertinoIcons.checkmark_alt,
+                  size: 15,
+                  color: DesignTokens.success,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

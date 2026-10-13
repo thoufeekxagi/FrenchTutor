@@ -1,0 +1,265 @@
+{
+  "id": "a1-u03-words-3",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Words: provinces and small words",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la province",
+      "en": "province",
+      "sound": "lah proh-VA(N)S",
+      "exampleFr": "Ontario est une province.",
+      "exampleEn": "Ontario is a province."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la capitale",
+      "en": "capital",
+      "sound": "lah kah-pee-TAHL",
+      "exampleFr": "Ottawa est la capitale.",
+      "exampleEn": "Ottawa is the capital."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "l'Ontario (m.)",
+      "en": "Ontario",
+      "say": "l'Ontario",
+      "sound": "lohn-tah-ree-OH"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "l'Alberta (f.)",
+      "en": "Alberta",
+      "say": "l'Alberta",
+      "sound": "lahl-behr-TAH"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le Manitoba",
+      "en": "Manitoba",
+      "sound": "luh mah-nee-toh-BAH"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la Colombie-Britannique",
+      "en": "British Columbia",
+      "sound": "lah koh-loh(n)-bee bree-tah-NEEK"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le Nouveau-Brunswick",
+      "en": "New Brunswick",
+      "sound": "luh noo-VOH bruhnz-WEEK"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la Nouvelle-Écosse",
+      "en": "Nova Scotia",
+      "sound": "lah noo-VEL ay-KOHS"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "ici",
+      "en": "here",
+      "sound": "ee-SEE",
+      "exampleFr": "Signez ici.",
+      "exampleEn": "Sign here."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "voici / voilà",
+      "en": "here is / there is",
+      "say": "voici, voilà",
+      "sound": "vwah-SEE / vwah-LAH",
+      "exampleFr": "Voici mon passeport.",
+      "exampleEn": "Here is my passport."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la province",
+      "options": [
+        "Alberta",
+        "province",
+        "New Brunswick",
+        "here is / there is"
+      ],
+      "answer": 1,
+      "explain": "la province means province."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la capitale",
+      "options": [
+        "Manitoba",
+        "Nova Scotia",
+        "province",
+        "capital"
+      ],
+      "answer": 3,
+      "explain": "la capitale means capital."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "l'Ontario (m.)",
+      "options": [
+        "British Columbia",
+        "Ontario",
+        "here",
+        "capital"
+      ],
+      "answer": 1,
+      "explain": "l'Ontario (m.) means Ontario."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "l'Alberta (f.)",
+      "options": [
+        "New Brunswick",
+        "here is / there is",
+        "Ontario",
+        "Alberta"
+      ],
+      "answer": 3,
+      "explain": "l'Alberta (f.) means Alberta."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le Manitoba",
+      "options": [
+        "Nova Scotia",
+        "Manitoba",
+        "province",
+        "Alberta"
+      ],
+      "answer": 1,
+      "explain": "le Manitoba means Manitoba."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la Colombie-Britannique",
+      "options": [
+        "here",
+        "capital",
+        "Manitoba",
+        "British Columbia"
+      ],
+      "answer": 3,
+      "explain": "la Colombie-Britannique means British Columbia."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "la capitale",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'Alberta",
+        "la capitale",
+        "la Colombie-Britannique",
+        "la Nouvelle-Écosse"
+      ],
+      "answer": 1,
+      "explain": "You heard la capitale: capital."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le Manitoba",
+      "question": "Which word did you hear?",
+      "options": [
+        "le Nouveau-Brunswick",
+        "le Manitoba",
+        "ici",
+        "la capitale"
+      ],
+      "answer": 1,
+      "explain": "You heard le Manitoba: Manitoba."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "The ten provinces. The country's capital is Ottawa (Ontario).",
+      "headers": [
+        "English",
+        "Français",
+        "Capital"
+      ],
+      "rows": [
+        [
+          "Ontario",
+          "l'Ontario",
+          "Toronto"
+        ],
+        [
+          "Québec",
+          "le Québec",
+          "Québec"
+        ],
+        [
+          "British Columbia",
+          "la Colombie-Britannique",
+          "Victoria"
+        ],
+        [
+          "Alberta",
+          "l'Alberta",
+          "Edmonton"
+        ],
+        [
+          "Manitoba",
+          "le Manitoba",
+          "Winnipeg"
+        ],
+        [
+          "Saskatchewan",
+          "la Saskatchewan",
+          "Regina"
+        ],
+        [
+          "Nova Scotia",
+          "la Nouvelle-Écosse",
+          "Halifax"
+        ],
+        [
+          "New Brunswick",
+          "le Nouveau-Brunswick",
+          "Fredericton"
+        ],
+        [
+          "Prince Edward Island",
+          "l'Île-du-Prince-Édouard",
+          "Charlottetown"
+        ],
+        [
+          "Newfoundland and Labrador",
+          "Terre-Neuve-et-Labrador",
+          "St. John's"
+        ]
+      ]
+    }
+  ]
+}

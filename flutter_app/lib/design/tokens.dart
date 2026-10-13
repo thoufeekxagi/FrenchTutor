@@ -12,8 +12,9 @@ import '../services/app_appearance_settings.dart';
 /// touch the typedef; a structural redesign only this file + design skills.
 ///
 /// Typography rules from the Northstar Studio reference:
-///  - Plus Jakarta Sans carries confident headings and display moments.
-///  - Inter carries reading, controls, labels, and data on every platform.
+///  - ONE family everywhere: Inter. Headings, reading, controls, labels and data
+///    all use it. Hierarchy comes from size, weight and spacing, never from a
+///    second typeface (see docs/v3/DESIGN_SYSTEM.md).
 ///  - No decorative type or monospace treatment in learner-facing content.
 abstract final class DesignTokens {
   // --- Colors — one runtime appearance source for every screen.
@@ -182,12 +183,13 @@ abstract final class DesignTokens {
 
   // --- Typography ---
 
-  /// Display voice — Plus Jakarta Sans for confident, geometric headings.
+  /// Display voice. The whole product uses ONE family (Inter); headings get
+  /// their hierarchy from size, weight and tracking, never from another font.
   static TextStyle display(double size, {FontWeight weight = FontWeight.w700}) {
     final resolved = size >= 22
         ? (weight.value < FontWeight.w600.value ? FontWeight.w600 : weight)
         : (weight.value < FontWeight.w600.value ? FontWeight.w600 : weight);
-    return GoogleFonts.plusJakartaSans(
+    return GoogleFonts.inter(
       fontSize: size,
       fontWeight: resolved,
       color: ink,

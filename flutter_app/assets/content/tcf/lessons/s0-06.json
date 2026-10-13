@@ -1,0 +1,321 @@
+{
+  "id": "s0-06",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Nasal vowels",
+  "subtitle": "Stage 0, lesson 6",
+  "minutes": 11,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Nasal vowels",
+      "body": "When a vowel is followed by n or m at the end of a syllable, the vowel becomes nasal: the air goes through your nose and you do not say the n. There are four nasal vowels. Pinch your nose: the sound should buzz."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Four nasal vowels",
+      "headers": [
+        "Spelling",
+        "Say it",
+        "Example",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "an, en, am, em",
+          "ah(n)",
+          "enfant (ah(n)-fah(n)), dans (dah(n)), temps (tah(n))",
+          "child, in, time"
+        ],
+        [
+          "on, om",
+          "oh(n)",
+          "bon (boh(n)), nom (noh(n)), maison (meh-zoh(n))",
+          "good, name, house"
+        ],
+        [
+          "in, ain, ein, im, aim",
+          "a(n)",
+          "vin (va(n)), pain (pa(n)), plein (pla(n))",
+          "wine, bread, full"
+        ],
+        [
+          "un, um",
+          "uh(n)",
+          "un (uh(n)), lundi (luh(n)-DEE)",
+          "one, Monday"
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Say the three columns slowly",
+      "headers": [
+        "an / en",
+        "on",
+        "in / ain"
+      ],
+      "rows": [
+        [
+          "banc (bah(n))",
+          "bon (boh(n))",
+          "bain (ba(n))"
+        ],
+        [
+          "vent (vah(n))",
+          "vont (voh(n))",
+          "vin (va(n))"
+        ],
+        [
+          "quand (kah(n))",
+          "qu'on (koh(n))",
+          "quinze (ka(n)z)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "The vowel is not nasal when n or m is doubled or followed by a vowel: bon is boh(n), but bonne is bun. un is uh(n), but une is ün. vin is va(n), but vinaigre is vee-NEHgR."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "Québec French has these nasals too, with a slightly different quality: maintenant (now) and quinze (fifteen) sound a little different from France. Both are correct."
+    },
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "français",
+      "en": "French",
+      "sound": "frah(n)-SEH"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "enfant",
+      "en": "child",
+      "sound": "ah(n)-FAH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "bon",
+      "en": "good",
+      "sound": "boh(n)",
+      "exampleFr": "Bon appétit !",
+      "exampleEn": "Enjoy your meal!"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "bonne",
+      "en": "good (feminine)",
+      "sound": "bun",
+      "exampleFr": "Bonne journée !",
+      "exampleEn": "Have a good day!"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "maintenant",
+      "en": "now",
+      "sound": "ma(n)t-NAH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "quinze",
+      "en": "fifteen",
+      "sound": "ka(n)z"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "pain",
+      "en": "bread",
+      "sound": "pa(n)"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "lundi",
+      "en": "Monday",
+      "sound": "luh(n)-DEE"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "français",
+      "options": [
+        "good (feminine)",
+        "French",
+        "bread",
+        "child"
+      ],
+      "answer": 1,
+      "explain": "français means French."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "enfant",
+      "options": [
+        "now",
+        "Monday",
+        "good",
+        "child"
+      ],
+      "answer": 3,
+      "explain": "enfant means child."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "bon",
+      "options": [
+        "fifteen",
+        "good",
+        "French",
+        "bread"
+      ],
+      "answer": 1,
+      "explain": "bon means good."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "bonne",
+      "options": [
+        "bread",
+        "child",
+        "now",
+        "good (feminine)"
+      ],
+      "answer": 3,
+      "explain": "bonne means good (feminine)."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "maintenant",
+      "options": [
+        "Monday",
+        "now",
+        "good",
+        "fifteen"
+      ],
+      "answer": 1,
+      "explain": "maintenant means now."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "quinze",
+      "options": [
+        "French",
+        "good (feminine)",
+        "bread",
+        "fifteen"
+      ],
+      "answer": 3,
+      "explain": "quinze means fifteen."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "enfant",
+      "question": "Which word did you hear?",
+      "options": [
+        "bonne",
+        "enfant",
+        "quinze",
+        "lundi"
+      ],
+      "answer": 1,
+      "explain": "You heard enfant: child."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "bonne",
+      "question": "Which word did you hear?",
+      "options": [
+        "bonne",
+        "quinze",
+        "lundi",
+        "enfant"
+      ],
+      "answer": 0,
+      "explain": "You heard bonne: good (feminine)."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "bon",
+      "question": "Which word?",
+      "options": [
+        "banc",
+        "bon",
+        "bain",
+        "beau"
+      ],
+      "answer": 1,
+      "explain": "Bon is boh(n)."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "vent",
+      "question": "Which word?",
+      "options": [
+        "vin",
+        "vont",
+        "vent",
+        "vous"
+      ],
+      "answer": 2,
+      "explain": "Vent is vah(n) (wind)."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "pain",
+      "question": "Which word?",
+      "options": [
+        "pan",
+        "pont",
+        "pain",
+        "pas"
+      ],
+      "answer": 2,
+      "explain": "Pain is pa(n) (bread)."
+    },
+    {
+      "type": "listen",
+      "id": "l6",
+      "fr": "quinze",
+      "question": "Which number?",
+      "options": [
+        "cinq",
+        "quinze",
+        "quatorze",
+        "seize"
+      ],
+      "answer": 1,
+      "explain": "Quinze is ka(n)z (fifteen)."
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "id": "a1-u04-words-4",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Words: what people do",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "travailler",
+      "en": "to work",
+      "sound": "trah-vah-YAY",
+      "exampleFr": "Mon père travaille à l'hôpital.",
+      "exampleEn": "My father works at the hospital."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "étudier",
+      "en": "to study",
+      "sound": "ay-tü-DYAY",
+      "exampleFr": "Ma sœur étudie.",
+      "exampleEn": "My sister studies."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "l'étudiant / l'étudiante",
+      "en": "student (m. / f.)",
+      "say": "l'étudiant, l'étudiante",
+      "sound": "lay-tü-DYAH(N) / lay-tü-DYAH(N)T",
+      "exampleFr": "Ils sont étudiants.",
+      "exampleEn": "They are students."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "aussi",
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "beaucoup",
+      "en": "a lot, many",
+      "sound": "boh-KOO"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "tous / toutes",
+      "en": "all, everyone",
+      "say": "tous, toutes",
+      "sound": "toos / toot",
+      "exampleFr": "Ils sont tous contents.",
+      "exampleEn": "They are all happy."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le professeur / la professeure",
+      "en": "teacher (Canada: la professeure)",
+      "say": "le professeur, la professeure",
+      "sound": "luh proh-feh-SUHR / lah proh-feh-SUHR"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "travailler",
+      "options": [
+        "also, too",
+        "to work",
+        "teacher (Canada: la professeure)",
+        "student (m. / f.)"
+      ],
+      "answer": 1,
+      "explain": "travailler means to work."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "étudier",
+      "options": [
+        "a lot, many",
+        "to work",
+        "also, too",
+        "to study"
+      ],
+      "answer": 3,
+      "explain": "étudier means to study."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "l'étudiant / l'étudiante",
+      "options": [
+        "all, everyone",
+        "student (m. / f.)",
+        "to study",
+        "a lot, many"
+      ],
+      "answer": 1,
+      "explain": "l'étudiant / l'étudiante means student (m. / f.)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "aussi",
+      "options": [
+        "teacher (Canada: la professeure)",
+        "student (m. / f.)",
+        "all, everyone",
+        "also, too"
+      ],
+      "answer": 3,
+      "explain": "aussi means also, too."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "beaucoup",
+      "options": [
+        "to work",
+        "a lot, many",
+        "also, too",
+        "teacher (Canada: la professeure)"
+      ],
+      "answer": 1,
+      "explain": "beaucoup means a lot, many."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "tous / toutes",
+      "options": [
+        "to study",
+        "a lot, many",
+        "to work",
+        "all, everyone"
+      ],
+      "answer": 3,
+      "explain": "tous / toutes means all, everyone."
+    }
+  ]
+}

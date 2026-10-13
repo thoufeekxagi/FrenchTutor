@@ -28,6 +28,15 @@ abstract final class V3Type {
         letterSpacing: -0.1,
       );
 
+  /// Long-form reading text (story sentences). Same family as the rest of
+  /// the app, one step lighter than [strong]; never a different font.
+  static TextStyle reading(double size, {Color? color}) =>
+      DesignTokens.body(size, weight: FontWeight.w500).copyWith(
+        color: color ?? DesignTokens.ink,
+        height: 1.42,
+        letterSpacing: -0.2,
+      );
+
   static TextStyle strong([double size = 16, Color? color]) =>
       DesignTokens.body(
         size,

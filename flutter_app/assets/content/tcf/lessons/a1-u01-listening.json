@@ -1,0 +1,86 @@
+{
+  "id": "a1-u01-listening",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Listening practice",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Bonjour, je m'appelle Karim. Je suis marocain. J'habite à Montréal.",
+      "question": "Where does Karim live?",
+      "options": [
+        "Rabat",
+        "Montréal",
+        "Ottawa",
+        "Paris"
+      ],
+      "answer": 1,
+      "explain": "J'habite à Montréal."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Vous parlez français, madame ? — Oui, un peu. Je parle anglais et espagnol.",
+      "question": "Which languages does the woman speak?",
+      "options": [
+        "French and English",
+        "English and Spanish",
+        "Only Spanish",
+        "Arabic and French"
+      ],
+      "answer": 1,
+      "explain": "Anglais et espagnol; français un peu."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Salut ! Moi, c'est Priya. Je suis indienne. Je parle hindi et anglais.",
+      "question": "What is Priya's nationality?",
+      "options": [
+        "Chinese",
+        "Indian",
+        "Filipino",
+        "Haitian"
+      ],
+      "answer": 1,
+      "explain": "Indienne is the feminine of indien."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Votre nom, s'il vous plaît ? — Gagnon. G-A-G-N-O-N. — Merci, monsieur.",
+      "question": "What is the man's last name?",
+      "options": [
+        "Gagnon",
+        "Gannon",
+        "Gaignon",
+        "Gagnan"
+      ],
+      "answer": 0,
+      "explain": "G-A-G-N-O-N."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Allô ? Bonsoir, c'est Marc. Vous êtes madame Diallo ?",
+      "question": "What time of day is it?",
+      "options": [
+        "Morning",
+        "Evening",
+        "Noon",
+        "Midnight"
+      ],
+      "answer": 1,
+      "explain": "Bonsoir is the evening greeting."
+    }
+  ]
+}

@@ -1,0 +1,366 @@
+{
+  "id": "s0-02",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "The alphabet and spelling your name",
+  "subtitle": "Stage 0, lesson 2",
+  "minutes": 12,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "The alphabet and spelling your name",
+      "body": "In Canada people ask you to spell your name all the time: on the phone with Service Canada, at a clinic, with a landlord, on a form. The French alphabet has the same 26 letters. Only the names of the letters are different. Learn them first, because everything else (names, emails, postal codes) uses them."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "The 26 letters",
+      "headers": [
+        "Letter",
+        "Say it",
+        "Letter",
+        "Say it",
+        "Letter",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "A",
+          "ah",
+          "J",
+          "zhee",
+          "S",
+          "ess"
+        ],
+        [
+          "B",
+          "bay",
+          "K",
+          "kah",
+          "T",
+          "tay"
+        ],
+        [
+          "C",
+          "say",
+          "L",
+          "ell",
+          "U",
+          "ü"
+        ],
+        [
+          "D",
+          "day",
+          "M",
+          "emm",
+          "V",
+          "vay"
+        ],
+        [
+          "E",
+          "uh",
+          "N",
+          "enn",
+          "W",
+          "doo-bluh-VAY"
+        ],
+        [
+          "F",
+          "eff",
+          "O",
+          "oh",
+          "X",
+          "eeks"
+        ],
+        [
+          "G",
+          "zhay",
+          "P",
+          "pay",
+          "Y",
+          "ee-GREK"
+        ],
+        [
+          "H",
+          "ahsh",
+          "Q",
+          "kü",
+          "Z",
+          "zed"
+        ],
+        [
+          "I",
+          "ee",
+          "R",
+          "ehR",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "The alphabet and spelling your name",
+      "body": "Tip for the hard ones. G is zhay (not “gee”). J is zhee (not “jay”). E is uh, I is ee. W is “double V” in French. Y is “i grec” (Greek i)."
+    },
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "Comment ça s'écrit ?",
+      "en": "How do you spell that?",
+      "sound": "koh-mah(n) sah say-KREE"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "Ça s'écrit...",
+      "en": "It is spelled...",
+      "say": "Ça s'écrit",
+      "sound": "sah say-KREE",
+      "exampleFr": "Ça s'écrit T-R-E-M-B-L-A-Y.",
+      "exampleEn": "It is spelled T-R-E-M-B-L-A-Y."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "Pouvez-vous répéter ?",
+      "en": "Can you repeat?",
+      "sound": "poo-vay-VOO ray-pay-TAY"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "deux L",
+      "en": "double L (two Ls)",
+      "sound": "duh ell",
+      "exampleFr": "Mallette : M-A-deux L-E-deux T-E.",
+      "exampleEn": "Mallette (a name): M-A-two L-E-two T-E."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un accent aigu",
+      "en": "an acute accent (é)",
+      "sound": "uh(n)n ahk-SAH(N) ay-GÜ"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un trait d'union",
+      "en": "a hyphen (-)",
+      "sound": "uh(n) tray dü-nee-OH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "arobase",
+      "en": "the @ sign",
+      "sound": "ah-roh-BAHZ"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "point",
+      "en": "dot (.)",
+      "sound": "pwa(n)"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "courriel",
+      "en": "email (Canada)",
+      "sound": "koo-ree-EL",
+      "exampleFr": "Mon courriel est sam@exemple.ca.",
+      "exampleEn": "My email is sam@example.ca."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Comment ça s'écrit ?",
+      "options": [
+        "an acute accent (é)",
+        "How do you spell that?",
+        "dot (.)",
+        "Can you repeat?"
+      ],
+      "answer": 1,
+      "explain": "Comment ça s'écrit ? means How do you spell that?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Pouvez-vous répéter ?",
+      "options": [
+        "a hyphen (-)",
+        "email (Canada)",
+        "double L (two Ls)",
+        "Can you repeat?"
+      ],
+      "answer": 3,
+      "explain": "Pouvez-vous répéter ? means Can you repeat?."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "deux L",
+      "options": [
+        "the @ sign",
+        "double L (two Ls)",
+        "How do you spell that?",
+        "an acute accent (é)"
+      ],
+      "answer": 1,
+      "explain": "deux L means double L (two Ls)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un accent aigu",
+      "options": [
+        "dot (.)",
+        "Can you repeat?",
+        "a hyphen (-)",
+        "an acute accent (é)"
+      ],
+      "answer": 3,
+      "explain": "un accent aigu means an acute accent (é)."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un trait d'union",
+      "options": [
+        "email (Canada)",
+        "a hyphen (-)",
+        "double L (two Ls)",
+        "the @ sign"
+      ],
+      "answer": 1,
+      "explain": "un trait d'union means a hyphen (-)."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "arobase",
+      "options": [
+        "How do you spell that?",
+        "an acute accent (é)",
+        "dot (.)",
+        "the @ sign"
+      ],
+      "answer": 3,
+      "explain": "arobase means the @ sign."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "In Canada the word for email is courriel. In France you hear mail or e-mail. For .ca say “point c-a” (point say-ah). Hyphens and dots are normal in names and addresses: say trait d'union and point."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "On the phone",
+      "body": "Samira calls a clinic to make an appointment.",
+      "examples": [
+        {
+          "fr": "Bonjour, clinique Sainte-Anne.",
+          "en": "Clinique: Hello, Sainte-Anne clinic."
+        },
+        {
+          "fr": "Bonjour. Je m'appelle Samira Haddad.",
+          "en": "Samira: Hello. My name is Samira Haddad."
+        },
+        {
+          "fr": "Comment ça s'écrit, Haddad ?",
+          "en": "Clinique: How is Haddad spelled?"
+        },
+        {
+          "fr": "Ça s'écrit H-A-D-D-A-D. Deux D.",
+          "en": "Samira: It is spelled H-A-D-D-A-D. Two Ds."
+        },
+        {
+          "fr": "Merci, madame.",
+          "en": "Clinique: Thank you, madam."
+        }
+      ]
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Mon nom, c'est Diallo. D-I-A-deux L-O.",
+      "question": "What is the name?",
+      "options": [
+        "Diallo",
+        "Dialo",
+        "Dilao",
+        "Diello"
+      ],
+      "answer": 0,
+      "explain": "D-I-A-L-L-O: two Ls, so Diallo."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Prénom : Awa. A-W-A.",
+      "question": "What is the first name?",
+      "options": [
+        "Ava",
+        "Awa",
+        "Aya",
+        "Ana"
+      ],
+      "answer": 1,
+      "explain": "A-W-A: the W is doo-bluh-vay."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Nom : Gagnon. G-A-G-N-O-N.",
+      "question": "What is the last name?",
+      "options": [
+        "Gagnon",
+        "Gannon",
+        "Gaignon",
+        "Gagnan"
+      ],
+      "answer": 0,
+      "explain": "G-A-G-N-O-N is Gagnon, a very common Québec surname."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Mon courriel : sam, arobase, exemple, point c-a.",
+      "question": "What is the end of the email?",
+      "options": [
+        ".com",
+        ".ca",
+        ".fr",
+        ".org"
+      ],
+      "answer": 1,
+      "explain": "Point c-a is .ca, the Canadian ending."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Speaking: Say your own name",
+      "body": "Say: Je m'appelle ... Then spell your family name in French, letter by letter. Say your email using arobase and point. Record yourself and listen.\n\n• Say each letter clearly with a very small pause.\n• Practise your own name until you can say it without thinking."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je m'appelle Sam Tremblay. Ça s'écrit T-R-E-M-B-L-A-Y. Mon courriel est sam, arobase, exemple, point c-a.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

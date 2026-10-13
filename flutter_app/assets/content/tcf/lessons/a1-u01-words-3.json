@@ -1,0 +1,210 @@
+{
+  "id": "a1-u01-words-3",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Words: names and people",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le nom",
+      "en": "last name, name",
+      "sound": "luh noh(n)",
+      "exampleFr": "Nom : Tremblay.",
+      "exampleEn": "Last name: Tremblay."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le prénom",
+      "en": "first name",
+      "sound": "luh pray-NOH(N)",
+      "exampleFr": "Prénom : Sam.",
+      "exampleEn": "First name: Sam."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le nom de famille",
+      "en": "family name",
+      "sound": "luh noh(n) duh fah-MEEY"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "l'homme (m.)",
+      "en": "man",
+      "say": "l'homme",
+      "sound": "lohm",
+      "exampleFr": "Un homme parle.",
+      "exampleEn": "A man is speaking."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la femme",
+      "en": "woman, wife",
+      "sound": "lah fahm",
+      "exampleFr": "Une femme arrive.",
+      "exampleEn": "A woman arrives."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le garçon",
+      "en": "boy",
+      "sound": "luh gahR-SOH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "la fille",
+      "en": "girl, daughter",
+      "sound": "lah feey"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "l'ami / l'amie",
+      "en": "friend (m. / f.)",
+      "say": "l'ami, l'amie",
+      "sound": "lah-MEE",
+      "exampleFr": "Marc est un ami.",
+      "exampleEn": "Marc is a friend."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la personne",
+      "en": "person",
+      "sound": "lah pehR-SUN"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "l'enfant",
+      "en": "child",
+      "sound": "lah(n)-FAH(N)"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le nom",
+      "options": [
+        "man",
+        "last name, name",
+        "girl, daughter",
+        "child"
+      ],
+      "answer": 1,
+      "explain": "le nom means last name, name."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le prénom",
+      "options": [
+        "woman, wife",
+        "friend (m. / f.)",
+        "man",
+        "first name"
+      ],
+      "answer": 3,
+      "explain": "le prénom means first name."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le nom de famille",
+      "options": [
+        "boy",
+        "family name",
+        "person",
+        "woman, wife"
+      ],
+      "answer": 1,
+      "explain": "le nom de famille means family name."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "l'homme (m.)",
+      "options": [
+        "girl, daughter",
+        "child",
+        "family name",
+        "man"
+      ],
+      "answer": 3,
+      "explain": "l'homme (m.) means man."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la femme",
+      "options": [
+        "friend (m. / f.)",
+        "woman, wife",
+        "last name, name",
+        "man"
+      ],
+      "answer": 1,
+      "explain": "la femme means woman, wife."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le garçon",
+      "options": [
+        "person",
+        "first name",
+        "woman, wife",
+        "boy"
+      ],
+      "answer": 3,
+      "explain": "le garçon means boy."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le prénom",
+      "question": "Which word did you hear?",
+      "options": [
+        "la femme",
+        "le prénom",
+        "la fille",
+        "l'enfant"
+      ],
+      "answer": 1,
+      "explain": "You heard le prénom: first name."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "la femme",
+      "question": "Which word did you hear?",
+      "options": [
+        "la femme",
+        "la fille",
+        "l'enfant",
+        "le prénom"
+      ],
+      "answer": 0,
+      "explain": "You heard la femme: woman, wife."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Watch out",
+      "body": "nom means both name and last name. On a form in Canada you will see Nom (last name) and Prénom (first name). Do not mix them up."
+    }
+  ]
+}

@@ -26,7 +26,10 @@ void main() {
     });
 
     test('omits Tamil', () {
-      expect(isFrenchEnglishTranscript('எனக்கு பிரெஞ்சு கற்க வேண்டும்'), isFalse);
+      expect(
+        isFrenchEnglishTranscript('எனக்கு பிரெஞ்சு கற்க வேண்டும்'),
+        isFalse,
+      );
     });
 
     test('omits Hindi', () {

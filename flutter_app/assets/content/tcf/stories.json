@@ -1,9 +1,10 @@
 {
-  "version": 1,
+  "version": 2,
   "stories": [
     "a1-nouvelle-voisine.json",
-    "a1-au-depanneur.json",
-    "a1-premier-jour.json",
-    "a1-rendez-vous-clinique.json"
+    "a1-bibliotheque.json",
+    "a1-formulaire.json",
+    "a1-famille-karim.json",
+    "a1-combien.json"
   ]
 }

@@ -1,0 +1,315 @@
+{
+  "id": "s0-11",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Numbers 20 to 1000 and beyond",
+  "subtitle": "Stage 0, lesson 11",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Numbers 20 to 1000 and beyond",
+      "body": "After 20 the system is regular up to 69. Then it changes: French counts 70 as sixty-ten, 80 as four-twenties, and 90 as four-twenties-ten. This is true in both France and Québec. (Belgium and Switzerland use septante and nonante, so you may hear these from time to time, but you do not need to say them.)"
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Counting up",
+      "headers": [
+        "#",
+        "French",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "20",
+          "vingt",
+          "va(n)"
+        ],
+        [
+          "21",
+          "vingt et un",
+          "va(n)-tay-UH(N)"
+        ],
+        [
+          "22",
+          "vingt-deux",
+          "va(n)-DUH"
+        ],
+        [
+          "30",
+          "trente",
+          "trah(n)t"
+        ],
+        [
+          "31",
+          "trente et un",
+          "trah(n)-tay-UH(N)"
+        ],
+        [
+          "40",
+          "quarante",
+          "kah-RAH(N)T"
+        ],
+        [
+          "50",
+          "cinquante",
+          "sa(n)-KAH(N)T"
+        ],
+        [
+          "60",
+          "soixante",
+          "swah-SAH(N)T"
+        ],
+        [
+          "70",
+          "soixante-dix",
+          "swah-sah(n)t-DEES"
+        ],
+        [
+          "71",
+          "soixante et onze",
+          "swah-sah(n)-tay-OH(N)Z"
+        ],
+        [
+          "72",
+          "soixante-douze",
+          "swah-sah(n)t-DOOZ"
+        ],
+        [
+          "79",
+          "soixante-dix-neuf",
+          "swah-sah(n)t-deez-NUHF"
+        ],
+        [
+          "80",
+          "quatre-vingts",
+          "kah-truh-VA(N)"
+        ],
+        [
+          "81",
+          "quatre-vingt-un",
+          "kah-truh-va(n)-TUH(N)"
+        ],
+        [
+          "90",
+          "quatre-vingt-dix",
+          "kah-truh-va(n)-DEES"
+        ],
+        [
+          "91",
+          "quatre-vingt-onze",
+          "kah-truh-va(n)-TOH(N)Z"
+        ],
+        [
+          "99",
+          "quatre-vingt-dix-neuf",
+          "kah-truh-va(n)-deez-NUHF"
+        ],
+        [
+          "100",
+          "cent",
+          "sah(n)"
+        ],
+        [
+          "200",
+          "deux cents",
+          "duh sah(n)"
+        ],
+        [
+          "201",
+          "deux cent un",
+          "duh sah(n)-TUH(N)"
+        ],
+        [
+          "1000",
+          "mille",
+          "meel"
+        ],
+        [
+          "2026",
+          "deux mille vingt-six",
+          "duh meel va(n)-SEES"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Numbers 20 to 1000 and beyond",
+      "body": "• et un is used for 21, 31, 41, 51, 61 and 71 (vingt et un, soixante et onze), but not for 81 and 91 (quatre-vingt-un, quatre-vingt-onze).\n• quatre-vingts takes an s only when nothing follows (80). With another number, no s: quatre-vingt-deux. The same for cent: deux cents, but deux cent trois.\n• mille never takes an s. Trois mille (3000)."
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Prices, rent, years",
+      "headers": [
+        "Written",
+        "You say"
+      ],
+      "rows": [
+        [
+          "12,50 $",
+          "douze dollars cinquante (or just: douze cinquante)"
+        ],
+        [
+          "1 200 $ (rent)",
+          "mille deux cents dollars"
+        ],
+        [
+          "1990",
+          "mille neuf cent quatre-vingt-dix"
+        ],
+        [
+          "2026",
+          "deux mille vingt-six"
+        ],
+        [
+          "15 %",
+          "quinze pour cent"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "In Canada the dollar sign comes after the number: 12,50 $, with a comma for the decimals and a space for thousands: 1 200 $. Taxes are shown as TPS (GST) and TVQ (QST, in Québec), so you will often hear plus taxes."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write each number in French words.  21",
+      "options": [
+        "quarante-cinq",
+        "vingt et un",
+        "soixante-douze",
+        "quatre-vingts"
+      ],
+      "answer": 1,
+      "explain": "The answer is vingt et un."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write each number in French words.  45",
+      "options": [
+        "vingt et un",
+        "soixante-douze",
+        "quatre-vingts",
+        "quarante-cinq"
+      ],
+      "answer": 3,
+      "explain": "The answer is quarante-cinq."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write each number in French words.  72",
+      "options": [
+        "soixante-douze",
+        "vingt et un",
+        "quarante-cinq",
+        "quatre-vingts"
+      ],
+      "answer": 0,
+      "explain": "The answer is soixante-douze."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write each number in French words.  80",
+      "options": [
+        "vingt et un",
+        "quarante-cinq",
+        "soixante-douze",
+        "quatre-vingts"
+      ],
+      "answer": 3,
+      "explain": "The answer is quatre-vingts."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write each number in French words.  95",
+      "options": [
+        "vingt et un",
+        "quatre-vingt-quinze",
+        "quarante-cinq",
+        "soixante-douze"
+      ],
+      "answer": 1,
+      "explain": "The answer is quatre-vingt-quinze."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write each number in French words.  1 200 $ (dollars)",
+      "options": [
+        "vingt et un",
+        "mille deux cents dollars",
+        "quarante-cinq",
+        "soixante-douze"
+      ],
+      "answer": 1,
+      "explain": "The answer is mille deux cents dollars."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le loyer est de mille deux cents dollars par mois.",
+      "question": "How much is the rent?",
+      "options": [
+        "$120",
+        "$1 200",
+        "$1 020",
+        "$12 000"
+      ],
+      "answer": 1,
+      "explain": "Mille deux cents is 1 200."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Ça fait soixante-douze dollars.",
+      "question": "How much?",
+      "options": [
+        "$62",
+        "$72",
+        "$82",
+        "$92"
+      ],
+      "answer": 1,
+      "explain": "Soixante-douze is 72 (60 + 12)."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le numéro est le quatre-vingt-quinze.",
+      "question": "Which number?",
+      "options": [
+        "85",
+        "95",
+        "75",
+        "90"
+      ],
+      "answer": 1,
+      "explain": "Quatre-vingt-quinze is 4 x 20 + 15 = 95."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Nous sommes en deux mille vingt-six.",
+      "question": "Which year?",
+      "options": [
+        "2016",
+        "2020",
+        "2026",
+        "2062"
+      ],
+      "answer": 2,
+      "explain": "Deux mille vingt-six is 2026."
+    }
+  ]
+}

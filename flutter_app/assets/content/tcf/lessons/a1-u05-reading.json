@@ -1,0 +1,80 @@
+{
+  "id": "a1-u05-reading",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Reading practice",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the subtotal?",
+      "options": [
+        "$3.50",
+        "$6.25",
+        "$7.18",
+        "$0.93"
+      ],
+      "answer": 1,
+      "explain": "Sous-total.",
+      "promptFr": "Lait ........ 3,50 $ · Pain ........ 2,75 $ · Sous-total ........ 6,25 $ · TPS ........ 0,31 $ · TVQ ........ 0,62 $ · Total ........ 7,18 $ · Paiement : carte de débit"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the total?",
+      "options": [
+        "$6.25",
+        "$7.18",
+        "$7.81",
+        "$8.18"
+      ],
+      "answer": 1,
+      "explain": "Total.",
+      "promptFr": "Lait ........ 3,50 $ · Pain ........ 2,75 $ · Sous-total ........ 6,25 $ · TPS ........ 0,31 $ · TVQ ........ 0,62 $ · Total ........ 7,18 $ · Paiement : carte de débit"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How did the customer pay?",
+      "options": [
+        "Cash",
+        "Debit card",
+        "Credit card",
+        "Transfer"
+      ],
+      "answer": 1,
+      "explain": "Carte de débit.",
+      "promptFr": "Lait ........ 3,50 $ · Pain ........ 2,75 $ · Sous-total ........ 6,25 $ · TPS ........ 0,31 $ · TVQ ........ 0,62 $ · Total ........ 7,18 $ · Paiement : carte de débit"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "How much is the electricity per month?",
+      "options": [
+        "$8",
+        "$80",
+        "$800",
+        "$1 200"
+      ],
+      "answer": 1,
+      "explain": "80 $ par mois.",
+      "promptFr": "Loyer : 1 200 $ par mois · Électricité : 80 $ par mois · Paiement le premier du mois, par virement."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "When is the payment?",
+      "options": [
+        "The 1st of the month",
+        "The 15th",
+        "The last day",
+        "Every week"
+      ],
+      "answer": 0,
+      "explain": "Le premier du mois.",
+      "promptFr": "Loyer : 1 200 $ par mois · Électricité : 80 $ par mois · Paiement le premier du mois, par virement."
+    }
+  ]
+}

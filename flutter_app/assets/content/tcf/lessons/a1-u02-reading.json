@@ -1,0 +1,80 @@
+{
+  "id": "a1-u02-reading",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Reading practice",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How old is Sam?",
+      "options": [
+        "23",
+        "32",
+        "42",
+        "52"
+      ],
+      "answer": 1,
+      "explain": "Âge : 32 ans.",
+      "promptFr": "Nom : Tremblay · Prénom : Sam · Âge : 32 ans · Courriel : sam@exemple.ca · Téléphone : 613 555 0142"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the area code?",
+      "options": [
+        "514",
+        "416",
+        "613",
+        "911"
+      ],
+      "answer": 2,
+      "explain": "613 is the Ottawa area code.",
+      "promptFr": "Nom : Tremblay · Prénom : Sam · Âge : 32 ans · Courriel : sam@exemple.ca · Téléphone : 613 555 0142"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which one is the email?",
+      "options": [
+        "613 555 0142",
+        "sam@exemple.ca",
+        "Tremblay",
+        "32 ans"
+      ],
+      "answer": 1,
+      "explain": "Courriel : sam@exemple.ca.",
+      "promptFr": "Nom : Tremblay · Prénom : Sam · Âge : 32 ans · Courriel : sam@exemple.ca · Téléphone : 613 555 0142"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does the writer say?",
+      "options": [
+        "He understands everything",
+        "He does not understand",
+        "He is angry",
+        "He is leaving"
+      ],
+      "answer": 1,
+      "explain": "Je ne comprends pas.",
+      "promptFr": "Pardon, Marc. Je ne comprends pas. Pouvez-vous répéter, s'il vous plaît ? Merci !"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does he ask Marc to do?",
+      "options": [
+        "Call him",
+        "Repeat",
+        "Come here",
+        "Write an email"
+      ],
+      "answer": 1,
+      "explain": "Pouvez-vous répéter ?",
+      "promptFr": "Pardon, Marc. Je ne comprends pas. Pouvez-vous répéter, s'il vous plaît ? Merci !"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "id": "a1-u04-write-speak",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Write and speak",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Describe your family",
+      "body": "Write 5 sentences about your family: who they are, their age and one thing about each (a job, hair, a colour). Use mon, ma, mes.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "J'ai une petite famille. Mon père s'appelle Ali. Il a soixante ans et il travaille à l'hôpital. Ma mère s'appelle Nadia. Elle est gentille et elle a les yeux verts. J'ai une sœur : elle a vingt ans et elle étudie.\n\nCheck:\n• mon / ma / mes match the noun.\n• Adjectives agree: elle est grande.\n• Elle a vingt ans (avoir, not être)."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Writing: Fill 'situation familiale'",
+      "body": "Write one line that gives your marital status and, if you have them, the name of your spouse and your children.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Model answer",
+      "body": "Situation familiale : marié(e). Nom du conjoint : Haddad Samira. Enfants : Omar (8 ans), Yasmine (5 ans).\n\nCheck:\n• Choose the form for your gender: marié or mariée."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Speaking: Show a photo",
+      "body": "Show a family photo (or imagine one). Say who is who, how old they are, and what they look like. Use Voici..., Il / Elle est..., Il / Elle a... ans. Record yourself.\n\n• Keep the sentences short and say each one cleanly.\n• Use et to join: Il est grand et blond."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Voici ma famille. Voici mon père : il a soixante ans, il est grand. Voici ma mère : elle est petite, elle a les cheveux bruns. Voici ma sœur Léa : elle est étudiante, elle a vingt ans.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

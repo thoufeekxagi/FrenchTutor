@@ -1,0 +1,199 @@
+{
+  "id": "a1-u02-phrases",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Phrases",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 10,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Pardon ?",
+      "en": "Sorry? (I did not hear)",
+      "tip": "Say it: pahR-DOH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Pouvez-vous répéter, s'il vous plaît ?",
+      "en": "Can you repeat, please?",
+      "tip": "Say it: poo-vay-voo ray-pay-TAY seel voo PLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Plus lentement, s'il vous plaît.",
+      "en": "More slowly, please.",
+      "tip": "Say it: plü lah(n)t-MAH(N) seel voo PLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je ne comprends pas.",
+      "en": "I do not understand.",
+      "tip": "Say it: zhuh nuh koh(n)-PRAH(N) pah"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je comprends un peu.",
+      "en": "I understand a little.",
+      "tip": "Say it: zhuh koh(n)-PRAH(N) uh(n) puh"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Comment ça s'écrit ?",
+      "en": "How is it spelled?",
+      "tip": "Say it: koh-mah(n) sah say-KREE"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Comment dit-on « email » en français ?",
+      "en": "How do you say “email” in French?",
+      "tip": "Say it: koh-mah(n) dee-TOH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Quel âge avez-vous ?",
+      "en": "How old are you? (formal)",
+      "tip": "Say it: kel ahzh ah-vay-VOO"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "J'ai trente ans.",
+      "en": "I am thirty.",
+      "tip": "Say it: zhay trah(n)-TAH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Quel est votre numéro de téléphone ?",
+      "en": "What is your phone number?",
+      "tip": "Say it: kel eh vohtr nü-may-ROH duh tay-lay-FOHN"
+    },
+    {
+      "type": "phrase",
+      "id": "p11",
+      "fr": "Mon courriel est...",
+      "en": "My email is...",
+      "say": "Mon courriel est",
+      "tip": "Say it: moh(n) koo-RYEL eh"
+    },
+    {
+      "type": "phrase",
+      "id": "p12",
+      "fr": "Pas de problème.",
+      "en": "No problem.",
+      "tip": "Say it: pah duh proh-BLEM"
+    },
+    {
+      "type": "phrase",
+      "id": "p13",
+      "fr": "Ça va ?",
+      "en": "How are you? (informal)",
+      "tip": "Say it: sah VAH"
+    },
+    {
+      "type": "phrase",
+      "id": "p14",
+      "fr": "Comment allez-vous ?",
+      "en": "How are you? (formal)",
+      "tip": "Say it: koh-mah(n) tah-lay-VOO"
+    },
+    {
+      "type": "phrase",
+      "id": "p15",
+      "fr": "Ça va bien, merci.",
+      "en": "I am fine, thank you.",
+      "tip": "Say it: sah vah BYA(N) mehr-SEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p16",
+      "fr": "Très bien. / Pas mal.",
+      "en": "Very well. / Not bad.",
+      "say": "Très bien., Pas mal.",
+      "tip": "Say it: treh BYA(N) / pah MAHL"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Pardon ?",
+      "options": [
+        "I do not understand.",
+        "Sorry? (I did not hear)",
+        "How do you say “email” in French?",
+        "What is your phone number?"
+      ],
+      "answer": 1,
+      "explain": "Pardon ? means Sorry? (I did not hear)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je ne comprends pas.",
+      "options": [
+        "How do you say “email” in French?",
+        "What is your phone number?",
+        "How are you? (formal)",
+        "I do not understand."
+      ],
+      "answer": 3,
+      "explain": "Je ne comprends pas. means I do not understand.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Comment dit-on « email » en français ?",
+      "options": [
+        "What is your phone number?",
+        "How do you say “email” in French?",
+        "Sorry? (I did not hear)",
+        "I do not understand."
+      ],
+      "answer": 1,
+      "explain": "Comment dit-on « email » en français ? means How do you say “email” in French?."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Quel est votre numéro de téléphone ?",
+      "options": [
+        "How are you? (formal)",
+        "Sorry? (I did not hear)",
+        "I do not understand.",
+        "What is your phone number?"
+      ],
+      "answer": 3,
+      "explain": "Quel est votre numéro de téléphone ? means What is your phone number?."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Speaking: Rescue phrases",
+      "body": "Say these three out loud until they are automatic: Pardon ? · Pouvez-vous répéter, s'il vous plaît ? · Plus lentement, s'il vous plaît. Then say them with a calm, friendly voice, as if you were at a counter.\n\n• Politeness is not weakness: examiners and clerks respond well to a calm s'il vous plaît."
+    },
+    {
+      "type": "phrase",
+      "id": "p17",
+      "fr": "Pardon ? Pouvez-vous répéter, s'il vous plaît ? Plus lentement, s'il vous plaît. Merci beaucoup.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

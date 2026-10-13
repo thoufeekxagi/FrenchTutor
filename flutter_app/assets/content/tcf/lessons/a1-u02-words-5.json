@@ -1,0 +1,215 @@
+{
+  "id": "a1-u02-words-5",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Words: email, phone, library",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le courriel",
+      "en": "email (Canada)",
+      "sound": "koo-RYEL",
+      "exampleFr": "Votre courriel, s'il vous plaît ?",
+      "exampleEn": "Your email, please?"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'arobase (f.)",
+      "en": "the @ sign",
+      "say": "l'arobase",
+      "sound": "lah-roh-BAHZ"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le point",
+      "en": "dot, full stop",
+      "sound": "luh pwa(n)"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le numéro",
+      "en": "number",
+      "sound": "luh nü-may-ROH"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le téléphone",
+      "en": "telephone",
+      "sound": "luh tay-lay-FOHN"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le cellulaire",
+      "en": "cell phone (Canada)",
+      "sound": "luh sel-ü-LEHR",
+      "exampleFr": "Mon numéro de cellulaire.",
+      "exampleEn": "My cell number."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le message",
+      "en": "message",
+      "sound": "luh meh-SAHZH"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la boîte vocale",
+      "en": "voicemail",
+      "sound": "lah bwaht voh-KAHL"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "appeler",
+      "en": "to call",
+      "sound": "ah-puh-LAY"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "écrire",
+      "en": "to write",
+      "sound": "ay-KREER",
+      "exampleFr": "Ça s'écrit D-I-A-L-L-O.",
+      "exampleEn": "It is spelled D-I-A-L-L-O."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "la bibliothèque",
+      "en": "library",
+      "sound": "lah bee-blee-oh-TEK",
+      "exampleFr": "Sam est à la bibliothèque.",
+      "exampleEn": "Sam is at the library."
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "la carte",
+      "en": "card",
+      "sound": "lah kahrt"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le courriel",
+      "options": [
+        "number",
+        "email (Canada)",
+        "message",
+        "to write"
+      ],
+      "answer": 1,
+      "explain": "le courriel means email (Canada)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le point",
+      "options": [
+        "cell phone (Canada)",
+        "dot, full stop",
+        "to call",
+        "card"
+      ],
+      "answer": 1,
+      "explain": "le point means dot, full stop."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le téléphone",
+      "options": [
+        "voicemail",
+        "telephone",
+        "library",
+        "the @ sign"
+      ],
+      "answer": 1,
+      "explain": "le téléphone means telephone."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le message",
+      "options": [
+        "to write",
+        "message",
+        "email (Canada)",
+        "number"
+      ],
+      "answer": 1,
+      "explain": "le message means message."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "appeler",
+      "options": [
+        "card",
+        "to call",
+        "dot, full stop",
+        "cell phone (Canada)"
+      ],
+      "answer": 1,
+      "explain": "appeler means to call."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la bibliothèque",
+      "options": [
+        "the @ sign",
+        "library",
+        "telephone",
+        "voicemail"
+      ],
+      "answer": 1,
+      "explain": "la bibliothèque means library."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "l'arobase",
+      "question": "Which word did you hear?",
+      "options": [
+        "le numéro",
+        "l'arobase",
+        "le cellulaire",
+        "appeler"
+      ],
+      "answer": 1,
+      "explain": "You heard l'arobase: the @ sign."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le téléphone",
+      "question": "Which word did you hear?",
+      "options": [
+        "le message",
+        "le téléphone",
+        "écrire",
+        "la carte"
+      ],
+      "answer": 1,
+      "explain": "You heard le téléphone: telephone."
+    }
+  ]
+}

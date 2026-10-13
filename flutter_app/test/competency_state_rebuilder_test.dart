@@ -86,26 +86,38 @@ List<EvidenceEvent> _evidence() {
 void main() {
   const rebuilder = CompetencyStateRebuilder();
 
-  test('rebuilds one state per competency/modality with real evidence counts', () {
-    final states = rebuilder.rebuild(framework: _framework, evidence: _evidence());
+  test(
+    'rebuilds one state per competency/modality with real evidence counts',
+    () {
+      final states = rebuilder.rebuild(
+        framework: _framework,
+        evidence: _evidence(),
+      );
 
-    expect(states, hasLength(2));
-    final reading = states.firstWhere(
-      (s) => s.modality == PerformanceModality.readingRecognition,
-    );
-    final speaking = states.firstWhere(
-      (s) => s.modality == PerformanceModality.controlledSpeaking,
-    );
-    expect(reading.evidenceCount, 2);
-    expect(speaking.evidenceCount, 1);
-    expect(reading.masteryEstimate, inInclusiveRange(0, 1));
-    expect(reading.confidence, inInclusiveRange(0, 1));
-    expect(reading.lastSuccessAt, isNotNull);
-  });
+      expect(states, hasLength(2));
+      final reading = states.firstWhere(
+        (s) => s.modality == PerformanceModality.readingRecognition,
+      );
+      final speaking = states.firstWhere(
+        (s) => s.modality == PerformanceModality.controlledSpeaking,
+      );
+      expect(reading.evidenceCount, 2);
+      expect(speaking.evidenceCount, 1);
+      expect(reading.masteryEstimate, inInclusiveRange(0, 1));
+      expect(reading.confidence, inInclusiveRange(0, 1));
+      expect(reading.lastSuccessAt, isNotNull);
+    },
+  );
 
   test('same ordered evidence always rebuilds to the same posterior', () {
-    final first = rebuilder.rebuild(framework: _framework, evidence: _evidence());
-    final second = rebuilder.rebuild(framework: _framework, evidence: _evidence());
+    final first = rebuilder.rebuild(
+      framework: _framework,
+      evidence: _evidence(),
+    );
+    final second = rebuilder.rebuild(
+      framework: _framework,
+      evidence: _evidence(),
+    );
 
     for (var i = 0; i < first.length; i++) {
       expect(second[i].masteryEstimate, first[i].masteryEstimate);
@@ -116,7 +128,10 @@ void main() {
   });
 
   test('detects cross-modal productive transfer across the two modalities', () {
-    final states = rebuilder.rebuild(framework: _framework, evidence: _evidence());
+    final states = rebuilder.rebuild(
+      framework: _framework,
+      evidence: _evidence(),
+    );
     for (final state in states) {
       expect(state.transferStatus, TransferStatus.crossModalProductive);
     }

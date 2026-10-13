@@ -1,0 +1,215 @@
+{
+  "id": "a1-u05-words-1",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Words: money words",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "l'argent (m.)",
+      "en": "money",
+      "say": "l'argent",
+      "sound": "lahR-ZHAH(N)",
+      "exampleFr": "Je n'ai pas d'argent.",
+      "exampleEn": "I have no money."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le dollar",
+      "en": "dollar",
+      "sound": "luh doh-LAHR",
+      "exampleFr": "Ça coûte cinq dollars.",
+      "exampleEn": "It costs five dollars."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le cent",
+      "en": "cent (Québec: la cenne, informal)",
+      "sound": "luh sah(n)t",
+      "exampleFr": "Dix cents.",
+      "exampleEn": "Ten cents."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le prix",
+      "en": "price",
+      "sound": "luh pree",
+      "exampleFr": "Quel est le prix ?",
+      "exampleEn": "What is the price?"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "coûter",
+      "en": "to cost",
+      "sound": "koo-TAY",
+      "exampleFr": "Combien ça coûte ?",
+      "exampleEn": "How much does it cost?"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "cher / chère",
+      "en": "expensive",
+      "say": "cher, chère",
+      "sound": "shehr",
+      "exampleFr": "C'est cher.",
+      "exampleEn": "It is expensive."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "bon marché",
+      "en": "cheap, inexpensive",
+      "sound": "boh(n) mahr-SHAY",
+      "exampleFr": "C'est bon marché.",
+      "exampleEn": "It is inexpensive."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "gratuit / gratuite",
+      "en": "free (no cost)",
+      "say": "gratuit, gratuite",
+      "sound": "grah-TWEE / grah-TWEET",
+      "exampleFr": "L'entrée est gratuite.",
+      "exampleEn": "Entry is free."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "payer",
+      "en": "to pay",
+      "sound": "peh-YAY",
+      "exampleFr": "Je paie avec ma carte.",
+      "exampleEn": "I pay with my card."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "acheter",
+      "en": "to buy",
+      "sound": "ahsh-TAY",
+      "exampleFr": "J'achète du pain.",
+      "exampleEn": "I am buying bread."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "l'argent (m.)",
+      "options": [
+        "price",
+        "money",
+        "cheap, inexpensive",
+        "to buy"
+      ],
+      "answer": 1,
+      "explain": "l'argent (m.) means money."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le dollar",
+      "options": [
+        "to cost",
+        "free (no cost)",
+        "money",
+        "dollar"
+      ],
+      "answer": 3,
+      "explain": "le dollar means dollar."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le cent",
+      "options": [
+        "expensive",
+        "cent (Québec: la cenne, informal)",
+        "to pay",
+        "dollar"
+      ],
+      "answer": 1,
+      "explain": "le cent means cent (Québec: la cenne, informal)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le prix",
+      "options": [
+        "cheap, inexpensive",
+        "to buy",
+        "cent (Québec: la cenne, informal)",
+        "price"
+      ],
+      "answer": 3,
+      "explain": "le prix means price."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "coûter",
+      "options": [
+        "money",
+        "to cost",
+        "price",
+        "cheap, inexpensive"
+      ],
+      "answer": 1,
+      "explain": "coûter means to cost."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "cher / chère",
+      "options": [
+        "to pay",
+        "dollar",
+        "to cost",
+        "expensive"
+      ],
+      "answer": 3,
+      "explain": "cher / chère means expensive."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le dollar",
+      "question": "Which word did you hear?",
+      "options": [
+        "le prix",
+        "le dollar",
+        "bon marché",
+        "acheter"
+      ],
+      "answer": 1,
+      "explain": "You heard le dollar: dollar."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le prix",
+      "question": "Which word did you hear?",
+      "options": [
+        "le prix",
+        "bon marché",
+        "acheter",
+        "le dollar"
+      ],
+      "answer": 0,
+      "explain": "You heard le prix: price."
+    }
+  ]
+}

@@ -1,0 +1,348 @@
+{
+  "id": "a1-u05-dialogues",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Dialogues",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 12,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "je vous écoute",
+      "en": "I am listening (what would you like?)",
+      "sound": "zhuh voo zay-KOOT"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "regarder",
+      "en": "to look at",
+      "sound": "Ruh-gahR-DAY",
+      "exampleFr": "Elle regarde les prix.",
+      "exampleEn": "She looks at the prices."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "voilà",
+      "en": "there you are",
+      "sound": "vwah-LAH"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le café / le croissant",
+      "en": "coffee / croissant",
+      "say": "le café, le croissant",
+      "sound": "luh kah-FAY / luh krwah-SAH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le sandwich",
+      "en": "sandwich",
+      "sound": "luh sah(n)d-WEESH"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le manteau / les manteaux",
+      "en": "coat / coats",
+      "say": "le manteau, les manteaux",
+      "sound": "luh mah(n)-TOH / lay mah(n)-TOH"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le propriétaire",
+      "en": "landlord, owner",
+      "sound": "luh proh-pree-ay-TEHR"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le virement",
+      "en": "bank transfer",
+      "sound": "luh vee-ruh-MAH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le premier",
+      "en": "the first (of the month)",
+      "sound": "luh pruh-MYAY"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "l'électricité (f.)",
+      "en": "electricity",
+      "say": "l'électricité",
+      "sound": "lay-lek-tree-see-TAY"
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "bonne soirée",
+      "en": "have a good evening",
+      "sound": "bun swah-RAY"
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "à bientôt",
+      "en": "see you soon",
+      "sound": "ah byeh(n)-TOH"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "je vous écoute",
+      "options": [
+        "coffee / croissant",
+        "I am listening (what would you like?)",
+        "landlord, owner",
+        "electricity"
+      ],
+      "answer": 1,
+      "explain": "je vous écoute means I am listening (what would you like?)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "voilà",
+      "options": [
+        "coat / coats",
+        "there you are",
+        "the first (of the month)",
+        "see you soon"
+      ],
+      "answer": 1,
+      "explain": "voilà means there you are."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le sandwich",
+      "options": [
+        "bank transfer",
+        "sandwich",
+        "have a good evening",
+        "to look at"
+      ],
+      "answer": 1,
+      "explain": "le sandwich means sandwich."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le propriétaire",
+      "options": [
+        "electricity",
+        "landlord, owner",
+        "I am listening (what would you like?)",
+        "coffee / croissant"
+      ],
+      "answer": 1,
+      "explain": "le propriétaire means landlord, owner."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le premier",
+      "options": [
+        "see you soon",
+        "the first (of the month)",
+        "there you are",
+        "coat / coats"
+      ],
+      "answer": 1,
+      "explain": "le premier means the first (of the month)."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "bonne soirée",
+      "options": [
+        "to look at",
+        "have a good evening",
+        "sandwich",
+        "bank transfer"
+      ],
+      "answer": 1,
+      "explain": "bonne soirée means have a good evening."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "voilà",
+      "question": "Which word did you hear?",
+      "options": [
+        "le propriétaire",
+        "voilà",
+        "le premier",
+        "bonne soirée"
+      ],
+      "answer": 1,
+      "explain": "You heard voilà: there you are."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le virement",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'électricité",
+        "le virement",
+        "à bientôt",
+        "voilà"
+      ],
+      "answer": 1,
+      "explain": "You heard le virement: bank transfer."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "At the café",
+      "body": "Léa pays for a coffee. The clerk and Léa use vous.",
+      "examples": [
+        {
+          "fr": "Bonjour. Je vous écoute.",
+          "en": "Employé: Hello. I am listening (what would you like?)."
+        },
+        {
+          "fr": "Un café et un croissant, s'il vous plaît.",
+          "en": "Léa: A coffee and a croissant, please."
+        },
+        {
+          "fr": "Voilà. Ça fait six dollars.",
+          "en": "Employé: Here you are. That is 6 dollars."
+        },
+        {
+          "fr": "C'est combien avec les taxes ?",
+          "en": "Léa: How much is it with taxes?"
+        },
+        {
+          "fr": "Avec les taxes, ça fait six dollars quatre-vingt-dix.",
+          "en": "Employé: With taxes, it is 6.90."
+        },
+        {
+          "fr": "Je paie par carte.",
+          "en": "Léa: I pay by card."
+        },
+        {
+          "fr": "D'accord. Le reçu ?",
+          "en": "Employé: Okay. The receipt?"
+        },
+        {
+          "fr": "Oui, s'il vous plaît. Merci !",
+          "en": "Léa: Yes, please. Thank you!"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Rent and a bill",
+      "body": "Sam and his landlord. They use vous.",
+      "examples": [
+        {
+          "fr": "Bonjour, monsieur. Le loyer est de combien ?",
+          "en": "Sam: Hello, sir. How much is the rent?"
+        },
+        {
+          "fr": "Le loyer est de mille deux cents dollars par mois.",
+          "en": "Le propriétaire: The rent is 1,200 dollars per month."
+        },
+        {
+          "fr": "Et l'électricité ?",
+          "en": "Sam: And the electricity?"
+        },
+        {
+          "fr": "L'électricité coûte quatre-vingts dollars par mois.",
+          "en": "Le propriétaire: Electricity costs 80 dollars per month."
+        },
+        {
+          "fr": "Je paie le loyer comment ?",
+          "en": "Sam: How do I pay the rent?"
+        },
+        {
+          "fr": "Par virement, le premier du mois.",
+          "en": "Le propriétaire: By transfer, on the first of the month."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "How much is the order before taxes?",
+      "options": [
+        "$5.00",
+        "$6.00",
+        "$6.90",
+        "$7.50"
+      ],
+      "answer": 1,
+      "explain": "Ça fait six dollars (avant les taxes)."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "How much is the order with taxes?",
+      "options": [
+        "$6.00",
+        "$6.50",
+        "$6.90",
+        "$7.90"
+      ],
+      "answer": 2,
+      "explain": "Six dollars quatre-vingt-dix: 6,90."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "How does Léa pay?",
+      "options": [
+        "Cash",
+        "By card",
+        "By transfer",
+        "She does not pay"
+      ],
+      "answer": 1,
+      "explain": "Par carte."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "How much is the rent?",
+      "options": [
+        "$800",
+        "$1 000",
+        "$1 200",
+        "$2 000"
+      ],
+      "answer": 2,
+      "explain": "Mille deux cents."
+    },
+    {
+      "type": "choose",
+      "id": "c11",
+      "prompt": "How does Sam pay the rent?",
+      "options": [
+        "By cash",
+        "By card",
+        "By transfer",
+        "By cheque"
+      ],
+      "answer": 2,
+      "explain": "Par virement."
+    }
+  ]
+}

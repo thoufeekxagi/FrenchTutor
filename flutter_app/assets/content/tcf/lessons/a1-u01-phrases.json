@@ -1,159 +1,190 @@
 {
   "id": "a1-u01-phrases",
-  "title": "Introduce yourself",
-  "subtitle": "Unit 1: five sentences you will use everywhere",
-  "minutes": 7,
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Phrases",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 10,
   "steps": [
     {
       "type": "explain",
       "id": "e1",
-      "title": "Four short sentences",
-      "body": "You can introduce yourself with four short sentences. Learn them as blocks, exactly as you hear them. The grammar behind them comes in the next lesson.\n\nJe m'appelle literally means I call myself. It is how French says my name is.",
-      "examples": [
-        {
-          "fr": "Je m'appelle Sam.",
-          "en": "My name is Sam."
-        },
-        {
-          "fr": "Je suis canadien.",
-          "en": "I am Canadian."
-        },
-        {
-          "fr": "Je parle français.",
-          "en": "I speak French."
-        },
-        {
-          "fr": "J'habite à Montréal.",
-          "en": "I live in Montréal."
-        }
-      ]
+      "title": "Phrases",
+      "body": "Learn these as whole blocks, exactly as you hear them. Say each one out loud three times. The grammar behind them comes in section 1.3."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
     },
     {
       "type": "phrase",
       "id": "p1",
       "fr": "Je m'appelle Sam.",
       "en": "My name is Sam.",
-      "tip": "Say zhuh ma-PELL, then your own name."
+      "tip": "Say it: zhuh mah-PEL sam"
     },
     {
       "type": "phrase",
       "id": "p2",
-      "fr": "Je suis canadien.",
-      "en": "I am Canadian (a man).",
-      "tip": "A man says canadien. The ending is nasal, and the n is not pronounced. Next you hear the feminine form."
-    },
-    {
-      "type": "phrase",
-      "id": "p2b",
-      "fr": "Je suis canadienne.",
-      "en": "I am Canadian (a woman).",
-      "tip": "The same sentence, said by a woman. Now the n at the end is pronounced: ka-na-DYEN."
+      "fr": "Comment vous appelez-vous ?",
+      "en": "What is your name? (formal)",
+      "tip": "Say it: koh-mah(n) voo zah-puh-LAY-voo"
     },
     {
       "type": "phrase",
       "id": "p3",
-      "fr": "Je parle français.",
-      "en": "I speak French.",
-      "tip": "Say zhuh PARL. The last e of parle is silent."
+      "fr": "Comment tu t'appelles ?",
+      "en": "What is your name? (friends)",
+      "tip": "Say it: koh-mah(n) tü tah-PEL"
     },
     {
       "type": "phrase",
       "id": "p4",
-      "fr": "J'habite à Montréal.",
-      "en": "I live in Montréal.",
-      "tip": "J'habite sounds like zha-BEET. The h is silent."
-    },
-    {
-      "type": "choose",
-      "id": "c1",
-      "prompt": "How do you say My name is Sam?",
-      "options": [
-        "Je m'appelle Sam.",
-        "J'habite à Sam.",
-        "Je parle Sam."
-      ],
-      "answer": 0,
-      "explain": "Je m'appelle means my name is. The other two sentences mean I live in Sam and I speak Sam."
-    },
-    {
-      "type": "choose",
-      "id": "c2",
-      "prompt": "What does this sentence mean?",
-      "promptFr": "Je parle français.",
-      "options": [
-        "I live in French.",
-        "I speak French.",
-        "I am French."
-      ],
-      "answer": 1,
-      "explain": "Parle means speak. Je parle français means I speak French."
-    },
-    {
-      "type": "listen",
-      "id": "l1",
-      "fr": "J'habite à Montréal.",
-      "question": "Where does the speaker live?",
-      "options": [
-        "Toronto",
-        "Montréal",
-        "Ottawa"
-      ],
-      "answer": 1,
-      "explain": "À Montréal means in Montréal. The h in j'habite is silent."
-    },
-    {
-      "type": "listen",
-      "id": "l2",
-      "fr": "Je suis canadienne.",
-      "question": "What does the speaker say about themselves?",
-      "options": [
-        "I am Canadian",
-        "I speak English",
-        "I live in Canada"
-      ],
-      "answer": 0,
-      "explain": "Canadienne means Canadian, said by a woman. Je suis means I am."
-    },
-    {
-      "type": "explain",
-      "id": "e2",
-      "title": "Nice to meet you",
-      "body": "When you meet someone, say enchanté. It means nice to meet you.\n\nA man writes enchanté. A woman writes enchantée, with one more e. You say both exactly the same way: ahn-shahn-TAY.",
-      "examples": [
-        {
-          "fr": "Enchanté.",
-          "en": "Nice to meet you (written by a man)."
-        },
-        {
-          "fr": "Enchantée.",
-          "en": "Nice to meet you (written by a woman)."
-        }
-      ]
+      "fr": "Je suis canadien.",
+      "en": "I am Canadian. (a man)",
+      "tip": "Say it: zhuh swee kah-nah-DYA(N)"
     },
     {
       "type": "phrase",
       "id": "p5",
-      "fr": "Enchanté.",
+      "fr": "Je suis canadienne.",
+      "en": "I am Canadian. (a woman)",
+      "tip": "Say it: zhuh swee kah-nah-DYEN"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Je parle français.",
+      "en": "I speak French.",
+      "tip": "Say it: zhuh pahrl frah(n)-SEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je parle un peu anglais.",
+      "en": "I speak a little English.",
+      "tip": "Say it: zhuh pahrl uh(n) puh ah(n)-GLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Vous parlez français ?",
+      "en": "Do you speak French? (formal)",
+      "tip": "Say it: voo pahR-lay frah(n)-SEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "J'habite à Montréal.",
+      "en": "I live in Montréal.",
+      "tip": "Say it: zhah-BEET ah moh(n)-ray-AHL"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Je viens de l'Inde.",
+      "en": "I come from India.",
+      "tip": "Say it: zhuh vya(n) duh la(n)d"
+    },
+    {
+      "type": "phrase",
+      "id": "p11",
+      "fr": "D'où venez-vous ?",
+      "en": "Where are you from? (formal)",
+      "tip": "Say it: doo vuh-nay-VOO"
+    },
+    {
+      "type": "phrase",
+      "id": "p12",
+      "fr": "Et vous ?",
+      "en": "And you? (formal)",
+      "tip": "Say it: ay VOO"
+    },
+    {
+      "type": "phrase",
+      "id": "p13",
+      "fr": "Moi aussi.",
+      "en": "Me too.",
+      "tip": "Say it: mwah oh-SEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p14",
+      "fr": "Enchanté. / Enchantée.",
       "en": "Nice to meet you.",
-      "tip": "The same sound for a man or a woman: ahn-shahn-TAY."
+      "say": "Enchanté., Enchantée.",
+      "tip": "Say it: ah(n)-shah(n)-TAY"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Je m'appelle Sam.",
+      "options": [
+        "I am Canadian. (a man)",
+        "My name is Sam.",
+        "I speak a little English.",
+        "I come from India."
+      ],
+      "answer": 1,
+      "explain": "Je m'appelle Sam. means My name is Sam.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis canadien.",
+      "options": [
+        "I speak a little English.",
+        "I come from India.",
+        "Me too.",
+        "I am Canadian. (a man)"
+      ],
+      "answer": 3,
+      "explain": "Je suis canadien. means I am Canadian. (a man)."
     },
     {
       "type": "choose",
       "id": "c3",
-      "prompt": "Which sentence says where you live?",
+      "prompt": "What does this mean?",
+      "promptFr": "Je parle un peu anglais.",
       "options": [
-        "Je suis canadien.",
-        "J'habite à Montréal.",
-        "Je parle anglais."
+        "I come from India.",
+        "I speak a little English.",
+        "Me too.",
+        "What is your name? (formal)"
       ],
       "answer": 1,
-      "explain": "J'habite à means I live in. The other sentences say who you are and what you speak."
+      "explain": "Je parle un peu anglais. means I speak a little English.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je viens de l'Inde.",
+      "options": [
+        "Me too.",
+        "What is your name? (formal)",
+        "I am Canadian. (a woman)",
+        "I come from India."
+      ],
+      "answer": 3,
+      "explain": "Je viens de l'Inde. means I come from India.."
     },
     {
       "type": "explain",
       "id": "e3",
-      "title": "Next: why these sentences work",
-      "body": "In the next lesson you learn the small grammar behind them: je suis, tu es, and when to say tu or vous."
+      "title": "Speaking: Say it as a block",
+      "body": "Cover the English. Say each French block out loud. If you cannot, say it again with the guide. Then replace Sam, canadien, Montréal and l'Inde with your own details.\n\n• Say the whole block in one breath, evenly. Do not say words one by one."
+    },
+    {
+      "type": "phrase",
+      "id": "p15",
+      "fr": "Je m'appelle ... Je suis ... J'habite à ... Je parle ... Enchanté.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
     }
   ]
 }

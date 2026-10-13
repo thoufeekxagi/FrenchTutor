@@ -1,0 +1,76 @@
+"""Hand-written story data the book does not carry: summaries, key words, and
+a meaning for every story word that is not a plain entry in the word tables
+(verb forms, plurals, names, small words). Format: token -> (meaning, part of
+speech, sound guide). Tokens are lowercase with end punctuation removed.
+"""
+
+STORY_META = {
+    "a1-u01": dict(id="a1-nouvelle-voisine", minutes=3, summary="Marc meets Nadia, the new neighbour who arrives with a suitcase.",
+                   keywords=["couloir", "valise", "nouvelle", "habite", "étage", "bienvenue"]),
+    "a1-u02": dict(id="a1-bibliotheque", minutes=3, summary="Sam gets a library card and has to spell his email twice.",
+                   keywords=["bibliothèque", "courriel", "répète", "lentement", "écrit", "dame"]),
+    "a1-u03": dict(id="a1-formulaire", minutes=3, summary="Priya fills in a form at Service Canada and signs it.",
+                   keywords=["formulaire", "remplit", "l'adresse", "code", "signe", "l'agent"]),
+    "a1-u04": dict(id="a1-famille-karim", minutes=3, summary="A morning in the life of Karim's family in Montréal.",
+                   keywords=["famille", "fils", "fille", "travaille", "étudie", "grand-mère"]),
+    "a1-u05": dict(id="a1-combien", minutes=3, summary="Julie buys milk and bread at the corner store and pays by card.",
+                   keywords=["dépanneur", "lait", "pain", "taxes", "total", "carte"]),
+}
+
+STORY_GLOSS = {
+    "a1-nouvelle-voisine": {
+        "il": ("he, it", "pronoun"), "est": ("is (être)", "verb"), "sept": ("seven",), "heures": ("hours, o'clock",), "du": ("of the",),
+        "soir": ("evening", "noun, masculine", "swahr"), "marc": ("Marc (a man's name)",), "dans": ("in",), "le": ("the",),
+        "couloir": ("hallway", "noun, masculine", "koo-LWAHR"), "une": ("a",), "femme": ("woman", "noun, feminine", "fahm"),
+        "arrive": ("arrives (arriver)", "verb", "ah-REEV"), "avec": ("with",), "valise": ("suitcase", "noun, feminine", "vah-LEEZ"),
+        "bonsoir": ("good evening", None, "boh(n)-SWAHR"), "je": ("I", "pronoun"), "m'appelle": ("my name is (I call myself)",),
+        "nadia": ("Nadia (a woman's name)",), "enchanté": ("nice to meet you", None, "ah(n)-shah(n)-TAY"), "suis": ("am (être)", "verb"),
+        "nouvelle": ("new (feminine)", "adjective", "noo-VEL"), "l'immeuble": ("the building", "noun, masculine", "la-MUHBL"),
+        "elle": ("she", "pronoun"), "habite": ("lives (habiter)", "verb", "ah-BEET"), "au": ("on the, to the",), "troisième": ("third", None, "trwah-ZYEM"),
+        "étage": ("floor, storey", "noun, masculine", "ay-TAHZH"), "parle": ("speaks (parler)", "verb"), "français": ("French", None, "frah(n)-SEH"),
+        "et": ("and",), "anglais": ("English", None, "ah(n)-GLEH"), "dit": ("says (dire)", "verb"), "bienvenue": ("welcome", None, "bya(n)-vuh-NÜ"),
+    },
+    "a1-bibliotheque": {
+        "sam": ("Sam (a man's name)",), "est": ("is (être)", "verb"), "à": ("at, to",), "la": ("the",), "bibliothèque": ("library", "noun, feminine", "bee-blee-oh-TEK"),
+        "il": ("he, it", "pronoun"), "parle": ("speaks (parler)", "verb"), "avec": ("with",), "une": ("a",), "dame": ("lady", "noun, feminine", "dahm"),
+        "bonjour": ("hello", None, "boh(n)-ZHOOR"), "monsieur": ("sir, Mr.", "noun", "muh-SYUH"), "votre": ("your (formal)",), "nom": ("last name", "noun, masculine", "noh(n)"),
+        "s'il": ("if it",), "vous": ("you (formal)", "pronoun"), "plaît": ("pleases (plaire)", "verb"), "tremblay": ("Tremblay (a family name)",),
+        "t-r-e-m-b-l-a-y": ("the letters of Tremblay",), "et": ("and",), "courriel": ("email (Canada)", "noun, masculine", "koo-RYEL"), "dit": ("says (dire)", "verb"),
+        "sam, arobase, exemple, point c-a": ("the email read aloud",), "pardon": ("sorry? pardon", None, "pahr-DOH(N)"), "pouvez-vous": ("can you",),
+        "répéter": ("to repeat", "verb", "ray-pay-TAY"), "répète": ("repeats (répéter)", "verb", "ray-PET"), "lentement": ("slowly", None, "lah(n)t-MAH(N)"),
+        "écrit": ("writes (écrire)", "verb", "ay-KREE"), "merci": ("thank you", None, "mehr-SEE"), "bienvenue": ("welcome", None, "bya(n)-vuh-NÜ"),
+        "sam,": ("Sam",), "arobase": ("the @ sign", "noun, feminine", "ah-roh-BAHZ"), "exemple": ("example", "noun, masculine", "ehg-ZAH(N)pl"),
+        "point": ("dot", "noun, masculine", "pwa(n)"), "c-a": ("the letters c and a (.ca)",),
+    },
+    "a1-formulaire": {
+        "priya": ("Priya (a woman's name)",), "est": ("is (être)", "verb"), "à": ("at, to",), "service": ("service",), "canada": ("Canada",),
+        "l'agent": ("the agent, the officer", "noun, masculine", "lah-ZHAH(N)"), "donne": ("gives (donner)", "verb", "dohn"), "un": ("a",), "formulaire": ("form", "noun, masculine", "fohr-mü-LEHR"),
+        "elle": ("she", "pronoun"), "remplit": ("fills in (remplir)", "verb", "rah(n)-PLEE"), "le": ("the",), "d'abord": ("first",), "nom": ("last name", "noun, masculine"),
+        "et": ("and",), "prénom": ("first name", "noun, masculine", "pray-NOH(N)"), "ensuite": ("then, next",), "l'adresse": ("the address", "noun, feminine", "lah-DREHS"),
+        "code": ("code", "noun, masculine"), "postal": ("postal",), "puis": ("then",), "signe": ("signs (signer)", "verb", "SEE-nyuh"),
+        "dit": ("says (dire)", "verb"), "c'est": ("it is, that is",), "parfait": ("perfect", "adjective", "pahr-FEH"), "madame": ("madam", "noun, feminine", "mah-DAHM"),
+        "merci": ("thank you",), "h3b": ("the letters and digit H3B",), "1a7": ("the digit and letters 1A7",),
+    },
+    "a1-famille-karim": {
+        "karim": ("Karim (a man's name)",), "habite": ("lives (habiter)", "verb", "ah-BEET"), "à": ("in, at",), "montréal": ("Montréal",), "avec": ("with",),
+        "sa": ("his, her",), "famille": ("family", "noun, feminine", "fah-MEEY"), "femme": ("wife, woman", "noun, feminine", "fahm"), "s'appelle": ("is called (s'appeler)", "verb"),
+        "samira": ("Samira (a woman's name)",), "ils": ("they", "pronoun"), "ont": ("have (avoir)", "verb"), "deux": ("two",), "enfants": ("children", "noun, masculine"),
+        "un": ("a, one",), "fils": ("son", "noun, masculine", "fees"), "et": ("and",), "une": ("a, one",), "fille": ("daughter, girl", "noun, feminine", "feey"),
+        "leur": ("their",), "omar": ("Omar (a boy's name)",), "huit": ("eight",), "ans": ("years",), "il": ("he", "pronoun"), "est": ("is (être)", "verb"), "grand": ("tall, big", "adjective"),
+        "yasmine": ("Yasmine (a girl's name)",), "cinq": ("five",), "elle": ("she", "pronoun"), "petite": ("small (feminine)", "adjective"), "très": ("very",), "gentille": ("kind (feminine)", "adjective"),
+        "travaille": ("works (travailler)", "verb", "trah-VAHY"), "l'hôpital": ("the hospital", "noun, masculine"), "le": ("the",), "matin": ("morning", "noun, masculine", "mah-TA(N)"),
+        "étudie": ("studies (étudier)", "verb", "ay-TÜ-dee"), "français": ("French", None, "frah(n)-SEH"), "soir": ("evening", "noun, masculine", "swahr"), "dimanche": ("Sunday", "noun, masculine", "dee-MAH(N)sh"),
+        "sont": ("are (être)", "verb"), "tous": ("all, everyone",), "à la table de la grand-mère": ("at grandmother's table",), "table": ("table", "noun, feminine"), "de": ("of",), "la": ("the",),
+        "grand-mère": ("grandmother", "noun, feminine", "grah(n)-MEHR"), "contents": ("happy (plural)", "adjective"), "c'est": ("it is",), "belle": ("beautiful (feminine)", "adjective"),
+    },
+    "a1-combien": {
+        "julie": ("Julie (a woman's name)",), "est": ("is (être)", "verb"), "au": ("at the",), "dépanneur": ("convenience store (Québec)", "noun, masculine", "day-pa-NUHR"),
+        "elle": ("she", "pronoun"), "regarde": ("looks at (regarder)", "verb", "Ruh-GAHRD"), "les": ("the",), "prix": ("prices", "noun, masculine", "pree"), "le": ("the",),
+        "lait": ("milk", "noun, masculine", "lay"), "coûte": ("costs (coûter)", "verb", "koot"), "trois": ("three",), "dollars": ("dollars", "noun, masculine"), "cinquante": ("fifty",),
+        "pain": ("bread", "noun, masculine", "pa(n)"), "deux": ("two",), "soixante-quinze": ("seventy-five",), "ça": ("that, it",), "fait": ("makes, comes to (faire)", "verb"),
+        "combien": ("how much",), "demande": ("asks (demander)", "verb"), "six": ("six",), "vingt-cinq": ("twenty-five",), "plus": ("plus",), "taxes": ("taxes", "noun, feminine"),
+        "c'est": ("it is, that is",), "quatre-vingt-treize": ("ninety-three",), "cents": ("cents",), "total": ("total", "noun, masculine"), "de": ("of",), "sept": ("seven",),
+        "dix-huit": ("eighteen",), "paie": ("pays (payer)", "verb", "peh"), "avec": ("with",), "sa": ("her",), "carte": ("card", "noun, feminine"), "débit": ("debit",),
+        "merci": ("thank you",), "bonne": ("good (feminine)",), "soirée": ("evening", "noun, feminine", "swah-RAY"), "combien ça coûte": ("how much does it cost",),
+    },
+}

@@ -1,0 +1,131 @@
+{
+  "id": "a1-u01-dialogues",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Dialogues",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "The first day",
+      "body": "A French class in Ottawa. Anna lives in Montréal and Sam lives in Toronto. They meet for the first time.",
+      "examples": [
+        {
+          "fr": "Salut ! Je m'appelle Anna.",
+          "en": "Anna: Hi! My name is Anna."
+        },
+        {
+          "fr": "Salut ! Je m'appelle Sam. Enchanté.",
+          "en": "Sam: Hi! My name is Sam. Nice to meet you."
+        },
+        {
+          "fr": "Enchantée. J'habite à Montréal.",
+          "en": "Anna: Nice to meet you. I live in Montréal."
+        },
+        {
+          "fr": "J'habite à Toronto. Je parle anglais.",
+          "en": "Sam: I live in Toronto. I speak English."
+        },
+        {
+          "fr": "Tu parles français ?",
+          "en": "Anna: Do you speak French?"
+        },
+        {
+          "fr": "Oui. Je parle un peu français.",
+          "en": "Sam: Yes. I speak a little French."
+        },
+        {
+          "fr": "Moi aussi. Tu es canadien ?",
+          "en": "Anna: Me too. Are you Canadian?"
+        },
+        {
+          "fr": "Oui, je suis canadien. Et toi ?",
+          "en": "Sam: Yes, I am Canadian. And you?"
+        },
+        {
+          "fr": "Je suis indienne. Je viens de l'Inde.",
+          "en": "Anna: I am Indian. I come from India."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Tip",
+      "body": "toi is the stressed form of tu: Et toi ? means And you? (informal). The formal form is Et vous ?. The pair moi / toi is used after et and alone: Moi aussi."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "At the counter",
+      "body": "A service desk in a government office. The clerk uses vous.",
+      "examples": [
+        {
+          "fr": "Bonjour, madame. Votre nom, s'il vous plaît ?",
+          "en": "Agent: Hello, madam. Your name, please?"
+        },
+        {
+          "fr": "Diallo. D-I-A-deux L-O.",
+          "en": "Mme Diallo: Diallo. D-I-A-two L-O."
+        },
+        {
+          "fr": "Et votre prénom ?",
+          "en": "Agent: And your first name?"
+        },
+        {
+          "fr": "Awa. A-W-A.",
+          "en": "Mme Diallo: Awa. A-W-A."
+        },
+        {
+          "fr": "Merci. Vous êtes canadienne ?",
+          "en": "Agent: Thank you. Are you Canadian?"
+        },
+        {
+          "fr": "Non, je suis haïtienne. J'habite à Gatineau.",
+          "en": "Mme Diallo: No, I am Haitian. I live in Gatineau."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where does Awa Diallo live?",
+      "options": [
+        "Ottawa",
+        "Gatineau",
+        "Haiti",
+        "Montréal"
+      ],
+      "answer": 1,
+      "explain": "J'habite à Gatineau."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the clerk want first?",
+      "options": [
+        "Her country",
+        "Her last name",
+        "Her phone number",
+        "Her language"
+      ],
+      "answer": 1,
+      "explain": "Votre nom: her last name."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does Awa say about her nationality?",
+      "options": [
+        "She is Canadian",
+        "She is Haitian",
+        "She is French",
+        "She is Moroccan"
+      ],
+      "answer": 1,
+      "explain": "Je suis haïtienne."
+    }
+  ]
+}

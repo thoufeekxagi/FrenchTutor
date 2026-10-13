@@ -1,0 +1,187 @@
+{
+  "id": "a1-u03-words-4",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Words: small words that organise a conversation",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "d'abord",
+      "en": "first, at first",
+      "sound": "dah-BOHR",
+      "exampleFr": "D'abord, le nom.",
+      "exampleEn": "First, the name."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "ensuite",
+      "en": "then, next",
+      "sound": "ah(n)-SWEET"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "puis",
+      "en": "then",
+      "sound": "pwee"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "donner",
+      "en": "to give",
+      "sound": "doh-NAY",
+      "exampleFr": "Elle donne le formulaire.",
+      "exampleEn": "She gives the form."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "parfait",
+      "en": "perfect",
+      "sound": "pahR-FEH",
+      "exampleFr": "C'est parfait.",
+      "exampleEn": "That is perfect."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "principal / principale",
+      "en": "main",
+      "say": "principal, principale",
+      "sound": "pra(n)-see-PAHL",
+      "exampleFr": "la rue Principale",
+      "exampleEn": "Main Street"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un, une, des",
+      "en": "a, an, some",
+      "sound": "uh(n), ün, day"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le, la, l', les",
+      "en": "the",
+      "sound": "luh, lah, l, lay"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "d'abord",
+      "options": [
+        "to give",
+        "first, at first",
+        "a, an, some",
+        "then, next"
+      ],
+      "answer": 1,
+      "explain": "d'abord means first, at first."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "ensuite",
+      "options": [
+        "perfect",
+        "the",
+        "main",
+        "then, next"
+      ],
+      "answer": 3,
+      "explain": "ensuite means then, next."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "puis",
+      "options": [
+        "main",
+        "then",
+        "first, at first",
+        "to give"
+      ],
+      "answer": 1,
+      "explain": "puis means then."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "donner",
+      "options": [
+        "a, an, some",
+        "then, next",
+        "perfect",
+        "to give"
+      ],
+      "answer": 3,
+      "explain": "donner means to give."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "parfait",
+      "options": [
+        "the",
+        "perfect",
+        "then",
+        "main"
+      ],
+      "answer": 1,
+      "explain": "parfait means perfect."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "principal / principale",
+      "options": [
+        "first, at first",
+        "to give",
+        "a, an, some",
+        "main"
+      ],
+      "answer": 3,
+      "explain": "principal / principale means main."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "ensuite",
+      "question": "Which word did you hear?",
+      "options": [
+        "donner",
+        "ensuite",
+        "d'abord",
+        "puis"
+      ],
+      "answer": 1,
+      "explain": "You heard ensuite: then, next."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "puis",
+      "question": "Which word did you hear?",
+      "options": [
+        "parfait",
+        "ensuite",
+        "donner",
+        "puis"
+      ],
+      "answer": 3,
+      "explain": "You heard puis: then."
+    }
+  ]
+}

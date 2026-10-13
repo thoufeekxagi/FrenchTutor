@@ -29,13 +29,16 @@ void main() {
     expect(policy.isDue(state, DateTime.utc(2026)), isFalse);
   });
 
-  test('retentionStrength is the bounded product of mastery and confidence', () {
-    expect(
-      policy.retentionStrength(belief(pKnown: 0.5, confidence: 0.4)),
-      closeTo(0.2, 1e-9),
-    );
-    expect(policy.retentionStrength(belief(pKnown: 1, confidence: 1)), 1);
-  });
+  test(
+    'retentionStrength is the bounded product of mastery and confidence',
+    () {
+      expect(
+        policy.retentionStrength(belief(pKnown: 0.5, confidence: 0.4)),
+        closeTo(0.2, 1e-9),
+      );
+      expect(policy.retentionStrength(belief(pKnown: 1, confidence: 1)), 1);
+    },
+  );
 
   test('is not due before the scheduled review time', () {
     final now = DateTime.utc(2026, 3, 1);
@@ -48,7 +51,11 @@ void main() {
 
   test('urgency saturates to 1 once far enough overdue', () {
     final observedAt = DateTime.utc(2026, 1, 1);
-    final state = belief(lastObservedAt: observedAt, pKnown: 0.3, confidence: 0.3);
+    final state = belief(
+      lastObservedAt: observedAt,
+      pKnown: 0.3,
+      confidence: 0.3,
+    );
     final farFuture = observedAt.add(const Duration(days: 400));
 
     expect(policy.isDue(state, farFuture), isTrue);

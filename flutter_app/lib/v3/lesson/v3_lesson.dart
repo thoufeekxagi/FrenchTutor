@@ -32,6 +32,8 @@ class V3Lesson {
     required this.minutes,
     required this.steps,
     this.dev = false,
+    this.unit = '',
+    this.unitTitle = '',
   });
 
   final String id;
@@ -42,6 +44,18 @@ class V3Lesson {
 
   /// Dev-only lessons are hidden from release builds.
   final bool dev;
+
+  /// Which Path section the lesson belongs to: `s0` (Stage 0) or `a1-u02`.
+  final String unit;
+  final String unitTitle;
+
+  /// Short label for the Path: "Stage 0" or "Unit 2".
+  String get unitLabel {
+    if (unit == 's0') return 'Stage 0';
+    final m = RegExp(r'-u(\d+)$').firstMatch(unit);
+    if (m != null) return 'Unit ${int.parse(m.group(1)!)}';
+    return unit.toUpperCase();
+  }
 
   int get questionCount =>
       steps.where((s) => s is V3ChooseStep || s is V3ListenStep).length;
@@ -79,6 +93,8 @@ class V3Lesson {
       subtitle: str(json, 'subtitle', required: false),
       minutes: (json['minutes'] as num?)?.toInt() ?? 5,
       dev: json['dev'] == true,
+      unit: (json['unit'] as String?) ?? '',
+      unitTitle: (json['unitTitle'] as String?) ?? '',
       steps: steps,
     );
   }
@@ -140,6 +156,31 @@ sealed class V3Step {
           sound: str(m, 'sound', required: false),
           exampleFr: str(m, 'exampleFr', required: false),
           exampleEn: str(m, 'exampleEn', required: false),
+          say: str(m, 'say', required: false),
+        );
+      case 'table':
+        final headers = (m['headers'] as List?)?.cast<String>() ?? const [];
+        final rows = <List<String>>[];
+        for (final r in (m['rows'] as List? ?? const [])) {
+          final row = (r as List).cast<String>();
+          if (row.length != headers.length) {
+            throw FormatException('Step $id has a row of the wrong length');
+          }
+          rows.add(row);
+        }
+        if (headers.length < 2 || rows.isEmpty) {
+          throw FormatException('Step $id needs headers and rows');
+        }
+        final hear = (m['hear'] as num?)?.toInt() ?? -1;
+        if (hear >= headers.length) {
+          throw FormatException('Step $id has a bad hear column');
+        }
+        return V3TableStep(
+          id,
+          title: str(m, 'title'),
+          headers: headers,
+          rows: rows,
+          hear: hear,
         );
       case 'phrase':
         return V3PhraseStep(
@@ -147,6 +188,7 @@ sealed class V3Step {
           fr: str(m, 'fr'),
           en: str(m, 'en'),
           tip: str(m, 'tip', required: false),
+          say: str(m, 'say', required: false),
         );
       case 'choose':
         final opts = options();
@@ -195,6 +237,7 @@ class V3WordStep extends V3Step {
     this.sound = '',
     this.exampleFr = '',
     this.exampleEn = '',
+    this.say = '',
   });
 
   final String fr;
@@ -202,6 +245,11 @@ class V3WordStep extends V3Step {
   final String sound;
   final String exampleFr;
   final String exampleEn;
+
+  /// What the voice says when it differs from [fr] ("enchanté / enchantée"
+  /// is shown in full and spoken as "enchanté").
+  final String say;
+  String get spoken => say.isNotEmpty ? say : fr;
 }
 
 class V3PhraseStep extends V3Step {
@@ -210,11 +258,14 @@ class V3PhraseStep extends V3Step {
     required this.fr,
     required this.en,
     this.tip = '',
+    this.say = '',
   });
 
   final String fr;
   final String en;
   final String tip;
+  final String say;
+  String get spoken => say.isNotEmpty ? say : fr;
 }
 
 class V3ChooseStep extends V3Step {
@@ -249,4 +300,21 @@ class V3ListenStep extends V3Step {
   final List<String> options;
   final int answer;
   final String explain;
+}
+
+/// A reference table (conjugations, articles, numbers). When [hear] is a
+/// column index, each row gets a speaker that says that cell.
+class V3TableStep extends V3Step {
+  const V3TableStep(
+    super.id, {
+    required this.title,
+    required this.headers,
+    required this.rows,
+    this.hear = -1,
+  });
+
+  final String title;
+  final List<String> headers;
+  final List<List<String>> rows;
+  final int hear;
 }

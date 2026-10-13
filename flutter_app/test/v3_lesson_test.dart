@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/v3/lesson/v3_lesson.dart';
 
@@ -133,5 +136,69 @@ void main() {
         throwsA(isA<FormatException>()),
       );
     });
+  });
+
+  test('table step parses and rejects a ragged row', () {
+    final ok = V3Lesson.fromJson(
+      _lesson([
+        {
+          'type': 'table',
+          'id': 't1',
+          'title': 'être',
+          'headers': ['Person', 'Form', 'Example'],
+          'rows': [
+            ['je', 'suis', 'Je suis Sam.'],
+            ['tu', 'es', 'Tu es Léa.'],
+          ],
+          'hear': 2,
+        },
+      ]),
+    );
+    expect((ok.steps.single as V3TableStep).rows, hasLength(2));
+    expect(
+      () => V3Lesson.fromJson(
+        _lesson([
+          {
+            'type': 'table',
+            'id': 't1',
+            'title': 'x',
+            'headers': ['a', 'b'],
+            'rows': [
+              ['only one'],
+            ],
+          },
+        ]),
+      ),
+      throwsA(isA<FormatException>()),
+    );
+  });
+
+  test('every bundled lesson parses, is listed once, and has unit info', () {
+    final dir = Directory('assets/content/tcf/lessons');
+    final files = dir.listSync().whereType<File>().where(
+      (f) => f.path.endsWith('.json'),
+    );
+    final index =
+        (jsonDecode(File('assets/content/tcf/course.json').readAsStringSync())
+                as Map)['lessons']
+            as List;
+    final ids = <String>{};
+    for (final f in files) {
+      final lesson = V3Lesson.fromJson(
+        jsonDecode(f.readAsStringSync()) as Map<String, dynamic>,
+      );
+      expect(ids.add(lesson.id), isTrue, reason: 'duplicate id ${lesson.id}');
+      expect(index, contains(f.uri.pathSegments.last), reason: f.path);
+      if (!lesson.dev) {
+        expect(lesson.unit, isNotEmpty, reason: lesson.id);
+        expect(lesson.unitTitle, isNotEmpty, reason: lesson.id);
+      }
+    }
+    expect(
+      ids.length,
+      index.length,
+      reason: 'course.json lists a missing file',
+    );
+    expect(ids.length, greaterThan(60));
   });
 }

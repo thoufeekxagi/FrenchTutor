@@ -159,7 +159,10 @@ void main() {
       drillResults: [true],
     );
     expect(result.competencyEvidence, isEmpty);
-    expect(result.technicalMetadata['evidenceWithheld'], 'no_competency_mapping');
+    expect(
+      result.technicalMetadata['evidenceWithheld'],
+      'no_competency_mapping',
+    );
   });
 
   test('invalid evaluator confidence is rejected', () {

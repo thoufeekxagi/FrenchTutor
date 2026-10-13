@@ -1,0 +1,195 @@
+{
+  "id": "a1-u03-words-2",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Words: documents",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la pièce d'identité",
+      "en": "piece of ID",
+      "sound": "lah pyes dee-dah(n)-tee-TAY",
+      "exampleFr": "Votre pièce d'identité, s'il vous plaît.",
+      "exampleEn": "Your ID, please."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le passeport",
+      "en": "passport",
+      "sound": "luh pahs-POHR",
+      "exampleFr": "Voici mon passeport.",
+      "exampleEn": "Here is my passport."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le permis de conduire",
+      "en": "driver's licence",
+      "sound": "luh pehR-MEE duh koh(n)-DWEER"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la carte d'assurance maladie",
+      "en": "health insurance card",
+      "sound": "lah kahrt dah-sü-RAH(N)S mah-lah-DEE"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le NAS",
+      "en": "SIN (Social Insurance Number)",
+      "sound": "luh nahs",
+      "exampleFr": "Mon NAS, c'est le...",
+      "exampleEn": "My SIN is..."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le permis de travail",
+      "en": "work permit",
+      "sound": "luh pehR-MEE duh trah-VAHY"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le permis d'études",
+      "en": "study permit",
+      "sound": "luh pehR-MEE day-TÜD"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la carte de résident permanent",
+      "en": "permanent resident card",
+      "sound": "lah kahrt duh ray-zee-DAH(N) pehR-mah-NAH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le certificat de naissance",
+      "en": "birth certificate",
+      "sound": "luh sehR-tee-fee-KAH duh neh-SAH(N)S"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "le document",
+      "en": "document",
+      "sound": "luh doh-kü-MAH(N)",
+      "exampleFr": "Les documents sont ici.",
+      "exampleEn": "The documents are here."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "accepté / acceptée",
+      "en": "accepted (m. / f.)",
+      "say": "accepté, acceptée",
+      "sound": "ahk-sehp-TAY",
+      "exampleFr": "Les documents acceptés sont ici. Les photocopies ne sont pas acceptées.",
+      "exampleEn": "The accepted documents are here. Photocopies are not accepted."
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "la photocopie",
+      "en": "photocopy",
+      "sound": "lah foh-toh-koh-PEE"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la pièce d'identité",
+      "options": [
+        "health insurance card",
+        "piece of ID",
+        "study permit",
+        "document"
+      ],
+      "answer": 1,
+      "explain": "la pièce d'identité means piece of ID."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le permis de conduire",
+      "options": [
+        "work permit",
+        "driver's licence",
+        "birth certificate",
+        "photocopy"
+      ],
+      "answer": 1,
+      "explain": "le permis de conduire means driver's licence."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le NAS",
+      "options": [
+        "permanent resident card",
+        "SIN (Social Insurance Number)",
+        "accepted (m. / f.)",
+        "passport"
+      ],
+      "answer": 1,
+      "explain": "le NAS means SIN (Social Insurance Number)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le permis d'études",
+      "options": [
+        "document",
+        "study permit",
+        "piece of ID",
+        "health insurance card"
+      ],
+      "answer": 1,
+      "explain": "le permis d'études means study permit."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le certificat de naissance",
+      "options": [
+        "photocopy",
+        "birth certificate",
+        "driver's licence",
+        "work permit"
+      ],
+      "answer": 1,
+      "explain": "le certificat de naissance means birth certificate."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "accepté / acceptée",
+      "options": [
+        "passport",
+        "accepted (m. / f.)",
+        "SIN (Social Insurance Number)",
+        "permanent resident card"
+      ],
+      "answer": 1,
+      "explain": "accepté / acceptée means accepted (m. / f.)."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "NAS is said as one word: nahs. On a form it is written NAS (French) or SIN (English). PR card is carte de résident permanent. These four documents come up again and again: passeport, permis de travail ou d'études, carte de résident permanent, carte d'assurance maladie."
+    }
+  ]
+}

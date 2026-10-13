@@ -1,28 +1,30 @@
 {
   "id": "a1-u01-tcf",
-  "title": "TCF corner: Unit 1",
-  "subtitle": "Exam-style questions with only Unit 1 words",
-  "minutes": 8,
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "TCF corner",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 4,
   "steps": [
     {
       "type": "explain",
       "id": "e1",
-      "title": "How the real test works",
-      "body": "In the TCF Canada listening test you hear each recording once and you cannot go back. Each question has 4 answers and only one is correct.\n\nA wrong answer and a blank answer both score zero. So never leave a question empty. If you are not sure, choose the answer that sounds most likely.\n\nHere you practise with only the words from Unit 1. First 5 listening questions, then 5 reading questions."
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
     },
     {
       "type": "listen",
       "id": "l1",
-      "fr": "Bonjour. Je m'appelle Léa.",
-      "question": "What is the speaker's name?",
+      "fr": "Bonjour. Je m'appelle Léa. Mon nom, c'est Gagnon.",
+      "question": "What is the speaker's last name?",
       "options": [
         "Léa",
-        "Sam",
-        "Anna",
-        "Marie"
+        "Gagnon",
+        "Marc",
+        "Diallo"
       ],
-      "answer": 0,
-      "explain": "Je m'appelle Léa means my name is Léa."
+      "answer": 1,
+      "explain": "Mon nom, c'est Gagnon."
     },
     {
       "type": "listen",
@@ -36,7 +38,7 @@
         "Arabic"
       ],
       "answer": 1,
-      "explain": "Je parle anglais means I speak English."
+      "explain": "Anglais is English."
     },
     {
       "type": "listen",
@@ -50,105 +52,63 @@
         "Vancouver"
       ],
       "answer": 1,
-      "explain": "J'habite à Montréal means I live in Montréal."
+      "explain": "J'habite à Montréal."
     },
     {
       "type": "listen",
       "id": "l4",
-      "fr": "Salut !",
-      "question": "Who would you say this to?",
+      "fr": "Salut ! Je suis Nadia. Je suis algérienne.",
+      "question": "What is Nadia's nationality?",
       "options": [
-        "A stranger",
-        "Your landlord",
-        "A friend",
-        "A doctor"
-      ],
-      "answer": 2,
-      "explain": "Salut is informal. Use it with friends and family only."
-    },
-    {
-      "type": "listen",
-      "id": "l5",
-      "fr": "Il est canadien.",
-      "question": "Who is Canadian?",
-      "options": [
-        "I",
-        "you",
-        "he",
-        "she"
-      ],
-      "answer": 2,
-      "explain": "Il means he. Il est canadien means he is Canadian."
-    },
-    {
-      "type": "choose",
-      "id": "r1",
-      "prompt": "What is the first name?",
-      "promptFr": "Nom : Tremblay. Prénom : Sam.",
-      "options": [
-        "Tremblay",
-        "Sam",
-        "Nom",
-        "Prénom"
+        "Moroccan",
+        "Algerian",
+        "Haitian",
+        "Colombian"
       ],
       "answer": 1,
-      "explain": "Prénom is the first name, so it is Sam."
+      "explain": "Algérienne: from Algeria."
     },
     {
       "type": "choose",
-      "id": "r2",
-      "prompt": "What is the last name?",
-      "promptFr": "Nom : Diallo. Prénom : Awa.",
-      "options": [
-        "Awa",
-        "Diallo",
-        "Nom",
-        "Prénom"
-      ],
-      "answer": 1,
-      "explain": "Nom is the last name, so it is Diallo."
-    },
-    {
-      "type": "choose",
-      "id": "r3",
-      "prompt": "Where does Julie live?",
-      "promptFr": "Salut ! Je suis Julie. J'habite à Toronto.",
+      "id": "c1",
+      "prompt": "Where does Marc live?",
       "options": [
         "Toronto",
-        "Montréal",
         "Ottawa",
-        "Vancouver"
+        "Montréal",
+        "Paris"
       ],
-      "answer": 0,
-      "explain": "J'habite à Toronto means I live in Toronto."
+      "answer": 1,
+      "explain": "J'habite à Ottawa.",
+      "promptFr": "Bonsoir ! Je m'appelle Marc. Je suis canadien. J'habite à Ottawa."
     },
     {
       "type": "choose",
-      "id": "r4",
-      "prompt": "When would you say this?",
-      "promptFr": "Bonsoir !",
+      "id": "c2",
+      "prompt": "Which is the first name?",
       "options": [
-        "In the morning",
-        "In the evening",
-        "On the phone only",
-        "Never"
+        "Diallo",
+        "Awa",
+        "Nom",
+        "Prénom"
       ],
       "answer": 1,
-      "explain": "Bonsoir means good evening."
+      "explain": "Prénom is the first name.",
+      "promptFr": "Nom : Diallo · Prénom : Awa"
     },
     {
       "type": "choose",
-      "id": "r5",
-      "prompt": "Who is writing this?",
-      "promptFr": "Je suis canadienne.",
+      "id": "c3",
+      "prompt": "How many languages?",
       "options": [
-        "A man",
-        "A woman",
-        "A group",
-        "A company"
+        "Two",
+        "Three",
+        "Four",
+        "One"
       ],
       "answer": 1,
-      "explain": "Canadienne is the feminine form, so the writer is a woman."
+      "explain": "Français, anglais, espagnol: three.",
+      "promptFr": "Je parle français, anglais et espagnol."
     }
   ]
 }

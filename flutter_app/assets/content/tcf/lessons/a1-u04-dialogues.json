@@ -1,0 +1,142 @@
+{
+  "id": "a1-u04-dialogues",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Dialogues",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "A photo of the family",
+      "body": "Anna and Sam are classmates. Sam shows a photo on his phone.",
+      "examples": [
+        {
+          "fr": "C'est ta famille ?",
+          "en": "Anna: Is that your family?"
+        },
+        {
+          "fr": "Oui. Voici mon père et ma mère.",
+          "en": "Sam: Yes. Here are my father and my mother."
+        },
+        {
+          "fr": "Ils sont jeunes !",
+          "en": "Anna: They are young!"
+        },
+        {
+          "fr": "Mon père a soixante ans. Ma mère a cinquante-huit ans.",
+          "en": "Sam: My father is sixty. My mother is fifty-eight."
+        },
+        {
+          "fr": "Et ça, c'est qui ?",
+          "en": "Anna: And who is that?"
+        },
+        {
+          "fr": "C'est ma sœur. Elle s'appelle Léa. Elle est étudiante.",
+          "en": "Sam: That is my sister. She is called Léa. She is a student."
+        },
+        {
+          "fr": "Elle est belle. Elle a les cheveux blonds ?",
+          "en": "Anna: She is pretty. Does she have blond hair?"
+        },
+        {
+          "fr": "Non, elle a les cheveux bruns et les yeux verts.",
+          "en": "Sam: No, she has brown hair and green eyes."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "On a form: situation familiale",
+      "body": "A clerk helps Karim fill in a form. The clerk uses vous.",
+      "examples": [
+        {
+          "fr": "Vous êtes marié, monsieur ?",
+          "en": "L'agente: Are you married, sir?"
+        },
+        {
+          "fr": "Oui, je suis marié. Voici ma femme.",
+          "en": "Karim: Yes, I am married. Here is my wife."
+        },
+        {
+          "fr": "Comment s'appelle votre conjointe ?",
+          "en": "L'agente: What is your spouse's name?"
+        },
+        {
+          "fr": "Elle s'appelle Samira.",
+          "en": "Karim: She is called Samira."
+        },
+        {
+          "fr": "Vous avez des enfants ?",
+          "en": "L'agente: Do you have children?"
+        },
+        {
+          "fr": "Oui, nous avons deux enfants. Un fils et une fille.",
+          "en": "Karim: Yes, we have two children. A son and a daughter."
+        },
+        {
+          "fr": "Ils ont quel âge ?",
+          "en": "L'agente: How old are they?"
+        },
+        {
+          "fr": "Mon fils a huit ans et ma fille a cinq ans.",
+          "en": "Karim: My son is eight and my daughter is five."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How old is Sam's father?",
+      "options": [
+        "50",
+        "58",
+        "60",
+        "68"
+      ],
+      "answer": 2,
+      "explain": "Mon père a soixante ans."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What colour are Léa's eyes?",
+      "options": [
+        "Blue",
+        "Green",
+        "Brown",
+        "Grey"
+      ],
+      "answer": 1,
+      "explain": "Les yeux verts."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How many children do Karim and Samira have?",
+      "options": [
+        "One",
+        "Two",
+        "Three",
+        "Four"
+      ],
+      "answer": 1,
+      "explain": "Deux enfants."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "How old is Karim's daughter?",
+      "options": [
+        "5",
+        "8",
+        "15",
+        "18"
+      ],
+      "answer": 0,
+      "explain": "Ma fille a cinq ans."
+    }
+  ]
+}

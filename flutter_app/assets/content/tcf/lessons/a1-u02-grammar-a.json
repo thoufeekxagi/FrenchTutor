@@ -1,0 +1,72 @@
+{
+  "id": "a1-u02-grammar-a",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Grammar: avoir: to have",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "avoir: to have",
+      "body": "avoir is the second most important verb. It also gives you age: in French you have years, you are not years."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "avoir (to have), present",
+      "headers": [
+        "Person",
+        "Form",
+        "Say it",
+        "Example"
+      ],
+      "rows": [
+        [
+          "j'",
+          "ai",
+          "ay",
+          "J'ai trente ans."
+        ],
+        [
+          "tu",
+          "as",
+          "ah",
+          "Tu as un courriel ?"
+        ],
+        [
+          "il / elle / on",
+          "a",
+          "ah",
+          "Elle a vingt ans."
+        ],
+        [
+          "nous",
+          "avons",
+          "ah-VOH(N)",
+          "Nous avons une question."
+        ],
+        [
+          "vous",
+          "avez",
+          "ah-VAY",
+          "Vous avez une carte ?"
+        ],
+        [
+          "ils / elles",
+          "ont",
+          "oh(n)",
+          "Ils ont un cellulaire."
+        ]
+      ],
+      "hear": 3
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "Age uses avoir, never être: J'ai trente ans (I have thirty years). Never Je suis trente ans. In English you are 30; in French you have 30. Also: ils ont (they have) sounds like ils sont (they are) apart from the first sound. Listen for the z: ils ont is eel-ZOH(N), ils sont is eel-SOH(N)."
+    }
+  ]
+}

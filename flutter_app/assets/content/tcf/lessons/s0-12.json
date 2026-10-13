@@ -1,0 +1,116 @@
+{
+  "id": "s0-12",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Rhythm, intonation and questions",
+  "subtitle": "Stage 0, lesson 12",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Rhythm, intonation and questions",
+      "body": "Melody is part of meaning in French. Two simple rules cover most of what you need."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Melody",
+      "headers": [
+        "Sentence type",
+        "Melody",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Statement",
+          "falls at the end ↘",
+          "Je parle français. ↘"
+        ],
+        [
+          "Yes/no question",
+          "rises at the end ↗",
+          "Tu parles français ? ↗"
+        ],
+        [
+          "Question with a question word (où, quand, comment...)",
+          "falls ↘",
+          "Où habites-tu ? ↘"
+        ],
+        [
+          "List",
+          "rises on each item, falls on the last",
+          "Du pain ↗, du lait ↗, des pommes ↘."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Rhythm, intonation and questions",
+      "body": "Rhythm. Cut the sentence into small groups. Each syllable has the same length. The last syllable of each group is a little longer and higher. Je m'appelle Sam. = zhuh-mah-PELL-sam. Tu parles français ? = tü-pahrl-frah(n)-SEH ↗."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "In Québec, a yes/no question often ends with a small word -tu: Tu viens-tu ? (Are you coming?). It is informal speech. In the exam use Tu viens ? or Est-ce que tu viens ?."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Vous êtes canadien ?",
+      "question": "What did you hear?",
+      "options": [
+        "a statement",
+        "a yes/no question",
+        "a command",
+        "a greeting"
+      ],
+      "answer": 1,
+      "explain": "Voice goes up: it is a yes/no question."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il est huit heures.",
+      "question": "What did you hear?",
+      "options": [
+        "a question",
+        "a statement",
+        "a greeting",
+        "a name"
+      ],
+      "answer": 1,
+      "explain": "Voice goes down: it is a statement."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Où est la gare ?",
+      "question": "What does the person want to know?",
+      "options": [
+        "Where the station is",
+        "What time it is",
+        "The price",
+        "The name"
+      ],
+      "answer": 0,
+      "explain": "Où est la gare ? means Where is the station?"
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Speaking: Melody practice",
+      "body": "Say each sentence twice, once as a statement and once as a question: Il parle français. · Il parle français ? Record yourself and compare.\n\n• Exaggerate the melody at first. Then make it smaller."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Il parle français. (↘) Il parle français ? (↗)",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

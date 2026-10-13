@@ -1,0 +1,293 @@
+{
+  "id": "a1-u01-words-4",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Words: countries",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 10,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le Canada",
+      "en": "Canada",
+      "sound": "luh kah-nah-DAH",
+      "exampleFr": "C'est le Canada.",
+      "exampleEn": "This is Canada."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la France",
+      "en": "France",
+      "sound": "lah frah(n)s"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le Québec",
+      "en": "Québec",
+      "sound": "luh kay-BEK"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "l'Inde (f.)",
+      "en": "India",
+      "say": "l'Inde",
+      "sound": "la(n)d"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "les Philippines (f.)",
+      "en": "the Philippines",
+      "say": "les Philippines",
+      "sound": "lay fee-lee-PEEN"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la Chine",
+      "en": "China",
+      "sound": "lah sheen"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le Maroc",
+      "en": "Morocco",
+      "sound": "luh mah-ROK"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "l'Algérie (f.)",
+      "en": "Algeria",
+      "say": "l'Algérie",
+      "sound": "lahl-zhay-REE"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "Haïti (m.)",
+      "en": "Haiti",
+      "say": "Haïti",
+      "sound": "ah-ee-TEE"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "la Colombie",
+      "en": "Colombia",
+      "sound": "lah koh-loh(n)-BEE"
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "le pays",
+      "en": "country",
+      "sound": "luh pay-EE",
+      "exampleFr": "Le Canada est un pays.",
+      "exampleEn": "Canada is a country."
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "la ville",
+      "en": "city, town",
+      "sound": "lah veel",
+      "exampleFr": "Ottawa est une ville.",
+      "exampleEn": "Ottawa is a city."
+    },
+    {
+      "type": "word",
+      "id": "w13",
+      "fr": "la nationalité",
+      "en": "nationality",
+      "sound": "lah nah-syoh-nah-lee-TAY",
+      "exampleFr": "Nationalité : canadienne.",
+      "exampleEn": "Nationality: Canadian."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le Canada",
+      "options": [
+        "India",
+        "Canada",
+        "Morocco",
+        "Colombia"
+      ],
+      "answer": 1,
+      "explain": "le Canada means Canada."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le Québec",
+      "options": [
+        "China",
+        "Québec",
+        "Haiti",
+        "city, town"
+      ],
+      "answer": 1,
+      "explain": "le Québec means Québec."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "les Philippines (f.)",
+      "options": [
+        "Algeria",
+        "the Philippines",
+        "country",
+        "Canada"
+      ],
+      "answer": 1,
+      "explain": "les Philippines (f.) means the Philippines."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le Maroc",
+      "options": [
+        "Colombia",
+        "Morocco",
+        "nationality",
+        "Québec"
+      ],
+      "answer": 1,
+      "explain": "le Maroc means Morocco."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "Haïti (m.)",
+      "options": [
+        "city, town",
+        "Haiti",
+        "France",
+        "the Philippines"
+      ],
+      "answer": 1,
+      "explain": "Haïti (m.) means Haiti."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le pays",
+      "options": [
+        "Canada",
+        "country",
+        "India",
+        "Morocco"
+      ],
+      "answer": 1,
+      "explain": "le pays means country."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "la France",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'Inde",
+        "la France",
+        "la Chine",
+        "l'Algérie"
+      ],
+      "answer": 1,
+      "explain": "You heard la France: France."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "la Chine",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'Algérie",
+        "la Colombie",
+        "la Chine",
+        "la ville"
+      ],
+      "answer": 2,
+      "explain": "You heard la Chine: China."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Group 5: nationalities (masculine and feminine)",
+      "headers": [
+        "Country",
+        "He is...",
+        "She is..."
+      ],
+      "rows": [
+        [
+          "le Canada",
+          "canadien (kah-nah-DYA(N))",
+          "canadienne (kah-nah-DYEN)"
+        ],
+        [
+          "la France",
+          "français (frah(n)-SEH)",
+          "française (frah(n)-SEHZ)"
+        ],
+        [
+          "le Québec",
+          "québécois (kay-bay-KWAH)",
+          "québécoise (kay-bay-KWAHZ)"
+        ],
+        [
+          "l'Inde",
+          "indien (a(n)-DYA(N))",
+          "indienne (a(n)-DYEN)"
+        ],
+        [
+          "les Philippines",
+          "philippin (fee-lee-PA(N))",
+          "philippine (fee-lee-PEEN)"
+        ],
+        [
+          "la Chine",
+          "chinois (shee-NWAH)",
+          "chinoise (shee-NWAHZ)"
+        ],
+        [
+          "le Maroc",
+          "marocain (mah-roh-KA(N))",
+          "marocaine (mah-roh-KEHN)"
+        ],
+        [
+          "l'Algérie",
+          "algérien (ahl-zhay-RYA(N))",
+          "algérienne (ahl-zhay-RYEN)"
+        ],
+        [
+          "Haïti",
+          "haïtien (ah-ee-SYA(N))",
+          "haïtienne (ah-ee-SYEN)"
+        ],
+        [
+          "la Colombie",
+          "colombien (koh-loh(n)-BYA(N))",
+          "colombienne (koh-loh(n)-BYEN)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Tip",
+      "body": "In writing, a nationality is not capitalised in French: un homme canadien, une femme française. In speech, the feminine form says the last consonant: canadien ends in a nasal vowel, canadienne ends in the n sound."
+    }
+  ]
+}

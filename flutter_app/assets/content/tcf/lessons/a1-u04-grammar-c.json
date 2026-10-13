@@ -1,0 +1,208 @@
+{
+  "id": "a1-u04-grammar-c",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Grammar: Verbs with nous, vous, ils, elles",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "-er verbs, present, all persons",
+      "headers": [
+        "",
+        "parler",
+        "habiter",
+        "travailler"
+      ],
+      "rows": [
+        [
+          "je",
+          "parle",
+          "j'habite",
+          "travaille"
+        ],
+        [
+          "tu",
+          "parles",
+          "habites",
+          "travailles"
+        ],
+        [
+          "il / elle",
+          "parle",
+          "habite",
+          "travaille"
+        ],
+        [
+          "nous",
+          "parlons (pahr-LOH(N))",
+          "habitons (ah-bee-TOH(N))",
+          "travaillons (trah-vah-YOH(N))"
+        ],
+        [
+          "vous",
+          "parlez (pahr-LAY)",
+          "habitez (ah-bee-TAY)",
+          "travaillez (trah-vah-YAY)"
+        ],
+        [
+          "ils / elles",
+          "parlent (pahrl)",
+          "habitent (ah-BEET)",
+          "travaillent (trah-VAHY)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Watch out",
+      "body": "-ent (ils/elles) is silent: ils parlent sounds like il parle. Listen for the link: ils habitent is eel-zah-BEET, with a z, while il habite is ee-lah-BEET. Also note -ons (nous) and -ez (vous) are always said."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write the adjective in the right form.  Ma mère est (grand) ___.",
+      "options": [
+        "content",
+        "petite",
+        "grande",
+        "jeunes"
+      ],
+      "answer": 2,
+      "explain": "The answer is grande."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write the adjective in the right form.  Mon père est (content) ___.",
+      "options": [
+        "grande",
+        "petite",
+        "content",
+        "jeunes"
+      ],
+      "answer": 2,
+      "explain": "The answer is content."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write the adjective in the right form.  Ma sœur est (petit) ___.",
+      "options": [
+        "grande",
+        "content",
+        "petite",
+        "jeunes"
+      ],
+      "answer": 2,
+      "explain": "The answer is petite."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write the adjective in the right form.  Mes enfants sont (jeune) ___.",
+      "options": [
+        "grande",
+        "content",
+        "petite",
+        "jeunes"
+      ],
+      "answer": 3,
+      "explain": "The answer is jeunes."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write the adjective in the right form.  Elle est (beau) ___.",
+      "options": [
+        "grande",
+        "belle",
+        "content",
+        "petite"
+      ],
+      "answer": 1,
+      "explain": "The answer is belle."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write the adjective in the right form.  Ils sont (marié) ___.",
+      "options": [
+        "grande",
+        "content",
+        "petite",
+        "mariés"
+      ],
+      "answer": 3,
+      "explain": "The answer is mariés."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Write the right form.  Nous (parler) ___ français.",
+      "options": [
+        "habitez",
+        "travaillent",
+        "parlons",
+        "étudient"
+      ],
+      "answer": 2,
+      "explain": "The answer is parlons."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Write the right form.  Vous (habiter) ___ à Ottawa ?",
+      "options": [
+        "habitez",
+        "parlons",
+        "travaillent",
+        "étudient"
+      ],
+      "answer": 0,
+      "explain": "The answer is habitez."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Write the right form.  Ils (travailler) ___ à l'hôpital.",
+      "options": [
+        "travaillent",
+        "parlons",
+        "habitez",
+        "étudient"
+      ],
+      "answer": 0,
+      "explain": "The answer is travaillent."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Write the right form.  Elles (étudier) ___ le français.",
+      "options": [
+        "étudient",
+        "parlons",
+        "habitez",
+        "travaillent"
+      ],
+      "answer": 0,
+      "explain": "The answer is étudient."
+    },
+    {
+      "type": "choose",
+      "id": "c11",
+      "prompt": "Write the right form.  Nous (travailler) ___ beaucoup.",
+      "options": [
+        "parlons",
+        "habitez",
+        "travaillons",
+        "travaillent"
+      ],
+      "answer": 2,
+      "explain": "The answer is travaillons."
+    }
+  ]
+}

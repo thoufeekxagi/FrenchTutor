@@ -1,0 +1,169 @@
+{
+  "id": "s0-09",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Liaison, enchaînement and élision",
+  "subtitle": "Stage 0, lesson 9",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Liaison, enchaînement and élision",
+      "body": "French speakers join words together. This is why spoken French feels fast. There are three kinds of joining."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Liaison",
+      "headers": [
+        "Written",
+        "Say it",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "les amis",
+          "lay-zah-MEE",
+          "the friends"
+        ],
+        [
+          "un ami",
+          "uh(n)-nah-MEE",
+          "a friend (male)"
+        ],
+        [
+          "vous êtes",
+          "voo-ZET",
+          "you are"
+        ],
+        [
+          "ils ont",
+          "eel-ZOH(N)",
+          "they have"
+        ],
+        [
+          "c'est un homme",
+          "seh-tuh(n)-NOHM",
+          "it is a man"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "Never make a liaison after the word et (and): un garçon et un homme has no link between et and un."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "2. Enchaînement: a said consonant links to the next vowel",
+      "body": "il est ici is not eel-eh-ee-SEE with gaps. It is ee-leh-tee-SEE: the l of il and the t of est attach to the next vowel. elle a is eh-lah. une amie is ü-nah-MEE."
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Élision",
+      "headers": [
+        "Written",
+        "Say it",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "le + ami = l'ami",
+          "lah-MEE",
+          "the friend"
+        ],
+        [
+          "je + ai = j'ai",
+          "zhay",
+          "I have"
+        ],
+        [
+          "ce + est = c'est",
+          "seh",
+          "it is"
+        ],
+        [
+          "que + il = qu'il",
+          "keel",
+          "that he"
+        ],
+        [
+          "de + eau = d'eau",
+          "doh",
+          "of water"
+        ],
+        [
+          "je + habite = j'habite",
+          "zhah-BEET",
+          "I live"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "In Canada",
+      "body": "In fast Canadian speech you will hear je suis become “chu” and tu es become “t'es”. This is informal. You understand it when you hear it, but in the exam writing and in careful speech use je suis and tu es."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "les amis",
+      "question": "Which phrase?",
+      "options": [
+        "les amis",
+        "le ami",
+        "les mis",
+        "l'ami"
+      ],
+      "answer": 0,
+      "explain": "Les amis is lay-zah-MEE, with the z link."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "vous êtes",
+      "question": "Which phrase?",
+      "options": [
+        "vous êtes",
+        "vous être",
+        "vous aites",
+        "vous elles"
+      ],
+      "answer": 0,
+      "explain": "Vous êtes is voo-ZET."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "j'habite à Montréal",
+      "question": "Where does the speaker live?",
+      "options": [
+        "Toronto",
+        "Montréal",
+        "Ottawa",
+        "Québec"
+      ],
+      "answer": 1,
+      "explain": "J'habite à Montréal: I live in Montréal."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "c'est un homme",
+      "question": "What is it?",
+      "options": [
+        "a woman",
+        "a man",
+        "a child",
+        "a friend"
+      ],
+      "answer": 1,
+      "explain": "Un homme is a man. C'est un homme: it is a man."
+    }
+  ]
+}

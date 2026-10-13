@@ -173,7 +173,7 @@ def check_units(info, strict):
 
 
 APP_CONTENT = ROOT.parent.parent / "flutter_app" / "assets" / "content" / "tcf"
-STEP_TYPES = {"explain", "word", "phrase", "choose", "listen"}
+STEP_TYPES = {"explain", "word", "phrase", "choose", "listen", "table"}
 
 
 def _need(step, key, where):
@@ -207,6 +207,9 @@ def check_lessons():
             err(f"{where}: duplicate lesson id")
         seen_ids.add(lid)
         _need(lesson, "title", where)
+        if not lesson.get("dev"):
+            _need(lesson, "unit", where)
+            _need(lesson, "unitTitle", where)
         steps = lesson.get("steps")
         if not isinstance(steps, list) or not steps:
             err(f"{where}: has no steps")
@@ -234,6 +237,24 @@ def check_lessons():
                     _need(step, "exampleEn", sw)
             elif kind == "phrase":
                 fr.append(_need(step, "fr", sw)); _need(step, "en", sw)
+            elif kind == "table":
+                _need(step, "title", sw)
+                hdr = step.get("headers")
+                rows = step.get("rows")
+                if not (isinstance(hdr, list) and len(hdr) >= 2 and isinstance(rows, list) and rows):
+                    err(f"{sw}: table needs headers (2+) and rows")
+                else:
+                    for r in rows:
+                        if not (isinstance(r, list) and len(r) == len(hdr)):
+                            err(f"{sw}: a table row has the wrong number of cells")
+                            break
+                    hear = step.get("hear", -1)
+                    if hear != -1 and not (isinstance(hear, int) and 0 <= hear < len(hdr)):
+                        err(f"{sw}: bad hear column")
+                    elif isinstance(hear, int) and hear >= 0 and isinstance(rows, list):
+                        for r in rows:
+                            if isinstance(r, list) and len(r) > hear:
+                                fr.append(r[hear])
             elif kind in ("choose", "listen"):
                 if kind == "choose":
                     _need(step, "prompt", sw)

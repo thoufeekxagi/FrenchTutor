@@ -36,7 +36,14 @@ interaction (see BUILD_STRUCTURE.md).
 | `integration_test/v3_onboarding_test.dart` | `E2E_DEFINES='--dart-define=SKIP_NOTIFICATION_PROMPT=true' tool/e2e.sh ...` | launch, welcome, level, Marie, rhythm, plan, then the account gate. Asserts facts on the plan screen |
 | `integration_test/v3_lesson_test.dart` | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh ...` | plays the dev sample lesson from Learn to completion: every step type, wrong then right answer, score, missed list, completion saved, hero moves on. Never taps a speaker (that would call Gemini Live and cost money) |
 | `integration_test/v3_course_walk_test.dart` | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh integration_test/v3_course_walk_test.dart <device-id> 900` | plays EVERY authored lesson on the phone, answering each question from the lesson file's own key. Fails if any lesson does not load, any step cannot render, any key is not accepted, or a lesson does not finish with a perfect score and get recorded. Run it after adding or editing any lesson (about 4 minutes for 4 lessons) |
+| `integration_test/v3_story_test.dart` | `E2E_DEFINES='--dart-define=E2E_SHELL=true --dart-define=E2E_FAKE_AUDIO=true' tool/e2e.sh integration_test/v3_story_test.dart <device-id> 900` | Stories list and level chips, reader, the small word card, hear-words on and off, translation toggle, playback and speed controls, Words tab and saving, quiz and completion for every story, Dark mode. `E2E_FAKE_AUDIO` swaps live Marie for a free fake, so nothing is billed. The real voice is tested by hand |
 | `integration_test/v3_shell_test.dart` | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh ...` | four tabs, exam countdown, Path units, TCF format numbers, dark toggle persists |
+
+**Run everything:** `tool/e2e_all.sh` runs every v3 device test one at a time with the right flags and prints a pass/fail table (about 15 minutes). `tool/e2e_all.sh story` runs only matching tests. Screenshots are kept in `artifacts/e2e_all/<test>/`.
+
+**Course walk filter.** `E2E_ONLY=s0-01,a1-u02` (a `--dart-define`) limits `v3_course_walk_test.dart` to lessons whose id starts with one of the prefixes. `tool/e2e_all.sh` walks a representative sample (about 9 minutes). `FULL_WALK=1 tool/e2e_all.sh walk` plays every lesson (about an hour, 1 000+ steps).
+
+**Test progress is separate from real progress.** In debug builds started with `E2E_SHELL`, every progress key is stored with an `e2e_` prefix (`lib/v3/v3_prefs.dart`, `v3Key()`), so a test run can never read or erase what you learned on the same phone.
 
 `tool/e2e.sh` stops any leftover copy of our own app on the phone before each run (matched by bundle id, never other apps). A copy still running under a debugger makes Flutter's launch fail.
 

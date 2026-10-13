@@ -57,10 +57,38 @@ void main() {
     await probe.tapLabel(tester, 'Path');
     await tester.pump(const Duration(milliseconds: 600));
     await probe.capture(tester, '02_learn_path');
+    // Stage 0 is open first (it holds the next lesson) and lists its lessons.
+    var pathLabels = await labels(tester);
     expect(
-      (await labels(tester)).any((t) => t.startsWith('Unit ')),
+      pathLabels.any((t) => t.startsWith('Stage 0, ')),
       isTrue,
-      reason: 'no unit rows on Path',
+      reason: 'Stage 0 card missing: $pathLabels',
+    );
+    expect(
+      pathLabels.where((t) => t.startsWith('Lesson, ')).length,
+      greaterThanOrEqualTo(5),
+      reason: 'Stage 0 lessons missing: $pathLabels',
+    );
+    // Collapse it: every unit card is then on screen.
+    await probe.tapLabel(tester, 'Stage 0, Sounds and spelling');
+    await tester.pump(const Duration(milliseconds: 600));
+    pathLabels = await labels(tester);
+    for (var n = 1; n <= 5; n++) {
+      expect(
+        pathLabels.any((t) => t.startsWith('Unit $n, ')),
+        isTrue,
+        reason: 'Unit $n missing on Path: $pathLabels',
+      );
+    }
+    // Opening Unit 1 shows its lessons.
+    await probe.tapLabel(tester, 'Unit 1, Introduce yourself');
+    await tester.pump(const Duration(milliseconds: 600));
+    await probe.capture(tester, '02b_learn_path_unit1');
+    pathLabels = await labels(tester);
+    expect(
+      pathLabels.any((t) => t.startsWith('Lesson, Words:')),
+      isTrue,
+      reason: 'Unit 1 lessons missing: $pathLabels',
     );
 
     // Marie tab.

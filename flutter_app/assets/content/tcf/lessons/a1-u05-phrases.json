@@ -1,0 +1,148 @@
+{
+  "id": "a1-u05-phrases",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Phrases",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Combien ça coûte ?",
+      "en": "How much does it cost?",
+      "tip": "Say it: koh(n)-BYA(N) sah koot"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "C'est combien ?",
+      "en": "How much is it?",
+      "tip": "Say it: seh koh(n)-BYA(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Ça fait combien ?",
+      "en": "What does it come to?",
+      "tip": "Say it: sah feh koh(n)-BYA(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Ça fait six dollars vingt-cinq.",
+      "en": "That is 6.25 dollars.",
+      "tip": "Say it: sah feh see doh-LAHR va(n)-SA(N)k"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "C'est trop cher.",
+      "en": "It is too expensive.",
+      "tip": "Say it: seh troh shehr"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Vous payez comment ?",
+      "en": "How are you paying?",
+      "tip": "Say it: voo peh-yay koh-MAH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je paie par carte.",
+      "en": "I pay by card.",
+      "tip": "Say it: zhuh peh pahr kahrt"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Comptant ou par carte ?",
+      "en": "Cash or card?",
+      "tip": "Say it: koh(n)-tah(n) oo pahr kahrt"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Le reçu, s'il vous plaît.",
+      "en": "The receipt, please.",
+      "tip": "Say it: luh ruh-SÜ seel voo PLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Le total est de sept dollars dix-huit.",
+      "en": "The total is $7.18.",
+      "tip": "Say it: luh toh-TAHL eh duh set doh-LAHR dee-ZWEET"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Combien ça coûte ?",
+      "options": [
+        "That is 6.25 dollars.",
+        "How much does it cost?",
+        "I pay by card.",
+        "The total is $7.18."
+      ],
+      "answer": 1,
+      "explain": "Combien ça coûte ? means How much does it cost?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Ça fait combien ?",
+      "options": [
+        "How are you paying?",
+        "What does it come to?",
+        "The receipt, please.",
+        "How much is it?"
+      ],
+      "answer": 1,
+      "explain": "Ça fait combien ? means What does it come to?."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "C'est trop cher.",
+      "options": [
+        "Cash or card?",
+        "It is too expensive.",
+        "How much does it cost?",
+        "That is 6.25 dollars."
+      ],
+      "answer": 1,
+      "explain": "C'est trop cher. means It is too expensive.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je paie par carte.",
+      "options": [
+        "The total is $7.18.",
+        "I pay by card.",
+        "What does it come to?",
+        "How are you paying?"
+      ],
+      "answer": 1,
+      "explain": "Je paie par carte. means I pay by card.."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "In Canada",
+      "body": "Say prices like this: 7,18 $ = sept dollars dix-huit (you do not need to say cents). 0,75 $ = soixante-quinze cents. 12 $ = douze dollars. For 1 200 $ say mille deux cents dollars. In Québec you may hear piastre for dollar and cenne for cent in casual talk. That is informal: you understand it, but you write dollar and cent."
+    }
+  ]
+}

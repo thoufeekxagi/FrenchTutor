@@ -1,0 +1,211 @@
+{
+  "id": "s0-08",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "The French r",
+  "subtitle": "Stage 0, lesson 8",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "The French r",
+      "body": "The French r is not made with the tongue tip like in English. It is made in the back of the throat, a soft friction, a little like clearing your throat very gently or a quiet gargle."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "How to find it",
+      "body": "• Say a long ah. Now say g-g-g-ah. Feel the back of your tongue touch the soft palate.\n• Say ha, then make the h rough and soft in the throat: hRa.\n• Keep the tongue tip down, touching your bottom front teeth, and do not move it."
+    },
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "rue",
+      "en": "street",
+      "sound": "Rü",
+      "exampleFr": "La rue Sainte-Catherine.",
+      "exampleEn": "Sainte-Catherine Street."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "rouge",
+      "en": "red",
+      "sound": "RoozH"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "merci",
+      "en": "thank you",
+      "sound": "mehR-SEE"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "par",
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "mer",
+      "en": "sea",
+      "sound": "mehR"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "sœur",
+      "en": "sister",
+      "sound": "suhR"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "bonjour",
+      "en": "hello",
+      "sound": "boh(n)-ZHOOR"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "regarder",
+      "en": "to look at",
+      "sound": "Ruh-gahR-DAY"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "rue",
+      "options": [
+        "by, through",
+        "street",
+        "hello",
+        "red"
+      ],
+      "answer": 1,
+      "explain": "rue means street."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "rouge",
+      "options": [
+        "sea",
+        "to look at",
+        "thank you",
+        "red"
+      ],
+      "answer": 3,
+      "explain": "rouge means red."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "merci",
+      "options": [
+        "sister",
+        "thank you",
+        "street",
+        "by, through"
+      ],
+      "answer": 1,
+      "explain": "merci means thank you."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "par",
+      "options": [
+        "hello",
+        "red",
+        "sea",
+        "by, through"
+      ],
+      "answer": 3,
+      "explain": "par means by, through."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "mer",
+      "options": [
+        "to look at",
+        "sea",
+        "thank you",
+        "sister"
+      ],
+      "answer": 1,
+      "explain": "mer means sea."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "sœur",
+      "options": [
+        "street",
+        "by, through",
+        "hello",
+        "sister"
+      ],
+      "answer": 3,
+      "explain": "sœur means sister."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "rouge",
+      "question": "Which word did you hear?",
+      "options": [
+        "par",
+        "rouge",
+        "sœur",
+        "regarder"
+      ],
+      "answer": 1,
+      "explain": "You heard rouge: red."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "par",
+      "question": "Which word did you hear?",
+      "options": [
+        "par",
+        "sœur",
+        "regarder",
+        "rouge"
+      ],
+      "answer": 0,
+      "explain": "You heard par: by, through."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "The r varies a lot in Québec: it can be more rolled or more relaxed depending on the region. A clear standard r is enough for the exam. Do not worry about getting it perfect on day one."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Speaking: R practice",
+      "body": "Say slowly, then faster: rue, rouge, merci, par, bonjour, regarder. Say Bonjour, merci, au revoir three times. Record yourself.\n\n• If your r sounds like an English r, relax your tongue and keep the tip against your bottom teeth.\n• Do not push. Soft and in the throat is better than hard."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "rue, rouge, merci, par, bonjour, regarder.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "a1-u04-reading",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Reading practice",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the marital status?",
+      "options": [
+        "Single",
+        "Married",
+        "Common-law",
+        "Divorced"
+      ],
+      "answer": 1,
+      "explain": "Marié(e) is ticked.",
+      "promptFr": "Situation familiale : ☐ célibataire ☒ marié(e) ☐ conjoint(e) de fait ☐ divorcé(e) · Nom du conjoint : Haddad · Prénom : Samira · Nombre d'enfants : 2"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How many children?",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": 2,
+      "explain": "Nombre d'enfants : 2.",
+      "promptFr": "Situation familiale : ☐ célibataire ☒ marié(e) ☐ conjoint(e) de fait ☐ divorcé(e) · Nom du conjoint : Haddad · Prénom : Samira · Nombre d'enfants : 2"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How old is Léa?",
+      "options": [
+        "12",
+        "20",
+        "22",
+        "30"
+      ],
+      "answer": 1,
+      "explain": "Vingt ans.",
+      "promptFr": "Voici ma sœur. Elle s'appelle Léa. Elle a vingt ans. Elle est petite et blonde. Elle a les yeux bleus. Elle est étudiante."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Léa look like?",
+      "options": [
+        "Tall with dark hair",
+        "Small and blond with blue eyes",
+        "Tall and blond",
+        "Small with brown hair"
+      ],
+      "answer": 1,
+      "explain": "Petite et blonde, les yeux bleus.",
+      "promptFr": "Voici ma sœur. Elle s'appelle Léa. Elle a vingt ans. Elle est petite et blonde. Elle a les yeux bleus. Elle est étudiante."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does Léa do?",
+      "options": [
+        "She works",
+        "She studies",
+        "She cooks",
+        "She travels"
+      ],
+      "answer": 1,
+      "explain": "Étudiante.",
+      "promptFr": "Voici ma sœur. Elle s'appelle Léa. Elle a vingt ans. Elle est petite et blonde. Elle a les yeux bleus. Elle est étudiante."
+    }
+  ]
+}

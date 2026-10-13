@@ -1,0 +1,140 @@
+{
+  "id": "a1-u03-checkpoint",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Checkpoint",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "___ adresse (the address)",
+      "options": [
+        "le",
+        "la",
+        "l'",
+        "les"
+      ],
+      "answer": 2,
+      "explain": "L'adresse."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "___ formulaire (a form)",
+      "options": [
+        "un",
+        "une",
+        "des",
+        "les"
+      ],
+      "answer": 0,
+      "explain": "Un formulaire."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Plural of 'la rue'?",
+      "options": [
+        "les rues",
+        "les rue",
+        "le rues",
+        "des rue"
+      ],
+      "answer": 0,
+      "explain": "Les rues."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Plural of 'le pays'?",
+      "options": [
+        "les pays",
+        "les païs",
+        "le pays",
+        "les payss"
+      ],
+      "answer": 0,
+      "explain": "Pays does not change."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does 'né le' mean?",
+      "options": [
+        "born on",
+        "named",
+        "lives",
+        "wants"
+      ],
+      "answer": 0,
+      "explain": "Né: born."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "In a Canadian address, what comes first?",
+      "options": [
+        "The street name",
+        "The number",
+        "The city",
+        "The province"
+      ],
+      "answer": 1,
+      "explain": "Number first."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Which one is a province?",
+      "options": [
+        "Ottawa",
+        "Ontario",
+        "Montréal",
+        "Gatineau"
+      ],
+      "answer": 1,
+      "explain": "Ontario."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "'NAS' in English is...",
+      "options": [
+        "SIN",
+        "PR",
+        "ID",
+        "GST"
+      ],
+      "answer": 0,
+      "explain": "Social Insurance Number."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which word is formal for 'your'?",
+      "options": [
+        "votre",
+        "ton",
+        "ta",
+        "tes"
+      ],
+      "answer": 0,
+      "explain": "Votre."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "'Signez ici' means...",
+      "options": [
+        "Sign here",
+        "Come here",
+        "Pay here",
+        "Wait here"
+      ],
+      "answer": 0,
+      "explain": "Signer."
+    }
+  ]
+}

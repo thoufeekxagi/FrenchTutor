@@ -1,0 +1,114 @@
+{
+  "id": "a1-u03-dialogues",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Dialogues",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "At Service Canada: the SIN",
+      "body": "Priya wants a SIN. The agent uses vous.",
+      "examples": [
+        {
+          "fr": "Bonjour, madame. Votre pièce d'identité, s'il vous plaît ?",
+          "en": "L'agent: Hello, madam. Your ID, please?"
+        },
+        {
+          "fr": "Voici mon passeport et mon permis de travail.",
+          "en": "Priya: Here is my passport and my work permit."
+        },
+        {
+          "fr": "Merci. Votre nom et votre prénom ?",
+          "en": "L'agent: Thank you. Your last name and first name?"
+        },
+        {
+          "fr": "Patel. Priya. P-A-T-E-L.",
+          "en": "Priya: Patel. Priya. P-A-T-E-L."
+        },
+        {
+          "fr": "Votre date de naissance ?",
+          "en": "L'agent: Your date of birth?"
+        },
+        {
+          "fr": "Je suis née le quinze avril mille neuf cent quatre-vingt-dix.",
+          "en": "Priya: I was born on April 15, 1990."
+        },
+        {
+          "fr": "Votre adresse ?",
+          "en": "L'agent: Your address?"
+        },
+        {
+          "fr": "J'habite au douze, rue Sainte-Catherine, appartement quatre, Montréal.",
+          "en": "Priya: I live at 12 Sainte-Catherine Street, apartment 4, Montréal."
+        },
+        {
+          "fr": "Et le code postal ?",
+          "en": "L'agent: And the postal code?"
+        },
+        {
+          "fr": "C'est H3B 1A7.",
+          "en": "Priya: It is H3B 1A7."
+        },
+        {
+          "fr": "Parfait. Signez ici, s'il vous plaît.",
+          "en": "L'agent: Perfect. Sign here, please."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which documents does Priya show?",
+      "options": [
+        "Passport and work permit",
+        "Passport and health card",
+        "Licence and PR card",
+        "Birth certificate only"
+      ],
+      "answer": 0,
+      "explain": "Mon passeport et mon permis de travail."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When was Priya born?",
+      "options": [
+        "April 15, 1990",
+        "April 5, 1990",
+        "May 15, 1990",
+        "April 15, 1999"
+      ],
+      "answer": 0,
+      "explain": "Le quinze avril mille neuf cent quatre-vingt-dix."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is the apartment number?",
+      "options": [
+        "2",
+        "4",
+        "12",
+        "14"
+      ],
+      "answer": 1,
+      "explain": "Appartement quatre."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does the agent ask at the end?",
+      "options": [
+        "To sign",
+        "To wait",
+        "To pay",
+        "To call"
+      ],
+      "answer": 0,
+      "explain": "Signez ici."
+    }
+  ]
+}

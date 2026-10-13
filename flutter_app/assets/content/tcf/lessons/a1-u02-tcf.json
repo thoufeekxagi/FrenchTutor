@@ -1,0 +1,114 @@
+{
+  "id": "a1-u02-tcf",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "TCF corner",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Bonjour, ici Marc. Mon numéro de téléphone est le quatre, un, six, cinq, cinq, cinq, zéro, un, deux, trois.",
+      "question": "Which city has this area code (416)?",
+      "options": [
+        "Toronto",
+        "Montréal",
+        "Ottawa",
+        "Québec"
+      ],
+      "answer": 0,
+      "explain": "416 is the Toronto area code."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Quel âge as-tu ? — J'ai vingt et un ans.",
+      "question": "How old is the person?",
+      "options": [
+        "20",
+        "21",
+        "12",
+        "31"
+      ],
+      "answer": 1,
+      "explain": "Vingt et un: 21."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Pardon ? Plus lentement, s'il vous plaît.",
+      "question": "What does the person ask?",
+      "options": [
+        "To speak more slowly",
+        "To speak louder",
+        "To leave",
+        "To write"
+      ],
+      "answer": 0,
+      "explain": "Plus lentement: more slowly."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Mon courriel : L-E-A, arobase, exemple, point c-a.",
+      "question": "What does the email end with?",
+      "options": [
+        ".com",
+        ".ca",
+        ".fr",
+        ".org"
+      ],
+      "answer": 1,
+      "explain": "Point c-a: .ca."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How old is Karim?",
+      "options": [
+        "18",
+        "28",
+        "38",
+        "82"
+      ],
+      "answer": 1,
+      "explain": "Vingt-huit: 28.",
+      "promptFr": "Bonsoir ! Je m'appelle Karim. J'ai vingt-huit ans. Je parle arabe et français."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the second person say?",
+      "options": [
+        "Thank you",
+        "You're welcome",
+        "Sorry",
+        "Hello"
+      ],
+      "answer": 1,
+      "explain": "Bienvenue: you're welcome.",
+      "promptFr": "Merci beaucoup ! — Bienvenue !"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does the person want?",
+      "options": [
+        "An address",
+        "A cell phone number",
+        "A name",
+        "An age"
+      ],
+      "answer": 1,
+      "explain": "Numéro de cellulaire.",
+      "promptFr": "Votre numéro de cellulaire, s'il vous plaît ?"
+    }
+  ]
+}

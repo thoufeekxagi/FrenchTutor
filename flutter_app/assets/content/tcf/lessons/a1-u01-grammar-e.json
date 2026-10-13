@@ -1,0 +1,250 @@
+{
+  "id": "a1-u01-grammar-e",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Grammar: Nationalities: man and woman",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Nationalities: man and woman",
+      "body": "A nationality is an adjective. It matches the person: add -e for a woman (français → française). Many end in -ien for a man and -ienne for a woman (canadien → canadienne). In speech, the feminine says the final consonant. In writing, you add the letters. The full rule comes in Unit 4."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write the right form of être.  Je ___ Sam.",
+      "options": [
+        "es",
+        "est",
+        "sommes",
+        "suis"
+      ],
+      "answer": 3,
+      "explain": "The answer is suis."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write the right form of être.  Tu ___ canadien.",
+      "options": [
+        "suis",
+        "est",
+        "es",
+        "sommes"
+      ],
+      "answer": 2,
+      "explain": "The answer is es."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write the right form of être.  Elle ___ française.",
+      "options": [
+        "suis",
+        "es",
+        "est",
+        "sommes"
+      ],
+      "answer": 2,
+      "explain": "The answer is est."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write the right form of être.  Nous ___ à Ottawa.",
+      "options": [
+        "sommes",
+        "suis",
+        "es",
+        "est"
+      ],
+      "answer": 0,
+      "explain": "The answer is sommes."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write the right form of être.  Vous ___ madame Diallo ?",
+      "options": [
+        "êtes",
+        "suis",
+        "es",
+        "est"
+      ],
+      "answer": 0,
+      "explain": "The answer is êtes."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write the right form of être.  Ils ___ canadiens.",
+      "options": [
+        "suis",
+        "es",
+        "sont",
+        "est"
+      ],
+      "answer": 2,
+      "explain": "The answer is sont."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Write the right form of the verb in brackets.  Je (parler) ___ français.",
+      "options": [
+        "habites",
+        "s'appelle",
+        "parle",
+        "habite"
+      ],
+      "answer": 2,
+      "explain": "The answer is parle."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Write the right form of the verb in brackets.  Tu (habiter) ___ à Toronto.",
+      "options": [
+        "parle",
+        "s'appelle",
+        "habites",
+        "habite"
+      ],
+      "answer": 2,
+      "explain": "The answer is habites."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Write the right form of the verb in brackets.  Elle (s'appeler) ___ Nadia.",
+      "options": [
+        "s'appelle",
+        "parle",
+        "habites",
+        "habite"
+      ],
+      "answer": 0,
+      "explain": "The answer is s'appelle."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Write the right form of the verb in brackets.  J' (habiter) ___ à Ottawa.",
+      "options": [
+        "habite",
+        "parle",
+        "habites",
+        "s'appelle"
+      ],
+      "answer": 0,
+      "explain": "The answer is habite."
+    },
+    {
+      "type": "choose",
+      "id": "c11",
+      "prompt": "Write the right form of the verb in brackets.  Il (parler) ___ anglais.",
+      "options": [
+        "habites",
+        "parle",
+        "s'appelle",
+        "habite"
+      ],
+      "answer": 1,
+      "explain": "The answer is parle."
+    },
+    {
+      "type": "choose",
+      "id": "c12",
+      "prompt": "Write the right form of the verb in brackets.  Tu (s'appeler) ___ comment ?",
+      "options": [
+        "parle",
+        "habites",
+        "t'appelles",
+        "s'appelle"
+      ],
+      "answer": 2,
+      "explain": "The answer is t'appelles."
+    },
+    {
+      "type": "choose",
+      "id": "c13",
+      "prompt": "Write the correct nationality: a man or a woman.  Marc is from Canada. Il est ___.",
+      "options": [
+        "canadien",
+        "française",
+        "marocain",
+        "algérienne"
+      ],
+      "answer": 0,
+      "explain": "The answer is canadien."
+    },
+    {
+      "type": "choose",
+      "id": "c14",
+      "prompt": "Write the correct nationality: a man or a woman.  Julie is from France. Elle est ___.",
+      "options": [
+        "française",
+        "canadien",
+        "marocain",
+        "algérienne"
+      ],
+      "answer": 0,
+      "explain": "The answer is française."
+    },
+    {
+      "type": "choose",
+      "id": "c15",
+      "prompt": "Write the correct nationality: a man or a woman.  Karim is from Morocco. Il est ___.",
+      "options": [
+        "canadien",
+        "française",
+        "marocain",
+        "algérienne"
+      ],
+      "answer": 2,
+      "explain": "The answer is marocain."
+    },
+    {
+      "type": "choose",
+      "id": "c16",
+      "prompt": "Write the correct nationality: a man or a woman.  Nadia is from Algeria. Elle est ___.",
+      "options": [
+        "canadien",
+        "française",
+        "algérienne",
+        "marocain"
+      ],
+      "answer": 2,
+      "explain": "The answer is algérienne."
+    },
+    {
+      "type": "choose",
+      "id": "c17",
+      "prompt": "Write the correct nationality: a man or a woman.  Priya is from India. Elle est ___.",
+      "options": [
+        "canadien",
+        "française",
+        "indienne",
+        "marocain"
+      ],
+      "answer": 2,
+      "explain": "The answer is indienne."
+    },
+    {
+      "type": "choose",
+      "id": "c18",
+      "prompt": "Write the correct nationality: a man or a woman.  Wei is from China. Il est ___.",
+      "options": [
+        "canadien",
+        "chinois",
+        "française",
+        "marocain"
+      ],
+      "answer": 1,
+      "explain": "The answer is chinois."
+    }
+  ]
+}

@@ -1,0 +1,207 @@
+{
+  "id": "a1-u05-words-3",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Words: taxes and savings",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la taxe",
+      "en": "tax",
+      "sound": "lah tahks"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la TPS",
+      "en": "GST (federal sales tax)",
+      "sound": "lah tay-pay-ESS"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la TVQ",
+      "en": "QST (Québec sales tax)",
+      "sound": "lah tay-vay-KÜ"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "avant taxes / plus taxes",
+      "en": "before tax / plus tax",
+      "say": "avant taxes, plus taxes",
+      "sound": "ah-VAH(N) tahks / plü tahks"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le total",
+      "en": "total",
+      "sound": "luh toh-TAHL"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le sous-total",
+      "en": "subtotal",
+      "sound": "luh soo-toh-TAHL"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le rabais",
+      "en": "discount",
+      "sound": "luh rah-BEH",
+      "exampleFr": "Vingt pour cent de rabais.",
+      "exampleEn": "Twenty percent off."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "en solde",
+      "en": "on sale",
+      "sound": "ah(n) sohld",
+      "exampleFr": "C'est en solde.",
+      "exampleEn": "It is on sale."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "pour cent",
+      "en": "percent",
+      "sound": "poor sah(n)",
+      "exampleFr": "Quinze pour cent.",
+      "exampleEn": "Fifteen percent."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "demander",
+      "en": "to ask",
+      "sound": "duh-mah(n)-DAY",
+      "exampleFr": "Je demande le prix.",
+      "exampleEn": "I ask for the price."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la taxe",
+      "options": [
+        "discount",
+        "tax",
+        "to ask",
+        "subtotal"
+      ],
+      "answer": 1,
+      "explain": "la taxe means tax."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la TPS",
+      "options": [
+        "total",
+        "on sale",
+        "discount",
+        "GST (federal sales tax)"
+      ],
+      "answer": 3,
+      "explain": "la TPS means GST (federal sales tax)."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la TVQ",
+      "options": [
+        "subtotal",
+        "QST (Québec sales tax)",
+        "percent",
+        "total"
+      ],
+      "answer": 1,
+      "explain": "la TVQ means QST (Québec sales tax)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "avant taxes / plus taxes",
+      "options": [
+        "discount",
+        "to ask",
+        "subtotal",
+        "before tax / plus tax"
+      ],
+      "answer": 3,
+      "explain": "avant taxes / plus taxes means before tax / plus tax."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le total",
+      "options": [
+        "on sale",
+        "total",
+        "tax",
+        "before tax / plus tax"
+      ],
+      "answer": 1,
+      "explain": "le total means total."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le sous-total",
+      "options": [
+        "percent",
+        "GST (federal sales tax)",
+        "total",
+        "subtotal"
+      ],
+      "answer": 3,
+      "explain": "le sous-total means subtotal."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "la TPS",
+      "question": "Which word did you hear?",
+      "options": [
+        "le total",
+        "la TPS",
+        "le rabais",
+        "pour cent"
+      ],
+      "answer": 1,
+      "explain": "You heard la TPS: GST (federal sales tax)."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le sous-total",
+      "question": "Which word did you hear?",
+      "options": [
+        "en solde",
+        "le sous-total",
+        "demander",
+        "la TPS"
+      ],
+      "answer": 1,
+      "explain": "You heard le sous-total: subtotal."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Watch out",
+      "body": "cent (100) and cent (the coin) are written the same. Context tells them apart: cent dollars = 100 dollars. Dix cents = 10 cents. sept cents (700) and cent (a cent) are not the same: write the number clearly."
+    }
+  ]
+}

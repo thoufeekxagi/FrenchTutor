@@ -1,0 +1,200 @@
+{
+  "id": "a1-formulaire",
+  "title": "Le formulaire",
+  "titleEn": "The form",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Priya fills in a form at Service Canada and signs it.",
+  "unit": "a1-u03",
+  "sentences": [
+    {
+      "fr": "Priya est à Service Canada.",
+      "en": "Priya is at Service Canada.",
+      "note": "Service Canada is the federal office for the SIN, benefits and many documents."
+    },
+    {
+      "fr": "L'agent donne un formulaire.",
+      "en": "The agent gives her a form."
+    },
+    {
+      "fr": "Elle remplit le formulaire.",
+      "en": "She fills in the form."
+    },
+    {
+      "fr": "D'abord, le nom et le prénom.",
+      "en": "First, the last name and the first name."
+    },
+    {
+      "fr": "Ensuite, l'adresse et le code postal.",
+      "en": "Then, the address and the postal code.",
+      "note": "In an address, French writes the number first and the street name after."
+    },
+    {
+      "fr": "Le code postal est H3B 1A7.",
+      "en": "The postal code is H3B 1A7."
+    },
+    {
+      "fr": "Puis elle signe le formulaire.",
+      "en": "Then she signs the form."
+    },
+    {
+      "fr": "L'agent dit : « C'est parfait, madame. Merci ! »",
+      "en": "The agent says: “That is perfect, madam. Thank you!”"
+    }
+  ],
+  "words": {
+    "priya": {
+      "en": "Priya (a woman's name)"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "à": {
+      "en": "at, to"
+    },
+    "service": {
+      "en": "service"
+    },
+    "canada": {
+      "en": "Canada"
+    },
+    "l'agent": {
+      "en": "the agent, the officer",
+      "pos": "noun, masculine",
+      "sound": "lah-ZHAH(N)"
+    },
+    "donne": {
+      "en": "gives (donner)",
+      "pos": "verb",
+      "sound": "dohn"
+    },
+    "un": {
+      "en": "a"
+    },
+    "formulaire": {
+      "en": "form",
+      "pos": "noun, masculine",
+      "sound": "fohr-mü-LEHR"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "remplit": {
+      "en": "fills in (remplir)",
+      "pos": "verb",
+      "sound": "rah(n)-PLEE"
+    },
+    "le": {
+      "en": "the"
+    },
+    "d'abord": {
+      "en": "first"
+    },
+    "nom": {
+      "en": "last name",
+      "pos": "noun, masculine"
+    },
+    "et": {
+      "en": "and"
+    },
+    "prénom": {
+      "en": "first name",
+      "pos": "noun, masculine",
+      "sound": "pray-NOH(N)"
+    },
+    "ensuite": {
+      "en": "then, next"
+    },
+    "l'adresse": {
+      "en": "the address",
+      "pos": "noun, feminine",
+      "sound": "lah-DREHS"
+    },
+    "code": {
+      "en": "code",
+      "pos": "noun, masculine"
+    },
+    "postal": {
+      "en": "postal"
+    },
+    "h3b": {
+      "en": "the letters and digit H3B"
+    },
+    "1a7": {
+      "en": "the digit and letters 1A7"
+    },
+    "puis": {
+      "en": "then"
+    },
+    "signe": {
+      "en": "signs (signer)",
+      "pos": "verb",
+      "sound": "SEE-nyuh"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "c'est": {
+      "en": "it is, that is"
+    },
+    "parfait": {
+      "en": "perfect",
+      "pos": "adjective",
+      "sound": "pahr-FEH"
+    },
+    "madame": {
+      "en": "madam",
+      "pos": "noun, feminine",
+      "sound": "mah-DAHM"
+    },
+    "merci": {
+      "en": "thank you"
+    }
+  },
+  "keywords": [
+    "formulaire",
+    "remplit",
+    "l'adresse",
+    "code",
+    "signe",
+    "l'agent"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does the agent give Priya?",
+      "options": [
+        "A card",
+        "A form",
+        "A passport",
+        "A phone"
+      ],
+      "answer": 1,
+      "explain": "L'agent donne un formulaire."
+    },
+    {
+      "prompt": "What does she write first?",
+      "options": [
+        "The postal code",
+        "The name",
+        "The signature",
+        "The age"
+      ],
+      "answer": 1,
+      "explain": "D'abord, le nom."
+    },
+    {
+      "prompt": "What does she do last?",
+      "options": [
+        "Pays",
+        "Signs the form",
+        "Calls",
+        "Leaves"
+      ],
+      "answer": 1,
+      "explain": "Puis elle signe."
+    }
+  ]
+}

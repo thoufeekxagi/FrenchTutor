@@ -1,0 +1,101 @@
+{
+  "id": "a1-u04-grammar-b",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Grammar: Adjectives agree with the noun",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Adjectives agree with the noun",
+      "body": "Adjectives match the gender and number of the noun. Add -e for feminine, -s for plural."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Regular agreement",
+      "headers": [
+        "",
+        "masculine",
+        "feminine",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "singular",
+          "il est grand",
+          "elle est grande",
+          "grah(n) / grah(n)d"
+        ],
+        [
+          "singular",
+          "il est petit",
+          "elle est petite",
+          "puh-TEE / puh-TEET"
+        ],
+        [
+          "singular",
+          "il est content",
+          "elle est contente",
+          "koh(n)-TAH(N) / koh(n)-TAH(N)T"
+        ],
+        [
+          "plural",
+          "ils sont grands",
+          "elles sont grandes",
+          "same as singular"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "The same -s rule: the s is silent",
+      "headers": [
+        "Plural adjectives",
+        "Example"
+      ],
+      "rows": [
+        [
+          "jeunes",
+          "Mes parents sont jeunes."
+        ],
+        [
+          "contents",
+          "Ils sont contents."
+        ],
+        [
+          "blonds / blondes",
+          "Ils ont les cheveux blonds."
+        ],
+        [
+          "verts / vertes",
+          "Elle a les yeux verts."
+        ],
+        [
+          "noirs / noires",
+          "Il a les cheveux noirs."
+        ],
+        [
+          "filles (plural of fille)",
+          "J'ai deux filles."
+        ]
+      ],
+      "hear": 1
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Adjectives agree with the noun",
+      "body": "Some adjectives change more: beau → belle, vieux → vieille, gentil → gentille, blanc → blanche, roux → rousse. -e adjectives do not change in the feminine: jeune, rouge, célibataire, sympathique. Colour words used as nouns for things never change: orange, marron.\n\nPosition. Most adjectives come after the noun: une femme canadienne, un sac noir. A few short, common ones come before: grand, petit, jeune, vieux, beau, bon, mauvais, nouveau: une grande famille, un petit garçon, une belle ville."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "On Canadian forms: Né(e), Canadien(ne), Marié(e). The (e) tells you to add an e if you are a woman. You choose your form, you do not write both."
+    }
+  ]
+}

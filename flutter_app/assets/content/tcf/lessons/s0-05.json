@@ -1,0 +1,138 @@
+{
+  "id": "s0-05",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "u or ou? The rounded vowels",
+  "subtitle": "Stage 0, lesson 5",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "u or ou? The rounded vowels",
+      "body": "This is the first sound that is really new for English speakers. u and ou are different, and they change the meaning of a word.\n\n• ou = oo, as in food. Lips round and push forward. tout (all): too.\n• u = ü. Say ee and, without moving your tongue, round your lips as for oo. tu (you): tü.\n• eu = lips round, tongue forward, like her with a rounded mouth. deux (two): duh."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Minimal pairs: one letter, different word",
+      "headers": [
+        "u (ü)",
+        "ou (oo)",
+        "eu (uh)"
+      ],
+      "rows": [
+        [
+          "tu (you)",
+          "tout (all)",
+          "—"
+        ],
+        [
+          "rue (street)",
+          "roue (wheel)",
+          "—"
+        ],
+        [
+          "dessus (on top)",
+          "dessous (underneath)",
+          "—"
+        ],
+        [
+          "su (known)",
+          "sous (under)",
+          "—"
+        ],
+        [
+          "—",
+          "doux (soft)",
+          "deux (two)"
+        ],
+        [
+          "—",
+          "pour (for)",
+          "peur (fear)"
+        ],
+        [
+          "—",
+          "fou (crazy)",
+          "feu (fire)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "In Canada",
+      "body": "In Québec, short u, i and ou can become more relaxed: petite and lune sound slightly different from France. You will hear it in the app. For the exam, the clear standard sounds are what you produce."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "tout",
+      "question": "Which word?",
+      "options": [
+        "tu",
+        "tout",
+        "toux",
+        "tue"
+      ],
+      "answer": 1,
+      "explain": "Tout is too (oo), not tü."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "rue",
+      "question": "Which word?",
+      "options": [
+        "roue",
+        "rue",
+        "rouge",
+        "roux"
+      ],
+      "answer": 1,
+      "explain": "Rue is Rü (street)."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "sous",
+      "question": "Which word?",
+      "options": [
+        "su",
+        "sous",
+        "sur",
+        "sou"
+      ],
+      "answer": 1,
+      "explain": "Sous is soo (under)."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "deux",
+      "question": "Which number?",
+      "options": [
+        "doux",
+        "deux",
+        "dix",
+        "dos"
+      ],
+      "answer": 1,
+      "explain": "Deux is duh (two)."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Pairs out loud",
+      "body": "Say these pairs. Make the two sounds really different: tu, tout · rue, roue · dessus, dessous. Then say Il est sous la table (He is under the table).\n\n• Look in a mirror: for ü and oo your lips are rounded. For ü your tongue is forward, for oo it is back."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "tu, tout. rue, roue. dessus, dessous.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

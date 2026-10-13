@@ -1,0 +1,211 @@
+{
+  "id": "a1-u03-words-1",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Words: on the form",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le formulaire",
+      "en": "form",
+      "sound": "luh fohr-mü-LEHR",
+      "exampleFr": "Voici le formulaire.",
+      "exampleEn": "Here is the form."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "remplir",
+      "en": "to fill in",
+      "sound": "rah(n)-PLEER",
+      "exampleFr": "Remplissez le formulaire.",
+      "exampleEn": "Fill in the form."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "signer",
+      "en": "to sign",
+      "sound": "see-NYAY",
+      "exampleFr": "Signez ici, s'il vous plaît.",
+      "exampleEn": "Sign here, please."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la signature",
+      "en": "signature",
+      "sound": "lah see-nyah-TÜR"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "l'adresse (f.)",
+      "en": "address",
+      "say": "l'adresse",
+      "sound": "lah-DREHS",
+      "exampleFr": "Votre adresse, s'il vous plaît ?",
+      "exampleEn": "Your address, please?"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la rue",
+      "en": "street",
+      "sound": "lah Rü",
+      "exampleFr": "J'habite rue Sainte-Catherine.",
+      "exampleEn": "I live on Sainte-Catherine Street."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le code postal",
+      "en": "postal code",
+      "sound": "luh kohd poh-STAHL",
+      "exampleFr": "Mon code postal est H3B 1A7.",
+      "exampleEn": "My postal code is H3B 1A7."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "l'appartement (m.)",
+      "en": "apartment (written app.)",
+      "say": "l'appartement",
+      "sound": "lah-pahr-tuh-MAH(N)",
+      "exampleFr": "Appartement douze (app. 12).",
+      "exampleEn": "Apartment twelve."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la date de naissance",
+      "en": "date of birth",
+      "sound": "lah daht duh neh-SAH(N)S"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "né / née",
+      "en": "born (m. / f.)",
+      "say": "né, née",
+      "sound": "nay",
+      "exampleFr": "Je suis né en 1990.",
+      "exampleEn": "I was born in 1990."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le formulaire",
+      "options": [
+        "signature",
+        "form",
+        "postal code",
+        "born (m. / f.)"
+      ],
+      "answer": 1,
+      "explain": "le formulaire means form."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "remplir",
+      "options": [
+        "address",
+        "apartment (written app.)",
+        "form",
+        "to fill in"
+      ],
+      "answer": 3,
+      "explain": "remplir means to fill in."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "signer",
+      "options": [
+        "street",
+        "to sign",
+        "date of birth",
+        "to fill in"
+      ],
+      "answer": 1,
+      "explain": "signer means to sign."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la signature",
+      "options": [
+        "postal code",
+        "born (m. / f.)",
+        "to sign",
+        "signature"
+      ],
+      "answer": 3,
+      "explain": "la signature means signature."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "l'adresse (f.)",
+      "options": [
+        "apartment (written app.)",
+        "address",
+        "form",
+        "signature"
+      ],
+      "answer": 1,
+      "explain": "l'adresse (f.) means address."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la rue",
+      "options": [
+        "date of birth",
+        "to fill in",
+        "address",
+        "street"
+      ],
+      "answer": 3,
+      "explain": "la rue means street."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "remplir",
+      "question": "Which word did you hear?",
+      "options": [
+        "la signature",
+        "remplir",
+        "la rue",
+        "le formulaire"
+      ],
+      "answer": 1,
+      "explain": "You heard remplir: to fill in."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "la signature",
+      "question": "Which word did you hear?",
+      "options": [
+        "la signature",
+        "la rue",
+        "le formulaire",
+        "signer"
+      ],
+      "answer": 0,
+      "explain": "You heard la signature: signature."
+    }
+  ]
+}

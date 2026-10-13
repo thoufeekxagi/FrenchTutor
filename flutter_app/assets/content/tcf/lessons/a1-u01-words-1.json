@@ -1,0 +1,228 @@
+{
+  "id": "a1-u01-words-1",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Words: say hello",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "bonjour",
+      "en": "hello, good day",
+      "sound": "boh(n)-ZHOOR",
+      "exampleFr": "Bonjour, madame.",
+      "exampleEn": "Hello, madam."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "bonsoir",
+      "en": "good evening",
+      "sound": "boh(n)-SWAHR",
+      "exampleFr": "Bonsoir, monsieur.",
+      "exampleEn": "Good evening, sir."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "salut",
+      "en": "hi (friends and family)",
+      "sound": "sah-LÜ",
+      "exampleFr": "Salut, Marc !",
+      "exampleEn": "Hi, Marc!"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "allô",
+      "en": "hello (casual, phone)",
+      "sound": "ah-LOH",
+      "exampleFr": "Allô ? C'est Léa.",
+      "exampleEn": "Hello? It's Léa."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "oui",
+      "en": "yes",
+      "sound": "wee",
+      "exampleFr": "Oui, c'est ça.",
+      "exampleEn": "Yes, that's right."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "non",
+      "en": "no",
+      "sound": "noh(n)",
+      "exampleFr": "Non, elle est canadienne.",
+      "exampleEn": "No, she is Canadian."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "monsieur",
+      "en": "sir, Mr., man",
+      "sound": "muh-SYUH",
+      "exampleFr": "Bonjour, monsieur.",
+      "exampleEn": "Hello, sir."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "madame",
+      "en": "madam, Mrs., woman",
+      "sound": "mah-DAHM",
+      "exampleFr": "Bonjour, madame.",
+      "exampleEn": "Hello, madam."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "enchanté / enchantée",
+      "en": "nice to meet you",
+      "say": "enchanté, enchantée",
+      "sound": "ah(n)-shah(n)-TAY",
+      "exampleFr": "Enchanté, Sam.",
+      "exampleEn": "Nice to meet you, Sam."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "et",
+      "en": "and",
+      "sound": "ay",
+      "exampleFr": "Marc et Léa.",
+      "exampleEn": "Marc and Léa."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "le soir",
+      "en": "evening",
+      "sound": "luh swahr",
+      "exampleFr": "Il est sept heures du soir.",
+      "exampleEn": "It is seven in the evening."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "bonjour",
+      "options": [
+        "sir, Mr., man",
+        "hello, good day",
+        "and",
+        "yes"
+      ],
+      "answer": 1,
+      "explain": "bonjour means hello, good day."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "bonsoir",
+      "options": [
+        "yes",
+        "madam, Mrs., woman",
+        "hi (friends and family)",
+        "good evening"
+      ],
+      "answer": 3,
+      "explain": "bonsoir means good evening."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "salut",
+      "options": [
+        "no",
+        "hi (friends and family)",
+        "nice to meet you",
+        "hello, good day"
+      ],
+      "answer": 1,
+      "explain": "salut means hi (friends and family)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "allô",
+      "options": [
+        "sir, Mr., man",
+        "and",
+        "good evening",
+        "hello (casual, phone)"
+      ],
+      "answer": 3,
+      "explain": "allô means hello (casual, phone)."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "oui",
+      "options": [
+        "madam, Mrs., woman",
+        "yes",
+        "evening",
+        "hi (friends and family)"
+      ],
+      "answer": 1,
+      "explain": "oui means yes."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "non",
+      "options": [
+        "nice to meet you",
+        "hello, good day",
+        "hello (casual, phone)",
+        "no"
+      ],
+      "answer": 3,
+      "explain": "non means no."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "bonsoir",
+      "question": "Which word did you hear?",
+      "options": [
+        "allô",
+        "bonsoir",
+        "non",
+        "madame"
+      ],
+      "answer": 1,
+      "explain": "You heard bonsoir: good evening."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "oui",
+      "question": "Which word did you hear?",
+      "options": [
+        "monsieur",
+        "oui",
+        "et",
+        "bonjour"
+      ],
+      "answer": 1,
+      "explain": "You heard oui: yes."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "In Canada, allô is a normal casual hello, especially on the phone. In France you hear allô mostly on the phone too. Use bonjour with anyone you do not know."
+    }
+  ]
+}

@@ -1,160 +1,282 @@
 {
   "id": "s0-01",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
   "title": "How French works",
-  "subtitle": "Spelling, silent letters and rhythm",
-  "minutes": 6,
+  "subtitle": "Stage 0, lesson 1",
+  "minutes": 12,
   "steps": [
     {
       "type": "explain",
       "id": "e1",
-      "title": "French is not read like English",
-      "body": "French uses the same letters as English, but they often make different sounds.\n\nThe good news: French spelling follows rules, and the rules are very regular. In this course you learn them one at a time.\n\nYou will start by hearing French, not only reading it.",
-      "examples": [
-        {
-          "fr": "hôtel",
-          "en": "hotel"
-        },
-        {
-          "fr": "restaurant",
-          "en": "restaurant"
-        },
-        {
-          "fr": "orange",
-          "en": "orange"
-        }
-      ]
+      "title": "How French works",
+      "body": "French uses the same letters as English, but the letters often make different sounds. The good news: French spelling follows rules, and the rules are very regular. You will learn them one group at a time."
     },
     {
       "type": "explain",
       "id": "e2",
-      "title": "Most last letters are silent",
-      "body": "In French, the last letter of a word is very often not said. You see the letter, but you do not pronounce it.\n\nListen to these words and notice what you do not hear.\n\nThere are exceptions. The letters c, r, f and l are often said at the end, as in avec, bonjour, neuf and sel. You will practise them later.",
-      "examples": [
-        {
-          "fr": "petit",
-          "en": "small (the t is silent)"
-        },
-        {
-          "fr": "grand",
-          "en": "big (the d is silent)"
-        },
-        {
-          "fr": "vous",
-          "en": "you (the s is silent)"
-        }
-      ]
-    },
-    {
-      "type": "choose",
-      "id": "c1",
-      "prompt": "Which letter is silent at the end of this word?",
-      "promptFr": "petit",
-      "options": [
-        "the p",
-        "the e",
-        "the t"
-      ],
-      "answer": 2,
-      "explain": "The last letter, t, is silent. You say puh-TEE."
+      "title": "Three big ideas",
+      "body": "• Spelling is not sound. Learn to hear first, then read.\n• The last letter is often silent. petit (small) is said puh-TEE. The t is written, but you do not say it.\n• Every syllable counts. English stresses one syllable (PHO-to-graph). French gives each syllable almost the same length and force, with a small lift only on the last syllable of a group of words."
     },
     {
       "type": "explain",
       "id": "e3",
-      "title": "Every syllable counts",
-      "body": "English puts a strong stress on one syllable, like PHO-to-graph. French is different: each syllable has almost the same length and force.\n\nThink of a steady beat: ta, ta, ta. The only small lift is on the last syllable of a group of words.",
-      "examples": [
-        {
-          "fr": "Canada",
-          "en": "ka-na-DA, an even beat with a small lift at the end"
-        },
-        {
-          "fr": "bonjour",
-          "en": "bon-JOUR, two even syllables"
-        },
-        {
-          "fr": "restaurant",
-          "en": "res-to-RAN, three even syllables"
-        }
-      ]
+      "title": "Tip",
+      "body": "You already read French every day in Canada: on road signs, packages and shop doors. Now learn how those words really sound."
     },
     {
-      "type": "explain",
-      "id": "e4",
-      "title": "You already read French every day",
-      "body": "If you live in Canada, you see French on road signs, packages and shop doors.\n\nNow you will hear how these words really sound. Notice the silent last letters in arrêt and ouvert.",
-      "examples": [
-        {
-          "fr": "sortie",
-          "en": "exit"
-        },
-        {
-          "fr": "entrée",
-          "en": "entrance"
-        },
-        {
-          "fr": "arrêt",
-          "en": "stop"
-        },
-        {
-          "fr": "ouvert",
-          "en": "open"
-        },
-        {
-          "fr": "fermé",
-          "en": "closed"
-        }
-      ]
+      "type": "word",
+      "id": "w1",
+      "fr": "sortie",
+      "en": "exit",
+      "sound": "sohR-TEE",
+      "exampleFr": "La sortie est à gauche.",
+      "exampleEn": "The exit is on the left."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "entrée",
+      "en": "entrance",
+      "sound": "ah(n)-TRAY",
+      "exampleFr": "L'entrée est ici.",
+      "exampleEn": "The entrance is here."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "arrêt",
+      "en": "stop",
+      "sound": "ah-RAY",
+      "exampleFr": "Arrêt d'autobus.",
+      "exampleEn": "Bus stop."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "ouvert",
+      "en": "open",
+      "sound": "oo-VEHR",
+      "exampleFr": "Le magasin est ouvert.",
+      "exampleEn": "The store is open."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "fermé",
+      "en": "closed",
+      "sound": "fehR-MAY",
+      "exampleFr": "La banque est fermée.",
+      "exampleEn": "The bank is closed."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "hôtel",
+      "en": "hotel",
+      "sound": "oh-TEL"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "restaurant",
+      "en": "restaurant",
+      "sound": "rehs-toh-RAH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "banque",
+      "en": "bank",
+      "sound": "bah(n)k"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "pharmacie",
+      "en": "pharmacy",
+      "sound": "fahR-mah-SEE"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "hôpital",
+      "en": "hospital",
+      "sound": "oh-pee-TAHL"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "sortie",
+      "options": [
+        "open",
+        "exit",
+        "restaurant",
+        "hospital"
+      ],
+      "answer": 1,
+      "explain": "sortie means exit."
     },
     {
       "type": "choose",
       "id": "c2",
-      "prompt": "What does this word mean?",
-      "promptFr": "sortie",
+      "prompt": "What does this mean?",
+      "promptFr": "entrée",
       "options": [
-        "Entrance",
-        "Exit",
-        "Closed"
+        "closed",
+        "bank",
+        "exit",
+        "entrance"
       ],
-      "answer": 1,
-      "explain": "Sortie means exit. You will see it above doors in Canada."
-    },
-    {
-      "type": "listen",
-      "id": "l1",
-      "fr": "arrêt",
-      "question": "What does the sign say?",
-      "options": [
-        "Exit",
-        "Stop",
-        "Open"
-      ],
-      "answer": 1,
-      "explain": "Arrêt means stop. The final t is silent, so you say a-RAY."
+      "answer": 3,
+      "explain": "entrée means entrance."
     },
     {
       "type": "choose",
       "id": "c3",
-      "prompt": "Complete the rule: in French, the last letter of a word is…",
+      "prompt": "What does this mean?",
+      "promptFr": "arrêt",
       "options": [
-        "always said",
-        "often silent",
-        "never written"
+        "hotel",
+        "stop",
+        "pharmacy",
+        "entrance"
       ],
       "answer": 1,
-      "explain": "Often silent. So listen first, then read."
+      "explain": "arrêt means stop."
     },
     {
-      "type": "phrase",
-      "id": "p1",
-      "fr": "Bonjour !",
-      "en": "Hello!",
-      "tip": "Say it slowly: bon-JOUR. Keep both syllables the same length."
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "ouvert",
+      "options": [
+        "restaurant",
+        "hospital",
+        "stop",
+        "open"
+      ],
+      "answer": 3,
+      "explain": "ouvert means open."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "fermé",
+      "options": [
+        "bank",
+        "closed",
+        "exit",
+        "open"
+      ],
+      "answer": 1,
+      "explain": "fermé means closed."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "hôtel",
+      "options": [
+        "pharmacy",
+        "entrance",
+        "closed",
+        "hotel"
+      ],
+      "answer": 3,
+      "explain": "hôtel means hotel."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "entrée",
+      "question": "Which word did you hear?",
+      "options": [
+        "ouvert",
+        "entrée",
+        "hôtel",
+        "banque"
+      ],
+      "answer": 1,
+      "explain": "You heard entrée: entrance."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "fermé",
+      "question": "Which word did you hear?",
+      "options": [
+        "restaurant",
+        "fermé",
+        "pharmacie",
+        "sortie"
+      ],
+      "answer": 1,
+      "explain": "You heard fermé: closed."
     },
     {
       "type": "explain",
-      "id": "e5",
-      "title": "What comes next",
-      "body": "Next you learn the alphabet and how to spell your name out loud. Then you learn the sounds one group at a time.\n\nYou do not need to memorise anything today. Just listen a lot, and use Ask Marie whenever a sound feels strange."
+      "id": "e4",
+      "title": "Watch out",
+      "body": "In arrêt, ouvert, restaurant and petit the last letter t is silent. In hôtel and hôpital the h is silent. Read the guide, not the spelling."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Where do you go?",
+      "options": [
+        "Out",
+        "In",
+        "To the bank",
+        "To the bus"
+      ],
+      "answer": 0,
+      "explain": "Sortie means exit.",
+      "promptFr": "SORTIE"
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What do you do?",
+      "options": [
+        "Turn left",
+        "Stop",
+        "Go faster",
+        "Park"
+      ],
+      "answer": 1,
+      "explain": "Arrêt means stop.",
+      "promptFr": "ARRÊT"
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What is the situation?",
+      "options": [
+        "The shop is open",
+        "The shop is far",
+        "The shop is closed",
+        "The shop is new"
+      ],
+      "answer": 2,
+      "explain": "Fermé means closed.",
+      "promptFr": "FERMÉ"
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "What is this?",
+      "options": [
+        "The exit",
+        "The way in",
+        "The price",
+        "The bus stop"
+      ],
+      "answer": 1,
+      "explain": "Entrée means entrance.",
+      "promptFr": "ENTRÉE"
     }
   ]
 }

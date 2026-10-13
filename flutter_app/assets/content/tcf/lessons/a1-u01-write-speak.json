@@ -1,0 +1,47 @@
+{
+  "id": "a1-u01-write-speak",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Write and speak",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Introduce yourself in four sentences",
+      "body": "Write four sentences: your name, your nationality, where you live, which languages you speak. Use Je m'appelle, Je suis, J'habite à, Je parle.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Je m'appelle Sam Tremblay. Je suis canadien. J'habite à Toronto. Je parle anglais et un peu français.\n\nCheck:\n• Capital letter at the start, full stop at the end.\n• Nationality: masculine or feminine for you?\n• J'habite with an apostrophe.\n• Je parle, not je parles."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Writing: Fill a form",
+      "body": "Fill in this form for yourself: Nom, Prénom, Nationalité, Ville (city), Langues.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Model answer",
+      "body": "Nom : Tremblay · Prénom : Sam · Nationalité : canadienne · Ville : Toronto · Langues : anglais, français.\n\nCheck:\n• Nationality: write canadien for a man, canadienne for a woman."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Speaking: Meet someone",
+      "body": "Say a short conversation: greet, say your name, ask their name, say where you live, say what you speak. Record yourself. Use vous first.\n\n• Greet first. Smile. Slow and clear is better than fast.\n• End with Et vous ? to keep the conversation going."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, madame. Je m'appelle Sam. Comment vous appelez-vous ? ... Enchanté. J'habite à Toronto. Je parle anglais et un peu français. Et vous ? ... Moi aussi.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

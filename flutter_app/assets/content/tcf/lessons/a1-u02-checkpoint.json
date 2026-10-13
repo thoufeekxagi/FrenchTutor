@@ -1,0 +1,140 @@
+{
+  "id": "a1-u02-checkpoint",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Checkpoint",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which is the polite way to ask for repetition?",
+      "options": [
+        "Quoi ?",
+        "Pouvez-vous répéter, s'il vous plaît ?",
+        "Répète !",
+        "Non."
+      ],
+      "answer": 1,
+      "explain": "Polite and complete."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "J'___ trente ans.",
+      "options": [
+        "suis",
+        "ai",
+        "as",
+        "a"
+      ],
+      "answer": 1,
+      "explain": "J'ai."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Elle ___ vingt ans.",
+      "options": [
+        "est",
+        "ai",
+        "a",
+        "ont"
+      ],
+      "answer": 2,
+      "explain": "Elle a."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which question word means 'where'?",
+      "options": [
+        "où",
+        "quand",
+        "comment",
+        "pourquoi"
+      ],
+      "answer": 0,
+      "explain": "Où."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which question word means 'how'?",
+      "options": [
+        "où",
+        "quand",
+        "comment",
+        "combien"
+      ],
+      "answer": 2,
+      "explain": "Comment."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Which way is formal?",
+      "options": [
+        "Vous parlez français ?",
+        "Parlez-vous français ?",
+        "Tu parles français ?",
+        "Parle français ?"
+      ],
+      "answer": 1,
+      "explain": "Inversion is formal."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "'Je ne comprends pas' means...",
+      "options": [
+        "I understand",
+        "I do not understand",
+        "I speak",
+        "I repeat"
+      ],
+      "answer": 1,
+      "explain": "Ne ... pas: not."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Which word is Canadian for 'email'?",
+      "options": [
+        "mail",
+        "courriel",
+        "message",
+        "lettre"
+      ],
+      "answer": 1,
+      "explain": "Courriel."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "How do you answer 'Merci' in Canada?",
+      "options": [
+        "Bienvenue",
+        "Bonsoir",
+        "Salut",
+        "Pardon"
+      ],
+      "answer": 0,
+      "explain": "Bienvenue."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "'Ça s'écrit comment ?' asks for...",
+      "options": [
+        "the age",
+        "the spelling",
+        "the address",
+        "the price"
+      ],
+      "answer": 1,
+      "explain": "Spelling."
+    }
+  ]
+}

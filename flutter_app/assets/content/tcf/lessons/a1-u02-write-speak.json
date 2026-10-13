@@ -1,0 +1,47 @@
+{
+  "id": "a1-u02-write-speak",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Write and speak",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Ask someone to repeat",
+      "body": "Write a short message to a classmate: say you do not understand, ask them to repeat more slowly, and say thank you.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour Marc. Pardon, je ne comprends pas. Pouvez-vous répéter plus lentement, s'il vous plaît ? Merci beaucoup !\n\nCheck:\n• Start with a greeting.\n• Je ne comprends pas.\n• Plus lentement, s'il vous plaît.\n• End with Merci."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Writing: Fill a library form",
+      "body": "Fill in this form for yourself: Nom, Prénom, Âge, Courriel, Téléphone.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Model answer",
+      "body": "Nom : Tremblay · Prénom : Sam · Âge : 32 ans · Courriel : sam@exemple.ca · Téléphone : 613 555 0142.\n\nCheck:\n• Use ans after the age.\n• Write the email with @ and a dot."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Speaking: At the desk",
+      "body": "Say a short conversation: give your name, spell it, say your age, give your email and phone number. Use vous with the clerk and Pardon ? Plus lentement when you need it. Record yourself.\n\n• Say the digits in short groups, with a short pause.\n• If you make a mistake, say Pardon and repeat. It is normal."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Je m'appelle Sam Tremblay. Ça s'écrit T-R-E-M-B-L-A-Y. J'ai trente-deux ans. Mon courriel est sam, arobase, exemple, point c-a. Mon numéro est le six, un, trois...",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

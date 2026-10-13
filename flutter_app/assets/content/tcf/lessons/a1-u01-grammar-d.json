@@ -1,0 +1,53 @@
+{
+  "id": "a1-u01-grammar-d",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Grammar: -er verbs: parler, habiter, s'appeler",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "-er verbs: parler, habiter, s'appeler",
+      "body": "Most French verbs end in -er. They are regular. Remove -er, then add the endings:"
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "The first three persons (we, you-plural and they come in Unit 4)",
+      "headers": [
+        "Person",
+        "parler",
+        "habiter",
+        "s'appeler"
+      ],
+      "rows": [
+        [
+          "je",
+          "je parle",
+          "j'habite",
+          "je m'appelle"
+        ],
+        [
+          "tu",
+          "tu parles",
+          "tu habites",
+          "tu t'appelles"
+        ],
+        [
+          "il / elle",
+          "il parle",
+          "elle habite",
+          "elle s'appelle"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "-er verbs: parler, habiter, s'appeler",
+      "body": "• The endings -e, -es, -e are silent: parle, parles and parle all sound the same (pahrl).\n• Only the pronoun tells you who is speaking. This is the silent-letter rule from Stage 0.\n• s'appeler literally means to call oneself. Je m'appelle Sam = I call myself Sam. The m' is me reduced (élision)."
+    }
+  ]
+}

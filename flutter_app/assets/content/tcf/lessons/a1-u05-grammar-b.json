@@ -1,0 +1,39 @@
+{
+  "id": "a1-u05-grammar-b",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Grammar: Asking the price: three ways, same meaning",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Asking the price: three ways, same meaning",
+      "headers": [
+        "Question",
+        "Answer"
+      ],
+      "rows": [
+        [
+          "Combien ça coûte ?",
+          "Ça coûte quatre dollars."
+        ],
+        [
+          "C'est combien ?",
+          "C'est quatre dollars."
+        ],
+        [
+          "Ça fait combien ?",
+          "Ça fait quatre dollars. (used for a total)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Tip",
+      "body": "Learn the chunk Ça fait ... dollars for totals at the register, and Ça coûte ... for a single price. Clerks mostly say Ça fait."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "a1-u05-listening",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Listening practice",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le café coûte deux dollars quinze.",
+      "question": "How much is the coffee?",
+      "options": [
+        "$2.05",
+        "$2.15",
+        "$2.50",
+        "$12.15"
+      ],
+      "answer": 1,
+      "explain": "Deux dollars quinze."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Ça fait quarante-sept dollars.",
+      "question": "How much?",
+      "options": [
+        "$14",
+        "$40",
+        "$47",
+        "$74"
+      ],
+      "answer": 2,
+      "explain": "Quarante-sept: 47."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Vous payez comment ? — Par carte, s'il vous plaît.",
+      "question": "How does the customer pay?",
+      "options": [
+        "By card",
+        "In cash",
+        "By cheque",
+        "By transfer"
+      ],
+      "answer": 0,
+      "explain": "Par carte."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Le loyer est de mille cent cinquante dollars par mois.",
+      "question": "What is the rent?",
+      "options": [
+        "$1 050",
+        "$1 150",
+        "$1 500",
+        "$11 500"
+      ],
+      "answer": 1,
+      "explain": "Mille cent cinquante."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "C'est en solde : vingt pour cent de rabais.",
+      "question": "What is the discount?",
+      "options": [
+        "2 %",
+        "12 %",
+        "20 %",
+        "50 %"
+      ],
+      "answer": 2,
+      "explain": "Vingt pour cent."
+    }
+  ]
+}

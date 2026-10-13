@@ -1,0 +1,86 @@
+{
+  "id": "a1-u03-listening",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Listening practice",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Mon code postal est H, trois, B, un, A, sept.",
+      "question": "Which postal code?",
+      "options": [
+        "H3B 1A7",
+        "H3B 1A9",
+        "H3D 1A7",
+        "K3B 1A7"
+      ],
+      "answer": 0,
+      "explain": "H3B 1A7."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je suis née le quinze avril mille neuf cent quatre-vingt-dix.",
+      "question": "What month?",
+      "options": [
+        "March",
+        "April",
+        "August",
+        "October"
+      ],
+      "answer": 1,
+      "explain": "Avril: April."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "J'habite au vingt-trois, rue Principale, appartement six.",
+      "question": "What is the apartment number?",
+      "options": [
+        "3",
+        "6",
+        "16",
+        "23"
+      ],
+      "answer": 1,
+      "explain": "Appartement six."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Votre pièce d'identité, s'il vous plaît. — Voici mon passeport.",
+      "question": "Which document is shown?",
+      "options": [
+        "A passport",
+        "A licence",
+        "A health card",
+        "A work permit"
+      ],
+      "answer": 0,
+      "explain": "Passeport."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Signez ici, s'il vous plaît.",
+      "question": "What must the person do?",
+      "options": [
+        "Pay",
+        "Sign",
+        "Wait",
+        "Call"
+      ],
+      "answer": 1,
+      "explain": "Signer: to sign."
+    }
+  ]
+}

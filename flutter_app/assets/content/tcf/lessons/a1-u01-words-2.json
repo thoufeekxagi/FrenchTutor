@@ -1,0 +1,220 @@
+{
+  "id": "a1-u01-words-2",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Words: who is speaking?",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "je",
+      "en": "I",
+      "sound": "zhuh",
+      "exampleFr": "Je suis Sam.",
+      "exampleEn": "I am Sam."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "tu",
+      "en": "you (one friend, family, child)",
+      "sound": "tü",
+      "exampleFr": "Tu es Léa.",
+      "exampleEn": "You are Léa."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "il",
+      "en": "he, it",
+      "sound": "eel",
+      "exampleFr": "Il est canadien.",
+      "exampleEn": "He is Canadian."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "elle",
+      "en": "she, it",
+      "sound": "el",
+      "exampleFr": "Elle est canadienne.",
+      "exampleEn": "She is Canadian."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "on",
+      "en": "we, one (informal)",
+      "sound": "oh(n)",
+      "exampleFr": "On parle français.",
+      "exampleEn": "We speak French."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "nous",
+      "en": "we",
+      "sound": "noo",
+      "exampleFr": "Nous sommes à Ottawa.",
+      "exampleEn": "We are in Ottawa."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "vous",
+      "en": "you (formal, or more than one)",
+      "sound": "voo",
+      "exampleFr": "Vous êtes madame Diallo ?",
+      "exampleEn": "Are you Mrs. Diallo?"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "ils",
+      "en": "they (masculine or mixed)",
+      "sound": "eel",
+      "exampleFr": "Ils sont canadiens.",
+      "exampleEn": "They are Canadian."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "elles",
+      "en": "they (feminine only)",
+      "sound": "el",
+      "exampleFr": "Elles sont canadiennes.",
+      "exampleEn": "They are Canadian."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "être",
+      "en": "to be",
+      "sound": "EHtr"
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "moi / toi",
+      "en": "me / you (stressed forms)",
+      "say": "moi, toi",
+      "sound": "mwah / twah",
+      "exampleFr": "Et toi ?",
+      "exampleEn": "And you?"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "je",
+      "options": [
+        "she, it",
+        "I",
+        "you (formal, or more than one)",
+        "to be"
+      ],
+      "answer": 1,
+      "explain": "je means I."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "tu",
+      "options": [
+        "they (masculine or mixed)",
+        "me / you (stressed forms)",
+        "he, it",
+        "you (one friend, family, child)"
+      ],
+      "answer": 3,
+      "explain": "tu means you (one friend, family, child)."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "il",
+      "options": [
+        "we",
+        "he, it",
+        "they (feminine only)",
+        "I"
+      ],
+      "answer": 1,
+      "explain": "il means he, it."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "elle",
+      "options": [
+        "you (formal, or more than one)",
+        "to be",
+        "you (one friend, family, child)",
+        "she, it"
+      ],
+      "answer": 3,
+      "explain": "elle means she, it."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "on",
+      "options": [
+        "they (masculine or mixed)",
+        "we, one (informal)",
+        "me / you (stressed forms)",
+        "he, it"
+      ],
+      "answer": 1,
+      "explain": "on means we, one (informal)."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "nous",
+      "options": [
+        "they (feminine only)",
+        "I",
+        "she, it",
+        "we"
+      ],
+      "answer": 3,
+      "explain": "nous means we."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "tu",
+      "question": "Which word did you hear?",
+      "options": [
+        "elle",
+        "tu",
+        "nous",
+        "ils"
+      ],
+      "answer": 1,
+      "explain": "You heard tu: you (one friend, family, child)."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "on",
+      "question": "Which word did you hear?",
+      "options": [
+        "vous",
+        "on",
+        "elles",
+        "je"
+      ],
+      "answer": 1,
+      "explain": "You heard on: we, one (informal)."
+    }
+  ]
+}

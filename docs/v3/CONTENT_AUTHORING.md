@@ -96,3 +96,29 @@ speaker button plays baked audio, falling back to live generation on a miss.
 - Human: fluent speaker reviews Stage 0 pronunciation and a sample of every
   later stage, and the baked audio. Record who reviewed in the unit's
   `review.json`.
+
+
+## The book is the source, the app is the product
+
+All A1 content is written by hand once, in `content/tcf/book/chapters/NN_*.py` (plain Python data: words with sound guides, phrases, grammar tables, dialogues, stories, listening, reading, writing, speaking, TCF corner, checkpoint). Two things are made from it:
+
+1. `python3 content/tcf/book/build_book.py` makes the PDF (for the owner to study from and for review).
+2. `python3 content/tcf/book/export_app.py` makes the app files: `flutter_app/assets/content/tcf/lessons/*.json`, `stories/*.json`, `course.json`, `stories.json`. **Never edit those generated files by hand.** Fix the chapter file and export again.
+
+Order of work for any change:
+
+```
+edit content/tcf/book/chapters/NN_*.py
+python3 content/tcf/book/check_book.py      # no word used before it is taught, 4 options, answers valid
+python3 content/tcf/book/export_app.py       # also prints any story word that has no meaning
+python3 content/tcf/tools/validate.py        # the app's own lesson and story rules
+flutter test test/v3_lesson_test.dart test/v3_story_test.dart
+tool/e2e_all.sh                              # on the phone
+```
+
+What the exporter does and does not do:
+
+- Each WORDS group becomes a word lesson. It adds "what does this mean" and "which word did you hear" checks, built only from the authored list (distractors never share a word with the answer).
+- Exercises become multiple-choice only when there are 4 distinct short answers to use as options. Others stay on paper.
+- Stories need a meaning for every word. Words that are plain entries in the word tables are filled in automatically. Everything else (verb forms, names, plurals) is hand-written in `content/tcf/book/story_gloss.py`, together with each story's summary and key words.
+- Listening and reading questions, explanations, dialogues, grammar tables and notes are carried over unchanged.

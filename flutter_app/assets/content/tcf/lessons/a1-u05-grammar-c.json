@@ -1,0 +1,58 @@
+{
+  "id": "a1-u05-grammar-c",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Grammar: acheter and payer: the spelling change",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "acheter and payer: the spelling change",
+      "body": "Two common -er verbs change a letter in some forms. You hear and see the change in je, tu, il/elle and ils/elles. nous and vous are regular."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "acheter and payer: the spelling change",
+      "headers": [
+        "",
+        "acheter",
+        "payer"
+      ],
+      "rows": [
+        [
+          "je",
+          "j'achète (zhah-SHET)",
+          "je paie / je paye (zhuh peh)"
+        ],
+        [
+          "tu",
+          "tu achètes",
+          "tu paies"
+        ],
+        [
+          "il / elle",
+          "il achète",
+          "elle paie"
+        ],
+        [
+          "nous",
+          "nous achetons (ahsh-TOH(N))",
+          "nous payons (peh-YOH(N))"
+        ],
+        [
+          "vous",
+          "vous achetez",
+          "vous payez (peh-YAY)"
+        ],
+        [
+          "ils / elles",
+          "ils achètent",
+          "elles paient"
+        ]
+      ]
+    }
+  ]
+}

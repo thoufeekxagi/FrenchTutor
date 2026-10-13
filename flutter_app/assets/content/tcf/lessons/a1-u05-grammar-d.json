@@ -1,0 +1,167 @@
+{
+  "id": "a1-u05-grammar-d",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Grammar: Taxes and totals (reading a receipt)",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "A receipt",
+      "headers": [
+        "Line",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Sous-total",
+          "before tax"
+        ],
+        [
+          "TPS 5 %",
+          "federal tax"
+        ],
+        [
+          "TVQ 9,975 %",
+          "Québec tax"
+        ],
+        [
+          "Total",
+          "what you pay"
+        ]
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write each price with digits and $ (comma for cents).  quinze dollars cinquante",
+      "options": [
+        "2,25 $",
+        "45 $",
+        "1 200 $",
+        "15,50 $"
+      ],
+      "answer": 3,
+      "explain": "The answer is 15,50 $."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write each price with digits and $ (comma for cents).  deux dollars vingt-cinq",
+      "options": [
+        "15,50 $",
+        "2,25 $",
+        "45 $",
+        "1 200 $"
+      ],
+      "answer": 1,
+      "explain": "The answer is 2,25 $."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write each price with digits and $ (comma for cents).  quarante-cinq dollars",
+      "options": [
+        "15,50 $",
+        "45 $",
+        "2,25 $",
+        "1 200 $"
+      ],
+      "answer": 1,
+      "explain": "The answer is 45 $."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write each price with digits and $ (comma for cents).  mille deux cents dollars",
+      "options": [
+        "15,50 $",
+        "2,25 $",
+        "45 $",
+        "1 200 $"
+      ],
+      "answer": 3,
+      "explain": "The answer is 1 200 $."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write each price with digits and $ (comma for cents).  soixante-treize cents",
+      "options": [
+        "15,50 $",
+        "2,25 $",
+        "45 $",
+        "0,73 $"
+      ],
+      "answer": 3,
+      "explain": "The answer is 0,73 $."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write the right form of acheter or payer.  J'___ du pain. (acheter)",
+      "options": [
+        "payons",
+        "payez",
+        "achète",
+        "paient"
+      ],
+      "answer": 2,
+      "explain": "The answer is achète."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Write the right form of acheter or payer.  Nous ___ avec la carte. (payer)",
+      "options": [
+        "achète",
+        "payons",
+        "payez",
+        "paient"
+      ],
+      "answer": 1,
+      "explain": "The answer is payons."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Write the right form of acheter or payer.  Vous ___ comptant ? (payer)",
+      "options": [
+        "payez",
+        "achète",
+        "payons",
+        "paient"
+      ],
+      "answer": 0,
+      "explain": "The answer is payez."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Write the right form of acheter or payer.  Elle ___ un manteau. (acheter)",
+      "options": [
+        "achète",
+        "payons",
+        "payez",
+        "paient"
+      ],
+      "answer": 0,
+      "explain": "The answer is achète."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Write the right form of acheter or payer.  Ils ___ le loyer. (payer)",
+      "options": [
+        "achète",
+        "payons",
+        "payez",
+        "paient"
+      ],
+      "answer": 3,
+      "explain": "The answer is paient."
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "id": "a1-u05-checkpoint",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Checkpoint",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How do you write 'twelve dollars fifty'?",
+      "options": [
+        "$12.50",
+        "12,50 $",
+        "12 50$",
+        "$12,50"
+      ],
+      "answer": 1,
+      "explain": "12,50 $."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "'quatre-vingts' is...",
+      "options": [
+        "40",
+        "60",
+        "80",
+        "90"
+      ],
+      "answer": 2,
+      "explain": "Quatre-vingts: 80."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "'Ça fait combien ?' asks...",
+      "options": [
+        "the time",
+        "the total",
+        "the name",
+        "the age"
+      ],
+      "answer": 1,
+      "explain": "Ça fait: it comes to."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "'TPS' is...",
+      "options": [
+        "a provincial tax",
+        "the federal sales tax (GST)",
+        "a bank",
+        "a card"
+      ],
+      "answer": 1,
+      "explain": "Taxe sur les produits et services."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "'C'est trop cher' means...",
+      "options": [
+        "It is free",
+        "It is too expensive",
+        "It is cheap",
+        "It is on sale"
+      ],
+      "answer": 1,
+      "explain": "Trop cher."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "'Je paie par carte' means...",
+      "options": [
+        "I pay by card",
+        "I buy a card",
+        "I have a card",
+        "I lose a card"
+      ],
+      "answer": 0,
+      "explain": "Payer par carte."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "'20 % de rabais' means...",
+      "options": [
+        "20 % tax",
+        "20 % off",
+        "20 % more",
+        "20 dollars"
+      ],
+      "answer": 1,
+      "explain": "Rabais: discount."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "'Par mois' means...",
+      "options": [
+        "per week",
+        "per month",
+        "per day",
+        "per year"
+      ],
+      "answer": 1,
+      "explain": "Mois: month."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Nous ___ le loyer. (payer)",
+      "options": [
+        "paie",
+        "payons",
+        "payez",
+        "paient"
+      ],
+      "answer": 1,
+      "explain": "Nous payons."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "J'___ du pain. (acheter)",
+      "options": [
+        "achète",
+        "achetons",
+        "achetez",
+        "achètent"
+      ],
+      "answer": 0,
+      "explain": "J'achète."
+    }
+  ]
+}

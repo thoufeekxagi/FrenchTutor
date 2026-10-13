@@ -1,0 +1,80 @@
+{
+  "id": "a1-u03-reading",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Reading practice",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the province?",
+      "options": [
+        "Ontario",
+        "Québec",
+        "Alberta",
+        "Manitoba"
+      ],
+      "answer": 1,
+      "explain": "Province : Québec.",
+      "promptFr": "Nom : Patel · Prénom : Priya · Date de naissance : 1990-04-15 · Adresse : 12, rue Sainte-Catherine, app. 4 · Ville : Montréal · Province : Québec · Code postal : H3B 1A7"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the first name?",
+      "options": [
+        "Patel",
+        "Priya",
+        "Montréal",
+        "Sainte-Catherine"
+      ],
+      "answer": 1,
+      "explain": "Prénom : Priya.",
+      "promptFr": "Nom : Patel · Prénom : Priya · Date de naissance : 1990-04-15 · Adresse : 12, rue Sainte-Catherine, app. 4 · Ville : Montréal · Province : Québec · Code postal : H3B 1A7"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which year was she born?",
+      "options": [
+        "1900",
+        "1990",
+        "1999",
+        "2010"
+      ],
+      "answer": 1,
+      "explain": "1990-04-15.",
+      "promptFr": "Nom : Patel · Prénom : Priya · Date de naissance : 1990-04-15 · Adresse : 12, rue Sainte-Catherine, app. 4 · Ville : Montréal · Province : Québec · Code postal : H3B 1A7"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which document is accepted?",
+      "options": [
+        "A photocopy",
+        "A passport",
+        "A phone photo",
+        "A library card"
+      ],
+      "answer": 1,
+      "explain": "Passeport is on the list.",
+      "promptFr": "Documents acceptés : passeport, permis de travail, carte de résident permanent. Les photocopies ne sont pas acceptées."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which is NOT accepted?",
+      "options": [
+        "Work permit",
+        "Passport",
+        "Photocopies",
+        "PR card"
+      ],
+      "answer": 2,
+      "explain": "Les photocopies ne sont pas acceptées.",
+      "promptFr": "Documents acceptés : passeport, permis de travail, carte de résident permanent. Les photocopies ne sont pas acceptées."
+    }
+  ]
+}

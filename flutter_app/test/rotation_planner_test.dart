@@ -86,8 +86,14 @@ void main() {
       availableMinutes: 20,
       learnerLevel: 'a1',
     );
-    expect(secondListening.plan.tasks.first.modality, PerformanceModality.listeningRecognition);
-    expect(secondListening.plan.tasks.first.contentItemId, isNot(firstContentId));
+    expect(
+      secondListening.plan.tasks.first.modality,
+      PerformanceModality.listeningRecognition,
+    );
+    expect(
+      secondListening.plan.tasks.first.contentItemId,
+      isNot(firstContentId),
+    );
   });
 
   test('reading/vocab slot batches several words, not just one', () {
@@ -116,7 +122,10 @@ void main() {
       availableMinutes: 20,
       learnerLevel: 'a1',
     );
-    expect(vocabDay.plan.tasks.first.modality, PerformanceModality.readingRecognition);
+    expect(
+      vocabDay.plan.tasks.first.modality,
+      PerformanceModality.readingRecognition,
+    );
     expect(vocabDay.plan.tasks.length, vocabBatchSize);
     expect(vocabDay.mission.steps.length, vocabBatchSize);
   });

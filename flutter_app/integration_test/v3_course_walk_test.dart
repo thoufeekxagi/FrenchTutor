@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/main.dart' as app;
 import 'package:french_tutor/v3/lesson/v3_course.dart';
 import 'package:french_tutor/v3/lesson/v3_lesson.dart';
+import 'package:french_tutor/v3/v3_prefs.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,11 +33,23 @@ void main() {
     await prefs.setBool('dev_force_pro_unlock', true);
     await prefs.setBool('app_dark_mode_v3_choice', true);
     await prefs.setBool('app_dark_mode', false);
-    await prefs.remove('v3_completed_lessons');
+    // E2E_ONLY=s0-01,a1-u02 limits the walk to lessons whose id starts with
+    // one of the prefixes. Everything else is marked done, so the Learn hero
+    // walks the chosen lessons in order. No filter walks every lesson.
+    const only = String.fromEnvironment('E2E_ONLY');
+    final all = await V3Course.load();
+    final prefixes = only.isEmpty ? <String>[] : only.split(',');
+    final lessons = prefixes.isEmpty
+        ? all
+        : all.where((l) => prefixes.any(l.id.startsWith)).toList();
+    expect(lessons, isNotEmpty);
+    await prefs.setStringList(
+      v3Key('v3_completed_lessons'),
+      all.where((l) => !lessons.contains(l)).map((l) => l.id).toList(),
+    );
+    await prefs.remove(v3Key('v3_lesson_position'));
 
     app.main();
-    final lessons = await V3Course.load();
-    expect(lessons.length, greaterThanOrEqualTo(3));
     await probe.waitForLabel(
       tester,
       'Start lesson',
@@ -98,7 +111,7 @@ void main() {
       }
       await press(tester, 'Done');
       final done = (await SharedPreferences.getInstance()).getStringList(
-        'v3_completed_lessons',
+        v3Key('v3_completed_lessons'),
       );
       expect(done, contains(lesson.id), reason: '${lesson.id} not recorded');
     }

@@ -1,0 +1,54 @@
+{
+  "id": "a1-u03-write-speak",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Write and speak",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Fill in the form",
+      "body": "Fill in this form for yourself: Nom, Prénom, Date de naissance (year-month-day), Adresse, Ville, Province, Code postal.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Nom : Tremblay · Prénom : Sam · Date de naissance : 1992-03-08 · Adresse : 25, rue Principale, app. 3 · Ville : Ottawa · Province : Ontario · Code postal : K1A 0B1.\n\nCheck:\n• Date: year-month-day, with hyphens.\n• Address: number first, then the street.\n• Postal code: letter, digit, letter, space, digit, letter, digit."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Writing: Write your address in a sentence",
+      "body": "Write one sentence that gives your address and postal code. Use J'habite au... and Mon code postal est...\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Model answer",
+      "body": "J'habite au vingt-cinq, rue Principale, appartement trois. Mon code postal est K1A 0B1.\n\nCheck:\n• Say the number in letters when you write a full sentence."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Speaking: At the counter",
+      "body": "Say a short conversation with an agent: show an ID, give your name, date of birth, address and postal code. Use vous and Voici... Record yourself.\n\n• Say the postal code slowly, character by character.\n• End with Merci, madame."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, madame. Voici mon passeport. Je m'appelle Sam Tremblay. Je suis né le huit mars mille neuf cent quatre-vingt-douze. J'habite au vingt-cinq, rue Principale, appartement trois, Ottawa.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Mon code postal est K, un, A, zéro, B, un.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

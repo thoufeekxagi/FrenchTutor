@@ -87,19 +87,22 @@ void main() {
     evidenceCount: 5,
   );
 
-  test('excludes a scenario two bands below the learner (the original bug)', () {
-    // This is the exact shape of the reported bug: an A2 scenario (e.g.
-    // "order coffee") staying eligible for a B2 learner forever because the
-    // level filter only ever checked a ceiling, never a floor.
-    final recommendation = selector.select(
-      catalog: _levelWindowCatalog,
-      level: 'b2',
-      goal: 'everyday',
-      competencyStates: [_calibDone],
-    );
+  test(
+    'excludes a scenario two bands below the learner (the original bug)',
+    () {
+      // This is the exact shape of the reported bug: an A2 scenario (e.g.
+      // "order coffee") staying eligible for a B2 learner forever because the
+      // level filter only ever checked a ceiling, never a floor.
+      final recommendation = selector.select(
+        catalog: _levelWindowCatalog,
+        level: 'b2',
+        goal: 'everyday',
+        competencyStates: [_calibDone],
+      );
 
-    expect(recommendation.mission.id, 'b2_match');
-  });
+      expect(recommendation.mission.id, 'b2_match');
+    },
+  );
 
   test('a lower-level scenario is reachable only as a fallback', () {
     final recommendation = selector.select(

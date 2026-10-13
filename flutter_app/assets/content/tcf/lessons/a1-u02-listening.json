@@ -1,0 +1,86 @@
+{
+  "id": "a1-u02-listening",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Listening practice",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Pardon, madame. Pouvez-vous répéter, s'il vous plaît ?",
+      "question": "What does the person want?",
+      "options": [
+        "To buy something",
+        "To hear it again",
+        "To say goodbye",
+        "To give a name"
+      ],
+      "answer": 1,
+      "explain": "Répéter: say again."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Quel âge avez-vous ? — J'ai trente-deux ans.",
+      "question": "How old is the person?",
+      "options": [
+        "22",
+        "32",
+        "42",
+        "23"
+      ],
+      "answer": 1,
+      "explain": "Trente-deux: 32."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Votre nom, s'il vous plaît ? — Diallo. D-I-A-L-L-O.",
+      "question": "Which name?",
+      "options": [
+        "Diallo",
+        "Dialo",
+        "Diallio",
+        "Dialio"
+      ],
+      "answer": 0,
+      "explain": "D-I-A-L-L-O."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Merci beaucoup, monsieur. — Bienvenue, madame.",
+      "question": "What does the man say?",
+      "options": [
+        "Thank you",
+        "You're welcome",
+        "Sorry",
+        "Goodbye"
+      ],
+      "answer": 1,
+      "explain": "Bienvenue: you're welcome."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Quel est votre numéro de téléphone ? — C'est le cinq, un, quatre, cinq, cinq, cinq, zéro, un, neuf, huit.",
+      "question": "What are the last two digits?",
+      "options": [
+        "98",
+        "89",
+        "18",
+        "19"
+      ],
+      "answer": 0,
+      "explain": "Neuf, huit: 98."
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "id": "a1-u04-tcf",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "TCF corner",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Bonjour, je m'appelle Léa. Voici ma famille : mon père, ma mère et mon frère.",
+      "question": "Who is in the family?",
+      "options": [
+        "Father, mother and brother",
+        "Father, mother and sister",
+        "Mother and sister",
+        "Brother and sister"
+      ],
+      "answer": 0,
+      "explain": "Père, mère, frère."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Mon fils a dix ans. Il est grand pour son âge.",
+      "question": "How old is the boy?",
+      "options": [
+        "8",
+        "10",
+        "12",
+        "15"
+      ],
+      "answer": 1,
+      "explain": "Dix ans."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Ma tante est professeure. Elle est très gentille.",
+      "question": "What is the aunt like?",
+      "options": [
+        "Kind",
+        "Tired",
+        "Angry",
+        "Young"
+      ],
+      "answer": 0,
+      "explain": "Gentille: kind."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Elle a les cheveux roux et les yeux verts.",
+      "question": "What colour is her hair?",
+      "options": [
+        "Red",
+        "Brown",
+        "Blond",
+        "Black"
+      ],
+      "answer": 0,
+      "explain": "Roux: red-haired."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where does the sister work?",
+      "options": [
+        "Ottawa",
+        "Montréal",
+        "Toronto",
+        "Québec"
+      ],
+      "answer": 2,
+      "explain": "Elle travaille à Toronto.",
+      "promptFr": "Ma sœur est grande. Elle a vingt-deux ans. Elle travaille à Toronto."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Who is single?",
+      "options": [
+        "The father",
+        "The uncle",
+        "The mother",
+        "The brother"
+      ],
+      "answer": 0,
+      "explain": "Père: célibataire.",
+      "promptFr": "Mon père est célibataire. Mon oncle est marié."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How many daughters?",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 1,
+      "explain": "Deux filles.",
+      "promptFr": "Nous avons deux filles. Elles s'appellent Léa et Nadia."
+    }
+  ]
+}

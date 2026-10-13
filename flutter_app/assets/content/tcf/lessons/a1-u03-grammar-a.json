@@ -1,0 +1,98 @@
+{
+  "id": "a1-u03-grammar-a",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Grammar: Gender: every noun is masculine or feminine",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Gender: every noun is masculine or feminine",
+      "body": "All French nouns have a gender, even objects. There is no logic to learn from the meaning, so always learn a noun with its article: not passeport, but le passeport."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Articles",
+      "headers": [
+        "",
+        "Masculine",
+        "Feminine"
+      ],
+      "rows": [
+        [
+          "the (before a consonant)",
+          "le passeport",
+          "la signature"
+        ],
+        [
+          "the (before a vowel or silent h)",
+          "l'appartement (m.)",
+          "l'adresse (f.)"
+        ],
+        [
+          "a / an",
+          "un formulaire",
+          "une rue"
+        ],
+        [
+          "the (plural)",
+          "les passeports",
+          "les adresses"
+        ],
+        [
+          "some (plural)",
+          "des formulaires",
+          "des rues"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Gender: every noun is masculine or feminine",
+      "body": "Helpful endings (not perfect rules, but they work most of the time):"
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Endings that help",
+      "headers": [
+        "Usually feminine",
+        "Usually masculine"
+      ],
+      "rows": [
+        [
+          "-tion: la signature, la nation, la station",
+          "-ment: le document, l'appartement, le paiement"
+        ],
+        [
+          "-té: la nationalité, l'identité, la ville... (many)",
+          "-age: le courrier? no: le message, le passage"
+        ],
+        [
+          "-ure: la signature, la voiture",
+          "-eau: le bureau, le chapeau"
+        ],
+        [
+          "-ette, -ine: la cigarette, la cuisine",
+          "most words ending in a consonant: le passeport, le nom"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Watch out",
+      "body": "la ville (city) and la maison (house) are feminine; le pays (country) and le nom (name) are masculine. Do not guess from English. When you learn a new noun, say it with its article three times."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Tip",
+      "body": "In a dictionary or list you see n.m. (masculine noun) or n.f. (feminine noun). In this book we write (m.) and (f.) when the article does not show it (l'adresse (f.))."
+    }
+  ]
+}

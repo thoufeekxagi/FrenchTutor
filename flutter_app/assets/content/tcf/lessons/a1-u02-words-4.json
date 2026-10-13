@@ -1,0 +1,196 @@
+{
+  "id": "a1-u02-words-4",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Words: question words",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "qui",
+      "en": "who",
+      "sound": "kee",
+      "exampleFr": "Qui est-ce ?",
+      "exampleEn": "Who is it?"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "que / quoi",
+      "en": "what",
+      "say": "que, quoi",
+      "sound": "kuh / kwah",
+      "exampleFr": "Qu'est-ce que c'est ?",
+      "exampleEn": "What is it?"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "où",
+      "en": "where",
+      "sound": "oo",
+      "exampleFr": "Où habitez-vous ?",
+      "exampleEn": "Where do you live?"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "quand",
+      "en": "when",
+      "sound": "kah(n)"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "comment",
+      "en": "how",
+      "sound": "koh-MAH(N)",
+      "exampleFr": "Comment ça s'écrit ?",
+      "exampleEn": "How is it spelled?"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "combien",
+      "en": "how much, how many",
+      "sound": "koh(n)-BYA(N)"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "pourquoi",
+      "en": "why",
+      "sound": "poor-KWAH"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "parce que",
+      "en": "because",
+      "sound": "pahrs-KUH"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "est-ce que",
+      "en": "(starts a yes/no question)",
+      "sound": "ehs-kuh",
+      "exampleFr": "Est-ce que vous parlez français ?",
+      "exampleEn": "Do you speak French?"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "qui",
+      "options": [
+        "when",
+        "who",
+        "why",
+        "what"
+      ],
+      "answer": 1,
+      "explain": "qui means who."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "que / quoi",
+      "options": [
+        "how",
+        "because",
+        "where",
+        "what"
+      ],
+      "answer": 3,
+      "explain": "que / quoi means what."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "où",
+      "options": [
+        "how much, how many",
+        "where",
+        "(starts a yes/no question)",
+        "when"
+      ],
+      "answer": 1,
+      "explain": "où means where."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "quand",
+      "options": [
+        "why",
+        "who",
+        "how",
+        "when"
+      ],
+      "answer": 3,
+      "explain": "quand means when."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "comment",
+      "options": [
+        "because",
+        "how",
+        "what",
+        "why"
+      ],
+      "answer": 1,
+      "explain": "comment means how."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "combien",
+      "options": [
+        "(starts a yes/no question)",
+        "where",
+        "why",
+        "how much, how many"
+      ],
+      "answer": 3,
+      "explain": "combien means how much, how many."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "où",
+      "question": "Which word did you hear?",
+      "options": [
+        "comment",
+        "où",
+        "pourquoi",
+        "est-ce que"
+      ],
+      "answer": 1,
+      "explain": "You heard où: where."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "comment",
+      "question": "Which word did you hear?",
+      "options": [
+        "comment",
+        "pourquoi",
+        "est-ce que",
+        "où"
+      ],
+      "answer": 0,
+      "explain": "You heard comment: how."
+    }
+  ]
+}

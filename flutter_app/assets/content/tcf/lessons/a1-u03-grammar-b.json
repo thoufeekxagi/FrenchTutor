@@ -1,0 +1,65 @@
+{
+  "id": "a1-u03-grammar-b",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Grammar: More than one: the plural",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "More than one: the plural",
+      "body": "To make a plural, add -s to the noun and change the article: le passeport → les passeports, une rue → des rues. The s is silent, so you hear the plural only in the article: le → les (lay), un/une → des (day)."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Plural nouns",
+      "headers": [
+        "Singular",
+        "Plural",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "le formulaire",
+          "les formulaires",
+          "lay fohr-mü-LEHR"
+        ],
+        [
+          "la rue",
+          "les rues",
+          "lay Rü"
+        ],
+        [
+          "une adresse",
+          "des adresses",
+          "day zah-DREHS (liaison)"
+        ],
+        [
+          "l'appartement",
+          "les appartements",
+          "lay zah-pahr-tuh-MAH(N)"
+        ],
+        [
+          "le document",
+          "les documents",
+          "lay doh-kü-MAH(N)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "More than one: the plural",
+      "body": "• -eau → -eaux: le bureau → les bureaux.\n• -al → -aux: le journal → les journaux.\n• Words already ending in -s, -x, -z do not change: le pays → les pays.\n• Before a vowel, les / des link with a z: les adresses (lay-zah-DREHS)."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "On forms and in official French you see the masculine as the default. Canadian offices increasingly write both: Né(e) le, Canadien(ne). The (e) tells you to add an e if you are a woman."
+    }
+  ]
+}

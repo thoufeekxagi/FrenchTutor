@@ -1,0 +1,59 @@
+{
+  "id": "a1-u05-grammar-a",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Grammar: How to say and read a price",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Prices in French",
+      "headers": [
+        "Written",
+        "You say"
+      ],
+      "rows": [
+        [
+          "3,50 $",
+          "trois dollars cinquante"
+        ],
+        [
+          "12,99 $",
+          "douze dollars quatre-vingt-dix-neuf"
+        ],
+        [
+          "0,75 $",
+          "soixante-quinze cents"
+        ],
+        [
+          "21 $",
+          "vingt et un dollars"
+        ],
+        [
+          "80 $",
+          "quatre-vingts dollars"
+        ],
+        [
+          "1 450 $",
+          "mille quatre cent cinquante dollars"
+        ],
+        [
+          "15 %",
+          "quinze pour cent"
+        ],
+        [
+          "7,18 $ (total)",
+          "sept dollars dix-huit"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "How to say and read a price",
+      "body": "• Dollar sign after the number, comma for cents, space for thousands: 12,50 $ and 1 200 $.\n• vingt and cent take s when they are multiplied and nothing follows: quatre-vingts dollars (80), deux cents dollars (200). With another number after: quatre-vingt-deux, deux cent trois.\n• dollar takes s after 2 and more: trois dollars; cent (coin) also: dix cents."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "a1-u04-words-5",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Words: On a form",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la situation familiale",
+      "en": "marital status (form)",
+      "sound": "lah see-tü-ah-syoh(n) fah-mee-LYAL"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "divorcé / divorcée",
+      "en": "divorced",
+      "say": "divorcé, divorcée",
+      "sound": "dee-vohr-SAY"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "veuf / veuve",
+      "en": "widowed",
+      "say": "veuf, veuve",
+      "sound": "vuhf / vuhv"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "conjoint de fait",
+      "en": "common-law partner",
+      "sound": "koh(n)-ZHWA(N) duh feh"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le nombre",
+      "en": "number, quantity",
+      "sound": "luh NOH(N)br",
+      "exampleFr": "Nombre d'enfants : 2.",
+      "exampleEn": "Number of children: 2."
+    }
+  ]
+}

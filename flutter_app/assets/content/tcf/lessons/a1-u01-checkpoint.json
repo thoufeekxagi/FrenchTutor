@@ -1,0 +1,140 @@
+{
+  "id": "a1-u01-checkpoint",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Checkpoint",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which word means 'last name' on a form?",
+      "options": [
+        "prénom",
+        "nom",
+        "pays",
+        "langue"
+      ],
+      "answer": 1,
+      "explain": "Nom is the last name."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Je ___ canadien.",
+      "options": [
+        "suis",
+        "es",
+        "est",
+        "êtes"
+      ],
+      "answer": 0,
+      "explain": "Je suis."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Tu ___ Sam ?",
+      "options": [
+        "suis",
+        "es",
+        "est",
+        "sommes"
+      ],
+      "answer": 1,
+      "explain": "Tu es."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which pronoun for a stranger at an office?",
+      "options": [
+        "tu",
+        "vous",
+        "il",
+        "elle"
+      ],
+      "answer": 1,
+      "explain": "Vous is polite."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Elle ___ Nadia.",
+      "options": [
+        "m'appelle",
+        "s'appelle",
+        "t'appelles",
+        "vous appelez"
+      ],
+      "answer": 1,
+      "explain": "Elle s'appelle."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Elle est ___. (from France)",
+      "options": [
+        "français",
+        "française",
+        "francais",
+        "France"
+      ],
+      "answer": 1,
+      "explain": "Feminine: française."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "'Je parle un peu anglais' means...",
+      "options": [
+        "I speak English well",
+        "I speak a little English",
+        "I do not speak English",
+        "I teach English"
+      ],
+      "answer": 1,
+      "explain": "Un peu is a little."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Which greeting in the evening?",
+      "options": [
+        "bonjour",
+        "bonsoir",
+        "salut",
+        "allô"
+      ],
+      "answer": 1,
+      "explain": "Bonsoir."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "J'___ à Ottawa.",
+      "options": [
+        "habite",
+        "habites",
+        "habitent",
+        "habiter"
+      ],
+      "answer": 0,
+      "explain": "J'habite."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which one is the feminine of canadien?",
+      "options": [
+        "canadienne",
+        "canadiene",
+        "canadiens",
+        "canadian"
+      ],
+      "answer": 0,
+      "explain": "Canadienne."
+    }
+  ]
+}

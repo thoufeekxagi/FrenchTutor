@@ -1,0 +1,229 @@
+{
+  "id": "a1-bibliotheque",
+  "title": "À la bibliothèque",
+  "titleEn": "At the library",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Sam gets a library card and has to spell his email twice.",
+  "unit": "a1-u02",
+  "sentences": [
+    {
+      "fr": "Sam est à la bibliothèque.",
+      "en": "Sam is at the library."
+    },
+    {
+      "fr": "Il parle avec une dame.",
+      "en": "He is speaking with a lady."
+    },
+    {
+      "fr": "« Bonjour, monsieur. Votre nom, s'il vous plaît ? »",
+      "en": "“Hello, sir. Your name, please?”"
+    },
+    {
+      "fr": "« Tremblay. T-R-E-M-B-L-A-Y. »",
+      "en": "“Tremblay. T-R-E-M-B-L-A-Y.”"
+    },
+    {
+      "fr": "« Et votre courriel ? »",
+      "en": "“And your email?”"
+    },
+    {
+      "fr": "Sam dit : « sam, arobase, exemple, point c-a. »",
+      "en": "Sam says: “sam, at, example, dot c-a.”"
+    },
+    {
+      "fr": "« Pardon ? Pouvez-vous répéter, s'il vous plaît ? »",
+      "en": "“Sorry? Can you repeat, please?”"
+    },
+    {
+      "fr": "Sam répète lentement.",
+      "en": "Sam repeats slowly.",
+      "note": "Lentement is built from lent (slow) + -ment, like -ly in English."
+    },
+    {
+      "fr": "La dame écrit. « Merci, monsieur. Bienvenue ! »",
+      "en": "The lady writes. “Thank you, sir. Welcome!”",
+      "note": "Here bienvenue means welcome: she welcomes him to the library."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a man's name)"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "à": {
+      "en": "at, to"
+    },
+    "la": {
+      "en": "the"
+    },
+    "bibliothèque": {
+      "en": "library",
+      "pos": "noun, feminine",
+      "sound": "bee-blee-oh-TEK"
+    },
+    "il": {
+      "en": "he, it",
+      "pos": "pronoun"
+    },
+    "parle": {
+      "en": "speaks (parler)",
+      "pos": "verb"
+    },
+    "avec": {
+      "en": "with"
+    },
+    "une": {
+      "en": "a"
+    },
+    "dame": {
+      "en": "lady",
+      "pos": "noun, feminine",
+      "sound": "dahm"
+    },
+    "bonjour": {
+      "en": "hello",
+      "sound": "boh(n)-ZHOOR"
+    },
+    "monsieur": {
+      "en": "sir, Mr.",
+      "pos": "noun",
+      "sound": "muh-SYUH"
+    },
+    "votre": {
+      "en": "your (formal)"
+    },
+    "nom": {
+      "en": "last name",
+      "pos": "noun, masculine",
+      "sound": "noh(n)"
+    },
+    "s'il": {
+      "en": "if it"
+    },
+    "vous": {
+      "en": "you (formal)",
+      "pos": "pronoun"
+    },
+    "plaît": {
+      "en": "pleases (plaire)",
+      "pos": "verb"
+    },
+    "tremblay": {
+      "en": "Tremblay (a family name)"
+    },
+    "t-r-e-m-b-l-a-y": {
+      "en": "the letters of Tremblay"
+    },
+    "et": {
+      "en": "and"
+    },
+    "courriel": {
+      "en": "email (Canada)",
+      "pos": "noun, masculine",
+      "sound": "koo-RYEL"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "arobase": {
+      "en": "the @ sign",
+      "pos": "noun, feminine",
+      "sound": "ah-roh-BAHZ"
+    },
+    "exemple": {
+      "en": "example",
+      "pos": "noun, masculine",
+      "sound": "ehg-ZAH(N)pl"
+    },
+    "point": {
+      "en": "dot",
+      "pos": "noun, masculine",
+      "sound": "pwa(n)"
+    },
+    "c-a": {
+      "en": "the letters c and a (.ca)"
+    },
+    "pardon": {
+      "en": "sorry? pardon",
+      "sound": "pahr-DOH(N)"
+    },
+    "pouvez-vous": {
+      "en": "can you"
+    },
+    "répéter": {
+      "en": "to repeat",
+      "pos": "verb",
+      "sound": "ray-pay-TAY"
+    },
+    "répète": {
+      "en": "repeats (répéter)",
+      "pos": "verb",
+      "sound": "ray-PET"
+    },
+    "lentement": {
+      "en": "slowly",
+      "sound": "lah(n)t-MAH(N)"
+    },
+    "écrit": {
+      "en": "writes (écrire)",
+      "pos": "verb",
+      "sound": "ay-KREE"
+    },
+    "merci": {
+      "en": "thank you",
+      "sound": "mehr-SEE"
+    },
+    "bienvenue": {
+      "en": "welcome",
+      "sound": "bya(n)-vuh-NÜ"
+    }
+  },
+  "keywords": [
+    "bibliothèque",
+    "courriel",
+    "répète",
+    "lentement",
+    "écrit",
+    "dame"
+  ],
+  "quiz": [
+    {
+      "prompt": "Where is Sam?",
+      "options": [
+        "At a clinic",
+        "At the library",
+        "At the bank",
+        "At school"
+      ],
+      "answer": 1,
+      "explain": "Sam est à la bibliothèque."
+    },
+    {
+      "prompt": "Why does the lady say Pardon?",
+      "options": [
+        "She did not hear the email",
+        "She does not like the name",
+        "She is leaving",
+        "She wants a card"
+      ],
+      "answer": 0,
+      "explain": "She asks him to repeat."
+    },
+    {
+      "prompt": "How does Sam repeat the email?",
+      "options": [
+        "Quickly",
+        "Slowly",
+        "Loudly",
+        "In English"
+      ],
+      "answer": 1,
+      "explain": "Sam répète lentement."
+    }
+  ]
+}

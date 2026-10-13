@@ -1,0 +1,253 @@
+{
+  "id": "a1-u04-words-1",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Words: family",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 11,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la famille",
+      "en": "family",
+      "sound": "lah fah-MEEY",
+      "exampleFr": "Voici ma famille.",
+      "exampleEn": "Here is my family."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le père",
+      "en": "father",
+      "sound": "luh pehR",
+      "exampleFr": "Mon père est canadien.",
+      "exampleEn": "My father is Canadian."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la mère",
+      "en": "mother",
+      "sound": "lah mehR",
+      "exampleFr": "Ma mère s'appelle Nadia.",
+      "exampleEn": "My mother is called Nadia."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "les parents",
+      "en": "parents (also: relatives)",
+      "sound": "lay pah-RAH(N)",
+      "exampleFr": "Mes parents habitent à Ottawa.",
+      "exampleEn": "My parents live in Ottawa."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le frère",
+      "en": "brother",
+      "sound": "luh frehR"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la sœur",
+      "en": "sister",
+      "sound": "lah suhR",
+      "exampleFr": "Ma sœur a vingt ans.",
+      "exampleEn": "My sister is twenty."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le fils",
+      "en": "son (the s is said!)",
+      "sound": "luh fees",
+      "exampleFr": "Mon fils s'appelle Omar.",
+      "exampleEn": "My son is called Omar."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la fille",
+      "en": "daughter, girl",
+      "sound": "lah feey"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le mari",
+      "en": "husband",
+      "sound": "luh mah-REE"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "la femme",
+      "en": "wife, woman",
+      "sound": "lah fahm",
+      "exampleFr": "Voici ma femme.",
+      "exampleEn": "Here is my wife."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "le conjoint / la conjointe",
+      "en": "spouse, partner",
+      "say": "le conjoint, la conjointe",
+      "sound": "luh koh(n)-ZHWA(N) / lah koh(n)-ZHWA(N)T",
+      "exampleFr": "Nom du conjoint : Haddad.",
+      "exampleEn": "Name of spouse: Haddad."
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "le grand-père / la grand-mère",
+      "en": "grandfather / grandmother",
+      "say": "le grand-père, la grand-mère",
+      "sound": "luh grah(n)-PEHR / lah grah(n)-MEHR"
+    },
+    {
+      "type": "word",
+      "id": "w13",
+      "fr": "l'oncle / la tante",
+      "en": "uncle / aunt",
+      "say": "l'oncle, la tante",
+      "sound": "lohn-kl / lah tah(n)t"
+    },
+    {
+      "type": "word",
+      "id": "w14",
+      "fr": "le cousin / la cousine",
+      "en": "cousin (m. / f.)",
+      "say": "le cousin, la cousine",
+      "sound": "luh koo-ZA(N) / lah koo-ZEEN"
+    },
+    {
+      "type": "word",
+      "id": "w15",
+      "fr": "le bébé",
+      "en": "baby",
+      "sound": "luh bay-BAY"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la famille",
+      "options": [
+        "parents (also: relatives)",
+        "family",
+        "son (the s is said!)",
+        "wife, woman"
+      ],
+      "answer": 1,
+      "explain": "la famille means family."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la mère",
+      "options": [
+        "sister",
+        "mother",
+        "husband",
+        "grandfather / grandmother"
+      ],
+      "answer": 1,
+      "explain": "la mère means mother."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le frère",
+      "options": [
+        "daughter, girl",
+        "brother",
+        "spouse, partner",
+        "cousin (m. / f.)"
+      ],
+      "answer": 1,
+      "explain": "le frère means brother."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le fils",
+      "options": [
+        "wife, woman",
+        "son (the s is said!)",
+        "uncle / aunt",
+        "family"
+      ],
+      "answer": 1,
+      "explain": "le fils means son (the s is said!)."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le mari",
+      "options": [
+        "grandfather / grandmother",
+        "husband",
+        "baby",
+        "mother"
+      ],
+      "answer": 1,
+      "explain": "le mari means husband."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le conjoint / la conjointe",
+      "options": [
+        "cousin (m. / f.)",
+        "spouse, partner",
+        "father",
+        "brother"
+      ],
+      "answer": 1,
+      "explain": "le conjoint / la conjointe means spouse, partner."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le père",
+      "question": "Which word did you hear?",
+      "options": [
+        "les parents",
+        "le père",
+        "la sœur",
+        "la fille"
+      ],
+      "answer": 1,
+      "explain": "You heard le père: father."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le frère",
+      "question": "Which word did you hear?",
+      "options": [
+        "le fils",
+        "le frère",
+        "le mari",
+        "le bébé"
+      ],
+      "answer": 1,
+      "explain": "You heard le frère: brother."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Watch out",
+      "body": "fils (son) is said fees, with the s. It is one of the few exceptions to the silent-final-s rule. fille is feey, not “fill”. Do not mix fils (son) with fil (thread)."
+    }
+  ]
+}

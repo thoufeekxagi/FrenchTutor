@@ -28,16 +28,20 @@ import 'v3_lesson.dart';
 /// selected tutor's voice (saved after it is made once). Ask Marie opens the
 /// live tutor with the current step as context.
 class V3LessonPlayer extends ConsumerStatefulWidget {
-  const V3LessonPlayer({super.key, required this.lesson});
+  const V3LessonPlayer({super.key, required this.lesson, this.startAt = 0});
 
   final V3Lesson lesson;
+
+  /// Step to start from when the learner left this lesson half way.
+  final int startAt;
 
   @override
   ConsumerState<V3LessonPlayer> createState() => _V3LessonPlayerState();
 }
 
 class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
-  var _index = 0;
+  late int _index = widget.startAt.clamp(0, widget.lesson.steps.length - 1);
+  var _lastAdvance = DateTime.fromMillisecondsSinceEpoch(0);
   int? _selected;
   var _checked = false;
   var _complete = false;
@@ -67,6 +71,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
   String _audioId(String slot) => 'v3-${_lesson.id}-${_step.id}-$slot';
 
   void _check() {
+    _lastAdvance = DateTime.now();
     final correct = _selected == _answer;
     _results[_step.id] = correct;
     if (!correct) {
@@ -81,6 +86,12 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
   }
 
   void _next() {
+    // A double tap must never skip a step: ignore a second tap right away.
+    final now = DateTime.now();
+    if (now.difference(_lastAdvance) < const Duration(milliseconds: 450)) {
+      return;
+    }
+    _lastAdvance = now;
     if (_index == _lesson.steps.length - 1) {
       unawaited(V3Progress.markDone(_lesson.id));
       setState(() => _complete = true);
@@ -91,6 +102,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
       _selected = null;
       _checked = false;
     });
+    unawaited(V3Progress.savePosition(_lesson.id, _index));
   }
 
   String _marieContext() {
@@ -103,6 +115,10 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
         if (s.exampleFr.isNotEmpty) b.write(' Example: ${s.exampleFr}');
       case V3PhraseStep s:
         b.write('CURRENT STEP (phrase to say): "${s.fr}" means "${s.en}".');
+      case V3TableStep s:
+        b.write(
+          'CURRENT STEP (reference table): ${s.title}. Columns: ${s.headers.join(', ')}. First rows: ${s.rows.take(6).map((r) => r.join(' | ')).join('; ')}.',
+        );
       case V3ChooseStep s:
         b.write(
           'CURRENT STEP (question): ${s.prompt} ${s.promptFr}. Options: ${s.options.join(' / ')}.',
@@ -243,6 +259,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
       V3ExplainStep() => _explainBody(s),
       V3WordStep() => _word(s),
       V3PhraseStep() => _phrase(s),
+      V3TableStep() => _table(s),
       V3ChooseStep() => _choose(s),
       V3ListenStep() => _listen(s),
     };
@@ -290,11 +307,20 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
   List<Widget> _word(V3WordStep s) => [
     Text('NEW WORD', style: V3Type.eyebrow()),
     const SizedBox(height: 14),
-    Text(s.fr, style: V3Type.hero(58)),
+    Text(
+      s.fr,
+      style: V3Type.hero(
+        s.fr.length <= 10
+            ? 58
+            : s.fr.length <= 18
+            ? 42
+            : 30,
+      ),
+    ),
     const SizedBox(height: 16),
     Row(
       children: [
-        V3Speaker(text: s.fr, audioId: _audioId('word'), size: 56),
+        V3Speaker(text: s.spoken, audioId: _audioId('word'), size: 56),
         if (s.sound.isNotEmpty) ...[
           const SizedBox(width: 16),
           Expanded(
@@ -319,11 +345,11 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
   List<Widget> _phrase(V3PhraseStep s) => [
     Text('SAY IT OUT LOUD', style: V3Type.eyebrow()),
     const SizedBox(height: 14),
-    Text(s.fr, style: V3Type.title(40)),
+    Text(s.fr, style: V3Type.title(s.fr.length <= 24 ? 38 : 28)),
     const SizedBox(height: 16),
     Row(
       children: [
-        V3Speaker(text: s.fr, audioId: _audioId('phrase'), size: 56),
+        V3Speaker(text: s.spoken, audioId: _audioId('phrase'), size: 56),
         const SizedBox(width: 16),
         Expanded(child: Text(s.en, style: V3Type.body(17, DesignTokens.ink))),
       ],
@@ -346,6 +372,73 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
     ),
   ];
 
+  List<Widget> _table(V3TableStep s) {
+    final cols = s.headers.length;
+    return [
+      Text('REFERENCE', style: V3Type.eyebrow()),
+      const SizedBox(height: 10),
+      Text(s.title, style: V3Type.title(28)),
+      const SizedBox(height: 18),
+      Container(
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: DesignTokens.hairline),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+              child: Row(
+                children: [
+                  for (var c = 0; c < cols; c++)
+                    Expanded(
+                      flex: c == s.hear ? 3 : 2,
+                      child: Text(
+                        s.headers[c].toUpperCase(),
+                        style: V3Type.eyebrow(DesignTokens.inkSoft),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            for (var r = 0; r < s.rows.length; r++)
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: DesignTokens.hairline)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var c = 0; c < cols; c++)
+                      Expanded(
+                        flex: c == s.hear ? 3 : 2,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Text(
+                            s.rows[r][c],
+                            style: c == 0
+                                ? V3Type.strong(15)
+                                : V3Type.body(14, DesignTokens.ink),
+                          ),
+                        ),
+                      ),
+                    if (s.hear >= 0)
+                      V3Speaker(
+                        text: s.rows[r][s.hear],
+                        audioId: '${_audioId('row')}-$r',
+                        size: 40,
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    ];
+  }
+
   List<Widget> _choose(V3ChooseStep s) => [
     Text('CHOOSE', style: V3Type.eyebrow()),
     const SizedBox(height: 12),
@@ -357,10 +450,12 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
           V3Speaker(text: s.promptFr, audioId: _audioId('prompt'), size: 52),
           const SizedBox(width: 14),
           Expanded(
-            child: Text(
-              s.promptFr,
-              style: V3Type.title(34, color: DesignTokens.primary),
-            ),
+            child: s.promptFr.length > 30
+                ? Text(s.promptFr, style: V3Type.reading(21))
+                : Text(
+                    s.promptFr,
+                    style: V3Type.title(34, color: DesignTokens.primary),
+                  ),
           ),
         ],
       ),

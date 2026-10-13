@@ -1,0 +1,239 @@
+{
+  "id": "a1-u04-words-3",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Words: hair, eyes and colours",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 10,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "les cheveux (m.)",
+      "en": "hair",
+      "say": "les cheveux",
+      "sound": "lay shuh-VUH"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "les yeux (m.)",
+      "en": "eyes",
+      "say": "les yeux",
+      "sound": "lay zyuh",
+      "exampleFr": "Elle a les yeux bleus.",
+      "exampleEn": "She has blue eyes."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "blond / blonde",
+      "en": "blond",
+      "say": "blond, blonde",
+      "sound": "bloh(n) / bloh(n)d"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "brun / brune",
+      "en": "dark brown",
+      "say": "brun, brune",
+      "sound": "bruh(n) / brün"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "roux / rousse",
+      "en": "red-haired",
+      "say": "roux, rousse",
+      "sound": "roo / roos"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "rouge",
+      "en": "red",
+      "sound": "roozh"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "bleu / bleue",
+      "en": "blue",
+      "say": "bleu, bleue",
+      "sound": "bluh"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "vert / verte",
+      "en": "green",
+      "say": "vert, verte",
+      "sound": "vehr / vehrt"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "jaune",
+      "en": "yellow",
+      "sound": "zhohn"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "noir / noire",
+      "en": "black",
+      "say": "noir, noire",
+      "sound": "nwahr"
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "blanc / blanche",
+      "en": "white",
+      "say": "blanc, blanche",
+      "sound": "blah(n) / blah(n)sh"
+    },
+    {
+      "type": "word",
+      "id": "w12",
+      "fr": "gris / grise",
+      "en": "grey",
+      "say": "gris, grise",
+      "sound": "gree / greez"
+    },
+    {
+      "type": "word",
+      "id": "w13",
+      "fr": "rose",
+      "en": "pink",
+      "sound": "rohz"
+    },
+    {
+      "type": "word",
+      "id": "w14",
+      "fr": "orange",
+      "en": "orange (never changes)",
+      "sound": "oh-RAH(N)zh"
+    },
+    {
+      "type": "word",
+      "id": "w15",
+      "fr": "marron",
+      "en": "brown (never changes)",
+      "sound": "mah-ROH(N)"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "les cheveux (m.)",
+      "options": [
+        "dark brown",
+        "hair",
+        "blue",
+        "black"
+      ],
+      "answer": 1,
+      "explain": "les cheveux (m.) means hair."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "blond / blonde",
+      "options": [
+        "red",
+        "blond",
+        "yellow",
+        "grey"
+      ],
+      "answer": 1,
+      "explain": "blond / blonde means blond."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "roux / rousse",
+      "options": [
+        "green",
+        "red-haired",
+        "white",
+        "orange (never changes)"
+      ],
+      "answer": 1,
+      "explain": "roux / rousse means red-haired."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "bleu / bleue",
+      "options": [
+        "black",
+        "blue",
+        "pink",
+        "hair"
+      ],
+      "answer": 1,
+      "explain": "bleu / bleue means blue."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "jaune",
+      "options": [
+        "grey",
+        "yellow",
+        "brown (never changes)",
+        "blond"
+      ],
+      "answer": 1,
+      "explain": "jaune means yellow."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "blanc / blanche",
+      "options": [
+        "orange (never changes)",
+        "white",
+        "eyes",
+        "red-haired"
+      ],
+      "answer": 1,
+      "explain": "blanc / blanche means white."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "les yeux",
+      "question": "Which word did you hear?",
+      "options": [
+        "jaune",
+        "les yeux",
+        "orange",
+        "les cheveux"
+      ],
+      "answer": 1,
+      "explain": "You heard les yeux: eyes."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "jaune",
+      "question": "Which word did you hear?",
+      "options": [
+        "jaune",
+        "orange",
+        "les cheveux",
+        "rouge"
+      ],
+      "answer": 0,
+      "explain": "You heard jaune: yellow."
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "id": "a1-u02-dialogues",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Dialogues",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "On the phone: an email address",
+      "body": "Marc calls Sam. They are friends, so they use tu.",
+      "examples": [
+        {
+          "fr": "Allô, Sam ? C'est Marc.",
+          "en": "Marc: Hello, Sam? It is Marc."
+        },
+        {
+          "fr": "Salut, Marc ! Ça va ?",
+          "en": "Sam: Hi, Marc! How are you?"
+        },
+        {
+          "fr": "Oui, ça va. Tu as un courriel ?",
+          "en": "Marc: Yes, fine. Do you have an email?"
+        },
+        {
+          "fr": "Oui. Mon courriel est sam, arobase, exemple, point c-a.",
+          "en": "Sam: Yes. My email is sam, at, example, dot c-a."
+        },
+        {
+          "fr": "Pardon ? Répète, s'il te plaît.",
+          "en": "Marc: Sorry? Say it again, please."
+        },
+        {
+          "fr": "Oui. Plus lentement. S-A-M, arobase...",
+          "en": "Sam: Yes. More slowly. S-A-M, at..."
+        },
+        {
+          "fr": "D'accord. Merci beaucoup !",
+          "en": "Marc: Okay. Thank you very much!"
+        },
+        {
+          "fr": "Bienvenue !",
+          "en": "Sam: You're welcome!"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "At the library desk",
+      "body": "Samira gets a library card. The librarian uses vous.",
+      "examples": [
+        {
+          "fr": "Bonjour, madame. Votre nom, s'il vous plaît ?",
+          "en": "Employée: Hello, madam. Your name, please?"
+        },
+        {
+          "fr": "Haddad. Ça s'écrit H-A-D-D-A-D.",
+          "en": "Samira: Haddad. It is spelled H-A-D-D-A-D."
+        },
+        {
+          "fr": "Merci. Quel âge avez-vous ?",
+          "en": "Employée: Thank you. How old are you?"
+        },
+        {
+          "fr": "J'ai trente-deux ans.",
+          "en": "Samira: I am thirty-two."
+        },
+        {
+          "fr": "Et votre numéro de téléphone ?",
+          "en": "Employée: And your phone number?"
+        },
+        {
+          "fr": "Pardon ? Plus lentement, s'il vous plaît.",
+          "en": "Samira: Sorry? More slowly, please."
+        },
+        {
+          "fr": "Votre numéro de cellulaire, s'il vous plaît.",
+          "en": "Employée: Your cell phone number, please."
+        },
+        {
+          "fr": "Ah, d'accord ! C'est le six, un, trois, cinq, cinq, cinq, zéro, un, quatre, deux.",
+          "en": "Samira: Ah, okay! It is 613 555 0142."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why does Marc ask Sam to repeat?",
+      "options": [
+        "He is angry",
+        "He did not catch the email",
+        "He wants a phone number",
+        "He is leaving"
+      ],
+      "answer": 1,
+      "explain": "Pardon ? Tu peux répéter ?"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How old is Samira?",
+      "options": [
+        "Twenty-two",
+        "Thirty-two",
+        "Forty-two",
+        "Twenty-three"
+      ],
+      "answer": 1,
+      "explain": "Trente-deux ans."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does the librarian want at the end?",
+      "options": [
+        "Her email",
+        "Her cell number",
+        "Her address",
+        "Her age"
+      ],
+      "answer": 1,
+      "explain": "Votre numéro de cellulaire."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Sam say after Marc thanks him?",
+      "options": [
+        "Bienvenue",
+        "Pardon",
+        "Désolé",
+        "Salut"
+      ],
+      "answer": 0,
+      "explain": "Bienvenue: you're welcome (Canada)."
+    }
+  ]
+}

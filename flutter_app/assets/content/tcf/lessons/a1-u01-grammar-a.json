@@ -1,0 +1,72 @@
+{
+  "id": "a1-u01-grammar-a",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Grammar: être: to be",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "être: to be",
+      "body": "être is the most important verb in French. It is irregular, so you learn each form. It says who someone is and what someone is like."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "être (to be), present",
+      "headers": [
+        "Person",
+        "Form",
+        "Say it",
+        "Example"
+      ],
+      "rows": [
+        [
+          "je",
+          "suis",
+          "swee",
+          "Je suis Sam."
+        ],
+        [
+          "tu",
+          "es",
+          "eh",
+          "Tu es canadien."
+        ],
+        [
+          "il / elle / on",
+          "est",
+          "eh",
+          "Elle est française."
+        ],
+        [
+          "nous",
+          "sommes",
+          "sum",
+          "Nous sommes à Ottawa."
+        ],
+        [
+          "vous",
+          "êtes",
+          "et",
+          "Vous êtes madame Diallo ?"
+        ],
+        [
+          "ils / elles",
+          "sont",
+          "soh(n)",
+          "Ils sont canadiens."
+        ]
+      ],
+      "hear": 3
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "es and est sound exactly the same (eh). tu es and il est differ only by the first word. Always listen for the pronoun. vous êtes has a z-link: voo-ZET."
+    }
+  ]
+}

@@ -1,0 +1,342 @@
+{
+  "id": "s0-03",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "Accent marks",
+  "subtitle": "Stage 0, lesson 3",
+  "minutes": 12,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Accent marks",
+      "body": "Accents are part of the spelling. Some change the sound. Some only change the spelling. You must write them correctly, because a and à are different words, and ou and où are different words."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "The accents",
+      "headers": [
+        "Mark",
+        "On",
+        "What it does",
+        "Example"
+      ],
+      "rows": [
+        [
+          "é (acute)",
+          "é",
+          "sound ay",
+          "été (summer): ay-TAY"
+        ],
+        [
+          "è, ê (grave, circumflex)",
+          "è ê",
+          "sound eh",
+          "père (father): pehR · fête (party): feht"
+        ],
+        [
+          "ë",
+          "ë",
+          "say the e separately",
+          "Noël: noh-EL"
+        ],
+        [
+          "à, â",
+          "à â",
+          "sound ah (no change)",
+          "là (there): lah · âge (age): ahzh"
+        ],
+        [
+          "ù, û",
+          "ù û",
+          "sound ü or oo, no change",
+          "où (where): oo · sûr (sure): sür"
+        ],
+        [
+          "ô",
+          "ô",
+          "sound oh",
+          "hôtel: oh-TEL"
+        ],
+        [
+          "î, ï",
+          "î ï",
+          "sound ee",
+          "île (island): eel · maïs (corn): mah-EES"
+        ],
+        [
+          "ç (cedilla)",
+          "ç",
+          "c sounds like s",
+          "garçon (boy): gahR-SOH(N) · ça: sah"
+        ],
+        [
+          "œ",
+          "œ",
+          "sound uh",
+          "sœur (sister): suhR · œuf (egg): uhf"
+        ]
+      ],
+      "hear": 3
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Watch out",
+      "body": "é and è are two different sounds. été is ay-TAY. mère is mehR. a (has) and à (to, at) are different words. ou (or) and où (where) are different words."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "In Canada",
+      "body": "Accents are everywhere in Canadian names: Montréal, Québec, Trois-Rivières, Gaspésie, rue Sainte-Catherine. In French, capital letters keep their accents: À, É."
+    },
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "Montréal",
+      "en": "Montréal",
+      "sound": "moh(n)-ray-AHL",
+      "exampleFr": "J'habite à Montréal.",
+      "exampleEn": "I live in Montréal."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "Québec",
+      "en": "Québec",
+      "sound": "kay-BEK"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "français",
+      "en": "French",
+      "sound": "frah(n)-SEH",
+      "exampleFr": "Je parle français.",
+      "exampleEn": "I speak French."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "où",
+      "en": "where",
+      "sound": "oo",
+      "exampleFr": "Où est la sortie ?",
+      "exampleEn": "Where is the exit?"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "ou",
+      "en": "or",
+      "sound": "oo",
+      "exampleFr": "Café ou thé ?",
+      "exampleEn": "Coffee or tea?"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "à",
+      "en": "to, at",
+      "sound": "ah"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "a",
+      "en": "has",
+      "sound": "ah",
+      "exampleFr": "Il a un chat.",
+      "exampleEn": "He has a cat."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "là",
+      "en": "there",
+      "sound": "lah"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la",
+      "en": "the (feminine)",
+      "sound": "lah"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "très",
+      "en": "very",
+      "sound": "treh",
+      "exampleFr": "Très bien.",
+      "exampleEn": "Very well."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Montréal",
+      "options": [
+        "where",
+        "Montréal",
+        "has",
+        "very"
+      ],
+      "answer": 1,
+      "explain": "Montréal means Montréal."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Québec",
+      "options": [
+        "or",
+        "there",
+        "Montréal",
+        "Québec"
+      ],
+      "answer": 3,
+      "explain": "Québec means Québec."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "français",
+      "options": [
+        "to, at",
+        "French",
+        "the (feminine)",
+        "Québec"
+      ],
+      "answer": 1,
+      "explain": "français means French."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "où",
+      "options": [
+        "has",
+        "very",
+        "French",
+        "where"
+      ],
+      "answer": 3,
+      "explain": "où means where."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "ou",
+      "options": [
+        "there",
+        "or",
+        "Montréal",
+        "where"
+      ],
+      "answer": 1,
+      "explain": "ou means or."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "à",
+      "options": [
+        "the (feminine)",
+        "Québec",
+        "or",
+        "to, at"
+      ],
+      "answer": 3,
+      "explain": "à means to, at."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Québec",
+      "question": "Which word did you hear?",
+      "options": [
+        "où",
+        "Québec",
+        "à",
+        "là"
+      ],
+      "answer": 1,
+      "explain": "You heard Québec: Québec."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "ou",
+      "question": "Which word did you hear?",
+      "options": [
+        "a",
+        "ou",
+        "la",
+        "Montréal"
+      ],
+      "answer": 1,
+      "explain": "You heard ou: or."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Write the correct word: a or à, ou or où.  Il ___ un livre. (He has a book.)",
+      "options": [
+        "à",
+        "Où",
+        "a",
+        "ou"
+      ],
+      "answer": 2,
+      "explain": "The answer is a."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Write the correct word: a or à, ou or où.  Je vais ___ Montréal. (I am going to Montréal.)",
+      "options": [
+        "à",
+        "a",
+        "Où",
+        "ou"
+      ],
+      "answer": 0,
+      "explain": "The answer is à."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Write the correct word: a or à, ou or où.  ___ est la banque ? (Where is the bank?)",
+      "options": [
+        "a",
+        "à",
+        "Où",
+        "ou"
+      ],
+      "answer": 2,
+      "explain": "The answer is Où."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Write the correct word: a or à, ou or où.  Thé ___ café ? (Tea or coffee?)",
+      "options": [
+        "a",
+        "ou",
+        "à",
+        "Où"
+      ],
+      "answer": 1,
+      "explain": "The answer is ou."
+    }
+  ]
+}

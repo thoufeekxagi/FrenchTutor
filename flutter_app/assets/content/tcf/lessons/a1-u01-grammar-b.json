@@ -1,0 +1,43 @@
+{
+  "id": "a1-u01-grammar-b",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Grammar: The subject pronouns",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Who is acting?",
+      "headers": [
+        "",
+        "Singular",
+        "Plural"
+      ],
+      "rows": [
+        [
+          "1st person",
+          "je (I)",
+          "nous (we) · on (we, informal)"
+        ],
+        [
+          "2nd person",
+          "tu (you, informal)",
+          "vous (you, formal or plural)"
+        ],
+        [
+          "3rd person",
+          "il (he) · elle (she)",
+          "ils (they, m. or mixed) · elles (they, f.)"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "The subject pronouns",
+      "body": "je becomes j' before a vowel or a silent h (j'habite, j'ai). ils is used for a group that includes at least one man. In everyday speech, French speakers prefer on to mean we: On parle français = We speak French."
+    }
+  ]
+}

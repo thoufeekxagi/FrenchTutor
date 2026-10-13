@@ -1,0 +1,209 @@
+{
+  "id": "a1-u02-words-1",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Words: be polite",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "s'il vous plaît",
+      "en": "please (formal)",
+      "sound": "seel voo PLEH",
+      "exampleFr": "Votre nom, s'il vous plaît ?",
+      "exampleEn": "Your name, please?"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "s'il te plaît",
+      "en": "please (friends)",
+      "sound": "seel tuh PLEH",
+      "exampleFr": "Répète, s'il te plaît.",
+      "exampleEn": "Say it again, please."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "merci",
+      "en": "thank you",
+      "sound": "mehR-SEE",
+      "exampleFr": "Merci, madame.",
+      "exampleEn": "Thank you, madam."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "merci beaucoup",
+      "en": "thank you very much",
+      "sound": "mehR-SEE boh-KOO"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "de rien",
+      "en": "you're welcome (lit. of nothing)",
+      "sound": "duh RYA(N)"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "bienvenue",
+      "en": "you're welcome (Canada), welcome",
+      "sound": "bya(n)-vuh-NÜ",
+      "exampleFr": "Merci. — Bienvenue !",
+      "exampleEn": "Thank you. — You're welcome!"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "excusez-moi",
+      "en": "excuse me",
+      "sound": "ehk-skü-zay-MWAH",
+      "exampleFr": "Excusez-moi, monsieur.",
+      "exampleEn": "Excuse me, sir."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "pardon",
+      "en": "pardon, sorry, excuse me",
+      "sound": "pahR-DOH(N)",
+      "exampleFr": "Pardon ?",
+      "exampleEn": "Sorry? (I did not hear)"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "désolé / désolée",
+      "en": "sorry",
+      "say": "désolé, désolée",
+      "sound": "day-zoh-LAY",
+      "exampleFr": "Désolé, je ne comprends pas.",
+      "exampleEn": "Sorry, I do not understand."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "d'accord",
+      "en": "okay, agreed",
+      "sound": "dah-KOHR",
+      "exampleFr": "Oui, d'accord.",
+      "exampleEn": "Yes, okay."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "s'il vous plaît",
+      "options": [
+        "thank you very much",
+        "please (formal)",
+        "excuse me",
+        "okay, agreed"
+      ],
+      "answer": 1,
+      "explain": "s'il vous plaît means please (formal)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "s'il te plaît",
+      "options": [
+        "you're welcome (lit. of nothing)",
+        "pardon, sorry, excuse me",
+        "thank you very much",
+        "please (friends)"
+      ],
+      "answer": 3,
+      "explain": "s'il te plaît means please (friends)."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "merci",
+      "options": [
+        "you're welcome (Canada), welcome",
+        "thank you",
+        "sorry",
+        "please (friends)"
+      ],
+      "answer": 1,
+      "explain": "merci means thank you."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "merci beaucoup",
+      "options": [
+        "excuse me",
+        "okay, agreed",
+        "you're welcome (Canada), welcome",
+        "thank you very much"
+      ],
+      "answer": 3,
+      "explain": "merci beaucoup means thank you very much."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "de rien",
+      "options": [
+        "pardon, sorry, excuse me",
+        "you're welcome (lit. of nothing)",
+        "please (formal)",
+        "thank you very much"
+      ],
+      "answer": 1,
+      "explain": "de rien means you're welcome (lit. of nothing)."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "bienvenue",
+      "options": [
+        "sorry",
+        "please (friends)",
+        "pardon, sorry, excuse me",
+        "you're welcome (Canada), welcome"
+      ],
+      "answer": 3,
+      "explain": "bienvenue means you're welcome (Canada), welcome."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "merci beaucoup",
+      "question": "Which word did you hear?",
+      "options": [
+        "bienvenue",
+        "merci beaucoup",
+        "pardon",
+        "merci"
+      ],
+      "answer": 1,
+      "explain": "You heard merci beaucoup: thank you very much."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "bienvenue",
+      "question": "Which word did you hear?",
+      "options": [
+        "bienvenue",
+        "pardon",
+        "merci",
+        "de rien"
+      ],
+      "answer": 0,
+      "explain": "You heard bienvenue: you're welcome (Canada), welcome."
+    }
+  ]
+}

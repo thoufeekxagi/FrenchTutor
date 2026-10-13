@@ -1,0 +1,201 @@
+{
+  "id": "a1-u01-words-5",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Words: languages and two key verbs",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le français",
+      "en": "French (language)",
+      "sound": "luh frah(n)-SEH",
+      "exampleFr": "Je parle français.",
+      "exampleEn": "I speak French."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'anglais",
+      "en": "English (language)",
+      "sound": "lah(n)-GLEH",
+      "exampleFr": "Je parle anglais.",
+      "exampleEn": "I speak English."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "l'espagnol",
+      "en": "Spanish",
+      "sound": "lehs-pah-NYOL"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "l'arabe",
+      "en": "Arabic",
+      "sound": "lah-RAHB"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le hindi",
+      "en": "Hindi",
+      "sound": "luh a(n)-DEE"
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le mandarin",
+      "en": "Mandarin",
+      "sound": "luh mah(n)-dah-RA(N)"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "la langue / les langues",
+      "en": "language / languages",
+      "say": "la langue, les langues",
+      "sound": "lah lah(n)g / lay lah(n)g",
+      "exampleFr": "Le français est une langue.",
+      "exampleEn": "French is a language."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "parler",
+      "en": "to speak",
+      "sound": "pahR-LAY"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "habiter",
+      "en": "to live (in a place)",
+      "sound": "ah-bee-TAY"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "un peu",
+      "en": "a little",
+      "sound": "uh(n) puh",
+      "exampleFr": "Je parle un peu français.",
+      "exampleEn": "I speak a little French."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le français",
+      "options": [
+        "Arabic",
+        "French (language)",
+        "a little",
+        "Spanish"
+      ],
+      "answer": 1,
+      "explain": "le français means French (language)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "l'anglais",
+      "options": [
+        "Hindi",
+        "to speak",
+        "Arabic",
+        "English (language)"
+      ],
+      "answer": 3,
+      "explain": "l'anglais means English (language)."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "l'espagnol",
+      "options": [
+        "Mandarin",
+        "Spanish",
+        "to live (in a place)",
+        "English (language)"
+      ],
+      "answer": 1,
+      "explain": "l'espagnol means Spanish."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "l'arabe",
+      "options": [
+        "language / languages",
+        "a little",
+        "Spanish",
+        "Arabic"
+      ],
+      "answer": 3,
+      "explain": "l'arabe means Arabic."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le hindi",
+      "options": [
+        "to speak",
+        "Hindi",
+        "French (language)",
+        "Arabic"
+      ],
+      "answer": 1,
+      "explain": "le hindi means Hindi."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "le mandarin",
+      "options": [
+        "to live (in a place)",
+        "English (language)",
+        "Hindi",
+        "Mandarin"
+      ],
+      "answer": 3,
+      "explain": "le mandarin means Mandarin."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "l'anglais",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'arabe",
+        "l'anglais",
+        "le mandarin",
+        "habiter"
+      ],
+      "answer": 1,
+      "explain": "You heard l'anglais: English (language)."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le hindi",
+      "question": "Which word did you hear?",
+      "options": [
+        "parler",
+        "le hindi",
+        "un peu",
+        "l'anglais"
+      ],
+      "answer": 1,
+      "explain": "You heard le hindi: Hindi."
+    }
+  ]
+}

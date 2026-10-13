@@ -1,0 +1,47 @@
+{
+  "id": "a1-u05-write-speak",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "Write and speak",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write the prices in words",
+      "body": "Write each price in French words: 4,25 $ · 18 $ · 62,50 $ · 0,90 $.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "quatre dollars vingt-cinq · dix-huit dollars · soixante-deux dollars cinquante · quatre-vingt-dix cents\n\nCheck:\n• Dollar sign after the number in digits, but write words in a sentence.\n• quatre-vingt-dix has hyphens."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Writing: A short message",
+      "body": "Write a short message to a friend: say what you bought, how much it cost, and how you paid.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Model answer",
+      "body": "Salut ! J'achète du pain et du lait au dépanneur. Ça fait sept dollars dix-huit. Je paie par carte. À bientôt !\n\nCheck:\n• J'achète, je paie.\n• Say the amount in words.\n• End with À bientôt."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Speaking: At the register",
+      "body": "Say a short conversation: ask the price, hear the total, ask for the receipt and say how you pay. Use Ça fait combien ? Je paie par carte. Le reçu, s'il vous plaît. Record yourself.\n\n• Say the numbers slowly and clearly.\n• If you do not catch the price, say Pardon ? Plus lentement, s'il vous plaît."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Ça fait combien, s'il vous plaît ? ... Sept dollars dix-huit ? D'accord. Je paie par carte. Le reçu, s'il vous plaît. Merci, bonne soirée !",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "a1-u02-words-3",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Words: age",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "avoir",
+      "en": "to have",
+      "sound": "ah-VWAHR"
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'âge (m.)",
+      "en": "age",
+      "say": "l'âge",
+      "sound": "lahzh",
+      "exampleFr": "Quel âge ?",
+      "exampleEn": "How old?"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un an / des ans",
+      "en": "year / years",
+      "say": "un an, des ans",
+      "sound": "uh(n) nah(n) / lay zah(n)",
+      "exampleFr": "J'ai trente ans.",
+      "exampleEn": "I am thirty (years old)."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "jeune",
+      "en": "young",
+      "sound": "zhuhn"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "quel / quelle",
+      "en": "which, what",
+      "say": "quel, quelle",
+      "sound": "kel",
+      "exampleFr": "Quelle langue ?",
+      "exampleEn": "Which language?"
+    }
+  ]
+}

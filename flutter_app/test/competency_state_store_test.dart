@@ -51,7 +51,10 @@ void main() {
   });
 
   test('replaceAll discards stale rows instead of accumulating them', () {
-    store.replaceAll(null, [state(competencyId: 'a'), state(competencyId: 'b')]);
+    store.replaceAll(null, [
+      state(competencyId: 'a'),
+      state(competencyId: 'b'),
+    ]);
     store.replaceAll(null, [state(competencyId: 'a')]);
 
     expect(store.all().map((s) => s.competencyId), ['a']);
@@ -60,8 +63,14 @@ void main() {
   test('dueForReview only returns rows whose schedule has passed', () {
     final now = DateTime.utc(2026, 6, 1);
     store.replaceAll(null, [
-      state(competencyId: 'overdue', nextReviewAt: now.subtract(const Duration(days: 1))),
-      state(competencyId: 'future', nextReviewAt: now.add(const Duration(days: 1))),
+      state(
+        competencyId: 'overdue',
+        nextReviewAt: now.subtract(const Duration(days: 1)),
+      ),
+      state(
+        competencyId: 'future',
+        nextReviewAt: now.add(const Duration(days: 1)),
+      ),
       state(competencyId: 'none', nextReviewAt: null),
     ]);
 

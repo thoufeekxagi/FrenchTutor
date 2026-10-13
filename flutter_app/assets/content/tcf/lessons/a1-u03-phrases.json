@@ -1,0 +1,189 @@
+{
+  "id": "a1-u03-phrases",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Phrases",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Votre pièce d'identité, s'il vous plaît.",
+      "en": "Your ID, please.",
+      "tip": "Say it: vohtr pyes dee-dah(n)-tee-TAY seel voo PLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Remplissez ce formulaire.",
+      "en": "Fill in this form.",
+      "tip": "Say it: rah(n)-plee-SAY suh fohr-mü-LEHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Signez ici.",
+      "en": "Sign here.",
+      "tip": "Say it: see-NYAY ee-SEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Voici mon passeport.",
+      "en": "Here is my passport.",
+      "tip": "Say it: vwah-SEE moh(n) pahs-POHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je suis né le quinze avril mille neuf cent quatre-vingt-dix.",
+      "en": "I was born on April 15, 1990.",
+      "tip": "Say it: zhuh swee nay luh ka(n)z ah-VREEL meel nuhf sah(n) kah-truh-va(n)-DEES"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "J'habite au douze, rue Sainte-Catherine, appartement quatre.",
+      "en": "I live at 12 Sainte-Catherine Street, apartment 4.",
+      "tip": "Say it: zhah-BEET oh dooz Rü sa(n)t kah-tuh-REEN ah-pahr-tuh-MAH(N) KAHtr"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Mon code postal est H3B 1A7.",
+      "en": "My postal code is H3B 1A7.",
+      "tip": "Say it: moh(n) kohd poh-STAHL eh ahsh trwah bay uh(n) ah set"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "C'est parfait. Merci !",
+      "en": "That is perfect. Thank you!",
+      "tip": "Say it: seh pahR-FEH mehR-SEE"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Votre pièce d'identité, s'il vous plaît.",
+      "options": [
+        "Here is my passport.",
+        "Your ID, please.",
+        "My postal code is H3B 1A7.",
+        "Fill in this form."
+      ],
+      "answer": 1,
+      "explain": "Votre pièce d'identité, s'il vous plaît. means Your ID, please.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Signez ici.",
+      "options": [
+        "I live at 12 Sainte-Catherine Street, apartment 4.",
+        "Sign here.",
+        "Your ID, please.",
+        "My postal code is H3B 1A7."
+      ],
+      "answer": 1,
+      "explain": "Signez ici. means Sign here.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis né le quinze avril mille neuf cent quatre-vingt-dix.",
+      "options": [
+        "That is perfect. Thank you!",
+        "I was born on April 15, 1990.",
+        "Sign here.",
+        "I live at 12 Sainte-Catherine Street, apartment 4."
+      ],
+      "answer": 1,
+      "explain": "Je suis né le quinze avril mille neuf cent quatre-vingt-dix. means I was born on April 15, 1990.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Mon code postal est H3B 1A7.",
+      "options": [
+        "Fill in this form.",
+        "My postal code is H3B 1A7.",
+        "I was born on April 15, 1990.",
+        "That is perfect. Thank you!"
+      ],
+      "answer": 1,
+      "explain": "Mon code postal est H3B 1A7. means My postal code is H3B 1A7.."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "In Canada",
+      "body": "In a Canadian address, the number comes first, then the street: 12, rue Sainte-Catherine. A postal code has letters and numbers: H3B 1A7. You say each character: ahsh, trois, bay, un, ah, sept. Dates on forms are often written 2026-10-12 (year, month, day). You can say le douze octobre deux mille vingt-six."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Les mois",
+      "headers": [
+        "Month",
+        "Say it",
+        "Month",
+        "Say it"
+      ],
+      "rows": [
+        [
+          "janvier",
+          "zhah(n)-VYAY",
+          "juillet",
+          "zhwee-YEH"
+        ],
+        [
+          "février",
+          "fay-vree-AY",
+          "août",
+          "oot"
+        ],
+        [
+          "mars",
+          "mahrs",
+          "septembre",
+          "sehp-TAH(N)br"
+        ],
+        [
+          "avril",
+          "ah-VREEL",
+          "octobre",
+          "ohk-TOHbr"
+        ],
+        [
+          "mai",
+          "may",
+          "novembre",
+          "noh-VAH(N)br"
+        ],
+        [
+          "juin",
+          "zhwa(n)",
+          "décembre",
+          "day-SAH(N)br"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Tip",
+      "body": "Months are not capitalised in French: le douze octobre. The day comes before the month: le 12 octobre, not October 12. The first of the month is le 1er (le premier)."
+    }
+  ]
+}

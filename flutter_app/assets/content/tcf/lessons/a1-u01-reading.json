@@ -1,0 +1,66 @@
+{
+  "id": "a1-u01-reading",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Reading practice",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is Samira's last name?",
+      "options": [
+        "Samira",
+        "Haddad",
+        "Algérie",
+        "Arabe"
+      ],
+      "answer": 1,
+      "explain": "Nom is the last name.",
+      "promptFr": "Nom : Haddad · Prénom : Samira · Nationalité : algérienne · Langues : arabe, français"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which languages does Samira speak?",
+      "options": [
+        "Arabic and French",
+        "Arabic and English",
+        "French and English",
+        "Only Arabic"
+      ],
+      "answer": 0,
+      "explain": "Langues: arabe, français.",
+      "promptFr": "Nom : Haddad · Prénom : Samira · Nationalité : algérienne · Langues : arabe, français"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does Léa say about English?",
+      "options": [
+        "She speaks it well",
+        "She speaks a little",
+        "She does not speak it",
+        "She teaches it"
+      ],
+      "answer": 1,
+      "explain": "Un peu anglais: a little.",
+      "promptFr": "Bonjour, je m'appelle Léa. J'habite à Gatineau. Je parle français et un peu anglais."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where does Léa live?",
+      "options": [
+        "Ottawa",
+        "Gatineau",
+        "Montréal",
+        "Toronto"
+      ],
+      "answer": 1,
+      "explain": "J'habite à Gatineau.",
+      "promptFr": "Bonjour, je m'appelle Léa. J'habite à Gatineau. Je parle français et un peu anglais."
+    }
+  ]
+}

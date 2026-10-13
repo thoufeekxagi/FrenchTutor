@@ -1,0 +1,114 @@
+{
+  "id": "a1-u05-tcf",
+  "unit": "a1-u05",
+  "unitTitle": "Numbers, money and prices",
+  "title": "TCF corner",
+  "subtitle": "Unit 5: Numbers, money and prices",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Bonjour. Le sandwich coûte huit dollars quatre-vingts.",
+      "question": "How much is the sandwich?",
+      "options": [
+        "$8.40",
+        "$8.80",
+        "$18.80",
+        "$80.80"
+      ],
+      "answer": 1,
+      "explain": "Huit dollars quatre-vingts: 8,80."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Madame, votre facture est de cent vingt dollars.",
+      "question": "How much is the bill?",
+      "options": [
+        "$12",
+        "$102",
+        "$120",
+        "$220"
+      ],
+      "answer": 2,
+      "explain": "Cent vingt: 120."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je paie comptant. Voici cinquante dollars.",
+      "question": "How does the person pay?",
+      "options": [
+        "Card",
+        "Cash",
+        "Transfer",
+        "Cheque"
+      ],
+      "answer": 1,
+      "explain": "Comptant: cash."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Le loyer est de neuf cent cinquante dollars par mois.",
+      "question": "What is the monthly rent?",
+      "options": [
+        "$590",
+        "$905",
+        "$950",
+        "$1 950"
+      ],
+      "answer": 2,
+      "explain": "Neuf cent cinquante: 950."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the discount?",
+      "options": [
+        "3 %",
+        "13 %",
+        "30 %",
+        "50 %"
+      ],
+      "answer": 2,
+      "explain": "30 %.",
+      "promptFr": "Rabais de 30 % : tous les manteaux. Plus taxes."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How much do you pay?",
+      "options": [
+        "$45",
+        "$2.25",
+        "$47.25",
+        "$92.25"
+      ],
+      "answer": 2,
+      "explain": "À payer.",
+      "promptFr": "Total : 45,00 $ · TPS : 2,25 $ · À payer : 47,25 $"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is free?",
+      "options": [
+        "Bread",
+        "Coffee",
+        "The bus",
+        "The rent"
+      ],
+      "answer": 1,
+      "explain": "Le café est gratuit.",
+      "promptFr": "Le café est gratuit le dimanche."
+    }
+  ]
+}

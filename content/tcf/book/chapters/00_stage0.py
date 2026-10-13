@@ -54,7 +54,7 @@ CHAPTER = chapter(
             ("Comment ça s'écrit ?", "koh-mah(n) sah say-KREE", "How do you spell that?", "", ""),
             ("Ça s'écrit...", "sah say-KREE", "It is spelled...", "Ça s'écrit T-R-E-M-B-L-A-Y.", "It is spelled T-R-E-M-B-L-A-Y."),
             ("Pouvez-vous répéter ?", "poo-vay-VOO ray-pay-TAY", "Can you repeat?", "", ""),
-            ("deux L", "duh ell", "double L (two Ls)", "Mallette : M-A-deux L-E-deux T-E.", ""),
+            ("deux L", "duh ell", "double L (two Ls)", "Mallette : M-A-deux L-E-deux T-E.", "Mallette (a name): M-A-two L-E-two T-E."),
             ("un accent aigu", "uh(n)n ahk-SAH(N) ay-GÜ", "an acute accent (é)", "", ""),
             ("un trait d'union", "uh(n) tray dü-nee-OH(N)", "a hyphen (-)", "", ""),
             ("arobase", "ah-roh-BAHZ", "the @ sign", "", ""),

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/main.dart' as app;
 import 'package:french_tutor/v3/lesson/v3_course.dart';
+import 'package:french_tutor/v3/v3_prefs.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,7 +43,7 @@ void main() {
     // Mark every real lesson done so the dev sample is the next one offered,
     // however many real lessons exist.
     final real = (await V3Course.load()).where((l) => !l.dev).map((l) => l.id);
-    await prefs.setStringList('v3_completed_lessons', real.toList());
+    await prefs.setStringList(v3Key('v3_completed_lessons'), real.toList());
 
     app.main();
 
@@ -112,7 +113,7 @@ void main() {
     expect(t, contains('merci'));
     final progress = await SharedPreferences.getInstance();
     expect(
-      progress.getStringList('v3_completed_lessons'),
+      progress.getStringList(v3Key('v3_completed_lessons')),
       contains('dev-sample'),
       reason: 'completion was not recorded',
     );

@@ -4,10 +4,14 @@ import 'package:french_tutor/utils/voice_card_command.dart';
 void main() {
   test('recognizes the exact advance phrase, case/accent-insensitive', () {
     expect(matchesAdvanceCommand('Next word', nextPhrase: 'next word'), true);
-    expect(matchesAdvanceCommand('NEXT SENTENCE', nextPhrase: 'next sentence'),
-        true);
-    expect(matchesAdvanceCommand('Carte suivante', nextPhrase: 'carte suivante'),
-        true);
+    expect(
+      matchesAdvanceCommand('NEXT SENTENCE', nextPhrase: 'next sentence'),
+      true,
+    );
+    expect(
+      matchesAdvanceCommand('Carte suivante', nextPhrase: 'carte suivante'),
+      true,
+    );
   });
 
   test('tolerates near-exact STT noise on the approved phrase', () {
@@ -21,7 +25,10 @@ void main() {
     expect(matchesAdvanceCommand('yes', nextPhrase: 'next word'), false);
     expect(matchesAdvanceCommand('oui', nextPhrase: 'next word'), false);
     expect(
-      matchesAdvanceCommand('can we go to the next word', nextPhrase: 'next word'),
+      matchesAdvanceCommand(
+        'can we go to the next word',
+        nextPhrase: 'next word',
+      ),
       false,
     );
     expect(
@@ -29,14 +36,19 @@ void main() {
       false,
     );
     expect(
-      matchesAdvanceCommand('background noise next word hello',
-          nextPhrase: 'next word'),
+      matchesAdvanceCommand(
+        'background noise next word hello',
+        nextPhrase: 'next word',
+      ),
       false,
     );
   });
 
   test('never matches a phrase approved for a different screen', () {
-    expect(matchesAdvanceCommand('next word', nextPhrase: 'next sentence'), false);
+    expect(
+      matchesAdvanceCommand('next word', nextPhrase: 'next sentence'),
+      false,
+    );
   });
 
   test('accepts the command wrapped in filler words', () {
@@ -52,10 +64,7 @@ void main() {
       matchesAdvanceCommand('just next word', nextPhrase: 'next word'),
       true,
     );
-    expect(
-      matchesAdvanceCommand('next please', nextPhrase: 'next word'),
-      true,
-    );
+    expect(matchesAdvanceCommand('next please', nextPhrase: 'next word'), true);
     expect(
       matchesAdvanceCommand('ok next word', nextPhrase: 'next word'),
       true,
@@ -64,7 +73,10 @@ void main() {
 
   test('still rejects the phrase merely mentioned inside other content', () {
     expect(
-      matchesAdvanceCommand('can we go to the next word', nextPhrase: 'next word'),
+      matchesAdvanceCommand(
+        'can we go to the next word',
+        nextPhrase: 'next word',
+      ),
       false,
     );
     expect(
@@ -72,8 +84,10 @@ void main() {
       false,
     );
     expect(
-      matchesAdvanceCommand('background noise next word hello',
-          nextPhrase: 'next word'),
+      matchesAdvanceCommand(
+        'background noise next word hello',
+        nextPhrase: 'next word',
+      ),
       false,
     );
   });

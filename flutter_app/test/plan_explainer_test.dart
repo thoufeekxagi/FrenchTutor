@@ -15,17 +15,19 @@ const _competency = Competency(
   curriculumVersion: 'test',
 );
 
-PlanTask _task(List<PlanReasonTrace> trace, {PlanPriority priority = PlanPriority.must}) =>
-    PlanTask(
-      contentItemId: 'content-1',
-      competencyId: 'competency-1',
-      modality: PerformanceModality.controlledSpeaking,
-      role: ContentMappingRole.practises,
-      estimatedMinutes: 10,
-      priority: priority,
-      score: 3,
-      reasonTrace: trace,
-    );
+PlanTask _task(
+  List<PlanReasonTrace> trace, {
+  PlanPriority priority = PlanPriority.must,
+}) => PlanTask(
+  contentItemId: 'content-1',
+  competencyId: 'competency-1',
+  modality: PerformanceModality.controlledSpeaking,
+  role: ContentMappingRole.practises,
+  estimatedMinutes: 10,
+  priority: priority,
+  score: 3,
+  reasonTrace: trace,
+);
 
 void main() {
   const explainer = PlanExplainer();
@@ -44,25 +46,28 @@ void main() {
     expect(result.text, contains('Present tense of être'));
   });
 
-  test('falls back to skillMaintenance when nothing contributes positively', () {
-    final result = explainer.explain(
-      task: _task(const [
-        PlanReasonTrace(reason: PlanningReason.costPenalty, contribution: -1),
-      ]),
-      competency: _competency,
-    );
+  test(
+    'falls back to skillMaintenance when nothing contributes positively',
+    () {
+      final result = explainer.explain(
+        task: _task(const [
+          PlanReasonTrace(reason: PlanningReason.costPenalty, contribution: -1),
+        ]),
+        competency: _competency,
+      );
 
-    expect(result.code, PlanReasonCode.skillMaintenance);
-  });
+      expect(result.code, PlanReasonCode.skillMaintenance);
+    },
+  );
 
   test('mapping strength on a bonus task reads as learner choice', () {
     final result = explainer.explain(
-      task: _task(
-        const [
-          PlanReasonTrace(reason: PlanningReason.mappingStrength, contribution: 0.8),
-        ],
-        priority: PlanPriority.bonus,
-      ),
+      task: _task(const [
+        PlanReasonTrace(
+          reason: PlanningReason.mappingStrength,
+          contribution: 0.8,
+        ),
+      ], priority: PlanPriority.bonus),
       competency: _competency,
     );
 

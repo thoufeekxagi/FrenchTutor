@@ -47,7 +47,9 @@ void main() {
     );
 
     expect(
-      plan.tasks.every((t) => t.modality != PerformanceModality.spontaneousSpeaking),
+      plan.tasks.every(
+        (t) => t.modality != PerformanceModality.spontaneousSpeaking,
+      ),
       isTrue,
     );
     expect(plan.tasks, isNotEmpty);

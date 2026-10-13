@@ -1,0 +1,230 @@
+{
+  "id": "s0-04",
+  "unit": "s0",
+  "unitTitle": "Sounds and spelling",
+  "title": "The core vowels",
+  "subtitle": "Stage 0, lesson 4",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "The core vowels",
+      "body": "French has 16 vowel sounds. Start with the ones you hear most. Say each pair out loud. Keep your mouth shape still while you say a vowel: French vowels do not glide like English ones (say oh, not oh-oo)."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Vowels",
+      "headers": [
+        "Spelling",
+        "Say it",
+        "Example",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "a",
+          "ah",
+          "papa (pah-PAH)",
+          "dad"
+        ],
+        [
+          "é, er, ez (end of word)",
+          "ay",
+          "café (kah-FAY), parler (pahR-LAY)",
+          "coffee, to speak"
+        ],
+        [
+          "è, ê, ai, ei, e + two consonants",
+          "eh",
+          "mère (mehR), mais (meh), belle (bel)",
+          "mother, but, beautiful"
+        ],
+        [
+          "e (small, in the middle or end)",
+          "uh",
+          "le (luh), petit (puh-TEE), je (zhuh)",
+          "the, small, I"
+        ],
+        [
+          "i, y",
+          "ee",
+          "ici (ee-SEE), il (eel)",
+          "here, he"
+        ],
+        [
+          "o, ô, au, eau",
+          "oh",
+          "chose (shohz), chaud (shoh), beau (boh), eau (oh)",
+          "thing, hot, beautiful, water"
+        ],
+        [
+          "oi",
+          "wah",
+          "moi (mwah), trois (trwah)",
+          "me, three"
+        ],
+        [
+          "ou",
+          "oo",
+          "vous (voo), jour (zhoor), pour (poor)",
+          "you, day, for"
+        ],
+        [
+          "eu, œu",
+          "uh (round lips)",
+          "deux (duh), peur (puhR), fleur (fluhR)",
+          "two, fear, flower"
+        ],
+        [
+          "u",
+          "ü",
+          "tu (tü), rue (Rü), sûr (sür)",
+          "you, street, sure"
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Tip",
+      "body": "The e with no accent has three jobs. At the end of a word it is silent (petite ends with the t sound). In a small word (le, je, me) it is uh. Before two consonants it is eh (elle, belle)."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Say each word aloud. Write the sound of the underlined vowel: ah, ay, eh, uh, ee, oh, oo, wah or ü.  mère",
+      "options": [
+        "oo",
+        "wah",
+        "eh",
+        "ü"
+      ],
+      "answer": 2,
+      "explain": "The answer is eh."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Say each word aloud. Write the sound of the underlined vowel: ah, ay, eh, uh, ee, oh, oo, wah or ü.  vous",
+      "options": [
+        "eh",
+        "wah",
+        "oo",
+        "ü"
+      ],
+      "answer": 2,
+      "explain": "The answer is oo."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Say each word aloud. Write the sound of the underlined vowel: ah, ay, eh, uh, ee, oh, oo, wah or ü.  moi",
+      "options": [
+        "eh",
+        "oo",
+        "wah",
+        "ü"
+      ],
+      "answer": 2,
+      "explain": "The answer is wah."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Say each word aloud. Write the sound of the underlined vowel: ah, ay, eh, uh, ee, oh, oo, wah or ü.  tu",
+      "options": [
+        "eh",
+        "oo",
+        "wah",
+        "ü"
+      ],
+      "answer": 3,
+      "explain": "The answer is ü."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Say each word aloud. Write the sound of the underlined vowel: ah, ay, eh, uh, ee, oh, oo, wah or ü.  eau",
+      "options": [
+        "eh",
+        "oh",
+        "oo",
+        "wah"
+      ],
+      "answer": 1,
+      "explain": "The answer is oh."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Say each word aloud. Write the sound of the underlined vowel: ah, ay, eh, uh, ee, oh, oo, wah or ü.  café",
+      "options": [
+        "eh",
+        "oo",
+        "ay",
+        "wah"
+      ],
+      "answer": 2,
+      "explain": "The answer is ay."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "trois",
+      "question": "Which number?",
+      "options": [
+        "trois",
+        "tout",
+        "tu",
+        "toi"
+      ],
+      "answer": 0,
+      "explain": "Trois is trwah."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "beau",
+      "question": "Which word?",
+      "options": [
+        "bu",
+        "beau",
+        "bout",
+        "bœuf"
+      ],
+      "answer": 1,
+      "explain": "Beau is boh."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "vous",
+      "question": "Which word?",
+      "options": [
+        "vu",
+        "veux",
+        "vous",
+        "vue"
+      ],
+      "answer": 2,
+      "explain": "Vous is voo."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "mère",
+      "question": "Which word?",
+      "options": [
+        "mer",
+        "mère",
+        "mari",
+        "mur"
+      ],
+      "answer": 1,
+      "explain": "Mère is mehR (mother)."
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "id": "a1-u04-words-2",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Words: describe a person",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "grand / grande",
+      "en": "tall, big",
+      "say": "grand, grande",
+      "sound": "grah(n) / grah(n)d",
+      "exampleFr": "Mon frère est grand.",
+      "exampleEn": "My brother is tall."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "petit / petite",
+      "en": "small, short",
+      "say": "petit, petite",
+      "sound": "puh-TEE / puh-TEET"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "jeune",
+      "en": "young",
+      "sound": "zhuhn"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "vieux / vieille",
+      "en": "old (not for people politely: say âgé)",
+      "say": "vieux, vieille",
+      "sound": "vyuh / vyeey"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "beau / belle",
+      "en": "handsome, beautiful",
+      "say": "beau, belle",
+      "sound": "boh / bel",
+      "exampleFr": "Ma mère est belle.",
+      "exampleEn": "My mother is beautiful."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "gentil / gentille",
+      "en": "kind, nice",
+      "say": "gentil, gentille",
+      "sound": "zhah(n)-TEE / zhah(n)-TEEY",
+      "exampleFr": "Ma tante est gentille.",
+      "exampleEn": "My aunt is kind."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "sympathique",
+      "en": "friendly, nice (informal: sympa)",
+      "sound": "sa(n)-pah-TEEK"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "content / contente",
+      "en": "happy",
+      "say": "content, contente",
+      "sound": "koh(n)-TAH(N) / koh(n)-TAH(N)T"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "fatigué / fatiguée",
+      "en": "tired",
+      "say": "fatigué, fatiguée",
+      "sound": "fah-tee-GAY"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "marié / mariée",
+      "en": "married",
+      "say": "marié, mariée",
+      "sound": "mah-RYAY",
+      "exampleFr": "Je suis marié.",
+      "exampleEn": "I am married."
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "célibataire",
+      "en": "single (not married)",
+      "sound": "say-lee-bah-TEHR"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "grand / grande",
+      "options": [
+        "old (not for people politely: say âgé)",
+        "tall, big",
+        "friendly, nice (informal: sympa)",
+        "married"
+      ],
+      "answer": 1,
+      "explain": "grand / grande means tall, big."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "petit / petite",
+      "options": [
+        "handsome, beautiful",
+        "happy",
+        "single (not married)",
+        "small, short"
+      ],
+      "answer": 3,
+      "explain": "petit / petite means small, short."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "jeune",
+      "options": [
+        "kind, nice",
+        "young",
+        "tired",
+        "tall, big"
+      ],
+      "answer": 1,
+      "explain": "jeune means young."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "vieux / vieille",
+      "options": [
+        "friendly, nice (informal: sympa)",
+        "married",
+        "small, short",
+        "old (not for people politely: say âgé)"
+      ],
+      "answer": 3,
+      "explain": "vieux / vieille means old (not for people politely: say âgé)."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "beau / belle",
+      "options": [
+        "happy",
+        "handsome, beautiful",
+        "single (not married)",
+        "young"
+      ],
+      "answer": 1,
+      "explain": "beau / belle means handsome, beautiful."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "gentil / gentille",
+      "options": [
+        "tired",
+        "tall, big",
+        "old (not for people politely: say âgé)",
+        "kind, nice"
+      ],
+      "answer": 3,
+      "explain": "gentil / gentille means kind, nice."
+    }
+  ]
+}

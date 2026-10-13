@@ -39,6 +39,17 @@ def scan(path):
     }
 
 
+# One design everywhere: these are the only ways a v3 screen may style text,
+# colour and buttons. Each entry is (pattern, what to use instead).
+CONSISTENCY_RULES = [
+    (re.compile(r"GoogleFonts"), "use V3Type (one font family app wide), not GoogleFonts"),
+    (re.compile(r"fontFamily\s*:"), "use V3Type, not fontFamily"),
+    (re.compile(r"fontSize\s*:"), "set size through V3Type(size), not TextStyle(fontSize:)"),
+    (re.compile(r"Color\(\s*0x|Color\.fromARGB|Color\.fromRGBO"), "use DesignTokens / AppearanceColors, not a raw colour"),
+    (re.compile(r"\b(ElevatedButton|FilledButton|OutlinedButton|TextButton)\s*\("), "use V3Button / V3TextAction (one button design)"),
+]
+
+
 def lint_v3():
     root = LIB / "v3"
     findings = []
@@ -47,6 +58,11 @@ def lint_v3():
     for path in sorted(root.rglob("*.dart")):
         lines = path.read_text(errors="ignore").splitlines()
         for i, line in enumerate(lines):
+            code = line.strip()
+            if not code.startswith("//"):
+                for pattern, advice in CONSISTENCY_RULES:
+                    if pattern.search(code):
+                        findings.append(f"{path.relative_to(APP)}:{i + 1}: {advice}")
             if TAP_RE.search(line) and "onChanged" not in line:
                 window = "\n".join(lines[max(0, i - 14): i + 3])
                 if not GUARD_RE.search(window):

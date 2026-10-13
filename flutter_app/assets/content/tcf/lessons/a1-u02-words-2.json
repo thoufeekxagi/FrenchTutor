@@ -1,0 +1,216 @@
+{
+  "id": "a1-u02-words-2",
+  "unit": "a1-u02",
+  "unitTitle": "Greet, be polite, spell your name",
+  "title": "Words: when you do not understand",
+  "subtitle": "Unit 2: Greet, be polite, spell your name",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "comprendre",
+      "en": "to understand",
+      "sound": "koh(n)-PRAH(N)dr",
+      "exampleFr": "Je comprends un peu.",
+      "exampleEn": "I understand a little."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "répéter",
+      "en": "to repeat",
+      "sound": "ray-pay-TAY",
+      "exampleFr": "Pouvez-vous répéter ?",
+      "exampleEn": "Can you repeat?"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "lentement",
+      "en": "slowly",
+      "sound": "lah(n)t-MAH(N)",
+      "exampleFr": "Parlez lentement, s'il vous plaît.",
+      "exampleEn": "Speak slowly, please."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "plus",
+      "en": "more",
+      "sound": "plü",
+      "exampleFr": "Plus lentement, s'il vous plaît.",
+      "exampleEn": "More slowly, please."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "encore",
+      "en": "again, still",
+      "sound": "ah(n)-KOHR",
+      "exampleFr": "Encore une fois.",
+      "exampleEn": "One more time."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "aider",
+      "en": "to help",
+      "sound": "eh-DAY"
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "l'aide (f.)",
+      "en": "help",
+      "say": "l'aide",
+      "sound": "lehd"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la question",
+      "en": "question",
+      "sound": "lah kehs-TYOH(N)"
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "la réponse",
+      "en": "answer",
+      "sound": "lah ray-POH(N)S"
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "le mot",
+      "en": "word",
+      "sound": "luh moh"
+    },
+    {
+      "type": "word",
+      "id": "w11",
+      "fr": "la phrase",
+      "en": "sentence",
+      "sound": "lah frahz"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "comprendre",
+      "options": [
+        "more",
+        "to understand",
+        "help",
+        "word"
+      ],
+      "answer": 1,
+      "explain": "comprendre means to understand."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "répéter",
+      "options": [
+        "again, still",
+        "question",
+        "sentence",
+        "to repeat"
+      ],
+      "answer": 3,
+      "explain": "répéter means to repeat."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "lentement",
+      "options": [
+        "to help",
+        "slowly",
+        "answer",
+        "to understand"
+      ],
+      "answer": 1,
+      "explain": "lentement means slowly."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "plus",
+      "options": [
+        "help",
+        "word",
+        "to repeat",
+        "more"
+      ],
+      "answer": 3,
+      "explain": "plus means more."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "encore",
+      "options": [
+        "question",
+        "again, still",
+        "sentence",
+        "slowly"
+      ],
+      "answer": 1,
+      "explain": "encore means again, still."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "aider",
+      "options": [
+        "answer",
+        "to understand",
+        "more",
+        "to help"
+      ],
+      "answer": 3,
+      "explain": "aider means to help."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "répéter",
+      "question": "Which word did you hear?",
+      "options": [
+        "plus",
+        "répéter",
+        "aider",
+        "la question"
+      ],
+      "answer": 1,
+      "explain": "You heard répéter: to repeat."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "encore",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'aide",
+        "encore",
+        "la réponse",
+        "la phrase"
+      ],
+      "answer": 1,
+      "explain": "You heard encore: again, still."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "Asking someone to repeat is normal and respected. Canadians (and examiners) expect it. Pardon ? is the shortest. Pouvez-vous répéter, s'il vous plaît ? is the polite full form. Plus lentement, s'il vous plaît works every time."
+    }
+  ]
+}

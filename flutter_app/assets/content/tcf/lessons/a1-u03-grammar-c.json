@@ -1,0 +1,159 @@
+{
+  "id": "a1-u03-grammar-c",
+  "unit": "a1-u03",
+  "unitTitle": "Forms and papers",
+  "title": "Grammar: votre / vos: your (formal)",
+  "subtitle": "Unit 3: Forms and papers",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "votre / vos: your (formal)",
+      "body": "Forms and clerks use votre (singular) and vos (plural): votre nom, votre adresse, vos documents. For friends you will learn ton / ta / tes in Unit 4."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Write the right word for the.  ___ formulaire",
+      "options": [
+        "le",
+        "l'",
+        "la",
+        "les"
+      ],
+      "answer": 0,
+      "explain": "The answer is le."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Write the right word for the.  ___ adresse",
+      "options": [
+        "le",
+        "l'",
+        "la",
+        "les"
+      ],
+      "answer": 1,
+      "explain": "The answer is l'."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Write the right word for the.  ___ signature",
+      "options": [
+        "le",
+        "l'",
+        "les",
+        "la"
+      ],
+      "answer": 3,
+      "explain": "The answer is la."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Write the right word for the.  ___ passeports",
+      "options": [
+        "le",
+        "les",
+        "l'",
+        "la"
+      ],
+      "answer": 1,
+      "explain": "The answer is les."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Write the right word for the.  ___ appartement",
+      "options": [
+        "le",
+        "l'",
+        "la",
+        "les"
+      ],
+      "answer": 1,
+      "explain": "The answer is l'."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Write the right word for the.  ___ rue",
+      "options": [
+        "le",
+        "la",
+        "l'",
+        "les"
+      ],
+      "answer": 1,
+      "explain": "The answer is la."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Write the plural with the article les.  le formulaire",
+      "options": [
+        "les formulaires",
+        "les rues",
+        "les adresses",
+        "les pays"
+      ],
+      "answer": 0,
+      "explain": "The answer is les formulaires."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Write the plural with the article les.  la rue",
+      "options": [
+        "les formulaires",
+        "les adresses",
+        "les rues",
+        "les pays"
+      ],
+      "answer": 2,
+      "explain": "The answer is les rues."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Write the plural with the article les.  l'adresse",
+      "options": [
+        "les formulaires",
+        "les adresses",
+        "les rues",
+        "les pays"
+      ],
+      "answer": 1,
+      "explain": "The answer is les adresses."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Write the plural with the article les.  le pays",
+      "options": [
+        "les formulaires",
+        "les rues",
+        "les adresses",
+        "les pays"
+      ],
+      "answer": 3,
+      "explain": "The answer is les pays."
+    },
+    {
+      "type": "choose",
+      "id": "c11",
+      "prompt": "Write the plural with the article les.  le bureau",
+      "options": [
+        "les bureaux",
+        "les formulaires",
+        "les rues",
+        "les adresses"
+      ],
+      "answer": 0,
+      "explain": "The answer is les bureaux."
+    }
+  ]
+}

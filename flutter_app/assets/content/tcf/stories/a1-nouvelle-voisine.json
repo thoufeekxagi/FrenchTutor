@@ -21,23 +21,29 @@
     },
     {
       "fr": "« Bonsoir ! Je m'appelle Nadia. »",
-      "en": "\"Good evening! My name is Nadia.\""
+      "en": "“Good evening! My name is Nadia.”"
     },
     {
       "fr": "« Enchanté ! Je suis Marc. »",
-      "en": "\"Nice to meet you! I am Marc.\""
+      "en": "“Nice to meet you! I am Marc.”"
     },
     {
       "fr": "Nadia est nouvelle dans l'immeuble.",
-      "en": "Nadia is new in the building."
+      "en": "Nadia is new in the building.",
+      "note": "In Canada, immeuble is the usual word for an apartment building."
     },
     {
       "fr": "Elle habite au troisième étage.",
       "en": "She lives on the third floor."
     },
     {
+      "fr": "Elle parle français et anglais.",
+      "en": "She speaks French and English."
+    },
+    {
       "fr": "Marc dit : « Bienvenue ! »",
-      "en": "Marc says: \"Welcome!\""
+      "en": "Marc says: “Welcome!”",
+      "note": "In Canada, bienvenue is also how you say you're welcome after someone thanks you."
     }
   ],
   "words": {
@@ -83,11 +89,12 @@
     "femme": {
       "en": "woman",
       "pos": "noun, feminine",
-      "sound": "fam"
+      "sound": "fahm"
     },
     "arrive": {
       "en": "arrives (arriver)",
-      "pos": "verb"
+      "pos": "verb",
+      "sound": "ah-REEV"
     },
     "avec": {
       "en": "with"
@@ -95,11 +102,11 @@
     "valise": {
       "en": "suitcase",
       "pos": "noun, feminine",
-      "sound": "va-LEEZ"
+      "sound": "vah-LEEZ"
     },
     "bonsoir": {
       "en": "good evening",
-      "sound": "bon-SWAHR"
+      "sound": "boh(n)-SWAHR"
     },
     "je": {
       "en": "I",
@@ -113,7 +120,7 @@
     },
     "enchanté": {
       "en": "nice to meet you",
-      "sound": "ahn-shahn-TAY"
+      "sound": "ah(n)-shah(n)-TAY"
     },
     "suis": {
       "en": "am (être)",
@@ -121,11 +128,13 @@
     },
     "nouvelle": {
       "en": "new (feminine)",
-      "pos": "adjective"
+      "pos": "adjective",
+      "sound": "noo-VEL"
     },
     "l'immeuble": {
       "en": "the building",
-      "pos": "noun, masculine"
+      "pos": "noun, masculine",
+      "sound": "la-MUHBL"
     },
     "elle": {
       "en": "she",
@@ -133,18 +142,35 @@
     },
     "habite": {
       "en": "lives (habiter)",
-      "pos": "verb"
+      "pos": "verb",
+      "sound": "ah-BEET"
     },
     "au": {
-      "en": "to the, on the"
+      "en": "on the, to the"
     },
     "troisième": {
-      "en": "third"
+      "en": "third",
+      "sound": "trwah-ZYEM"
     },
     "étage": {
       "en": "floor, storey",
       "pos": "noun, masculine",
       "sound": "ay-TAHZH"
+    },
+    "parle": {
+      "en": "speaks (parler)",
+      "pos": "verb"
+    },
+    "français": {
+      "en": "French",
+      "sound": "frah(n)-SEH"
+    },
+    "et": {
+      "en": "and"
+    },
+    "anglais": {
+      "en": "English",
+      "sound": "ah(n)-GLEH"
     },
     "dit": {
       "en": "says (dire)",
@@ -152,7 +178,7 @@
     },
     "bienvenue": {
       "en": "welcome",
-      "sound": "byen-vuh-NU"
+      "sound": "bya(n)-vuh-NÜ"
     }
   },
   "keywords": [
@@ -165,7 +191,7 @@
   ],
   "quiz": [
     {
-      "prompt": "What time is it at the start of the story?",
+      "prompt": "What time is it at the start?",
       "options": [
         "Seven in the evening",
         "Seven in the morning",
@@ -173,29 +199,29 @@
         "Six in the evening"
       ],
       "answer": 0,
-      "explain": "Il est sept heures du soir means it is seven in the evening."
+      "explain": "Il est sept heures du soir."
     },
     {
       "prompt": "Who is new in the building?",
       "options": [
         "Marc",
         "Nadia",
-        "A man with a suitcase",
+        "A man",
         "Nobody"
       ],
       "answer": 1,
-      "explain": "Nadia est nouvelle dans l'immeuble: Nadia is new in the building."
+      "explain": "Nadia est nouvelle."
     },
     {
-      "prompt": "Where does Nadia live?",
+      "prompt": "Which languages does Nadia speak?",
       "options": [
-        "On the first floor",
-        "On the second floor",
-        "On the third floor",
-        "In the hallway"
+        "French only",
+        "English only",
+        "French and English",
+        "Arabic"
       ],
       "answer": 2,
-      "explain": "Elle habite au troisième étage: she lives on the third floor."
+      "explain": "Elle parle français et anglais."
     }
   ]
 }

@@ -1,0 +1,143 @@
+{
+  "id": "a1-u04-phrases",
+  "unit": "a1-u04",
+  "unitTitle": "Family and people",
+  "title": "Phrases",
+  "subtitle": "Unit 4: Family and people",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Voici ma famille.",
+      "en": "Here is my family.",
+      "tip": "Say it: vwah-SEE mah fah-MEEY"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'ai deux enfants.",
+      "en": "I have two children.",
+      "tip": "Say it: zhay duh zah(n)-FAH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je suis marié. / Je suis mariée.",
+      "en": "I am married.",
+      "say": "Je suis marié., Je suis mariée.",
+      "tip": "Say it: zhuh swee mah-RYAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je suis célibataire.",
+      "en": "I am single.",
+      "tip": "Say it: zhuh swee say-lee-bah-TEHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Mon fils a cinq ans.",
+      "en": "My son is five.",
+      "tip": "Say it: moh(n) fees ah sa(n)k ah(n)"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Elle a les cheveux bruns.",
+      "en": "She has brown hair.",
+      "tip": "Say it: el ah lay shuh-VUH brüh(n)"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Il est grand et blond.",
+      "en": "He is tall and blond.",
+      "tip": "Say it: eel eh grah(n) ay bloh(n)"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Ma femme travaille à l'hôpital.",
+      "en": "My wife works at the hospital.",
+      "tip": "Say it: mah fahm trah-vahy ah loh-pee-TAHL"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Nous habitons à Ottawa.",
+      "en": "We live in Ottawa.",
+      "tip": "Say it: noo zah-bee-TOH(N) ah oh-tah-WAH"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Ils parlent français et anglais.",
+      "en": "They speak French and English.",
+      "tip": "Say it: eel pahrl frah(n)-SEH ay ah(n)-GLEH"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Voici ma famille.",
+      "options": [
+        "I am single.",
+        "Here is my family.",
+        "He is tall and blond.",
+        "They speak French and English."
+      ],
+      "answer": 1,
+      "explain": "Voici ma famille. means Here is my family.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis marié. / Je suis mariée.",
+      "options": [
+        "She has brown hair.",
+        "I am married.",
+        "We live in Ottawa.",
+        "I have two children."
+      ],
+      "answer": 1,
+      "explain": "Je suis marié. / Je suis mariée. means I am married.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Mon fils a cinq ans.",
+      "options": [
+        "My wife works at the hospital.",
+        "My son is five.",
+        "Here is my family.",
+        "I am single."
+      ],
+      "answer": 1,
+      "explain": "Mon fils a cinq ans. means My son is five.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Il est grand et blond.",
+      "options": [
+        "They speak French and English.",
+        "He is tall and blond.",
+        "I am married.",
+        "She has brown hair."
+      ],
+      "answer": 1,
+      "explain": "Il est grand et blond. means He is tall and blond.."
+    }
+  ]
+}

@@ -1,0 +1,283 @@
+{
+  "id": "a1-famille-karim",
+  "title": "La famille de Karim",
+  "titleEn": "Karim's family",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "A morning in the life of Karim's family in Montréal.",
+  "unit": "a1-u04",
+  "sentences": [
+    {
+      "fr": "Karim habite à Montréal avec sa famille.",
+      "en": "Karim lives in Montréal with his family."
+    },
+    {
+      "fr": "Sa femme s'appelle Samira.",
+      "en": "His wife is called Samira."
+    },
+    {
+      "fr": "Ils ont deux enfants : un fils et une fille.",
+      "en": "They have two children: a son and a daughter.",
+      "note": "A colon (:) in French has a space before it: deux enfants :."
+    },
+    {
+      "fr": "Leur fils, Omar, a huit ans. Il est grand.",
+      "en": "Their son, Omar, is eight. He is tall."
+    },
+    {
+      "fr": "Leur fille, Yasmine, a cinq ans. Elle est petite et très gentille.",
+      "en": "Their daughter, Yasmine, is five. She is small and very kind."
+    },
+    {
+      "fr": "Karim travaille à l'hôpital le matin.",
+      "en": "Karim works at the hospital in the morning."
+    },
+    {
+      "fr": "Samira étudie le français le soir.",
+      "en": "Samira studies French in the evening."
+    },
+    {
+      "fr": "Le dimanche, ils sont tous à la table de la grand-mère.",
+      "en": "On Sundays, they are all at grandmother's table.",
+      "note": "tous means all: here, everyone together."
+    },
+    {
+      "fr": "Ils sont contents. C'est une belle famille.",
+      "en": "They are happy. It is a beautiful family."
+    }
+  ],
+  "words": {
+    "karim": {
+      "en": "Karim (a man's name)"
+    },
+    "habite": {
+      "en": "lives (habiter)",
+      "pos": "verb",
+      "sound": "ah-BEET"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "montréal": {
+      "en": "Montréal"
+    },
+    "avec": {
+      "en": "with"
+    },
+    "sa": {
+      "en": "his, her"
+    },
+    "famille": {
+      "en": "family",
+      "pos": "noun, feminine",
+      "sound": "fah-MEEY"
+    },
+    "femme": {
+      "en": "wife, woman",
+      "pos": "noun, feminine",
+      "sound": "fahm"
+    },
+    "s'appelle": {
+      "en": "is called (s'appeler)",
+      "pos": "verb"
+    },
+    "samira": {
+      "en": "Samira (a woman's name)"
+    },
+    "ils": {
+      "en": "they",
+      "pos": "pronoun"
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "deux": {
+      "en": "two"
+    },
+    "enfants": {
+      "en": "children",
+      "pos": "noun, masculine"
+    },
+    "un": {
+      "en": "a, one"
+    },
+    "fils": {
+      "en": "son",
+      "pos": "noun, masculine",
+      "sound": "fees"
+    },
+    "et": {
+      "en": "and"
+    },
+    "une": {
+      "en": "a, one"
+    },
+    "fille": {
+      "en": "daughter, girl",
+      "pos": "noun, feminine",
+      "sound": "feey"
+    },
+    "leur": {
+      "en": "their"
+    },
+    "omar": {
+      "en": "Omar (a boy's name)"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "huit": {
+      "en": "eight"
+    },
+    "ans": {
+      "en": "years"
+    },
+    "il": {
+      "en": "he",
+      "pos": "pronoun"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "grand": {
+      "en": "tall, big",
+      "pos": "adjective"
+    },
+    "yasmine": {
+      "en": "Yasmine (a girl's name)"
+    },
+    "cinq": {
+      "en": "five"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "petite": {
+      "en": "small (feminine)",
+      "pos": "adjective"
+    },
+    "très": {
+      "en": "very"
+    },
+    "gentille": {
+      "en": "kind (feminine)",
+      "pos": "adjective"
+    },
+    "travaille": {
+      "en": "works (travailler)",
+      "pos": "verb",
+      "sound": "trah-VAHY"
+    },
+    "l'hôpital": {
+      "en": "the hospital",
+      "pos": "noun, masculine"
+    },
+    "le": {
+      "en": "the"
+    },
+    "matin": {
+      "en": "morning",
+      "pos": "noun, masculine",
+      "sound": "mah-TA(N)"
+    },
+    "étudie": {
+      "en": "studies (étudier)",
+      "pos": "verb",
+      "sound": "ay-TÜ-dee"
+    },
+    "français": {
+      "en": "French",
+      "sound": "frah(n)-SEH"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine",
+      "sound": "swahr"
+    },
+    "dimanche": {
+      "en": "Sunday",
+      "pos": "noun, masculine",
+      "sound": "dee-MAH(N)sh"
+    },
+    "sont": {
+      "en": "are (être)",
+      "pos": "verb"
+    },
+    "tous": {
+      "en": "all, everyone"
+    },
+    "la": {
+      "en": "the"
+    },
+    "table": {
+      "en": "table",
+      "pos": "noun, feminine"
+    },
+    "de": {
+      "en": "of"
+    },
+    "grand-mère": {
+      "en": "grandmother",
+      "pos": "noun, feminine",
+      "sound": "grah(n)-MEHR"
+    },
+    "contents": {
+      "en": "happy (plural)",
+      "pos": "adjective"
+    },
+    "c'est": {
+      "en": "it is"
+    },
+    "belle": {
+      "en": "beautiful (feminine)",
+      "pos": "adjective"
+    }
+  },
+  "keywords": [
+    "famille",
+    "fils",
+    "fille",
+    "travaille",
+    "étudie",
+    "grand-mère"
+  ],
+  "quiz": [
+    {
+      "prompt": "How many children do Karim and Samira have?",
+      "options": [
+        "One",
+        "Two",
+        "Three",
+        "Four"
+      ],
+      "answer": 1,
+      "explain": "Deux enfants."
+    },
+    {
+      "prompt": "When does Samira study French?",
+      "options": [
+        "In the morning",
+        "In the evening",
+        "On Sundays only",
+        "At noon"
+      ],
+      "answer": 1,
+      "explain": "Le soir."
+    },
+    {
+      "prompt": "Where do they eat on Sunday?",
+      "options": [
+        "At the hospital",
+        "At a restaurant",
+        "At the grandmother's table",
+        "At school"
+      ],
+      "answer": 2,
+      "explain": "À la table de la grand-mère."
+    }
+  ]
+}

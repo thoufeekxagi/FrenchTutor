@@ -1,0 +1,49 @@
+{
+  "id": "a1-u01-grammar-c",
+  "unit": "a1-u01",
+  "unitTitle": "Introduce yourself",
+  "title": "Grammar: tu or vous?",
+  "subtitle": "Unit 1: Introduce yourself",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "tu or vous?",
+      "body": "French has two ways to say you. This is not decoration: using the wrong one can sound rude or strange."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "tu or vous?",
+      "headers": [
+        "Use tu",
+        "Use vous"
+      ],
+      "rows": [
+        [
+          "friends and family",
+          "a stranger, a clerk, an official"
+        ],
+        [
+          "children",
+          "someone older than you"
+        ],
+        [
+          "classmates",
+          "your manager or teacher at first"
+        ],
+        [
+          "people your own age, informally",
+          "more than one person, always"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "In Canada",
+      "body": "Québec uses tu more quickly than France. A shop clerk may say tu to you after five minutes, which is friendly and normal there. As a newcomer, start with vous and let the other person offer tu. In offices, clinics and government services, use vous."
+    }
+  ]
+}
