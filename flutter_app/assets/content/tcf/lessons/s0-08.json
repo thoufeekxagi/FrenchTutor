@@ -32,49 +32,63 @@
       "id": "w2",
       "fr": "rouge",
       "en": "red",
-      "sound": "RoozH"
+      "sound": "RoozH",
+      "exampleFr": "C'est rouge.",
+      "exampleEn": "It is red."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "merci",
       "en": "thank you",
-      "sound": "mehR-SEE"
+      "sound": "mehR-SEE",
+      "exampleFr": "Merci, madame.",
+      "exampleEn": "Thank you, madam."
     },
     {
       "type": "word",
       "id": "w4",
       "fr": "par",
       "en": "by, through",
-      "sound": "pahR"
+      "sound": "pahR",
+      "exampleFr": "Par ici.",
+      "exampleEn": "This way."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "mer",
       "en": "sea",
-      "sound": "mehR"
+      "sound": "mehR",
+      "exampleFr": "La mer est grande.",
+      "exampleEn": "The sea is big."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "sœur",
       "en": "sister",
-      "sound": "suhR"
+      "sound": "suhR",
+      "exampleFr": "La sœur de Marc est là.",
+      "exampleEn": "Marc's sister is there."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "bonjour",
       "en": "hello",
-      "sound": "boh(n)-ZHOOR"
+      "sound": "boh(n)-ZHOOR",
+      "exampleFr": "Bonjour, madame.",
+      "exampleEn": "Hello, madam."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "regarder",
       "en": "to look at",
-      "sound": "Ruh-gahR-DAY"
+      "sound": "Ruh-gahR-DAY",
+      "exampleFr": "Je regarde la sortie.",
+      "exampleEn": "I look at the exit."
     },
     {
       "type": "choose",

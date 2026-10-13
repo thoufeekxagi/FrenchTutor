@@ -11,7 +11,9 @@
       "id": "w1",
       "fr": "avoir",
       "en": "to have",
-      "sound": "ah-VWAHR"
+      "sound": "ah-VWAHR",
+      "exampleFr": "Avoir trente ans.",
+      "exampleEn": "To be thirty (to have thirty years)."
     },
     {
       "type": "word",
@@ -38,7 +40,9 @@
       "id": "w4",
       "fr": "jeune",
       "en": "young",
-      "sound": "zhuhn"
+      "sound": "zhuhn",
+      "exampleFr": "Elle est jeune.",
+      "exampleEn": "She is young."
     },
     {
       "type": "word",

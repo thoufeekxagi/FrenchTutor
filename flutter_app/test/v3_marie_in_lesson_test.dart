@@ -93,4 +93,33 @@ void main() {
       });
     }
   }
+
+  testWidgets('tapping a speaker asks Marie to say that exact word', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    V3MarieSession.debugLog.clear();
+    final marie = V3FakeMarieSession();
+    addTearDown(marie.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          home: V3LessonPlayer(lesson: words, marie: marie),
+        ),
+      ),
+    );
+    final first = (words.steps.first as V3WordStep).spoken;
+    await tester.tap(find.bySemanticsLabel('Hear $first').first);
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(V3MarieSession.debugLog, contains('speak:$first'));
+    expect(marie.muted, isTrue, reason: 'a speaker tap must not open the mic');
+    expect(find.byKey(const ValueKey('marie.dock')), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+    await marie.end();
+    await tester.pump(const Duration(milliseconds: 100));
+    semantics.dispose();
+  });
 }

@@ -206,4 +206,106 @@ void main() {
     await marie.skip();
     expect(V3MarieSession.debugLog, isEmpty);
   });
+
+  live('a speaker tap connects her muted, with no hello, and says the line', (
+    tester,
+  ) async {
+    await pumpHost(tester);
+    final f = marie.speak(ctx, 'bonjour');
+    expect(marie.phase, V3MariePhase.connecting);
+    await tester.pump(const Duration(milliseconds: 310));
+    expect(await f, isTrue);
+    expect(marie.phase, V3MariePhase.live);
+    expect(marie.muted, isTrue, reason: 'audio only: the mic stays closed');
+    expect(
+      V3MarieSession.debugLog,
+      containsAllInOrder(['start-audio', 'speak:bonjour']),
+    );
+    expect(marie.speakingText, 'bonjour');
+    await tester.pump(const Duration(seconds: 2));
+    expect(marie.speakingText, isNull, reason: 'cleared when she finishes');
+    expect(marie.caption, 'bonjour');
+  });
+
+  live('a second tap on a warm call is instant and needs no new connection', (
+    tester,
+  ) async {
+    await pumpHost(tester);
+    final f = marie.speak(ctx, 'bonjour');
+    await tester.pump(const Duration(milliseconds: 400));
+    await f;
+    await tester.pump(const Duration(seconds: 2));
+    V3MarieSession.debugLog.clear();
+    expect(await marie.speak(ctx, 'bonsoir'), isTrue);
+    expect(V3MarieSession.debugLog, ['speak:bonsoir']);
+  });
+
+  live('a tap while she is still connecting is ignored, not doubled', (
+    tester,
+  ) async {
+    await pumpHost(tester);
+    final first = marie.speak(ctx, 'bonjour');
+    expect(await marie.speak(ctx, 'bonsoir'), isFalse);
+    await tester.pump(const Duration(milliseconds: 400));
+    await first;
+    expect(
+      V3MarieSession.debugLog.where((e) => e.startsWith('speak:')).toList(),
+      ['speak:bonjour'],
+    );
+  });
+
+  live('empty text is never sent', (tester) async {
+    await pumpHost(tester);
+    expect(await marie.speak(ctx, '   '), isFalse);
+    expect(V3MarieSession.debugLog, isEmpty);
+  });
+
+  live('a muted audio-only call may idle three times as long', (tester) async {
+    await pumpHost(tester, idle: const Duration(seconds: 5));
+    final f = marie.speak(ctx, 'bonjour');
+    await tester.pump(const Duration(milliseconds: 400));
+    await f;
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 10)); // past the 5 s limit
+    expect(marie.phase, V3MariePhase.live, reason: 'closed mic costs nothing');
+    await tester.pump(const Duration(seconds: 10)); // past 15 s
+    expect(marie.phase, V3MariePhase.idle);
+  });
+
+  group('call memory for reconnects', () {
+    test('no history leaves the screen context alone', () {
+      expect(V3LiveMarieSession.withMemory('SCREEN', const []), 'SCREEN');
+    });
+
+    test('keeps only the last six lines, labelled, and trims long ones', () {
+      final lines = [
+        for (var i = 0; i < 9; i++)
+          V3MarieLine(fromMarie: i.isEven, text: 'line $i ${'x' * 300}'),
+      ];
+      final out = V3LiveMarieSession.withMemory('SCREEN', lines);
+      expect(out, startsWith('SCREEN'));
+      expect(out, contains('CALL MEMORY'));
+      expect(out, isNot(contains('line 2 ')));
+      expect(out, contains('line 3 '));
+      expect(out, contains('line 8 '));
+      expect(out, contains('- You: line 8'));
+      expect(out, contains('- Learner: line 7'));
+      expect(out.length, lessThan(1500));
+    });
+  });
+
+  live('an unanswered listening line is heard but never shown', (tester) async {
+    await pumpHost(tester);
+    final f = marie.speak(ctx, 'Je suis née en avril.', reveal: false);
+    await tester.pump(const Duration(milliseconds: 310));
+    await f;
+    await tester.pump(const Duration(seconds: 3));
+    expect(marie.caption, isEmpty, reason: 'the pill must not give the answer');
+    expect(marie.history, isEmpty, reason: 'nor the conversation sheet');
+    expect(marie.speakingText, isNull);
+    // The next normal line is shown again.
+    await marie.speak(ctx, 'bonjour');
+    await tester.pump(const Duration(seconds: 2));
+    expect(marie.caption, 'bonjour');
+  });
 }

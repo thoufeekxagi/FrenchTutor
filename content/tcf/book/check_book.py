@@ -58,7 +58,7 @@ def load():
 
 def main():
     chapters = load()
-    known, errors, warns = set(PROPER), [], []
+    known, errors, warns, notes = set(PROPER), [], [], []
 
     def teach(text):
         for t in toks(text):
@@ -75,9 +75,14 @@ def main():
             if not any(p in known for p in split_elision(t)):
                 missing.append(t)
         if missing:
-            warns.append(f"{where}: not taught yet: {', '.join(sorted(set(missing)))}")
+            line = f"{where}: not taught yet: {', '.join(sorted(set(missing)))}"
+            # Example sentences often show a verb form or a feminine form that
+            # the same unit's grammar explains a few pages later. That is normal
+            # teaching order, so they are reported as notes, not warnings.
+            (notes if " example of " in where else warns).append(line)
 
     seen_ids = set()
+    section = ''
     for ch in chapters:
         if ch["id"] in seen_ids:
             errors.append(f"duplicate chapter id {ch['id']}")
@@ -85,9 +90,19 @@ def main():
         for b in ch["blocks"]:
             k = b[0]
             where = f"{ch['label']}"
+            if k == "h2":
+                section = b[1]
             if k == "words":
                 for fr, snd, en, exf, exe in b[1]:
                     teach(fr)
+                    # Every word the learner studies needs a sentence that shows
+                    # it in use (phrase lists are sentences already).
+                    if "Phrases" not in section and not exf.strip():
+                        errors.append(f"{where}: word without an example sentence: {fr}")
+                    if exf.strip() and not exe.strip():
+                        errors.append(f"{where}: example without English: {exf}")
+                    if exf.strip() and "Phrases" not in section:
+                        need(exf, f"{where} example of '{fr}'")
                     teach(exf)
                     if not snd.strip():
                         errors.append(f"{where}: word without sound guide: {fr}")
@@ -138,11 +153,17 @@ def main():
             elif k in ("write", "speak"):
                 need(b[4], f"{where} {b[1]} model")
                 teach(b[4])
+    if "--verbose" in sys.argv:
+        for n in notes:
+            print("NOTE :", n)
     for w in warns:
         print("WARN :", w)
     for e in errors:
         print("ERROR:", e)
-    print(f"{len(chapters)} chapters, {len(known)} known tokens, {len(warns)} ledger warning(s), {len(errors)} error(s)")
+    print(
+        f"{len(chapters)} chapters, {len(known)} known tokens, {len(warns)} ledger "
+        f"warning(s), {len(notes)} example note(s) (--verbose to list), {len(errors)} error(s)"
+    )
     sys.exit(1 if errors else 0)
 
 

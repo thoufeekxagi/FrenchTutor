@@ -20,14 +20,18 @@
       "id": "w2",
       "fr": "la France",
       "en": "France",
-      "sound": "lah frah(n)s"
+      "sound": "lah frah(n)s",
+      "exampleFr": "Elle est française.",
+      "exampleEn": "She is French."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "le Québec",
       "en": "Québec",
-      "sound": "luh kay-BEK"
+      "sound": "luh kay-BEK",
+      "exampleFr": "Elle est québécoise.",
+      "exampleEn": "She is from Québec."
     },
     {
       "type": "word",
@@ -35,7 +39,9 @@
       "fr": "l'Inde (f.)",
       "en": "India",
       "say": "l'Inde",
-      "sound": "la(n)d"
+      "sound": "la(n)d",
+      "exampleFr": "Je viens de l'Inde.",
+      "exampleEn": "I come from India."
     },
     {
       "type": "word",
@@ -43,21 +49,27 @@
       "fr": "les Philippines (f.)",
       "en": "the Philippines",
       "say": "les Philippines",
-      "sound": "lay fee-lee-PEEN"
+      "sound": "lay fee-lee-PEEN",
+      "exampleFr": "Il est philippin.",
+      "exampleEn": "He is Filipino."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "la Chine",
       "en": "China",
-      "sound": "lah sheen"
+      "sound": "lah sheen",
+      "exampleFr": "Je viens de la Chine.",
+      "exampleEn": "I come from China."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "le Maroc",
       "en": "Morocco",
-      "sound": "luh mah-ROK"
+      "sound": "luh mah-ROK",
+      "exampleFr": "Il est marocain.",
+      "exampleEn": "He is Moroccan."
     },
     {
       "type": "word",
@@ -65,7 +77,9 @@
       "fr": "l'Algérie (f.)",
       "en": "Algeria",
       "say": "l'Algérie",
-      "sound": "lahl-zhay-REE"
+      "sound": "lahl-zhay-REE",
+      "exampleFr": "Elle est algérienne.",
+      "exampleEn": "She is Algerian."
     },
     {
       "type": "word",
@@ -73,14 +87,18 @@
       "fr": "Haïti (m.)",
       "en": "Haiti",
       "say": "Haïti",
-      "sound": "ah-ee-TEE"
+      "sound": "ah-ee-TEE",
+      "exampleFr": "Il est haïtien.",
+      "exampleEn": "He is Haitian."
     },
     {
       "type": "word",
       "id": "w10",
       "fr": "la Colombie",
       "en": "Colombia",
-      "sound": "lah koh-loh(n)-BEE"
+      "sound": "lah koh-loh(n)-BEE",
+      "exampleFr": "Elle est colombienne.",
+      "exampleEn": "She is Colombian."
     },
     {
       "type": "word",

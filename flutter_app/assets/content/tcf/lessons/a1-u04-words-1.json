@@ -47,7 +47,9 @@
       "id": "w5",
       "fr": "le frère",
       "en": "brother",
-      "sound": "luh frehR"
+      "sound": "luh frehR",
+      "exampleFr": "Mon frère est grand.",
+      "exampleEn": "My brother is tall."
     },
     {
       "type": "word",
@@ -72,14 +74,18 @@
       "id": "w8",
       "fr": "la fille",
       "en": "daughter, girl",
-      "sound": "lah feey"
+      "sound": "lah feey",
+      "exampleFr": "Ma fille a cinq ans.",
+      "exampleEn": "My daughter is five."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "le mari",
       "en": "husband",
-      "sound": "luh mah-REE"
+      "sound": "luh mah-REE",
+      "exampleFr": "Mon mari travaille à l'hôpital.",
+      "exampleEn": "My husband works at the hospital."
     },
     {
       "type": "word",
@@ -106,7 +112,9 @@
       "fr": "le grand-père / la grand-mère",
       "en": "grandfather / grandmother",
       "say": "le grand-père, la grand-mère",
-      "sound": "luh grah(n)-PEHR / lah grah(n)-MEHR"
+      "sound": "luh grah(n)-PEHR / lah grah(n)-MEHR",
+      "exampleFr": "Ma grand-mère habite à Gatineau.",
+      "exampleEn": "My grandmother lives in Gatineau."
     },
     {
       "type": "word",
@@ -114,7 +122,9 @@
       "fr": "l'oncle / la tante",
       "en": "uncle / aunt",
       "say": "l'oncle, la tante",
-      "sound": "lohn-kl / lah tah(n)t"
+      "sound": "lohn-kl / lah tah(n)t",
+      "exampleFr": "Mon oncle et ma tante sont à Ottawa.",
+      "exampleEn": "My uncle and aunt are in Ottawa."
     },
     {
       "type": "word",
@@ -122,14 +132,18 @@
       "fr": "le cousin / la cousine",
       "en": "cousin (m. / f.)",
       "say": "le cousin, la cousine",
-      "sound": "luh koo-ZA(N) / lah koo-ZEEN"
+      "sound": "luh koo-ZA(N) / lah koo-ZEEN",
+      "exampleFr": "Ma cousine est étudiante.",
+      "exampleEn": "My cousin is a student."
     },
     {
       "type": "word",
       "id": "w15",
       "fr": "le bébé",
       "en": "baby",
-      "sound": "luh bay-BAY"
+      "sound": "luh bay-BAY",
+      "exampleFr": "Le bébé est petit.",
+      "exampleEn": "The baby is small."
     },
     {
       "type": "choose",

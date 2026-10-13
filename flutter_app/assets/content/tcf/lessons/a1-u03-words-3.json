@@ -30,7 +30,9 @@
       "fr": "l'Ontario (m.)",
       "en": "Ontario",
       "say": "l'Ontario",
-      "sound": "lohn-tah-ree-OH"
+      "sound": "lohn-tah-ree-OH",
+      "exampleFr": "J'habite en Ontario.",
+      "exampleEn": "I live in Ontario."
     },
     {
       "type": "word",
@@ -38,35 +40,45 @@
       "fr": "l'Alberta (f.)",
       "en": "Alberta",
       "say": "l'Alberta",
-      "sound": "lahl-behr-TAH"
+      "sound": "lahl-behr-TAH",
+      "exampleFr": "Elle habite en Alberta.",
+      "exampleEn": "She lives in Alberta."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "le Manitoba",
       "en": "Manitoba",
-      "sound": "luh mah-nee-toh-BAH"
+      "sound": "luh mah-nee-toh-BAH",
+      "exampleFr": "Il habite au Manitoba.",
+      "exampleEn": "He lives in Manitoba."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "la Colombie-Britannique",
       "en": "British Columbia",
-      "sound": "lah koh-loh(n)-bee bree-tah-NEEK"
+      "sound": "lah koh-loh(n)-bee bree-tah-NEEK",
+      "exampleFr": "Je suis en Colombie-Britannique.",
+      "exampleEn": "I am in British Columbia."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "le Nouveau-Brunswick",
       "en": "New Brunswick",
-      "sound": "luh noo-VOH bruhnz-WEEK"
+      "sound": "luh noo-VOH bruhnz-WEEK",
+      "exampleFr": "Moncton est au Nouveau-Brunswick.",
+      "exampleEn": "Moncton is in New Brunswick."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "la Nouvelle-Écosse",
       "en": "Nova Scotia",
-      "sound": "lah noo-VEL ay-KOHS"
+      "sound": "lah noo-VEL ay-KOHS",
+      "exampleFr": "Halifax est en Nouvelle-Écosse.",
+      "exampleEn": "Halifax is in Nova Scotia."
     },
     {
       "type": "word",

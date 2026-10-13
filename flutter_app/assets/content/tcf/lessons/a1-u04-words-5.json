@@ -11,7 +11,9 @@
       "id": "w1",
       "fr": "la situation familiale",
       "en": "marital status (form)",
-      "sound": "lah see-tü-ah-syoh(n) fah-mee-LYAL"
+      "sound": "lah see-tü-ah-syoh(n) fah-mee-LYAL",
+      "exampleFr": "Situation familiale : marié.",
+      "exampleEn": "Marital status: married."
     },
     {
       "type": "word",
@@ -19,7 +21,9 @@
       "fr": "divorcé / divorcée",
       "en": "divorced",
       "say": "divorcé, divorcée",
-      "sound": "dee-vohr-SAY"
+      "sound": "dee-vohr-SAY",
+      "exampleFr": "Il est divorcé.",
+      "exampleEn": "He is divorced."
     },
     {
       "type": "word",
@@ -27,14 +31,18 @@
       "fr": "veuf / veuve",
       "en": "widowed",
       "say": "veuf, veuve",
-      "sound": "vuhf / vuhv"
+      "sound": "vuhf / vuhv",
+      "exampleFr": "Elle est veuve.",
+      "exampleEn": "She is a widow."
     },
     {
       "type": "word",
       "id": "w4",
       "fr": "conjoint de fait",
       "en": "common-law partner",
-      "sound": "koh(n)-ZHWA(N) duh feh"
+      "sound": "koh(n)-ZHWA(N) duh feh",
+      "exampleFr": "Marc et Léa sont conjoints de fait.",
+      "exampleEn": "Marc and Léa are common-law partners."
     },
     {
       "type": "word",

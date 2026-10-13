@@ -106,7 +106,9 @@
       "id": "w2",
       "fr": "Québec",
       "en": "Québec",
-      "sound": "kay-BEK"
+      "sound": "kay-BEK",
+      "exampleFr": "Montréal et Québec.",
+      "exampleEn": "Montréal and Québec."
     },
     {
       "type": "word",
@@ -140,7 +142,9 @@
       "id": "w6",
       "fr": "à",
       "en": "to, at",
-      "sound": "ah"
+      "sound": "ah",
+      "exampleFr": "Il est à Montréal.",
+      "exampleEn": "He is in Montréal."
     },
     {
       "type": "word",
@@ -156,14 +160,18 @@
       "id": "w8",
       "fr": "là",
       "en": "there",
-      "sound": "lah"
+      "sound": "lah",
+      "exampleFr": "Le café est là.",
+      "exampleEn": "The coffee is there."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "la",
       "en": "the (feminine)",
-      "sound": "lah"
+      "sound": "lah",
+      "exampleFr": "La pharmacie est là.",
+      "exampleEn": "The pharmacy is there."
     },
     {
       "type": "word",

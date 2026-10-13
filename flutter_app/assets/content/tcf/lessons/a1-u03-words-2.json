@@ -29,14 +29,18 @@
       "id": "w3",
       "fr": "le permis de conduire",
       "en": "driver's licence",
-      "sound": "luh pehR-MEE duh koh(n)-DWEER"
+      "sound": "luh pehR-MEE duh koh(n)-DWEER",
+      "exampleFr": "Voici mon permis de conduire.",
+      "exampleEn": "Here is my driver's licence."
     },
     {
       "type": "word",
       "id": "w4",
       "fr": "la carte d'assurance maladie",
       "en": "health insurance card",
-      "sound": "lah kahrt dah-sü-RAH(N)S mah-lah-DEE"
+      "sound": "lah kahrt dah-sü-RAH(N)S mah-lah-DEE",
+      "exampleFr": "Voici ma carte d'assurance maladie.",
+      "exampleEn": "Here is my health insurance card."
     },
     {
       "type": "word",
@@ -52,28 +56,36 @@
       "id": "w6",
       "fr": "le permis de travail",
       "en": "work permit",
-      "sound": "luh pehR-MEE duh trah-VAHY"
+      "sound": "luh pehR-MEE duh trah-VAHY",
+      "exampleFr": "Voici mon permis de travail.",
+      "exampleEn": "Here is my work permit."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "le permis d'études",
       "en": "study permit",
-      "sound": "luh pehR-MEE day-TÜD"
+      "sound": "luh pehR-MEE day-TÜD",
+      "exampleFr": "Voici mon permis d'études.",
+      "exampleEn": "Here is my study permit."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "la carte de résident permanent",
       "en": "permanent resident card",
-      "sound": "lah kahrt duh ray-zee-DAH(N) pehR-mah-NAH(N)"
+      "sound": "lah kahrt duh ray-zee-DAH(N) pehR-mah-NAH(N)",
+      "exampleFr": "Voici ma carte de résident permanent.",
+      "exampleEn": "Here is my permanent resident card."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "le certificat de naissance",
       "en": "birth certificate",
-      "sound": "luh sehR-tee-fee-KAH duh neh-SAH(N)S"
+      "sound": "luh sehR-tee-fee-KAH duh neh-SAH(N)S",
+      "exampleFr": "Voici mon certificat de naissance.",
+      "exampleEn": "Here is my birth certificate."
     },
     {
       "type": "word",
@@ -99,7 +111,9 @@
       "id": "w12",
       "fr": "la photocopie",
       "en": "photocopy",
-      "sound": "lah foh-toh-koh-PEE"
+      "sound": "lah foh-toh-koh-PEE",
+      "exampleFr": "Une photocopie, s'il vous plaît.",
+      "exampleEn": "A photocopy, please."
     },
     {
       "type": "choose",

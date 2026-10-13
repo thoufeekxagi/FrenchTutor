@@ -12,7 +12,9 @@
       "fr": "les cheveux (m.)",
       "en": "hair",
       "say": "les cheveux",
-      "sound": "lay shuh-VUH"
+      "sound": "lay shuh-VUH",
+      "exampleFr": "Elle a les cheveux bruns.",
+      "exampleEn": "She has brown hair."
     },
     {
       "type": "word",
@@ -30,7 +32,9 @@
       "fr": "blond / blonde",
       "en": "blond",
       "say": "blond, blonde",
-      "sound": "bloh(n) / bloh(n)d"
+      "sound": "bloh(n) / bloh(n)d",
+      "exampleFr": "Léa est blonde.",
+      "exampleEn": "Léa is blond."
     },
     {
       "type": "word",
@@ -38,7 +42,9 @@
       "fr": "brun / brune",
       "en": "dark brown",
       "say": "brun, brune",
-      "sound": "bruh(n) / brün"
+      "sound": "bruh(n) / brün",
+      "exampleFr": "Ma sœur est brune.",
+      "exampleEn": "My sister has dark brown hair."
     },
     {
       "type": "word",
@@ -46,14 +52,18 @@
       "fr": "roux / rousse",
       "en": "red-haired",
       "say": "roux, rousse",
-      "sound": "roo / roos"
+      "sound": "roo / roos",
+      "exampleFr": "Il a les cheveux roux.",
+      "exampleEn": "He has red hair."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "rouge",
       "en": "red",
-      "sound": "roozh"
+      "sound": "roozh",
+      "exampleFr": "La valise est rouge.",
+      "exampleEn": "The suitcase is red."
     },
     {
       "type": "word",
@@ -61,7 +71,9 @@
       "fr": "bleu / bleue",
       "en": "blue",
       "say": "bleu, bleue",
-      "sound": "bluh"
+      "sound": "bluh",
+      "exampleFr": "Le téléphone est bleu.",
+      "exampleEn": "The phone is blue."
     },
     {
       "type": "word",
@@ -69,14 +81,18 @@
       "fr": "vert / verte",
       "en": "green",
       "say": "vert, verte",
-      "sound": "vehr / vehrt"
+      "sound": "vehr / vehrt",
+      "exampleFr": "Le formulaire est vert.",
+      "exampleEn": "The form is green."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "jaune",
       "en": "yellow",
-      "sound": "zhohn"
+      "sound": "zhohn",
+      "exampleFr": "Le couloir est jaune.",
+      "exampleEn": "The hallway is yellow."
     },
     {
       "type": "word",
@@ -84,7 +100,9 @@
       "fr": "noir / noire",
       "en": "black",
       "say": "noir, noire",
-      "sound": "nwahr"
+      "sound": "nwahr",
+      "exampleFr": "La valise est noire.",
+      "exampleEn": "The suitcase is black."
     },
     {
       "type": "word",
@@ -92,7 +110,9 @@
       "fr": "blanc / blanche",
       "en": "white",
       "say": "blanc, blanche",
-      "sound": "blah(n) / blah(n)sh"
+      "sound": "blah(n) / blah(n)sh",
+      "exampleFr": "L'immeuble est blanc.",
+      "exampleEn": "The building is white."
     },
     {
       "type": "word",
@@ -100,28 +120,36 @@
       "fr": "gris / grise",
       "en": "grey",
       "say": "gris, grise",
-      "sound": "gree / greez"
+      "sound": "gree / greez",
+      "exampleFr": "Le téléphone est gris.",
+      "exampleEn": "The phone is grey."
     },
     {
       "type": "word",
       "id": "w13",
       "fr": "rose",
       "en": "pink",
-      "sound": "rohz"
+      "sound": "rohz",
+      "exampleFr": "La carte est rose.",
+      "exampleEn": "The card is pink."
     },
     {
       "type": "word",
       "id": "w14",
       "fr": "orange",
       "en": "orange (never changes)",
-      "sound": "oh-RAH(N)zh"
+      "sound": "oh-RAH(N)zh",
+      "exampleFr": "La valise est orange.",
+      "exampleEn": "The suitcase is orange."
     },
     {
       "type": "word",
       "id": "w15",
       "fr": "marron",
       "en": "brown (never changes)",
-      "sound": "mah-ROH(N)"
+      "sound": "mah-ROH(N)",
+      "exampleFr": "La carte est marron.",
+      "exampleEn": "The card is brown."
     },
     {
       "type": "choose",

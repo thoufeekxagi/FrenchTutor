@@ -11,21 +11,27 @@
       "id": "w1",
       "fr": "la taxe",
       "en": "tax",
-      "sound": "lah tahks"
+      "sound": "lah tahks",
+      "exampleFr": "La taxe est de cinq pour cent.",
+      "exampleEn": "The tax is five percent."
     },
     {
       "type": "word",
       "id": "w2",
       "fr": "la TPS",
       "en": "GST (federal sales tax)",
-      "sound": "lah tay-pay-ESS"
+      "sound": "lah tay-pay-ESS",
+      "exampleFr": "La TPS est de cinq pour cent.",
+      "exampleEn": "GST is five percent."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "la TVQ",
       "en": "QST (Québec sales tax)",
-      "sound": "lah tay-vay-KÜ"
+      "sound": "lah tay-vay-KÜ",
+      "exampleFr": "La TVQ est au Québec.",
+      "exampleEn": "QST is in Québec."
     },
     {
       "type": "word",
@@ -33,21 +39,27 @@
       "fr": "avant taxes / plus taxes",
       "en": "before tax / plus tax",
       "say": "avant taxes, plus taxes",
-      "sound": "ah-VAH(N) tahks / plü tahks"
+      "sound": "ah-VAH(N) tahks / plü tahks",
+      "exampleFr": "Dix dollars avant taxes.",
+      "exampleEn": "Ten dollars before tax."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "le total",
       "en": "total",
-      "sound": "luh toh-TAHL"
+      "sound": "luh toh-TAHL",
+      "exampleFr": "Le total est de sept dollars.",
+      "exampleEn": "The total is seven dollars."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "le sous-total",
       "en": "subtotal",
-      "sound": "luh soo-toh-TAHL"
+      "sound": "luh soo-toh-TAHL",
+      "exampleFr": "Le sous-total est de six dollars.",
+      "exampleEn": "The subtotal is six dollars."
     },
     {
       "type": "word",

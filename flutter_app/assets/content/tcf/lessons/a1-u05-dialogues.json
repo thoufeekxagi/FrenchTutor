@@ -11,7 +11,9 @@
       "id": "w1",
       "fr": "je vous écoute",
       "en": "I am listening (what would you like?)",
-      "sound": "zhuh voo zay-KOOT"
+      "sound": "zhuh voo zay-KOOT",
+      "exampleFr": "Bonjour, je vous écoute.",
+      "exampleEn": "Hello, what would you like?"
     },
     {
       "type": "word",
@@ -27,7 +29,9 @@
       "id": "w3",
       "fr": "voilà",
       "en": "there you are",
-      "sound": "vwah-LAH"
+      "sound": "vwah-LAH",
+      "exampleFr": "Voilà votre café.",
+      "exampleEn": "Here is your coffee."
     },
     {
       "type": "word",
@@ -35,14 +39,18 @@
       "fr": "le café / le croissant",
       "en": "coffee / croissant",
       "say": "le café, le croissant",
-      "sound": "luh kah-FAY / luh krwah-SAH(N)"
+      "sound": "luh kah-FAY / luh krwah-SAH(N)",
+      "exampleFr": "Le café est chaud.",
+      "exampleEn": "The coffee is hot."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "le sandwich",
       "en": "sandwich",
-      "sound": "luh sah(n)d-WEESH"
+      "sound": "luh sah(n)d-WEESH",
+      "exampleFr": "Un sandwich, s'il vous plaît.",
+      "exampleEn": "A sandwich, please."
     },
     {
       "type": "word",
@@ -50,28 +58,36 @@
       "fr": "le manteau / les manteaux",
       "en": "coat / coats",
       "say": "le manteau, les manteaux",
-      "sound": "luh mah(n)-TOH / lay mah(n)-TOH"
+      "sound": "luh mah(n)-TOH / lay mah(n)-TOH",
+      "exampleFr": "Le manteau est noir.",
+      "exampleEn": "The coat is black."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "le propriétaire",
       "en": "landlord, owner",
-      "sound": "luh proh-pree-ay-TEHR"
+      "sound": "luh proh-pree-ay-TEHR",
+      "exampleFr": "Le propriétaire est gentil.",
+      "exampleEn": "The landlord is kind."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "le virement",
       "en": "bank transfer",
-      "sound": "luh vee-ruh-MAH(N)"
+      "sound": "luh vee-ruh-MAH(N)",
+      "exampleFr": "Je paie par virement.",
+      "exampleEn": "I pay by transfer."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "le premier",
       "en": "the first (of the month)",
-      "sound": "luh pruh-MYAY"
+      "sound": "luh pruh-MYAY",
+      "exampleFr": "Le loyer est le premier du mois.",
+      "exampleEn": "The rent is due on the first of the month."
     },
     {
       "type": "word",
@@ -79,21 +95,27 @@
       "fr": "l'électricité (f.)",
       "en": "electricity",
       "say": "l'électricité",
-      "sound": "lay-lek-tree-see-TAY"
+      "sound": "lay-lek-tree-see-TAY",
+      "exampleFr": "L'électricité coûte quatre-vingts dollars.",
+      "exampleEn": "Electricity costs eighty dollars."
     },
     {
       "type": "word",
       "id": "w11",
       "fr": "bonne soirée",
       "en": "have a good evening",
-      "sound": "bun swah-RAY"
+      "sound": "bun swah-RAY",
+      "exampleFr": "Merci, bonne soirée !",
+      "exampleEn": "Thank you, have a good evening!"
     },
     {
       "type": "word",
       "id": "w12",
       "fr": "à bientôt",
       "en": "see you soon",
-      "sound": "ah byeh(n)-TOH"
+      "sound": "ah byeh(n)-TOH",
+      "exampleFr": "Merci, à bientôt !",
+      "exampleEn": "Thank you, see you soon!"
     },
     {
       "type": "choose",

@@ -38,14 +38,18 @@
       "id": "w4",
       "fr": "merci beaucoup",
       "en": "thank you very much",
-      "sound": "mehR-SEE boh-KOO"
+      "sound": "mehR-SEE boh-KOO",
+      "exampleFr": "Merci beaucoup, madame.",
+      "exampleEn": "Thank you very much, madam."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "de rien",
       "en": "you're welcome (lit. of nothing)",
-      "sound": "duh RYA(N)"
+      "sound": "duh RYA(N)",
+      "exampleFr": "Merci ! — De rien.",
+      "exampleEn": "Thank you! — You're welcome."
     },
     {
       "type": "word",

@@ -20,21 +20,27 @@
       "id": "w2",
       "fr": "la carte de débit",
       "en": "debit card",
-      "sound": "lah kahrt duh day-BEE"
+      "sound": "lah kahrt duh day-BEE",
+      "exampleFr": "Je paie avec ma carte de débit.",
+      "exampleEn": "I pay with my debit card."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "la carte de crédit",
       "en": "credit card",
-      "sound": "lah kahrt duh kray-DEE"
+      "sound": "lah kahrt duh kray-DEE",
+      "exampleFr": "Vous payez avec la carte de crédit ?",
+      "exampleEn": "Are you paying with a credit card?"
     },
     {
       "type": "word",
       "id": "w4",
       "fr": "Interac",
       "en": "Canadian debit payment (tap or chip)",
-      "sound": "a(n)-tehr-AHK"
+      "sound": "a(n)-tehr-AHK",
+      "exampleFr": "Je paie par Interac.",
+      "exampleEn": "I pay with Interac."
     },
     {
       "type": "word",
@@ -50,7 +56,9 @@
       "id": "w6",
       "fr": "la monnaie",
       "en": "change (coins), small change",
-      "sound": "lah moh-NEH"
+      "sound": "lah moh-NEH",
+      "exampleFr": "Voici votre monnaie.",
+      "exampleEn": "Here is your change."
     },
     {
       "type": "word",
@@ -76,14 +84,18 @@
       "fr": "par mois / par semaine",
       "en": "per month / per week",
       "say": "par mois, par semaine",
-      "sound": "pahr mwah / pahr suh-MEHN"
+      "sound": "pahr mwah / pahr suh-MEHN",
+      "exampleFr": "Vingt dollars par semaine.",
+      "exampleEn": "Twenty dollars per week."
     },
     {
       "type": "word",
       "id": "w10",
       "fr": "par heure",
       "en": "per hour",
-      "sound": "pahr uhr"
+      "sound": "pahr uhr",
+      "exampleFr": "Quinze dollars par heure.",
+      "exampleEn": "Fifteen dollars per hour."
     },
     {
       "type": "choose",

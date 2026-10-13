@@ -22,14 +22,18 @@
       "fr": "petit / petite",
       "en": "small, short",
       "say": "petit, petite",
-      "sound": "puh-TEE / puh-TEET"
+      "sound": "puh-TEE / puh-TEET",
+      "exampleFr": "Elle est petite.",
+      "exampleEn": "She is small."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "jeune",
       "en": "young",
-      "sound": "zhuhn"
+      "sound": "zhuhn",
+      "exampleFr": "Mon frère est jeune.",
+      "exampleEn": "My brother is young."
     },
     {
       "type": "word",
@@ -37,7 +41,9 @@
       "fr": "vieux / vieille",
       "en": "old (not for people politely: say âgé)",
       "say": "vieux, vieille",
-      "sound": "vyuh / vyeey"
+      "sound": "vyuh / vyeey",
+      "exampleFr": "L'immeuble est vieux.",
+      "exampleEn": "The building is old."
     },
     {
       "type": "word",
@@ -64,7 +70,9 @@
       "id": "w7",
       "fr": "sympathique",
       "en": "friendly, nice (informal: sympa)",
-      "sound": "sa(n)-pah-TEEK"
+      "sound": "sa(n)-pah-TEEK",
+      "exampleFr": "Ma tante est sympathique.",
+      "exampleEn": "My aunt is friendly."
     },
     {
       "type": "word",
@@ -72,7 +80,9 @@
       "fr": "content / contente",
       "en": "happy",
       "say": "content, contente",
-      "sound": "koh(n)-TAH(N) / koh(n)-TAH(N)T"
+      "sound": "koh(n)-TAH(N) / koh(n)-TAH(N)T",
+      "exampleFr": "Je suis content.",
+      "exampleEn": "I am happy."
     },
     {
       "type": "word",
@@ -80,7 +90,9 @@
       "fr": "fatigué / fatiguée",
       "en": "tired",
       "say": "fatigué, fatiguée",
-      "sound": "fah-tee-GAY"
+      "sound": "fah-tee-GAY",
+      "exampleFr": "Je suis fatigué.",
+      "exampleEn": "I am tired."
     },
     {
       "type": "word",
@@ -97,7 +109,9 @@
       "id": "w11",
       "fr": "célibataire",
       "en": "single (not married)",
-      "sound": "say-lee-bah-TEHR"
+      "sound": "say-lee-bah-TEHR",
+      "exampleFr": "Il est célibataire.",
+      "exampleEn": "He is single."
     },
     {
       "type": "choose",

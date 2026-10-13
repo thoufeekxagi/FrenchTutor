@@ -94,14 +94,18 @@
       "id": "w1",
       "fr": "français",
       "en": "French",
-      "sound": "frah(n)-SEH"
+      "sound": "frah(n)-SEH",
+      "exampleFr": "Bonjour, je parle français.",
+      "exampleEn": "Hello, I speak French."
     },
     {
       "type": "word",
       "id": "w2",
       "fr": "enfant",
       "en": "child",
-      "sound": "ah(n)-FAH(N)"
+      "sound": "ah(n)-FAH(N)",
+      "exampleFr": "L'enfant est là.",
+      "exampleEn": "The child is there."
     },
     {
       "type": "word",
@@ -126,28 +130,36 @@
       "id": "w5",
       "fr": "maintenant",
       "en": "now",
-      "sound": "ma(n)t-NAH(N)"
+      "sound": "ma(n)t-NAH(N)",
+      "exampleFr": "Je suis ici maintenant.",
+      "exampleEn": "I am here now."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "quinze",
       "en": "fifteen",
-      "sound": "ka(n)z"
+      "sound": "ka(n)z",
+      "exampleFr": "Il a quinze ans.",
+      "exampleEn": "He is fifteen."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "pain",
       "en": "bread",
-      "sound": "pa(n)"
+      "sound": "pa(n)",
+      "exampleFr": "Le pain est bon.",
+      "exampleEn": "The bread is good."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "lundi",
       "en": "Monday",
-      "sound": "luh(n)-DEE"
+      "sound": "luh(n)-DEE",
+      "exampleFr": "C'est lundi.",
+      "exampleEn": "It is Monday."
     },
     {
       "type": "choose",

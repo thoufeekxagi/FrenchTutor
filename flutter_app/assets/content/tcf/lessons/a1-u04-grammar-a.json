@@ -66,56 +66,72 @@
       "id": "w1",
       "fr": "mon père",
       "en": "my father",
-      "sound": "moh(n) pehR"
+      "sound": "moh(n) pehR",
+      "exampleFr": "Mon père s'appelle Ali.",
+      "exampleEn": "My father is called Ali."
     },
     {
       "type": "word",
       "id": "w2",
       "fr": "ma mère",
       "en": "my mother",
-      "sound": "mah mehR"
+      "sound": "mah mehR",
+      "exampleFr": "Ma mère travaille.",
+      "exampleEn": "My mother works."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "mes parents",
       "en": "my parents",
-      "sound": "may pah-RAH(N)"
+      "sound": "may pah-RAH(N)",
+      "exampleFr": "Mes parents parlent anglais.",
+      "exampleEn": "My parents speak English."
     },
     {
       "type": "word",
       "id": "w4",
       "fr": "mon amie",
       "en": "my friend (f.)",
-      "sound": "moh(n)-nah-MEE"
+      "sound": "moh(n)-nah-MEE",
+      "exampleFr": "Mon amie est canadienne.",
+      "exampleEn": "My friend is Canadian."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "son frère",
       "en": "his / her brother",
-      "sound": "soh(n) frehR"
+      "sound": "soh(n) frehR",
+      "exampleFr": "Son frère est étudiant.",
+      "exampleEn": "His brother is a student."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "sa sœur",
       "en": "his / her sister",
-      "sound": "sah suhR"
+      "sound": "sah suhR",
+      "exampleFr": "Sa sœur habite à Toronto.",
+      "exampleEn": "Her sister lives in Toronto."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "notre famille",
       "en": "our family",
-      "sound": "nohtr fah-MEEY"
+      "sound": "nohtr fah-MEEY",
+      "exampleFr": "Notre famille est grande.",
+      "exampleEn": "Our family is big."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "leurs enfants",
       "en": "their children",
-      "sound": "luhr zah(n)-FAH(N)"
+      "sound": "luhr zah(n)-FAH(N)",
+      "exampleFr": "Leurs enfants sont petits.",
+      "exampleEn": "Their children are small."
     },
     {
       "type": "choose",

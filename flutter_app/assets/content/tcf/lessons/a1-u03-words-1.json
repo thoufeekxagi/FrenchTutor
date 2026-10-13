@@ -38,7 +38,9 @@
       "id": "w4",
       "fr": "la signature",
       "en": "signature",
-      "sound": "lah see-nyah-TÜR"
+      "sound": "lah see-nyah-TÜR",
+      "exampleFr": "Votre signature, s'il vous plaît.",
+      "exampleEn": "Your signature, please."
     },
     {
       "type": "word",
@@ -83,7 +85,9 @@
       "id": "w9",
       "fr": "la date de naissance",
       "en": "date of birth",
-      "sound": "lah daht duh neh-SAH(N)S"
+      "sound": "lah daht duh neh-SAH(N)S",
+      "exampleFr": "Votre date de naissance, s'il vous plaît ?",
+      "exampleEn": "Your date of birth, please?"
     },
     {
       "type": "word",

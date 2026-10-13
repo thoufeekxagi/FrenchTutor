@@ -110,7 +110,9 @@
       "id": "w1",
       "fr": "Comment ça s'écrit ?",
       "en": "How do you spell that?",
-      "sound": "koh-mah(n) sah say-KREE"
+      "sound": "koh-mah(n) sah say-KREE",
+      "exampleFr": "Comment ça s'écrit, Haddad ?",
+      "exampleEn": "How is Haddad spelled?"
     },
     {
       "type": "word",
@@ -127,7 +129,9 @@
       "id": "w3",
       "fr": "Pouvez-vous répéter ?",
       "en": "Can you repeat?",
-      "sound": "poo-vay-VOO ray-pay-TAY"
+      "sound": "poo-vay-VOO ray-pay-TAY",
+      "exampleFr": "Pardon, pouvez-vous répéter ?",
+      "exampleEn": "Sorry, can you repeat?"
     },
     {
       "type": "word",
@@ -143,28 +147,36 @@
       "id": "w5",
       "fr": "un accent aigu",
       "en": "an acute accent (é)",
-      "sound": "uh(n)n ahk-SAH(N) ay-GÜ"
+      "sound": "uh(n)n ahk-SAH(N) ay-GÜ",
+      "exampleFr": "Le é a un accent aigu.",
+      "exampleEn": "The é has an acute accent."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "un trait d'union",
       "en": "a hyphen (-)",
-      "sound": "uh(n) tray dü-nee-OH(N)"
+      "sound": "uh(n) tray dü-nee-OH(N)",
+      "exampleFr": "Sainte-Anne a un trait d'union.",
+      "exampleEn": "Sainte-Anne has a hyphen."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "arobase",
       "en": "the @ sign",
-      "sound": "ah-roh-BAHZ"
+      "sound": "ah-roh-BAHZ",
+      "exampleFr": "sam, arobase, exemple, point c-a.",
+      "exampleEn": "sam, at, example, dot c-a."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "point",
       "en": "dot (.)",
-      "sound": "pwa(n)"
+      "sound": "pwa(n)",
+      "exampleFr": "exemple, point c-a.",
+      "exampleEn": "example, dot c-a."
     },
     {
       "type": "word",

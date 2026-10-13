@@ -29,28 +29,36 @@
       "id": "w3",
       "fr": "l'espagnol",
       "en": "Spanish",
-      "sound": "lehs-pah-NYOL"
+      "sound": "lehs-pah-NYOL",
+      "exampleFr": "Je parle espagnol.",
+      "exampleEn": "I speak Spanish."
     },
     {
       "type": "word",
       "id": "w4",
       "fr": "l'arabe",
       "en": "Arabic",
-      "sound": "lah-RAHB"
+      "sound": "lah-RAHB",
+      "exampleFr": "Elle parle arabe et français.",
+      "exampleEn": "She speaks Arabic and French."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "le hindi",
       "en": "Hindi",
-      "sound": "luh a(n)-DEE"
+      "sound": "luh a(n)-DEE",
+      "exampleFr": "Il parle hindi et anglais.",
+      "exampleEn": "He speaks Hindi and English."
     },
     {
       "type": "word",
       "id": "w6",
       "fr": "le mandarin",
       "en": "Mandarin",
-      "sound": "luh mah(n)-dah-RA(N)"
+      "sound": "luh mah(n)-dah-RA(N)",
+      "exampleFr": "Je parle un peu mandarin.",
+      "exampleEn": "I speak a little Mandarin."
     },
     {
       "type": "word",
@@ -67,14 +75,18 @@
       "id": "w8",
       "fr": "parler",
       "en": "to speak",
-      "sound": "pahR-LAY"
+      "sound": "pahR-LAY",
+      "exampleFr": "Je parle français.",
+      "exampleEn": "I speak French."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "habiter",
       "en": "to live (in a place)",
-      "sound": "ah-bee-TAY"
+      "sound": "ah-bee-TAY",
+      "exampleFr": "J'habite à Ottawa.",
+      "exampleEn": "I live in Ottawa."
     },
     {
       "type": "word",

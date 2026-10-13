@@ -20,14 +20,18 @@
       "id": "w2",
       "fr": "ensuite",
       "en": "then, next",
-      "sound": "ah(n)-SWEET"
+      "sound": "ah(n)-SWEET",
+      "exampleFr": "D'abord le nom, ensuite l'adresse.",
+      "exampleEn": "First the name, then the address."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "puis",
       "en": "then",
-      "sound": "pwee"
+      "sound": "pwee",
+      "exampleFr": "Le nom, puis l'adresse.",
+      "exampleEn": "The name, then the address."
     },
     {
       "type": "word",
@@ -62,14 +66,18 @@
       "id": "w7",
       "fr": "un, une, des",
       "en": "a, an, some",
-      "sound": "uh(n), ün, day"
+      "sound": "uh(n), ün, day",
+      "exampleFr": "Un passeport, une rue, des documents.",
+      "exampleEn": "A passport, a street, some documents."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "le, la, l', les",
       "en": "the",
-      "sound": "luh, lah, l, lay"
+      "sound": "luh, lah, l, lay",
+      "exampleFr": "Le passeport, la rue, l'adresse, les documents.",
+      "exampleEn": "The passport, the street, the address, the documents."
     },
     {
       "type": "choose",

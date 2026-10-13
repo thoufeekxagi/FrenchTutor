@@ -39,14 +39,18 @@
       "id": "w4",
       "fr": "aussi",
       "en": "also, too",
-      "sound": "oh-SEE"
+      "sound": "oh-SEE",
+      "exampleFr": "Moi aussi, je parle français.",
+      "exampleEn": "Me too, I speak French."
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "beaucoup",
       "en": "a lot, many",
-      "sound": "boh-KOO"
+      "sound": "boh-KOO",
+      "exampleFr": "Merci beaucoup.",
+      "exampleEn": "Thank you very much."
     },
     {
       "type": "word",
@@ -64,7 +68,9 @@
       "fr": "le professeur / la professeure",
       "en": "teacher (Canada: la professeure)",
       "say": "le professeur, la professeure",
-      "sound": "luh proh-feh-SUHR / lah proh-feh-SUHR"
+      "sound": "luh proh-feh-SUHR / lah proh-feh-SUHR",
+      "exampleFr": "La professeure parle français.",
+      "exampleEn": "The teacher speaks French."
     },
     {
       "type": "choose",

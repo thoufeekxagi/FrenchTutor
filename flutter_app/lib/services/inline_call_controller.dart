@@ -32,6 +32,7 @@ class InlineCallController {
   InlineCallController({
     required this.sessionType,
     required this.lessonContext,
+    this.setupContext,
     required this.learningStoreForProfile,
     required this.onChanged,
     this.openingPrompt,
@@ -53,6 +54,11 @@ class InlineCallController {
   /// LATEST content (draft, existing feedback) at connect time, not a
   /// snapshot taken when the controller was constructed.
   final String Function() lessonContext;
+
+  /// Context used when the Live socket is (re)established. Defaults to
+  /// [lessonContext]. A host that keeps its own conversation memory adds it
+  /// here, so a reconnect can pick up where the call was.
+  final String Function()? setupContext;
 
   final LearningStore learningStoreForProfile;
 
@@ -315,6 +321,7 @@ class InlineCallController {
       apiKey: ApiKeys.geminiKey,
       sessionType: sessionType,
       lessonContext: lessonContext(),
+      lessonContextBuilder: setupContext ?? lessonContext,
       learningStoreForProfile: learningStoreForProfile,
       levelOverride: levelOverride,
       // Keep Gemini on the proven legacy audioStreamEnd/automatic-VAD
@@ -412,8 +419,9 @@ class InlineCallController {
     g.onTranscriptDelta = (delta) {
       if (!_isCurrentGeneration(generation)) return;
       _externalNarrationTranscript?.call(delta);
-      if (_externalNarrationCompletion == null)
+      if (_externalNarrationCompletion == null) {
         onTutorTranscriptDelta?.call(delta);
+      }
     };
     g.onInterrupted = () {
       if (!_isCurrentGeneration(generation)) return;

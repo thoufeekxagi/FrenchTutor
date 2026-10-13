@@ -26,6 +26,7 @@ class GeminiLiveService {
     this.isTrial = false,
     this.sessionType = LiveSessionType.freeTalk,
     this.lessonContext,
+    this.lessonContextBuilder,
     this.levelOverride,
     this.tools = const [],
     this.learningStoreForProfile,
@@ -41,6 +42,13 @@ class GeminiLiveService {
   final bool isTrial;
   final LiveSessionType sessionType;
   final String? lessonContext;
+
+  /// Evaluated on every setup, including each automatic reconnect. A frozen
+  /// [lessonContext] string describes the screen the learner was on when the
+  /// call began, so after a reconnect the tutor talked about an old word.
+  final String Function()? lessonContextBuilder;
+  String? get _currentLessonContext =>
+      lessonContextBuilder?.call() ?? lessonContext;
 
   /// A speaking setup may intentionally practise a level different from the
   /// learner's profile level. When supplied, this selected level is the hard
@@ -237,6 +245,9 @@ class GeminiLiveService {
   // enough for a short network blip; never keep a background session retrying
   // indefinitely. Hosts also tear down their socket when the app is paused.
   static const _maxReconnectAttempts = 1;
+  static const _coachReconnectAttempts = 3;
+  int get _reconnectLimit =>
+      _isLessonCoach ? _coachReconnectAttempts : _maxReconnectAttempts;
   static const _connectTimeout = Duration(seconds: 10);
   int _reconnectAttempt = 0;
   bool _isReconnecting = false;
@@ -245,6 +256,8 @@ class GeminiLiveService {
   String? _resumptionHandle;
   Timer? _reconnectTimer;
   Timer? _connectTimeoutTimer;
+  Timer? _goAwayTimer;
+  bool _goAwayPending = false;
 
   String? _usageSocketId;
   bool _usageSocketConnected = false;
@@ -410,6 +423,7 @@ class GeminiLiveService {
     _inputFlushTimer?.cancel();
     _suppressWatchdog?.cancel();
     _reconnectTimer?.cancel();
+    _goAwayTimer?.cancel();
     _connectTimeoutTimer?.cancel();
     _completeTurnWaiter();
     _teardownSocket();
@@ -467,7 +481,7 @@ class GeminiLiveService {
   void _handleConnectionLoss(String reason) {
     _connectTimeoutTimer?.cancel();
     _isSetupComplete = false;
-    if (!autoReconnect || _reconnectAttempt >= _maxReconnectAttempts) {
+    if (!autoReconnect || _reconnectAttempt >= _reconnectLimit) {
       _isReconnecting = false;
       if (identical(_activeOwner, this)) _activeOwner = null;
       _teardownSocket();
@@ -501,6 +515,14 @@ class GeminiLiveService {
       if (_isIntentionalDisconnect) return;
       connect();
     });
+  }
+
+  void _finishGoAway() {
+    _goAwayTimer?.cancel();
+    _goAwayPending = false;
+    if (_isIntentionalDisconnect) return;
+    _teardownSocket();
+    _handleConnectionLoss('Server ending connection');
   }
 
   void sendAudioChunk(List<int> pcmBytes) {
@@ -649,11 +671,17 @@ class GeminiLiveService {
     }
     if (_isLessonCoach) {
       var coachPrompt = LivePrompts.compactLessonCoach(persona: _persona);
-      final ctx = lessonContext;
+      final ctx = _currentLessonContext;
       if (ctx != null && ctx.trim().isNotEmpty) {
         coachPrompt +=
             '\n\nCURRENT APP STEP (latest screen):\n'
             '${_boundDynamicContext(ctx, _lessonContextLimit)}';
+      }
+      if (_hasConnectedOnce) {
+        coachPrompt +=
+            '\n\nTHE CALL IS CONTINUING after a brief reconnect. Never greet '
+            'or introduce yourself again. Carry on from CALL MEMORY if it is '
+            'given; the CURRENT APP STEP above is what is on screen now.';
       }
       return coachPrompt;
     }
@@ -674,7 +702,7 @@ class GeminiLiveService {
         ),
         _ => LivePrompts.compactGuidedSpeaking(persona: _persona),
       };
-      final ctx = lessonContext;
+      final ctx = _currentLessonContext;
       if (ctx != null && ctx.trim().isNotEmpty) {
         compactPrompt +=
             '\n\nCURRENT APP STEP (latest screen):\n'
@@ -707,7 +735,7 @@ class GeminiLiveService {
     if (level != null) {
       prompt += '\n\n${LivePrompts.levelGuidance(level)}';
     }
-    final ctx = lessonContext;
+    final ctx = _currentLessonContext;
     if (ctx != null && ctx.isNotEmpty) {
       final boundedLessonContext = _boundDynamicContext(
         ctx,
@@ -814,7 +842,7 @@ class GeminiLiveService {
         : '(Note de contexte silencieuse pour toi, ne réponds pas directement à '
               'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
     if (expectReply) {
-      if (liveTutorMode || _isLessonCoach) {
+      if (liveTutorMode) {
         // Keep app-directed Live tutor turns deterministic and complete. A
         // realtime text note without an explicit boundary can leave the model
         // waiting for the learner's microphone turn.
@@ -1094,8 +1122,15 @@ class GeminiLiveService {
     // reconnect proactively instead of waiting for the drop mid-sentence.
     if (json.containsKey('goAway')) {
       if (!_isIntentionalDisconnect && autoReconnect) {
-        _teardownSocket();
-        _handleConnectionLoss('Server ending connection');
+        if (_isLessonCoach && _isModelGenerating) {
+          // The server resets a connection about every ten minutes. Never do
+          // it in the middle of her sentence: finish the turn, then swap.
+          _goAwayPending = true;
+          _goAwayTimer?.cancel();
+          _goAwayTimer = Timer(const Duration(seconds: 20), _finishGoAway);
+        } else {
+          _finishGoAway();
+        }
       }
       return;
     }
@@ -1225,6 +1260,7 @@ class GeminiLiveService {
       }
       onTurnComplete?.call();
       _deliverPendingSpokenContext();
+      if (_goAwayPending) _finishGoAway();
     }
   }
 

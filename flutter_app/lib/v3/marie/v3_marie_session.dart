@@ -54,6 +54,8 @@ abstract class V3MarieSession extends ChangeNotifier {
   String _streaming = '';
   String _caption = '';
   bool _marieSpeaking = false;
+  String? _speakingText;
+  bool _hideTranscript = false;
   String? _endedNote;
   Timer? _idleTimer;
 
@@ -64,6 +66,9 @@ abstract class V3MarieSession extends ChangeNotifier {
   bool get isLive => phase == V3MariePhase.live;
   bool get isBusy => phase != V3MariePhase.idle;
   bool get marieSpeaking => _marieSpeaking;
+
+  /// The line she was last asked to say, until she finishes it.
+  String? get speakingText => _speakingText;
 
   /// Her words as she says them, then her last complete line.
   String get caption => _caption;
@@ -77,6 +82,17 @@ abstract class V3MarieSession extends ChangeNotifier {
   Future<void> toggle(BuildContext context);
   Future<void> end();
   Future<void> toggleMute();
+
+  /// Says [text] out loud in the selected tutor's voice, exactly as written.
+  /// This is the speaker button: the old vocabulary lessons asked live Marie
+  /// the same way, on one warm connection, so it is fast and always the voice
+  /// the learner chose. A tap connects her (muted, no hello) if she is not
+  /// already on. Returns false if she could not be reached.
+  ///
+  /// With [reveal] false (an unanswered listening question) her words are not
+  /// shown in the pill or the conversation, so the text cannot give the answer
+  /// away. She is still heard.
+  Future<bool> speak(BuildContext context, String text, {bool reveal = true});
 
   /// Cuts off what she is saying right now. The call stays open.
   Future<void> skip();
@@ -115,13 +131,24 @@ abstract class V3MarieSession extends ChangeNotifier {
     _idleTimer = null;
     _streaming = '';
     _marieSpeaking = false;
+    _speakingText = null;
+    _hideTranscript = false;
+  }
+
+  @protected
+  void setSpeakingText(String? text, {bool reveal = true}) {
+    _speakingText = text;
+    _hideTranscript = !reveal;
+    notifyListeners();
   }
 
   @protected
   void touch() {
     _idleTimer?.cancel();
     if (!isLive) return;
-    _idleTimer = Timer(idleLimit, () {
+    // With the microphone closed nothing is being billed, so she may stay
+    // connected three times as long between speaker taps.
+    _idleTimer = Timer(muted ? idleLimit * 3 : idleLimit, () {
       if (!isLive) return;
       _endedNote =
           'The call ended after a minute and a half of quiet. Tap the phone to talk again.';
@@ -131,6 +158,12 @@ abstract class V3MarieSession extends ChangeNotifier {
 
   @protected
   void marieDelta(String delta) {
+    if (_hideTranscript) {
+      _marieSpeaking = true;
+      touch();
+      notifyListeners();
+      return;
+    }
     _streaming += delta;
     _caption = _streaming.trim();
     _marieSpeaking = true;
@@ -143,6 +176,13 @@ abstract class V3MarieSession extends ChangeNotifier {
     final line = text.trim();
     _streaming = '';
     _marieSpeaking = false;
+    _speakingText = null;
+    if (_hideTranscript) {
+      _hideTranscript = false;
+      touch();
+      notifyListeners();
+      return;
+    }
     if (line.isNotEmpty) {
       _caption = line;
       _addLine(V3MarieLine(fromMarie: true, text: line));
@@ -165,6 +205,8 @@ abstract class V3MarieSession extends ChangeNotifier {
     _streaming = '';
     _caption = '';
     _marieSpeaking = false;
+    _speakingText = null;
+    _hideTranscript = false;
   }
 
   void _addLine(V3MarieLine line) {
@@ -194,7 +236,9 @@ class V3LiveMarieSession extends V3MarieSession {
   InlineCallController? _callInstance;
   InlineCallController get _call => _callInstance ??= InlineCallController(
     sessionType: LiveSessionType.lessonCoach,
-    lessonContext: context,
+    lessonContext: () =>
+        'CURRENT APP STEP (the screen changed; this replaces every earlier step): ${context()}',
+    setupContext: _contextWithMemory,
     learningStoreForProfile: store(),
     onChanged: _changed,
     openingPrompt: _greeting(),
@@ -204,6 +248,36 @@ class V3LiveMarieSession extends V3MarieSession {
     onTurnComplete: touch,
   );
   var _wasLive = false;
+
+  /// The screen plus the last few lines of this call, for every connect and
+  /// reconnect. A reconnect that forgot the conversation made her introduce
+  /// herself again and talk about the wrong word.
+  String _contextWithMemory() => withMemory(context(), history);
+
+  /// [base] plus the last six lines of the call. Pure, so it can be tested.
+  @visibleForTesting
+  static String withMemory(String base, List<V3MarieLine> history) {
+    final lines = history.length <= 6
+        ? history
+        : history.sublist(history.length - 6);
+    if (lines.isEmpty) return base;
+    String cut(String v) => v.length <= 160 ? v : '${v.substring(0, 160)}...';
+    final b = StringBuffer(base)
+      ..write(
+        '\nCALL MEMORY (earlier in this same call, so the learner already '
+        'knows you):',
+      );
+    for (final l in lines) {
+      b.write('\n- ${l.fromMarie ? 'You' : 'Learner'}: ${cut(l.text)}');
+    }
+    return b.toString();
+  }
+
+  static String _speakCommand(String text) =>
+      'APP COMMAND: the learner tapped the speaker. Say only the exact French '
+      'text below once, clearly and at a learner-friendly pace. Do not '
+      'translate it, explain it, or add any other words. Then wait.\n'
+      'EXACT TEXT: "$text"';
 
   static String _greeting() {
     final name = ActiveTutor.current.displayName;
@@ -252,6 +326,34 @@ class V3LiveMarieSession extends V3MarieSession {
 
   @override
   Future<void> toggleMute() async => _callInstance?.toggleMute();
+
+  @override
+  Future<bool> speak(
+    BuildContext context,
+    String text, {
+    bool reveal = true,
+  }) async {
+    final line = text.trim();
+    if (line.isEmpty) return false;
+    final call = _call;
+    if (call.connecting || call.reconnecting) return false;
+    if (!call.active) {
+      startedCall();
+      // A speaker tap is a request for audio, not a conversation: no hello,
+      // microphone closed until the learner chooses to talk.
+      await call.start(context, sendOpeningPrompt: false);
+      if (!call.active) return false;
+      if (!call.muted) await call.toggleMute();
+    }
+    // A new tap wins over whatever she was still saying.
+    if (call.tutorTurnActive) await call.interruptTutorReply();
+    if (!call.active) return false;
+    clearCaption();
+    setSpeakingText(line, reveal: reveal);
+    call.promptTutor(_speakCommand(line));
+    touch();
+    return true;
+  }
 
   @override
   Future<void> skip() async {
@@ -372,6 +474,33 @@ class V3FakeMarieSession extends V3MarieSession {
     _muted = !_muted;
     V3MarieSession.debugLog.add(_muted ? 'mute' : 'unmute');
     notifyListeners();
+  }
+
+  @override
+  Future<bool> speak(
+    BuildContext context,
+    String text, {
+    bool reveal = true,
+  }) async {
+    final line = text.trim();
+    if (line.isEmpty || _phase == V3MariePhase.connecting) return false;
+    if (_phase == V3MariePhase.idle) {
+      V3MarieSession.debugLog.add('start-audio');
+      startedCall();
+      final gen = ++_generation;
+      _phase = V3MariePhase.connecting;
+      notifyListeners();
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      if (gen != _generation) return false;
+      _phase = V3MariePhase.live;
+      _muted = true;
+      touch();
+      notifyListeners();
+    }
+    V3MarieSession.debugLog.add('speak:$line');
+    setSpeakingText(line, reveal: reveal);
+    debugSay(line);
+    return true;
   }
 
   @override

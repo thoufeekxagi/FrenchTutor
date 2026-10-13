@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart'
+    show CupertinoActivityIndicator, CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +10,6 @@ import '../../design/tokens.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
 import '../../widgets/adaptive/adaptive.dart' show PSHaptics;
-import '../../widgets/tts_play_button.dart';
 import '../marie/v3_marie_dock.dart';
 import '../marie/v3_marie_session.dart';
 import '../ui/v3_ui.dart';
@@ -324,7 +325,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     ),
     child: Row(
       children: [
-        V3Speaker(text: line.fr, audioId: audioId, size: 44),
+        V3Speaker(text: line.fr, session: _marie, size: 44),
         const SizedBox(width: 14),
         Expanded(
           child: Column(
@@ -356,7 +357,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     const SizedBox(height: 16),
     Row(
       children: [
-        V3Speaker(text: s.spoken, audioId: _audioId('word'), size: 56),
+        V3Speaker(text: s.spoken, session: _marie, size: 56),
         if (s.sound.isNotEmpty) ...[
           const SizedBox(width: 16),
           Expanded(
@@ -385,7 +386,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     const SizedBox(height: 16),
     Row(
       children: [
-        V3Speaker(text: s.spoken, audioId: _audioId('phrase'), size: 56),
+        V3Speaker(text: s.spoken, session: _marie, size: 56),
         const SizedBox(width: 16),
         Expanded(child: Text(s.en, style: V3Type.body(17, DesignTokens.ink))),
       ],
@@ -463,7 +464,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
                     if (s.hear >= 0)
                       V3Speaker(
                         text: s.rows[r][s.hear],
-                        audioId: '${_audioId('row')}-$r',
+                        session: _marie,
                         size: 40,
                       ),
                   ],
@@ -483,7 +484,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
       const SizedBox(height: 16),
       Row(
         children: [
-          V3Speaker(text: s.promptFr, audioId: _audioId('prompt'), size: 52),
+          V3Speaker(text: s.promptFr, session: _marie, size: 52),
           const SizedBox(width: 14),
           Expanded(
             child: s.promptFr.length > 30
@@ -511,7 +512,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
         children: [
           V3Speaker(
             text: s.fr,
-            audioId: _audioId('listen'),
+            session: _marie,
             size: 72,
             oneShot: !_checked,
             onPlayed: () => setState(() => _listenedOnce.add(s.id)),
@@ -675,15 +676,20 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
   }
 }
 
-/// Speaker for one French line. Plays Gemini Live in the selected tutor's
-/// voice through the existing [TtsPlayButton] (saved after the first play).
-/// [oneShot] allows a single play, like the TCF listening test. [hidden]
-/// keeps the French text out of the accessibility label until it may be seen.
+/// Speaker for one French line. It asks the tutor (live Marie, or whichever
+/// tutor the learner chose) to say it, on the one warm connection the lesson
+/// keeps. That is how the old vocabulary lessons worked: fast, always the
+/// chosen voice, nothing saved that could be missing or in the wrong voice.
+///
+/// [oneShot] allows a single play, like the TCF listening test. It locks only
+/// after the tutor was really reached, so a failed tap can be retried.
+/// [hidden] keeps the French text out of the accessibility label until it may
+/// be seen.
 class V3Speaker extends StatefulWidget {
   const V3Speaker({
     super.key,
     required this.text,
-    required this.audioId,
+    required this.session,
     this.size = 48,
     this.oneShot = false,
     this.hidden = false,
@@ -691,7 +697,7 @@ class V3Speaker extends StatefulWidget {
   });
 
   final String text;
-  final String audioId;
+  final V3MarieSession session;
   final double size;
   final bool oneShot;
   final bool hidden;
@@ -702,53 +708,73 @@ class V3Speaker extends StatefulWidget {
 }
 
 class _V3SpeakerState extends State<V3Speaker> {
-  final _tts = GlobalKey<TtsPlayButtonState>();
   var _played = false;
+  var _busy = false;
 
   Future<void> _tap() async {
-    if (widget.oneShot && _played) return;
-    _played = true;
-    widget.onPlayed?.call();
-    await _tts.currentState?.trigger();
+    if (_busy || (widget.oneShot && _played)) return;
+    setState(() => _busy = true);
+    final reached = await widget.session.speak(
+      context,
+      widget.text,
+      reveal: !widget.hidden,
+    );
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      if (reached) _played = true;
+    });
+    if (reached) {
+      widget.onPlayed?.call();
+    } else {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not reach your tutor. Tap the speaker to try again.',
+            ),
+          ),
+        );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final locked = widget.oneShot && _played;
-    return V3Pressable(
-      label: widget.hidden ? 'Play audio' : 'Hear ${widget.text}',
-      onTap: locked ? null : _tap,
-      child: Opacity(
-        opacity: locked ? 0.45 : 1,
-        child: Container(
-          width: widget.size,
-          height: widget.size,
-          decoration: BoxDecoration(
-            color: DesignTokens.primarySoft,
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: IgnorePointer(
-            child: TtsPlayButton(
-              key: _tts,
-              text: widget.text,
-              contentItemId: widget.audioId,
-              size: widget.size,
-              iconSize: widget.size * 0.44,
-              onError: (_) {
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Could not play the audio. Check your connection.',
+    return ListenableBuilder(
+      listenable: widget.session,
+      builder: (context, _) {
+        final speaking = widget.session.speakingText == widget.text;
+        return V3Pressable(
+          label: widget.hidden ? 'Play audio' : 'Hear ${widget.text}',
+          onTap: locked ? null : _tap,
+          child: Opacity(
+            opacity: locked ? 0.45 : 1,
+            child: Container(
+              width: widget.size,
+              height: widget.size,
+              decoration: BoxDecoration(
+                color: DesignTokens.primarySoft,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: _busy
+                  ? SizedBox.square(
+                      dimension: widget.size * 0.4,
+                      child: const CupertinoActivityIndicator(),
+                    )
+                  : Icon(
+                      speaking
+                          ? CupertinoIcons.speaker_3_fill
+                          : CupertinoIcons.speaker_2_fill,
+                      color: DesignTokens.primary,
+                      size: widget.size * 0.44,
                     ),
-                  ),
-                );
-              },
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -56,7 +56,9 @@
       "id": "w6",
       "fr": "aider",
       "en": "to help",
-      "sound": "eh-DAY"
+      "sound": "eh-DAY",
+      "exampleFr": "Aidez-moi, s'il vous plaît.",
+      "exampleEn": "Help me, please."
     },
     {
       "type": "word",
@@ -64,35 +66,45 @@
       "fr": "l'aide (f.)",
       "en": "help",
       "say": "l'aide",
-      "sound": "lehd"
+      "sound": "lehd",
+      "exampleFr": "Merci pour l'aide, madame.",
+      "exampleEn": "Thank you for the help, madam."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "la question",
       "en": "question",
-      "sound": "lah kehs-TYOH(N)"
+      "sound": "lah kehs-TYOH(N)",
+      "exampleFr": "J'ai une question.",
+      "exampleEn": "I have a question."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "la réponse",
       "en": "answer",
-      "sound": "lah ray-POH(N)S"
+      "sound": "lah ray-POH(N)S",
+      "exampleFr": "La réponse est oui.",
+      "exampleEn": "The answer is yes."
     },
     {
       "type": "word",
       "id": "w10",
       "fr": "le mot",
       "en": "word",
-      "sound": "luh moh"
+      "sound": "luh moh",
+      "exampleFr": "Le mot « sortie » est français.",
+      "exampleEn": "The word “sortie” is French."
     },
     {
       "type": "word",
       "id": "w11",
       "fr": "la phrase",
       "en": "sentence",
-      "sound": "lah frahz"
+      "sound": "lah frahz",
+      "exampleFr": "C'est une phrase.",
+      "exampleEn": "It is a sentence."
     },
     {
       "type": "choose",

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/main.dart' as app;
 import 'package:french_tutor/models/tutor_persona.dart';
 import 'package:french_tutor/v3/lesson/v3_course.dart';
+import 'package:french_tutor/v3/lesson/v3_lesson.dart';
 import 'package:french_tutor/v3/marie/v3_marie_session.dart';
 import 'package:french_tutor/v3/v3_prefs.dart';
 import 'package:integration_test/integration_test.dart';
@@ -62,6 +63,20 @@ void main() {
     await press(tester, 'Start lesson');
     await probe.waitForLabel(tester, 'Talk to $name');
     await probe.capture(tester, '00_lesson_before_call');
+
+    // A speaker tap is the old vocabulary behaviour: Marie says the word on a
+    // warm connection, muted, with no hello. The same call then serves chat.
+    final first =
+        all.firstWhere((l) => l.id == 'a1-u01-words-1').steps.first
+            as V3WordStep;
+    await press(tester, 'Hear ${first.spoken}');
+    await tester.pump(const Duration(seconds: 2));
+    expect(V3MarieSession.debugLog, contains('speak:${first.spoken}'));
+    expect(await labels(tester), contains('Unmute microphone'));
+    await probe.capture(tester, '00b_speaker_tap_warm_call');
+    await press(tester, 'End call');
+    await probe.waitForLabel(tester, 'Talk to $name');
+    V3MarieSession.debugLog.clear();
 
     // The top button is a phone. Tap: connecting, then live with a hello.
     await probe.tapLabel(tester, 'Talk to $name');

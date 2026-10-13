@@ -21,28 +21,36 @@
       "fr": "l'arobase (f.)",
       "en": "the @ sign",
       "say": "l'arobase",
-      "sound": "lah-roh-BAHZ"
+      "sound": "lah-roh-BAHZ",
+      "exampleFr": "L'arobase est dans le courriel.",
+      "exampleEn": "The @ sign is in the email."
     },
     {
       "type": "word",
       "id": "w3",
       "fr": "le point",
       "en": "dot, full stop",
-      "sound": "luh pwa(n)"
+      "sound": "luh pwa(n)",
+      "exampleFr": "Courriel : sam, arobase, exemple, point c-a.",
+      "exampleEn": "Email: sam, at, example, dot c-a."
     },
     {
       "type": "word",
       "id": "w4",
       "fr": "le numéro",
       "en": "number",
-      "sound": "luh nü-may-ROH"
+      "sound": "luh nü-may-ROH",
+      "exampleFr": "Votre numéro, s'il vous plaît ?",
+      "exampleEn": "Your number, please?"
     },
     {
       "type": "word",
       "id": "w5",
       "fr": "le téléphone",
       "en": "telephone",
-      "sound": "luh tay-lay-FOHN"
+      "sound": "luh tay-lay-FOHN",
+      "exampleFr": "Le téléphone est là.",
+      "exampleEn": "The phone is there."
     },
     {
       "type": "word",
@@ -58,21 +66,27 @@
       "id": "w7",
       "fr": "le message",
       "en": "message",
-      "sound": "luh meh-SAHZH"
+      "sound": "luh meh-SAHZH",
+      "exampleFr": "Un message pour Marc.",
+      "exampleEn": "A message for Marc."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "la boîte vocale",
       "en": "voicemail",
-      "sound": "lah bwaht voh-KAHL"
+      "sound": "lah bwaht voh-KAHL",
+      "exampleFr": "Un message dans la boîte vocale.",
+      "exampleEn": "A message in the voicemail."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "appeler",
       "en": "to call",
-      "sound": "ah-puh-LAY"
+      "sound": "ah-puh-LAY",
+      "exampleFr": "Appelez-moi, s'il vous plaît.",
+      "exampleEn": "Call me, please."
     },
     {
       "type": "word",
@@ -97,7 +111,9 @@
       "id": "w12",
       "fr": "la carte",
       "en": "card",
-      "sound": "lah kahrt"
+      "sound": "lah kahrt",
+      "exampleFr": "La carte est ici.",
+      "exampleEn": "The card is here."
     },
     {
       "type": "choose",

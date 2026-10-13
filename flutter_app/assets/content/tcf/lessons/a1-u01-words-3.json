@@ -29,7 +29,9 @@
       "id": "w3",
       "fr": "le nom de famille",
       "en": "family name",
-      "sound": "luh noh(n) duh fah-MEEY"
+      "sound": "luh noh(n) duh fah-MEEY",
+      "exampleFr": "Nom de famille : Tremblay.",
+      "exampleEn": "Family name: Tremblay."
     },
     {
       "type": "word",
@@ -55,14 +57,18 @@
       "id": "w6",
       "fr": "le garçon",
       "en": "boy",
-      "sound": "luh gahR-SOH(N)"
+      "sound": "luh gahR-SOH(N)",
+      "exampleFr": "Le garçon est canadien.",
+      "exampleEn": "The boy is Canadian."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "la fille",
       "en": "girl, daughter",
-      "sound": "lah feey"
+      "sound": "lah feey",
+      "exampleFr": "La fille est canadienne.",
+      "exampleEn": "The girl is Canadian."
     },
     {
       "type": "word",
@@ -79,14 +85,18 @@
       "id": "w9",
       "fr": "la personne",
       "en": "person",
-      "sound": "lah pehR-SUN"
+      "sound": "lah pehR-SUN",
+      "exampleFr": "La personne est ici.",
+      "exampleEn": "The person is here."
     },
     {
       "type": "word",
       "id": "w10",
       "fr": "l'enfant",
       "en": "child",
-      "sound": "lah(n)-FAH(N)"
+      "sound": "lah(n)-FAH(N)",
+      "exampleFr": "L'enfant parle français.",
+      "exampleEn": "The child speaks French."
     },
     {
       "type": "choose",

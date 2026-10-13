@@ -92,7 +92,9 @@
       "id": "w10",
       "fr": "être",
       "en": "to be",
-      "sound": "EHtr"
+      "sound": "EHtr",
+      "exampleFr": "Je suis, tu es, il est.",
+      "exampleEn": "I am, you are, he is."
     },
     {
       "type": "word",

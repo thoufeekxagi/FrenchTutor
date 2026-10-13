@@ -74,35 +74,45 @@
       "id": "w6",
       "fr": "hôtel",
       "en": "hotel",
-      "sound": "oh-TEL"
+      "sound": "oh-TEL",
+      "exampleFr": "L'hôtel est ouvert.",
+      "exampleEn": "The hotel is open."
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "restaurant",
       "en": "restaurant",
-      "sound": "rehs-toh-RAH(N)"
+      "sound": "rehs-toh-RAH(N)",
+      "exampleFr": "Le restaurant est fermé.",
+      "exampleEn": "The restaurant is closed."
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "banque",
       "en": "bank",
-      "sound": "bah(n)k"
+      "sound": "bah(n)k",
+      "exampleFr": "La banque est là.",
+      "exampleEn": "The bank is there."
     },
     {
       "type": "word",
       "id": "w9",
       "fr": "pharmacie",
       "en": "pharmacy",
-      "sound": "fahR-mah-SEE"
+      "sound": "fahR-mah-SEE",
+      "exampleFr": "La pharmacie est fermée.",
+      "exampleEn": "The pharmacy is closed."
     },
     {
       "type": "word",
       "id": "w10",
       "fr": "hôpital",
       "en": "hospital",
-      "sound": "oh-pee-TAHL"
+      "sound": "oh-pee-TAHL",
+      "exampleFr": "L'hôpital est ici.",
+      "exampleEn": "The hospital is here."
     },
     {
       "type": "choose",

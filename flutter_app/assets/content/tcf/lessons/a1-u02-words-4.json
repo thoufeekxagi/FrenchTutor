@@ -39,7 +39,9 @@
       "id": "w4",
       "fr": "quand",
       "en": "when",
-      "sound": "kah(n)"
+      "sound": "kah(n)",
+      "exampleFr": "Quand ? Lundi.",
+      "exampleEn": "When? Monday."
     },
     {
       "type": "word",
@@ -55,21 +57,27 @@
       "id": "w6",
       "fr": "combien",
       "en": "how much, how many",
-      "sound": "koh(n)-BYA(N)"
+      "sound": "koh(n)-BYA(N)",
+      "exampleFr": "C'est combien ?",
+      "exampleEn": "How much is it?"
     },
     {
       "type": "word",
       "id": "w7",
       "fr": "pourquoi",
       "en": "why",
-      "sound": "poor-KWAH"
+      "sound": "poor-KWAH",
+      "exampleFr": "Pourquoi pas ?",
+      "exampleEn": "Why not?"
     },
     {
       "type": "word",
       "id": "w8",
       "fr": "parce que",
       "en": "because",
-      "sound": "pahrs-KUH"
+      "sound": "pahrs-KUH",
+      "exampleFr": "Parce que je suis canadien.",
+      "exampleEn": "Because I am Canadian."
     },
     {
       "type": "word",
