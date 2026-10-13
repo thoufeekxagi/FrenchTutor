@@ -1,0 +1,213 @@
+{
+  "id": "a1-au-depanneur",
+  "title": "Au dépanneur",
+  "titleEn": "At the convenience store",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Julie buys milk and bread at the corner store and pays by card.",
+  "unit": "a1-u01",
+  "sentences": [
+    {
+      "fr": "Julie entre dans le dépanneur.",
+      "en": "Julie goes into the convenience store.",
+      "note": "In Québec, a dépanneur (or dép) is a corner store. In France you would say épicerie or supérette."
+    },
+    {
+      "fr": "Il y a du lait, du pain et des pommes.",
+      "en": "There is milk, bread and apples."
+    },
+    {
+      "fr": "Elle prend du lait.",
+      "en": "She takes some milk."
+    },
+    {
+      "fr": "Elle prend aussi du pain.",
+      "en": "She also takes some bread."
+    },
+    {
+      "fr": "À la caisse, le monsieur dit : « Bonjour ! »",
+      "en": "At the cash register, the man says: \"Hello!\""
+    },
+    {
+      "fr": "« Ça fait quatre dollars. »",
+      "en": "\"That's four dollars.\""
+    },
+    {
+      "fr": "Julie paie avec sa carte.",
+      "en": "Julie pays with her card."
+    },
+    {
+      "fr": "« Merci ! Bonne soirée ! »",
+      "en": "\"Thank you! Have a nice evening!\""
+    }
+  ],
+  "words": {
+    "julie": {
+      "en": "Julie (a woman's name)"
+    },
+    "entre": {
+      "en": "goes in (entrer)",
+      "pos": "verb"
+    },
+    "dans": {
+      "en": "in, into"
+    },
+    "le": {
+      "en": "the"
+    },
+    "dépanneur": {
+      "en": "convenience store (Québec)",
+      "pos": "noun, masculine",
+      "sound": "day-pa-NUHR"
+    },
+    "il": {
+      "en": "he, it",
+      "pos": "pronoun"
+    },
+    "y": {
+      "en": "there"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "du": {
+      "en": "some, of the"
+    },
+    "lait": {
+      "en": "milk",
+      "pos": "noun, masculine",
+      "sound": "lay"
+    },
+    "pain": {
+      "en": "bread",
+      "pos": "noun, masculine",
+      "sound": "pan"
+    },
+    "et": {
+      "en": "and"
+    },
+    "des": {
+      "en": "some"
+    },
+    "pommes": {
+      "en": "apples",
+      "pos": "noun, feminine"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "prend": {
+      "en": "takes (prendre)",
+      "pos": "verb"
+    },
+    "aussi": {
+      "en": "also"
+    },
+    "à": {
+      "en": "at, to"
+    },
+    "la": {
+      "en": "the"
+    },
+    "caisse": {
+      "en": "cash register",
+      "pos": "noun, feminine",
+      "sound": "kess"
+    },
+    "monsieur": {
+      "en": "man, sir, Mr.",
+      "pos": "noun, masculine"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "bonjour": {
+      "en": "hello"
+    },
+    "ça": {
+      "en": "that, it"
+    },
+    "fait": {
+      "en": "makes, is (faire)",
+      "pos": "verb"
+    },
+    "quatre": {
+      "en": "four"
+    },
+    "dollars": {
+      "en": "dollars",
+      "pos": "noun, masculine"
+    },
+    "paie": {
+      "en": "pays (payer)",
+      "pos": "verb"
+    },
+    "avec": {
+      "en": "with"
+    },
+    "sa": {
+      "en": "her"
+    },
+    "carte": {
+      "en": "card",
+      "pos": "noun, feminine"
+    },
+    "merci": {
+      "en": "thank you"
+    },
+    "bonne": {
+      "en": "good, nice (feminine)"
+    },
+    "soirée": {
+      "en": "evening (the whole evening)",
+      "pos": "noun, feminine",
+      "sound": "swa-RAY"
+    }
+  },
+  "keywords": [
+    "dépanneur",
+    "lait",
+    "pain",
+    "caisse",
+    "dollars",
+    "carte"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does Julie buy?",
+      "options": [
+        "Milk and bread",
+        "Apples and milk",
+        "Bread and apples",
+        "Only milk"
+      ],
+      "answer": 0,
+      "explain": "Elle prend du lait. Elle prend aussi du pain. She takes milk and also bread."
+    },
+    {
+      "prompt": "How much does she pay?",
+      "options": [
+        "Two dollars",
+        "Four dollars",
+        "Five dollars",
+        "Fourteen dollars"
+      ],
+      "answer": 1,
+      "explain": "Ça fait quatre dollars means that's four dollars."
+    },
+    {
+      "prompt": "How does Julie pay?",
+      "options": [
+        "With cash",
+        "With her card",
+        "With her phone",
+        "She does not pay"
+      ],
+      "answer": 1,
+      "explain": "Julie paie avec sa carte: Julie pays with her card."
+    }
+  ]
+}

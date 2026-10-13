@@ -1,0 +1,219 @@
+{
+  "id": "a1-rendez-vous-clinique",
+  "title": "Un rendez-vous à la clinique",
+  "titleEn": "An appointment at the clinic",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Samira checks in at a clinic reception and shows her health card.",
+  "unit": "a1-u01",
+  "sentences": [
+    {
+      "fr": "Samira a un rendez-vous à la clinique.",
+      "en": "Samira has an appointment at the clinic."
+    },
+    {
+      "fr": "Elle entre dans la salle d'attente.",
+      "en": "She goes into the waiting room."
+    },
+    {
+      "fr": "La réceptionniste dit : « Bonjour, madame. »",
+      "en": "The receptionist says: \"Hello, madam.\""
+    },
+    {
+      "fr": "« Votre nom, s'il vous plaît ? »",
+      "en": "\"Your name, please?\"",
+      "note": "S'il vous plaît is the polite please. With a stranger you use vous."
+    },
+    {
+      "fr": "« Je m'appelle Samira Haddad. »",
+      "en": "\"My name is Samira Haddad.\""
+    },
+    {
+      "fr": "« Votre carte d'assurance maladie, s'il vous plaît. »",
+      "en": "\"Your health insurance card, please.\"",
+      "note": "In Canada your carte d'assurance maladie (health card) is the card you show at every medical visit."
+    },
+    {
+      "fr": "Samira donne sa carte.",
+      "en": "Samira gives her card."
+    },
+    {
+      "fr": "« Merci. Le docteur arrive dans cinq minutes. »",
+      "en": "\"Thank you. The doctor arrives in five minutes.\""
+    }
+  ],
+  "words": {
+    "samira": {
+      "en": "Samira (a woman's name)"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a"
+    },
+    "rendez-vous": {
+      "en": "appointment",
+      "pos": "noun, masculine",
+      "sound": "rahn-day-VOO"
+    },
+    "à": {
+      "en": "at, to"
+    },
+    "la": {
+      "en": "the"
+    },
+    "clinique": {
+      "en": "clinic",
+      "pos": "noun, feminine",
+      "sound": "kli-NEEK"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "entre": {
+      "en": "goes in (entrer)",
+      "pos": "verb"
+    },
+    "dans": {
+      "en": "in, into"
+    },
+    "salle": {
+      "en": "room",
+      "pos": "noun, feminine",
+      "sound": "sal"
+    },
+    "d'attente": {
+      "en": "of waiting"
+    },
+    "réceptionniste": {
+      "en": "receptionist",
+      "pos": "noun"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "bonjour": {
+      "en": "hello"
+    },
+    "madame": {
+      "en": "madam, Mrs.",
+      "pos": "noun, feminine"
+    },
+    "votre": {
+      "en": "your (formal)"
+    },
+    "nom": {
+      "en": "last name",
+      "pos": "noun, masculine"
+    },
+    "s'il": {
+      "en": "if it"
+    },
+    "vous": {
+      "en": "you (formal)",
+      "pos": "pronoun"
+    },
+    "plaît": {
+      "en": "pleases (plaire)",
+      "pos": "verb"
+    },
+    "je": {
+      "en": "I",
+      "pos": "pronoun"
+    },
+    "m'appelle": {
+      "en": "my name is (I call myself)"
+    },
+    "haddad": {
+      "en": "Haddad (a family name)"
+    },
+    "carte": {
+      "en": "card",
+      "pos": "noun, feminine"
+    },
+    "d'assurance": {
+      "en": "of insurance"
+    },
+    "maladie": {
+      "en": "illness, health",
+      "pos": "noun, feminine"
+    },
+    "donne": {
+      "en": "gives (donner)",
+      "pos": "verb"
+    },
+    "sa": {
+      "en": "her"
+    },
+    "merci": {
+      "en": "thank you"
+    },
+    "le": {
+      "en": "the"
+    },
+    "docteur": {
+      "en": "doctor",
+      "pos": "noun, masculine",
+      "sound": "dok-TUHR"
+    },
+    "arrive": {
+      "en": "arrives (arriver)",
+      "pos": "verb"
+    },
+    "cinq": {
+      "en": "five"
+    },
+    "minutes": {
+      "en": "minutes",
+      "pos": "noun, feminine"
+    }
+  },
+  "keywords": [
+    "rendez-vous",
+    "clinique",
+    "salle",
+    "nom",
+    "carte",
+    "maladie",
+    "docteur"
+  ],
+  "quiz": [
+    {
+      "prompt": "Where is Samira?",
+      "options": [
+        "At a bank",
+        "At a clinic",
+        "At a school",
+        "At a store"
+      ],
+      "answer": 1,
+      "explain": "Samira a un rendez-vous à la clinique: she has an appointment at the clinic."
+    },
+    {
+      "prompt": "What does the receptionist ask first?",
+      "options": [
+        "Her card",
+        "Her name",
+        "Her address",
+        "Her phone number"
+      ],
+      "answer": 1,
+      "explain": "Votre nom, s'il vous plaît ? means your name, please? The card comes next."
+    },
+    {
+      "prompt": "When does the doctor arrive?",
+      "options": [
+        "In five minutes",
+        "In fifteen minutes",
+        "Now",
+        "Tomorrow"
+      ],
+      "answer": 0,
+      "explain": "Le docteur arrive dans cinq minutes: the doctor arrives in five minutes."
+    }
+  ]
+}

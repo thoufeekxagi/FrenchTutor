@@ -259,11 +259,103 @@ def check_lessons():
             warn(f"{where}: is marked dev (hidden in release builds)")
     return len(seen_ids), lines
 
+
+STRIP = "«»\"“”‘’'.,!?;:()—–…"
+
+
+def story_tokens(text):
+    """Word tokens of a French sentence, exactly as the reader makes them:
+    split on spaces, trim punctuation from the ends, lowercase."""
+    out = []
+    for raw in text.replace("\u2019", "'").split():
+        t = raw.strip(STRIP).lower()
+        if t:
+            out.append(t)
+    return out
+
+
+def check_stories():
+    """Validates the reading stories. Every token of every sentence must have
+    a meaning in `words`, so a tapped word is never blank."""
+    index_path = APP_CONTENT / "stories.json"
+    if not index_path.exists():
+        return 0, 0
+    index = load(index_path) or {}
+    seen, lines = set(), 0
+    for name in index.get("stories", []):
+        path = APP_CONTENT / "stories" / name
+        if not path.exists():
+            err(f"stories.json lists {name} but the file does not exist")
+            continue
+        st = load(path)
+        if not st:
+            continue
+        sid = st.get("id", name)
+        w = f"story {sid}"
+        if sid in seen:
+            err(f"{w}: duplicate story id")
+        seen.add(sid)
+        for key in ("title", "titleEn", "summary"):
+            _need(st, key, w)
+        if st.get("level") not in ("A1", "A2", "B1", "B2"):
+            err(f"{w}: level must be A1, A2, B1 or B2")
+        if not isinstance(st.get("minutes"), int):
+            err(f"{w}: minutes must be a whole number")
+        sents = st.get("sentences", [])
+        if st.get("level") == "A1" and not 6 <= len(sents) <= 12:
+            warn(f"{w}: A1 stories are usually 6 to 12 sentences (has {len(sents)})")
+        words = st.get("words", {})
+        used = set()
+        for i, sent in enumerate(sents, 1):
+            fr, en = sent.get("fr", ""), sent.get("en", "")
+            if not fr.strip() or not en.strip():
+                err(f"{w} sentence {i}: needs both fr and en")
+                continue
+            lines += 1
+            toks = story_tokens(fr)
+            if st.get("level") == "A1" and len(toks) > 12:
+                warn(f"{w} sentence {i}: {len(toks)} words is long for A1")
+            for t in toks:
+                used.add(t)
+                if t not in words:
+                    err(f"{w} sentence {i}: word '{t}' has no meaning in 'words'")
+        for t, entry in words.items():
+            if not (isinstance(entry, dict) and str(entry.get("en", "")).strip()):
+                err(f"{w}: word '{t}' has an empty meaning")
+            if t not in used:
+                warn(f"{w}: word '{t}' is not used in any sentence")
+        kws = st.get("keywords", [])
+        if not 4 <= len(kws) <= 8:
+            warn(f"{w}: keywords usually 4 to 8 (has {len(kws)})")
+        for k in kws:
+            if k not in words:
+                err(f"{w}: keyword '{k}' is not in 'words'")
+        quiz = st.get("quiz", [])
+        if len(quiz) < 3:
+            err(f"{w}: needs at least 3 quiz questions")
+        for j, q in enumerate(quiz, 1):
+            qw = f"{w} quiz {j}"
+            _need(q, "prompt", qw)
+            _need(q, "explain", qw)
+            opts = q.get("options")
+            if not (isinstance(opts, list) and len(opts) >= 2 and all(isinstance(o, str) and o.strip() for o in opts)):
+                err(f"{qw}: needs at least 2 non-empty options")
+                continue
+            if len(opts) != 4:
+                warn(f"{qw}: TCF questions have 4 options (has {len(opts)})")
+            if len(set(opts)) != len(opts):
+                err(f"{qw}: options must be different from each other")
+            ans = q.get("answer")
+            if not (isinstance(ans, int) and 0 <= ans < len(opts)):
+                err(f"{qw}: answer must be a valid option index")
+    return len(seen), lines
+
 def main():
     strict = "--strict-ledger" in sys.argv
     info = check_syllabus()
     n_units = check_units(info, strict) if info else 0
     n_lessons, n_lines = check_lessons()
+    n_stories, n_story_lines = check_stories()
     for w in warnings:
         print("warn :", w)
     for e in errors:
@@ -272,6 +364,7 @@ def main():
         print(f"syllabus: stage0 {info['s0']} lessons, A1 {len(info['a1']['units'])} units, "
               f"{info['total']} target words, {n_units} authored unit file(s)")
     print(f"lessons: {n_lessons} file(s), {n_lines} French lines to voice")
+    print(f"stories: {n_stories} file(s), {n_story_lines} sentences")
     print(f"content validation: {len(errors)} error(s), {len(warnings)} warning(s)")
     sys.exit(1 if errors else 0)
 

@@ -1,14 +1,14 @@
 {
   "id": "a1-u01-dialogue",
-  "title": "Two neighbours meet",
+  "title": "Two classmates meet",
   "subtitle": "Unit 1: hear it, read it, say it",
   "minutes": 6,
   "steps": [
     {
       "type": "explain",
       "id": "e1",
-      "title": "In the hallway",
-      "body": "Anna and Sam live in the same building. They meet in the hallway. Tap each line to hear it, then read the English.",
+      "title": "At French class",
+      "body": "Anna and Sam meet at a French class in Ottawa. Anna lives in Montréal and Sam lives in Toronto. Tap each line to hear it, then read the English.",
       "examples": [
         {
           "fr": "Salut ! Je m'appelle Anna.",
@@ -71,7 +71,7 @@
         "Where do you live?"
       ],
       "answer": 0,
-      "explain": "Tu parles français ? means Do you speak French? Anna says tu because they are neighbours."
+      "explain": "Tu parles français ? means Do you speak French? Anna says tu because they are classmates."
     },
     {
       "type": "choose",
@@ -103,7 +103,7 @@
       "id": "p1",
       "fr": "Salut ! Je m'appelle Sam.",
       "en": "Hi! My name is Sam.",
-      "tip": "Say it as if you just met a neighbour. Use your own name."
+      "tip": "Say it as if you just met a classmate. Use your own name."
     },
     {
       "type": "phrase",

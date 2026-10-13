@@ -1,0 +1,201 @@
+{
+  "id": "a1-nouvelle-voisine",
+  "title": "Une nouvelle voisine",
+  "titleEn": "A new neighbour",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Marc meets Nadia, the new neighbour who arrives with a suitcase.",
+  "unit": "a1-u01",
+  "sentences": [
+    {
+      "fr": "Il est sept heures du soir.",
+      "en": "It is seven in the evening."
+    },
+    {
+      "fr": "Marc est dans le couloir.",
+      "en": "Marc is in the hallway."
+    },
+    {
+      "fr": "Une femme arrive avec une valise.",
+      "en": "A woman arrives with a suitcase."
+    },
+    {
+      "fr": "« Bonsoir ! Je m'appelle Nadia. »",
+      "en": "\"Good evening! My name is Nadia.\""
+    },
+    {
+      "fr": "« Enchanté ! Je suis Marc. »",
+      "en": "\"Nice to meet you! I am Marc.\""
+    },
+    {
+      "fr": "Nadia est nouvelle dans l'immeuble.",
+      "en": "Nadia is new in the building."
+    },
+    {
+      "fr": "Elle habite au troisième étage.",
+      "en": "She lives on the third floor."
+    },
+    {
+      "fr": "Marc dit : « Bienvenue ! »",
+      "en": "Marc says: \"Welcome!\""
+    }
+  ],
+  "words": {
+    "il": {
+      "en": "he, it",
+      "pos": "pronoun"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "sept": {
+      "en": "seven"
+    },
+    "heures": {
+      "en": "hours, o'clock"
+    },
+    "du": {
+      "en": "of the"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine",
+      "sound": "swahr"
+    },
+    "marc": {
+      "en": "Marc (a man's name)"
+    },
+    "dans": {
+      "en": "in"
+    },
+    "le": {
+      "en": "the"
+    },
+    "couloir": {
+      "en": "hallway",
+      "pos": "noun, masculine",
+      "sound": "koo-LWAHR"
+    },
+    "une": {
+      "en": "a"
+    },
+    "femme": {
+      "en": "woman",
+      "pos": "noun, feminine",
+      "sound": "fam"
+    },
+    "arrive": {
+      "en": "arrives (arriver)",
+      "pos": "verb"
+    },
+    "avec": {
+      "en": "with"
+    },
+    "valise": {
+      "en": "suitcase",
+      "pos": "noun, feminine",
+      "sound": "va-LEEZ"
+    },
+    "bonsoir": {
+      "en": "good evening",
+      "sound": "bon-SWAHR"
+    },
+    "je": {
+      "en": "I",
+      "pos": "pronoun"
+    },
+    "m'appelle": {
+      "en": "my name is (I call myself)"
+    },
+    "nadia": {
+      "en": "Nadia (a woman's name)"
+    },
+    "enchanté": {
+      "en": "nice to meet you",
+      "sound": "ahn-shahn-TAY"
+    },
+    "suis": {
+      "en": "am (être)",
+      "pos": "verb"
+    },
+    "nouvelle": {
+      "en": "new (feminine)",
+      "pos": "adjective"
+    },
+    "l'immeuble": {
+      "en": "the building",
+      "pos": "noun, masculine"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "habite": {
+      "en": "lives (habiter)",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "to the, on the"
+    },
+    "troisième": {
+      "en": "third"
+    },
+    "étage": {
+      "en": "floor, storey",
+      "pos": "noun, masculine",
+      "sound": "ay-TAHZH"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "bienvenue": {
+      "en": "welcome",
+      "sound": "byen-vuh-NU"
+    }
+  },
+  "keywords": [
+    "couloir",
+    "valise",
+    "nouvelle",
+    "habite",
+    "étage",
+    "bienvenue"
+  ],
+  "quiz": [
+    {
+      "prompt": "What time is it at the start of the story?",
+      "options": [
+        "Seven in the evening",
+        "Seven in the morning",
+        "Eight in the evening",
+        "Six in the evening"
+      ],
+      "answer": 0,
+      "explain": "Il est sept heures du soir means it is seven in the evening."
+    },
+    {
+      "prompt": "Who is new in the building?",
+      "options": [
+        "Marc",
+        "Nadia",
+        "A man with a suitcase",
+        "Nobody"
+      ],
+      "answer": 1,
+      "explain": "Nadia est nouvelle dans l'immeuble: Nadia is new in the building."
+    },
+    {
+      "prompt": "Where does Nadia live?",
+      "options": [
+        "On the first floor",
+        "On the second floor",
+        "On the third floor",
+        "In the hallway"
+      ],
+      "answer": 2,
+      "explain": "Elle habite au troisième étage: she lives on the third floor."
+    }
+  ]
+}

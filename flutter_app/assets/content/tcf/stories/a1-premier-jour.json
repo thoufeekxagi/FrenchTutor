@@ -1,0 +1,241 @@
+{
+  "id": "a1-premier-jour",
+  "title": "Mon premier jour",
+  "titleEn": "My first day",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "A newcomer takes the bus on a cold morning to start a new job.",
+  "unit": "a1-u01",
+  "sentences": [
+    {
+      "fr": "Aujourd'hui, c'est mon premier jour de travail.",
+      "en": "Today is my first day of work."
+    },
+    {
+      "fr": "Je prends l'autobus à sept heures.",
+      "en": "I take the bus at seven o'clock."
+    },
+    {
+      "fr": "Il fait froid, alors je porte un manteau.",
+      "en": "It is cold, so I wear a coat.",
+      "note": "Il fait froid is how French talks about the weather. It literally says it makes cold."
+    },
+    {
+      "fr": "J'arrive au bureau à huit heures.",
+      "en": "I arrive at the office at eight o'clock."
+    },
+    {
+      "fr": "Ma gérante s'appelle Karine.",
+      "en": "My manager is called Karine.",
+      "note": "Many job titles have a feminine form: gérante for a woman, gérant for a man."
+    },
+    {
+      "fr": "Elle dit : « Bonjour et bienvenue ! »",
+      "en": "She says: \"Hello and welcome!\""
+    },
+    {
+      "fr": "Je suis un peu nerveux, mais content.",
+      "en": "I am a little nervous, but happy."
+    },
+    {
+      "fr": "C'est une bonne journée !",
+      "en": "It is a good day!"
+    }
+  ],
+  "words": {
+    "aujourd'hui": {
+      "en": "today"
+    },
+    "c'est": {
+      "en": "it is, this is"
+    },
+    "mon": {
+      "en": "my (masculine)"
+    },
+    "premier": {
+      "en": "first",
+      "pos": "adjective"
+    },
+    "jour": {
+      "en": "day",
+      "pos": "noun, masculine",
+      "sound": "zhoor"
+    },
+    "de": {
+      "en": "of"
+    },
+    "travail": {
+      "en": "work",
+      "pos": "noun, masculine",
+      "sound": "tra-VAHY"
+    },
+    "je": {
+      "en": "I",
+      "pos": "pronoun"
+    },
+    "prends": {
+      "en": "take (prendre)",
+      "pos": "verb"
+    },
+    "l'autobus": {
+      "en": "the bus",
+      "pos": "noun, masculine"
+    },
+    "à": {
+      "en": "at, to"
+    },
+    "sept": {
+      "en": "seven"
+    },
+    "heures": {
+      "en": "hours, o'clock"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "fait": {
+      "en": "makes, is (faire)",
+      "pos": "verb"
+    },
+    "froid": {
+      "en": "cold",
+      "pos": "adjective",
+      "sound": "frwah"
+    },
+    "alors": {
+      "en": "so, then"
+    },
+    "porte": {
+      "en": "wear (porter)",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a"
+    },
+    "manteau": {
+      "en": "coat",
+      "pos": "noun, masculine",
+      "sound": "mahn-TOH"
+    },
+    "j'arrive": {
+      "en": "I arrive (arriver)",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "at the, to the"
+    },
+    "bureau": {
+      "en": "office",
+      "pos": "noun, masculine",
+      "sound": "bu-ROH"
+    },
+    "huit": {
+      "en": "eight"
+    },
+    "ma": {
+      "en": "my (feminine)"
+    },
+    "gérante": {
+      "en": "manager (a woman)",
+      "pos": "noun, feminine"
+    },
+    "s'appelle": {
+      "en": "is called (s'appeler)",
+      "pos": "verb"
+    },
+    "karine": {
+      "en": "Karine (a woman's name)"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "dit": {
+      "en": "says (dire)",
+      "pos": "verb"
+    },
+    "bonjour": {
+      "en": "hello"
+    },
+    "et": {
+      "en": "and"
+    },
+    "bienvenue": {
+      "en": "welcome"
+    },
+    "suis": {
+      "en": "am (être)",
+      "pos": "verb"
+    },
+    "peu": {
+      "en": "little"
+    },
+    "nerveux": {
+      "en": "nervous (a man)",
+      "pos": "adjective"
+    },
+    "mais": {
+      "en": "but"
+    },
+    "content": {
+      "en": "happy",
+      "pos": "adjective"
+    },
+    "une": {
+      "en": "a"
+    },
+    "bonne": {
+      "en": "good (feminine)"
+    },
+    "journée": {
+      "en": "day (the whole day)",
+      "pos": "noun, feminine",
+      "sound": "zhoor-NAY"
+    }
+  },
+  "keywords": [
+    "travail",
+    "l'autobus",
+    "froid",
+    "manteau",
+    "bureau",
+    "gérante",
+    "content"
+  ],
+  "quiz": [
+    {
+      "prompt": "How does the narrator get to work?",
+      "options": [
+        "By car",
+        "By bus",
+        "On foot",
+        "By train"
+      ],
+      "answer": 1,
+      "explain": "Je prends l'autobus: I take the bus."
+    },
+    {
+      "prompt": "Why does the narrator wear a coat?",
+      "options": [
+        "It is raining",
+        "It is cold",
+        "It is a rule at work",
+        "It is new"
+      ],
+      "answer": 1,
+      "explain": "Il fait froid, alors je porte un manteau: it is cold, so I wear a coat."
+    },
+    {
+      "prompt": "How does the narrator feel?",
+      "options": [
+        "Only nervous",
+        "Only tired",
+        "A little nervous but happy",
+        "Angry"
+      ],
+      "answer": 2,
+      "explain": "Je suis un peu nerveux, mais content: a little nervous, but happy."
+    }
+  ]
+}
