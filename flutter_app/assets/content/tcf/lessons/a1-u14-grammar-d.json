@@ -1,0 +1,91 @@
+{
+  "id": "a1-u14-grammar-d",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Grammar: make a plan for soon (review g16 and g15)",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "make a plan for soon (review g16 and g15)",
+      "body": "Use the present of aller + infinitive for a plan. Add a day and time you already know: On va patiner dimanche à quinze heures."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use aller + an action in the infinitive",
+      "headers": [
+        "Plan",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Je vais écouter un concert.",
+          "I am going to listen to a concert."
+        ],
+        [
+          "Tu vas jouer au hockey.",
+          "You are going to play hockey."
+        ],
+        [
+          "On va à la cabane à sucre samedi.",
+          "We are going to the sugar shack on Saturday."
+        ]
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "We are going to skate Sunday.",
+      "options": [
+        "On va patines dimanche.",
+        "On est patiner dimanche.",
+        "On va patiner dimanche.",
+        "On vais patiner dimanche."
+      ],
+      "answer": 2,
+      "explain": "With on, use va; keep the next verb in the infinitive patiner."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "I am going to watch a film.",
+      "options": [
+        "Je vais regarder un film.",
+        "Je va regarder un film.",
+        "Je vais regardes un film.",
+        "Je vais regarde un film."
+      ],
+      "answer": 0,
+      "explain": "With je, use vais and then the infinitive regarder."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "They are going to a concert.",
+      "options": [
+        "Ils va au concert.",
+        "Ils vont à le concert.",
+        "Ils vont aux concert.",
+        "Ils vont au concert."
+      ],
+      "answer": 3,
+      "explain": "With ils, use vont; à + le becomes au."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which question asks someone to go skating?",
+      "options": [
+        "Tu préfères patine ?",
+        "Tu veux aller patiner ?",
+        "Tu veux patines ?",
+        "Tu vas patines ?"
+      ],
+      "answer": 1,
+      "explain": "Use vouloir + infinitive: Tu veux aller patiner ?"
+    }
+  ]
+}

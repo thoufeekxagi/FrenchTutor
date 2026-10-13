@@ -1,0 +1,114 @@
+{
+  "id": "a1-u14-tcf",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "TCF corner",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je préfère la lecture et la danse.",
+      "question": "Which two hobbies does the speaker prefer?",
+      "options": [
+        "Reading and dancing",
+        "Hockey and skating",
+        "Music and theatre",
+        "Skiing and hiking"
+      ],
+      "answer": 0,
+      "explain": "The speaker names la lecture and la danse."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Oui, avec plaisir. On va au spectacle samedi.",
+      "question": "What is the reply?",
+      "options": [
+        "The person is busy and declines",
+        "The person asks about a clinic",
+        "The person cancels the event",
+        "The person accepts and plans to go to a show"
+      ],
+      "answer": 3,
+      "explain": "Oui, avec plaisir accepts; they plan to go to the show Saturday."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Désolé, je suis occupé vendredi soir.",
+      "question": "Why can't the speaker go Friday evening?",
+      "options": [
+        "The speaker has a class",
+        "The speaker is busy",
+        "The speaker is at a concert",
+        "The speaker prefers skiing"
+      ],
+      "answer": 1,
+      "explain": "The speaker says je suis occupé."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "La sortie commence à dix-huit heures.",
+      "question": "What time does the outing start?",
+      "options": [
+        "19 h",
+        "11 h",
+        "18 h",
+        "16 h"
+      ],
+      "answer": 2,
+      "explain": "The speaker says dix-huit heures."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where is the concert?",
+      "options": [
+        "At a performance venue",
+        "At a museum",
+        "At an ice rink",
+        "At a sugar shack"
+      ],
+      "answer": 0,
+      "explain": "The notice says salle de spectacle.",
+      "promptFr": "CONCERT · Vendredi, 20 h · Salle de spectacle"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is the outing?",
+      "options": [
+        "Saturday at 11 a.m.",
+        "Sunday at 7 p.m.",
+        "Friday at 8 p.m.",
+        "Sunday at 11 a.m."
+      ],
+      "answer": 3,
+      "explain": "The invitation says dimanche à 11 h.",
+      "promptFr": "INVITATION · Cabane à sucre · Dimanche à 11 h"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What activity is planned?",
+      "options": [
+        "An exhibition",
+        "Skating",
+        "A hike",
+        "A concert"
+      ],
+      "answer": 1,
+      "explain": "The notice says patinage.",
+      "promptFr": "PATINAGE · Samedi, 15 h · Patinoire du Parc"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "id": "a1-u14-grammar-c",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Grammar: present forms",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Present tense of aimer and préférer",
+      "headers": [
+        "Person",
+        "aimer",
+        "préférer"
+      ],
+      "rows": [
+        [
+          "je",
+          "aime",
+          "préfère"
+        ],
+        [
+          "tu",
+          "aimes",
+          "préfères"
+        ],
+        [
+          "il / elle / on",
+          "aime",
+          "préfère"
+        ],
+        [
+          "nous",
+          "aimons",
+          "préférons"
+        ],
+        [
+          "vous",
+          "aimez",
+          "préférez"
+        ],
+        [
+          "ils / elles",
+          "aiment",
+          "préfèrent"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "present forms",
+      "body": "• With aimer, remember: j'aime, tu aimes, elle aime, nous aimons, vous aimez, ils aiment.\n• With préférer, the accent is è in je préfère, tu préfères, il préfère, ils préfèrent. With nous and vous, write é: nous préférons, vous préférez.\n• Say the subject clearly. Several endings sound alike, so the subject tells you who likes the activity."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "I like hockey.",
+      "options": [
+        "Je suis aime le hockey.",
+        "J'aime un hockey.",
+        "J'aime le hockey.",
+        "Je aime du hockey."
+      ],
+      "answer": 2,
+      "explain": "Use j'aime + le for a general like. Je elides before aime: j'aime."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "I prefer music.",
+      "options": [
+        "Je préfère la musique.",
+        "Je préfère le musique.",
+        "Je préfères la musique.",
+        "Je préfère musique."
+      ],
+      "answer": 0,
+      "explain": "Musique is feminine; with je, use préfère."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "I like skating.",
+      "options": [
+        "J'aime patine.",
+        "Je aime patiner.",
+        "J'aime le patiner.",
+        "J'aime patiner."
+      ],
+      "answer": 3,
+      "explain": "Use the infinitive patiner after aimer."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "She prefers listening to music.",
+      "options": [
+        "Elle préférez écouter de la musique.",
+        "Elle préfère écouter de la musique.",
+        "Elle préfèrent écouter la musique.",
+        "Elle préfère écoute de la musique."
+      ],
+      "answer": 1,
+      "explain": "With elle, use préfère; the next verb stays in the infinitive écouter."
+    }
+  ]
+}

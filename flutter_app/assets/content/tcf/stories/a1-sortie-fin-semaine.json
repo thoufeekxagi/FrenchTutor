@@ -1,0 +1,214 @@
+{
+  "id": "a1-sortie-fin-semaine",
+  "title": "Une sortie en fin de semaine",
+  "titleEn": "A weekend outing",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Sam invites Nadia on a weekend outing to a Québec sugar shack.",
+  "unit": "a1-u14",
+  "sentences": [
+    {
+      "fr": "Sam propose une sortie en fin de semaine.",
+      "en": "Sam suggests an outing on the weekend."
+    },
+    {
+      "fr": "Il invite Nadia à une cabane à sucre dimanche.",
+      "en": "He invites Nadia to a sugar shack on Sunday."
+    },
+    {
+      "fr": "Nadia aime le sirop d'érable.",
+      "en": "Nadia likes maple syrup."
+    },
+    {
+      "fr": "Elle dit : « Oui, avec plaisir ! »",
+      "en": "She says: “Yes, gladly!”"
+    },
+    {
+      "fr": "Sam et Nadia vont à la cabane à sucre.",
+      "en": "Sam and Nadia go to the sugar shack."
+    },
+    {
+      "fr": "Nadia aime écouter de la musique.",
+      "en": "Nadia likes listening to music."
+    },
+    {
+      "fr": "Nadia préfère la musique.",
+      "en": "Nadia prefers music."
+    },
+    {
+      "fr": "La sortie est une activité de fin de semaine.",
+      "en": "The outing is a weekend activity."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a man's name)"
+    },
+    "propose": {
+      "en": "suggests (proposer)",
+      "pos": "verb",
+      "sound": "proh-POHZ"
+    },
+    "une": {
+      "en": "a"
+    },
+    "sortie": {
+      "en": "exit",
+      "sound": "sohR-TEE"
+    },
+    "en": {
+      "en": "on, during"
+    },
+    "fin": {
+      "en": "end"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "semaine": {
+      "en": "week, weekday period"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "invite": {
+      "en": "invites (inviter)",
+      "pos": "verb",
+      "sound": "a(n)-VEET"
+    },
+    "nadia": {
+      "en": "Nadia (a woman's name)"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "cabane": {
+      "en": "sugar shack",
+      "pos": "noun, feminine",
+      "sound": "kah-BAHN"
+    },
+    "sucre": {
+      "en": "sugar",
+      "pos": "noun, masculine",
+      "sound": "SÜKR"
+    },
+    "dimanche": {
+      "en": "on Sundays"
+    },
+    "aime": {
+      "en": "likes (aimer)",
+      "pos": "verb",
+      "sound": "ehm"
+    },
+    "le": {
+      "en": "the"
+    },
+    "sirop": {
+      "en": "syrup",
+      "pos": "noun, masculine",
+      "sound": "see-ROH"
+    },
+    "d'érable": {
+      "en": "of maple"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "dit": {
+      "en": "says",
+      "sound": "dee"
+    },
+    "oui": {
+      "en": "yes",
+      "sound": "wee"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "plaisir": {
+      "en": "pleasure",
+      "pos": "noun, masculine",
+      "sound": "pleh-ZEER"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "vont": {
+      "en": "go (aller)",
+      "pos": "verb",
+      "sound": "vohn"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "écouter": {
+      "en": "to listen",
+      "sound": "ay-koo-TAY"
+    },
+    "musique": {
+      "en": "music"
+    },
+    "préfère": {
+      "en": "prefers (préférer)",
+      "pos": "verb",
+      "sound": "pray-FEHR"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "activité": {
+      "en": "activity",
+      "pos": "noun, feminine",
+      "sound": "ahk-tee-vee-TAY"
+    }
+  },
+  "keywords": [
+    "sortie",
+    "cabane",
+    "sirop",
+    "musique",
+    "activité"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does Sam suggest?",
+      "options": [
+        "A museum exhibition",
+        "A hockey match",
+        "An outing to a sugar shack",
+        "A concert"
+      ],
+      "answer": 2,
+      "explain": "Sam proposes une sortie to a cabane à sucre."
+    },
+    {
+      "prompt": "When do Sam and Nadia go?",
+      "options": [
+        "On Sunday",
+        "On Friday",
+        "On Monday",
+        "On Tuesday"
+      ],
+      "answer": 0,
+      "explain": "Sam invites Nadia for dimanche."
+    },
+    {
+      "prompt": "What does Nadia prefer?",
+      "options": [
+        "Hockey",
+        "Skating",
+        "Theatre",
+        "Music"
+      ],
+      "answer": 3,
+      "explain": "The story says Nadia préfère la musique."
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "id": "a1-u14-words-2",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Words: sports and outdoor activities",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le hockey",
+      "en": "hockey",
+      "sound": "luh oh-KEH",
+      "exampleFr": "J'aime le hockey.",
+      "exampleEn": "I like hockey."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le patinage",
+      "en": "skating",
+      "sound": "luh pah-tee-NAHZH",
+      "exampleFr": "Le patinage est amusant.",
+      "exampleEn": "Skating is fun."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "patiner",
+      "en": "to skate",
+      "sound": "pah-tee-NAY",
+      "exampleFr": "Je préfère patiner.",
+      "exampleEn": "I prefer skating."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une patinoire",
+      "en": "an ice rink",
+      "sound": "ün pah-tee-NWAHR",
+      "exampleFr": "La patinoire est près du parc.",
+      "exampleEn": "The ice rink is near the park."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le ski",
+      "en": "skiing; a ski",
+      "sound": "luh skee",
+      "exampleFr": "J'aime le ski.",
+      "exampleEn": "I like skiing."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une randonnée",
+      "en": "a hike",
+      "sound": "ün rah(n)-doh-NAY",
+      "exampleFr": "La randonnée est samedi.",
+      "exampleEn": "The hike is on Saturday."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un sentier",
+      "en": "a trail",
+      "sound": "uh(n) sah(n)-TYAY",
+      "exampleFr": "Le sentier est dans le parc.",
+      "exampleEn": "The trail is in the park."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un match",
+      "en": "a game, match",
+      "sound": "uh(n) match",
+      "exampleFr": "Le match de hockey est à dix-neuf heures.",
+      "exampleEn": "The hockey game is at seven p.m."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "jouer",
+      "en": "to play",
+      "sound": "zhoo-AY",
+      "exampleFr": "Je joue au hockey.",
+      "exampleEn": "I play hockey."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le hockey",
+      "options": [
+        "an ice rink",
+        "hockey",
+        "a trail",
+        "skating"
+      ],
+      "answer": 1,
+      "explain": "le hockey means hockey."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le patinage",
+      "options": [
+        "skiing; a ski",
+        "a game, match",
+        "to skate",
+        "skating"
+      ],
+      "answer": 3,
+      "explain": "le patinage means skating."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "patiner",
+      "options": [
+        "a hike",
+        "to skate",
+        "to play",
+        "an ice rink"
+      ],
+      "answer": 1,
+      "explain": "patiner means to skate."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une patinoire",
+      "options": [
+        "a trail",
+        "hockey",
+        "skiing; a ski",
+        "an ice rink"
+      ],
+      "answer": 3,
+      "explain": "une patinoire means an ice rink."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le ski",
+      "options": [
+        "a game, match",
+        "skiing; a ski",
+        "skating",
+        "a hike"
+      ],
+      "answer": 1,
+      "explain": "le ski means skiing; a ski."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une randonnée",
+      "options": [
+        "to play",
+        "to skate",
+        "a trail",
+        "a hike"
+      ],
+      "answer": 3,
+      "explain": "une randonnée means a hike."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le patinage",
+      "question": "Which word did you hear?",
+      "options": [
+        "une patinoire",
+        "le patinage",
+        "une randonnée",
+        "un match"
+      ],
+      "answer": 1,
+      "explain": "You heard le patinage: skating."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le ski",
+      "question": "Which word did you hear?",
+      "options": [
+        "un sentier",
+        "le ski",
+        "jouer",
+        "le patinage"
+      ],
+      "answer": 1,
+      "explain": "You heard le ski: skiing; a ski."
+    }
+  ]
+}

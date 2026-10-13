@@ -1,0 +1,49 @@
+{
+  "id": "a1-u14-grammar-a",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Grammar: aimer and préférer with a noun",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "aimer and préférer with a noun",
+      "body": "Use aimer or préférer to say what you like or choose. Put a general activity noun after the verb with le, la or les. Put another verb in its infinitive form when you like doing an action."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use the definite article for a general like",
+      "headers": [
+        "Say",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "J'aime le hockey.",
+          "I like hockey."
+        ],
+        [
+          "J'aime la musique.",
+          "I like music."
+        ],
+        [
+          "Je préfère le patinage.",
+          "I prefer skating."
+        ],
+        [
+          "Je préfère les concerts.",
+          "I prefer concerts."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "aimer and préférer with a noun",
+      "body": "• For a general like or preference, use le, la or les before the activity noun: J'aime le hockey; j'aime la musique.\n• Use aimer to say what you like. Use préférer to say which of two or more choices you like more.\n• Do not copy the English pattern I like music word for word. In French, say J'aime la musique."
+    }
+  ]
+}

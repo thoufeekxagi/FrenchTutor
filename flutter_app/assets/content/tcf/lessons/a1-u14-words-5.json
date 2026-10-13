@@ -1,0 +1,209 @@
+{
+  "id": "a1-u14-words-5",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Words: weekend and local outings",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la fin de semaine",
+      "en": "the weekend (Québec/Canada)",
+      "sound": "lah fa(n) duh suh-MEN",
+      "exampleFr": "La fin de semaine, c'est samedi et dimanche.",
+      "exampleEn": "The weekend is Saturday and Sunday."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une cabane à sucre",
+      "en": "a Québec sugar shack",
+      "sound": "ün kah-BAHN ah SÜKR",
+      "exampleFr": "La cabane à sucre est ouverte.",
+      "exampleEn": "The sugar shack is open."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le sirop d'érable",
+      "en": "maple syrup",
+      "sound": "luh see-ROH day-RAHBL",
+      "exampleFr": "J'aime le sirop d'érable.",
+      "exampleEn": "I like maple syrup."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une activité",
+      "en": "an activity",
+      "sound": "ün ahk-tee-vee-TAY",
+      "exampleFr": "La randonnée est une activité.",
+      "exampleEn": "Hiking is an activity."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un événement",
+      "en": "an event",
+      "sound": "uh(n) ay-veh-nuh-MAH(N)",
+      "exampleFr": "L'événement est samedi.",
+      "exampleEn": "The event is on Saturday."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une exposition",
+      "en": "an exhibition",
+      "sound": "ün ehk-poh-zee-SYOH(N)",
+      "exampleFr": "L'exposition est au musée.",
+      "exampleEn": "The exhibition is at the museum."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un spectacle",
+      "en": "a show, performance",
+      "sound": "uh(n) spehk-TAHKL",
+      "exampleFr": "Le spectacle est à vingt heures.",
+      "exampleEn": "The show is at eight p.m."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une salle de spectacle",
+      "en": "a performance venue",
+      "sound": "ün sahl duh spehk-TAHKL",
+      "exampleFr": "La salle de spectacle est en ville.",
+      "exampleEn": "The performance venue is in town."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une fête",
+      "en": "a party, celebration",
+      "sound": "ün feht",
+      "exampleFr": "La fête est chez Nadia.",
+      "exampleEn": "The party is at Nadia's place."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la fin de semaine",
+      "options": [
+        "an activity",
+        "the weekend (Québec/Canada)",
+        "a show, performance",
+        "maple syrup"
+      ],
+      "answer": 1,
+      "explain": "la fin de semaine means the weekend (Québec/Canada)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une cabane à sucre",
+      "options": [
+        "an event",
+        "a performance venue",
+        "maple syrup",
+        "a Québec sugar shack"
+      ],
+      "answer": 3,
+      "explain": "une cabane à sucre means a Québec sugar shack."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le sirop d'érable",
+      "options": [
+        "an exhibition",
+        "maple syrup",
+        "a party, celebration",
+        "an activity"
+      ],
+      "answer": 1,
+      "explain": "le sirop d'érable means maple syrup."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une activité",
+      "options": [
+        "a show, performance",
+        "the weekend (Québec/Canada)",
+        "an event",
+        "an activity"
+      ],
+      "answer": 3,
+      "explain": "une activité means an activity."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un événement",
+      "options": [
+        "a performance venue",
+        "an event",
+        "a Québec sugar shack",
+        "an exhibition"
+      ],
+      "answer": 1,
+      "explain": "un événement means an event."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une exposition",
+      "options": [
+        "a party, celebration",
+        "maple syrup",
+        "a show, performance",
+        "an exhibition"
+      ],
+      "answer": 3,
+      "explain": "une exposition means an exhibition."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un événement",
+      "question": "Which word did you hear?",
+      "options": [
+        "un spectacle",
+        "un événement",
+        "une activité",
+        "une exposition"
+      ],
+      "answer": 1,
+      "explain": "You heard un événement: an event."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une exposition",
+      "question": "Which word did you hear?",
+      "options": [
+        "une fête",
+        "un événement",
+        "un spectacle",
+        "une exposition"
+      ],
+      "answer": 3,
+      "explain": "You heard une exposition: an exhibition."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "In Québec French, fin de semaine is the standard local expression for the weekend. You may also hear week-end. At a cabane à sucre, people can enjoy maple products and a seasonal outing; each venue sets its own dates and activities."
+    }
+  ]
+}

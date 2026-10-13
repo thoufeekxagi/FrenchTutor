@@ -1,0 +1,148 @@
+{
+  "id": "a1-u14-phrases",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Phrases",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Use a short invitation, then answer clearly. Add a day and time so both people know the plan."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Tu veux aller au concert vendredi ?",
+      "en": "Do you want to go to the concert on Friday?",
+      "tip": "Say it: tü vuh ah-LAY oh kohn-SEHR vah(n)-druh-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Tu veux aller patiner ?",
+      "en": "Do you want to go skating?",
+      "tip": "Say it: tü vuh ah-LAY pah-tee-NAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Oui, avec plaisir !",
+      "en": "Yes, gladly!",
+      "tip": "Say it: wee ah-vek pleh-ZEER"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Désolé, je ne peux pas samedi.",
+      "en": "Sorry, I can't on Saturday.",
+      "tip": "Say it: day-zoh-LAY zhuh nuh puh pah sahm-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je suis libre dimanche.",
+      "en": "I am free on Sunday.",
+      "tip": "Say it: zhuh swee leebr dee-MAH(N)sh"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "On va à la cabane à sucre.",
+      "en": "We are going to the sugar shack.",
+      "tip": "Say it: ohn vah ah lah kah-BAHN ah SÜKR"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "À quelle heure ?",
+      "en": "At what time?",
+      "tip": "Say it: ah kehl uhr"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Le match commence à dix-neuf heures.",
+      "en": "The game starts at seven p.m.",
+      "tip": "Say it: luh match koh-mah(n)s ah deez-nuhv uhr"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Je préfère regarder un film.",
+      "en": "I prefer watching a movie.",
+      "tip": "Say it: zhuh pray-FEHR ruh-gahr-DAY uh(n) feelm"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "On va au parc à quinze heures.",
+      "en": "We are going to the park at three p.m.",
+      "tip": "Say it: ohn vah oh park ah kah(n)z uhr"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Tu veux aller au concert vendredi ?",
+      "options": [
+        "Sorry, I can't on Saturday.",
+        "Do you want to go to the concert on Friday?",
+        "At what time?",
+        "We are going to the park at three p.m."
+      ],
+      "answer": 1,
+      "explain": "Tu veux aller au concert vendredi ? means Do you want to go to the concert on Friday?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Oui, avec plaisir !",
+      "options": [
+        "We are going to the sugar shack.",
+        "Yes, gladly!",
+        "I prefer watching a movie.",
+        "Do you want to go skating?"
+      ],
+      "answer": 1,
+      "explain": "Oui, avec plaisir ! means Yes, gladly!."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis libre dimanche.",
+      "options": [
+        "The game starts at seven p.m.",
+        "I am free on Sunday.",
+        "Do you want to go to the concert on Friday?",
+        "Sorry, I can't on Saturday."
+      ],
+      "answer": 1,
+      "explain": "Je suis libre dimanche. means I am free on Sunday.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "À quelle heure ?",
+      "options": [
+        "We are going to the park at three p.m.",
+        "At what time?",
+        "Yes, gladly!",
+        "We are going to the sugar shack."
+      ],
+      "answer": 1,
+      "explain": "À quelle heure ? means At what time?."
+    }
+  ]
+}

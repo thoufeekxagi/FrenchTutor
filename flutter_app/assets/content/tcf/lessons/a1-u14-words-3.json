@@ -1,0 +1,203 @@
+{
+  "id": "a1-u14-words-3",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Words: music and shows",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un instrument",
+      "en": "a musical instrument",
+      "sound": "uh(n) a(n)-strü-MAH(N)",
+      "exampleFr": "La guitare est un instrument.",
+      "exampleEn": "The guitar is an instrument."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la guitare",
+      "en": "guitar",
+      "sound": "lah gee-TAHR",
+      "exampleFr": "Je joue de la guitare.",
+      "exampleEn": "I play the guitar."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le piano",
+      "en": "piano",
+      "sound": "luh pee-ah-NOH",
+      "exampleFr": "J'aime le piano.",
+      "exampleEn": "I like the piano."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "chanter",
+      "en": "to sing",
+      "sound": "shah(n)-TAY",
+      "exampleFr": "J'aime chanter.",
+      "exampleEn": "I like singing."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "écouter",
+      "en": "to listen",
+      "sound": "ay-koo-TAY",
+      "exampleFr": "J'écoute de la musique.",
+      "exampleEn": "I listen to music."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un film",
+      "en": "a film, movie",
+      "sound": "uh(n) feelm",
+      "exampleFr": "Je préfère regarder un film.",
+      "exampleEn": "I prefer watching a movie."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une série",
+      "en": "a series, show",
+      "sound": "ün say-REE",
+      "exampleFr": "La série est drôle.",
+      "exampleEn": "The show is funny."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un concert",
+      "en": "a concert",
+      "sound": "uh(n) kohn-SEHR",
+      "exampleFr": "Le concert est vendredi soir.",
+      "exampleEn": "The concert is Friday evening."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un festival",
+      "en": "a festival",
+      "sound": "uh(n) fehs-tee-VAHL",
+      "exampleFr": "Le festival est en juin.",
+      "exampleEn": "The festival is in June."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un instrument",
+      "options": [
+        "to sing",
+        "a musical instrument",
+        "a series, show",
+        "guitar"
+      ],
+      "answer": 1,
+      "explain": "un instrument means a musical instrument."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la guitare",
+      "options": [
+        "to listen",
+        "a concert",
+        "piano",
+        "guitar"
+      ],
+      "answer": 3,
+      "explain": "la guitare means guitar."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le piano",
+      "options": [
+        "a film, movie",
+        "piano",
+        "a festival",
+        "to sing"
+      ],
+      "answer": 1,
+      "explain": "le piano means piano."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "chanter",
+      "options": [
+        "a series, show",
+        "a musical instrument",
+        "to listen",
+        "to sing"
+      ],
+      "answer": 3,
+      "explain": "chanter means to sing."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "écouter",
+      "options": [
+        "a concert",
+        "to listen",
+        "guitar",
+        "a film, movie"
+      ],
+      "answer": 1,
+      "explain": "écouter means to listen."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un film",
+      "options": [
+        "a festival",
+        "piano",
+        "a series, show",
+        "a film, movie"
+      ],
+      "answer": 3,
+      "explain": "un film means a film, movie."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "la guitare",
+      "question": "Which word did you hear?",
+      "options": [
+        "chanter",
+        "la guitare",
+        "un film",
+        "un concert"
+      ],
+      "answer": 1,
+      "explain": "You heard la guitare: guitar."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "écouter",
+      "question": "Which word did you hear?",
+      "options": [
+        "une série",
+        "écouter",
+        "un festival",
+        "la guitare"
+      ],
+      "answer": 1,
+      "explain": "You heard écouter: to listen."
+    }
+  ]
+}

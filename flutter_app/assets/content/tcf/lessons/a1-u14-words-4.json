@@ -1,0 +1,205 @@
+{
+  "id": "a1-u14-words-4",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Words: invite and reply",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "inviter",
+      "en": "to invite",
+      "sound": "a(n)-vee-TAY",
+      "exampleFr": "J'invite Nadia au concert.",
+      "exampleEn": "I invite Nadia to the concert."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une invitation",
+      "en": "an invitation",
+      "sound": "ün a(n)-vee-tah-SYOH(N)",
+      "exampleFr": "Merci pour l'invitation.",
+      "exampleEn": "Thank you for the invitation."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "proposer",
+      "en": "to suggest, propose",
+      "sound": "proh-poh-ZAY",
+      "exampleFr": "Sam propose une sortie.",
+      "exampleEn": "Sam suggests an outing."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une sortie",
+      "en": "an outing",
+      "sound": "ün sor-TEE",
+      "exampleFr": "La sortie est dimanche.",
+      "exampleEn": "The outing is on Sunday."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "accepter",
+      "en": "to accept",
+      "sound": "ahk-sehp-TAY",
+      "exampleFr": "J'accepte l'invitation.",
+      "exampleEn": "I accept the invitation."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "refuser",
+      "en": "to refuse, decline",
+      "sound": "ruh-fü-ZAY",
+      "exampleFr": "Je refuse poliment.",
+      "exampleEn": "I politely decline."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "occupé / occupée",
+      "en": "busy",
+      "say": "occupé, occupée",
+      "sound": "oh-kü-PAY",
+      "exampleFr": "Je suis occupée samedi.",
+      "exampleEn": "I am busy on Saturday."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "désolé / désolée",
+      "en": "sorry",
+      "say": "désolé, désolée",
+      "sound": "day-zoh-LAY",
+      "exampleFr": "Désolée, je ne peux pas.",
+      "exampleEn": "Sorry, I can't."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "avec plaisir",
+      "en": "with pleasure, gladly",
+      "sound": "ah-vek pleh-ZEER",
+      "exampleFr": "Oui, avec plaisir !",
+      "exampleEn": "Yes, gladly!"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "inviter",
+      "options": [
+        "an outing",
+        "to invite",
+        "busy",
+        "an invitation"
+      ],
+      "answer": 1,
+      "explain": "inviter means to invite."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une invitation",
+      "options": [
+        "to accept",
+        "sorry",
+        "to suggest, propose",
+        "an invitation"
+      ],
+      "answer": 3,
+      "explain": "une invitation means an invitation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "proposer",
+      "options": [
+        "to refuse, decline",
+        "to suggest, propose",
+        "with pleasure, gladly",
+        "an outing"
+      ],
+      "answer": 1,
+      "explain": "proposer means to suggest, propose."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une sortie",
+      "options": [
+        "busy",
+        "to invite",
+        "to accept",
+        "an outing"
+      ],
+      "answer": 3,
+      "explain": "une sortie means an outing."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "accepter",
+      "options": [
+        "sorry",
+        "to accept",
+        "an invitation",
+        "to refuse, decline"
+      ],
+      "answer": 1,
+      "explain": "accepter means to accept."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "refuser",
+      "options": [
+        "with pleasure, gladly",
+        "to suggest, propose",
+        "busy",
+        "to refuse, decline"
+      ],
+      "answer": 3,
+      "explain": "refuser means to refuse, decline."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une invitation",
+      "question": "Which word did you hear?",
+      "options": [
+        "une sortie",
+        "une invitation",
+        "refuser",
+        "inviter"
+      ],
+      "answer": 1,
+      "explain": "You heard une invitation: an invitation."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une sortie",
+      "question": "Which word did you hear?",
+      "options": [
+        "une sortie",
+        "refuser",
+        "inviter",
+        "proposer"
+      ],
+      "answer": 0,
+      "explain": "You heard une sortie: an outing."
+    }
+  ]
+}

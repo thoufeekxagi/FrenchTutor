@@ -1,0 +1,140 @@
+{
+  "id": "a1-u14-checkpoint",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Checkpoint",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does un loisir mean?",
+      "options": [
+        "An appointment",
+        "A forecast",
+        "A hobby",
+        "A job"
+      ],
+      "answer": 2,
+      "explain": "Un loisir is a hobby or leisure activity."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which sentence means “I like hockey”?",
+      "options": [
+        "J'aime le hockey.",
+        "J'aime du hockey.",
+        "Je aime le hockey.",
+        "Je suis aime hockey."
+      ],
+      "answer": 0,
+      "explain": "Use j'aime + le for a general like."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Je ___ la musique. (préférer)",
+      "options": [
+        "préférez",
+        "préférons",
+        "préfèrent",
+        "préfère"
+      ],
+      "answer": 3,
+      "explain": "With je, use préfère."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Elle préfère ___ un film.",
+      "options": [
+        "regardons",
+        "regarder",
+        "regarde",
+        "regardes"
+      ],
+      "answer": 1,
+      "explain": "Use the infinitive regarder after préfère."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does une patinoire mean?",
+      "options": [
+        "A concert",
+        "A sugar shack",
+        "An ice rink",
+        "A trail"
+      ],
+      "answer": 2,
+      "explain": "Une patinoire is an ice rink."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does avec plaisir mean?",
+      "options": [
+        "Gladly, with pleasure",
+        "I am busy",
+        "I decline",
+        "At what time?"
+      ],
+      "answer": 0,
+      "explain": "Avec plaisir is a warm way to accept."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Which phrase means “the weekend” in Québec/Canada?",
+      "options": [
+        "La salle de spectacle",
+        "Le temps libre",
+        "La prochaine réunion",
+        "La fin de semaine"
+      ],
+      "answer": 3,
+      "explain": "Fin de semaine is the standard local term for the weekend."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What is a cabane à sucre?",
+      "options": [
+        "A pharmacy",
+        "A Québec sugar shack",
+        "An ice rink",
+        "A music class"
+      ],
+      "answer": 1,
+      "explain": "A cabane à sucre is a sugar shack associated with maple season."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What does Désolée, je ne peux pas mean?",
+      "options": [
+        "I prefer skating",
+        "Let's go to the concert",
+        "Sorry, I can't",
+        "Yes, gladly"
+      ],
+      "answer": 2,
+      "explain": "The speaker politely says she cannot."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which sentence makes a simple plan for Sunday?",
+      "options": [
+        "On va patiner dimanche.",
+        "On vais patiner dimanche.",
+        "On va patines dimanche.",
+        "On est patiner dimanche."
+      ],
+      "answer": 0,
+      "explain": "With on, use va + infinitive: on va patiner."
+    }
+  ]
+}

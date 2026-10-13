@@ -1,0 +1,80 @@
+{
+  "id": "a1-u14-reading",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Reading practice",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What time is the concert?",
+      "options": [
+        "3 p.m.",
+        "9 p.m.",
+        "7 p.m.",
+        "11 a.m."
+      ],
+      "answer": 2,
+      "explain": "The poster says 19 h.",
+      "promptFr": "FESTIVAL DE MUSIQUE · Samedi · Concert à 19 h · Salle du Parc"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What outing is advertised?",
+      "options": [
+        "A sugar shack",
+        "A hockey game",
+        "A school class",
+        "A clinic visit"
+      ],
+      "answer": 0,
+      "explain": "The poster is for a cabane à sucre.",
+      "promptFr": "CABANE À SUCRE · Dimanche · Sortie en famille · Sirop d'érable"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What activity can visitors do?",
+      "options": [
+        "Ski",
+        "Listen to a concert",
+        "Visit an exhibition",
+        "Skate"
+      ],
+      "answer": 3,
+      "explain": "The poster says patinage libre.",
+      "promptFr": "PATINOIRE · Vendredi, 18 h · Patinage libre"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where is the exhibition?",
+      "options": [
+        "At the school",
+        "At the museum",
+        "At the sugar shack",
+        "At the rink"
+      ],
+      "answer": 1,
+      "explain": "The notice names Musée du Centre.",
+      "promptFr": "EXPOSITION · Musée du Centre · Ouverte dimanche"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What activity is planned?",
+      "options": [
+        "A board game",
+        "A hockey match",
+        "A hike on the trail",
+        "A concert"
+      ],
+      "answer": 2,
+      "explain": "The notice says randonnée sur le sentier.",
+      "promptFr": "SORTIE · Randonnée sur le sentier · Samedi à 10 h"
+    }
+  ]
+}

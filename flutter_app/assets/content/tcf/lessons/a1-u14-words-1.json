@@ -1,0 +1,203 @@
+{
+  "id": "a1-u14-words-1",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Words: hobbies",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un loisir",
+      "en": "a hobby, leisure activity",
+      "sound": "uh(n) lwah-ZEER",
+      "exampleFr": "La lecture est un loisir.",
+      "exampleEn": "Reading is a hobby."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le temps libre",
+      "en": "free time",
+      "sound": "luh tah(n) leebr",
+      "exampleFr": "J'ai du temps libre samedi.",
+      "exampleEn": "I have free time on Saturday."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "aimer",
+      "en": "to like, love",
+      "sound": "ay-MAY",
+      "exampleFr": "J'aime la musique.",
+      "exampleEn": "I like music."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "préférer",
+      "en": "to prefer",
+      "sound": "pray-fay-RAY",
+      "exampleFr": "Je préfère la danse.",
+      "exampleEn": "I prefer dancing."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la lecture",
+      "en": "reading",
+      "sound": "lah lehk-TÜR",
+      "exampleFr": "J'aime la lecture.",
+      "exampleEn": "I like reading."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la musique",
+      "en": "music",
+      "sound": "lah mü-ZEEK",
+      "exampleFr": "J'écoute de la musique.",
+      "exampleEn": "I listen to music."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le dessin",
+      "en": "drawing",
+      "sound": "luh deh-SA(N)",
+      "exampleFr": "Le dessin est un loisir.",
+      "exampleEn": "Drawing is a hobby."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la danse",
+      "en": "dance, dancing",
+      "sound": "lah dah(n)s",
+      "exampleFr": "J'aime la danse.",
+      "exampleEn": "I like dancing."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "le théâtre",
+      "en": "theatre",
+      "sound": "luh tay-AHTR",
+      "exampleFr": "J'aime le théâtre.",
+      "exampleEn": "I like theatre."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un loisir",
+      "options": [
+        "to prefer",
+        "a hobby, leisure activity",
+        "drawing",
+        "free time"
+      ],
+      "answer": 1,
+      "explain": "un loisir means a hobby, leisure activity."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le temps libre",
+      "options": [
+        "reading",
+        "dance, dancing",
+        "to like, love",
+        "free time"
+      ],
+      "answer": 3,
+      "explain": "le temps libre means free time."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "aimer",
+      "options": [
+        "music",
+        "to like, love",
+        "theatre",
+        "to prefer"
+      ],
+      "answer": 1,
+      "explain": "aimer means to like, love."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "préférer",
+      "options": [
+        "drawing",
+        "a hobby, leisure activity",
+        "reading",
+        "to prefer"
+      ],
+      "answer": 3,
+      "explain": "préférer means to prefer."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la lecture",
+      "options": [
+        "dance, dancing",
+        "reading",
+        "free time",
+        "music"
+      ],
+      "answer": 1,
+      "explain": "la lecture means reading."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la musique",
+      "options": [
+        "theatre",
+        "to like, love",
+        "drawing",
+        "music"
+      ],
+      "answer": 3,
+      "explain": "la musique means music."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "aimer",
+      "question": "Which word did you hear?",
+      "options": [
+        "la lecture",
+        "aimer",
+        "le dessin",
+        "le théâtre"
+      ],
+      "answer": 1,
+      "explain": "You heard aimer: to like, love."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "la lecture",
+      "question": "Which word did you hear?",
+      "options": [
+        "la lecture",
+        "le dessin",
+        "le théâtre",
+        "aimer"
+      ],
+      "answer": 0,
+      "explain": "You heard la lecture: reading."
+    }
+  ]
+}

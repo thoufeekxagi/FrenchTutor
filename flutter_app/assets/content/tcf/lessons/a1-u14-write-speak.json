@@ -1,0 +1,35 @@
+{
+  "id": "a1-u14-write-speak",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Write and speak",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Reply to a friend",
+      "body": "Write 3 or 4 short lines. Accept or decline an invitation, then give one day or time that works for you.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Salut Sam. Oui, avec plaisir ! Je suis libre samedi. On va à la patinoire à quinze heures ? À bientôt !\n\nCheck:\n• Say whether you accept or decline.\n• Use avec plaisir or désolé(e).\n• Give a clear day or time."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Talk about a free-time plan",
+      "body": "Say one activity you like, invite a friend to do something, and agree on a day and time.\n\n• Use j'aime or je préfère with a noun or infinitive.\n• Ask a friendly invitation question.\n• Repeat the day and time clearly."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "J'aime le hockey et je préfère patiner. Tu veux aller à la patinoire samedi à quinze heures ?",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

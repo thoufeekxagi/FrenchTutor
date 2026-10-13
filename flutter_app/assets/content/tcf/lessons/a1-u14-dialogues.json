@@ -1,0 +1,132 @@
+{
+  "id": "a1-u14-dialogues",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Dialogues",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Use tu with a friend. One person suggests an activity; the other accepts or declines and gives a clear alternative or time."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "An invitation to skate",
+      "body": "Sam invites Nadia to the rink.",
+      "examples": [
+        {
+          "fr": "Salut Nadia. Tu veux aller patiner vendredi soir ?",
+          "en": "Sam: Hi, Nadia. Do you want to go skating Friday evening?"
+        },
+        {
+          "fr": "Oui, avec plaisir ! À quelle heure ?",
+          "en": "Nadia: Yes, gladly! At what time?"
+        },
+        {
+          "fr": "À dix-neuf heures. La patinoire est près du parc.",
+          "en": "Sam: At seven p.m. The rink is near the park."
+        },
+        {
+          "fr": "D'accord. Je préfère patiner.",
+          "en": "Nadia: Okay. I prefer skating."
+        },
+        {
+          "fr": "Moi aussi. On va à la patinoire.",
+          "en": "Sam: Me too. We are going to the rink."
+        },
+        {
+          "fr": "À vendredi !",
+          "en": "Nadia: See you Friday!"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A weekend plan",
+      "body": "Julie suggests an outing to a sugar shack.",
+      "examples": [
+        {
+          "fr": "Tu es libre dimanche ?",
+          "en": "Julie: Are you free Sunday?"
+        },
+        {
+          "fr": "Oui. Qu'est-ce que tu veux faire ?",
+          "en": "Sam: Yes. What do you want to do?"
+        },
+        {
+          "fr": "Tu veux aller à une cabane à sucre ?",
+          "en": "Julie: Do you want to go to a sugar shack?"
+        },
+        {
+          "fr": "Avec plaisir ! J'aime le sirop d'érable.",
+          "en": "Sam: Gladly! I like maple syrup."
+        },
+        {
+          "fr": "On va à la cabane à sucre à onze heures.",
+          "en": "Julie: We are going to the sugar shack at eleven o'clock."
+        },
+        {
+          "fr": "D'accord. À dimanche !",
+          "en": "Sam: Okay. See you Sunday!"
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does Sam invite Nadia to do?",
+      "options": [
+        "Go to a hockey game",
+        "Go to a concert",
+        "Go skating",
+        "Go skiing"
+      ],
+      "answer": 2,
+      "explain": "Sam asks Tu veux aller patiner ?"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What time will Sam and Nadia meet?",
+      "options": [
+        "At 19 h",
+        "At 11 h",
+        "At noon",
+        "At 16 h"
+      ],
+      "answer": 0,
+      "explain": "Sam says à dix-neuf heures."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What outing does Julie suggest?",
+      "options": [
+        "A concert",
+        "An exhibition",
+        "A hockey game",
+        "A trip to a sugar shack"
+      ],
+      "answer": 3,
+      "explain": "Julie proposes going to une cabane à sucre."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Sam like?",
+      "options": [
+        "Theatre",
+        "Maple syrup",
+        "The piano",
+        "Skating"
+      ],
+      "answer": 1,
+      "explain": "Sam says J'aime le sirop d'érable."
+    }
+  ]
+}

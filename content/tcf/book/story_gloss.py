@@ -31,6 +31,8 @@ STORY_META = {
                    keywords=["travail", "l'autobus", "bureau", "gérante", "manteau", "premier"]),
     "a1-u13": dict(id="a1-rendez-vous-clinique", minutes=3, summary="Samira checks in at a clinic and describes a headache and fever.",
                    keywords=["rendez-vous", "clinique", "salle", "carte", "tête", "fièvre"]),
+    "a1-u14": dict(id="a1-sortie-fin-semaine", minutes=3, summary="Sam invites Nadia on a weekend outing to a Québec sugar shack.",
+                   keywords=["sortie", "cabane", "sirop", "musique", "activité"]),
 }
 
 STORY_GLOSS = {
@@ -209,6 +211,20 @@ STORY_GLOSS = {
         "réceptionniste": ("receptionist", "noun", "ray-sehp-syoh-NEEST"),
         "sa": ("her",), "salle": ("room", "noun, feminine", "sal"),
         "samira": ("Samira (a woman's name)",), "son": ("her (masculine noun)",), "un": ("a",),
+    },
+    "a1-sortie-fin-semaine": {
+        "activité": ("activity", "noun, feminine", "ahk-tee-vee-TAY"),
+        "aime": ("likes (aimer)", "verb", "ehm"),
+        "cabane": ("sugar shack", "noun, feminine", "kah-BAHN"),
+        "d'érable": ("of maple",), "de": ("of; some",), "en": ("on, during",),
+        "est": ("is (être)", "verb"), "invite": ("invites (inviter)", "verb", "a(n)-VEET"),
+        "le": ("the",), "nadia": ("Nadia (a woman's name)",),
+        "plaisir": ("pleasure", "noun, masculine", "pleh-ZEER"),
+        "propose": ("suggests (proposer)", "verb", "proh-POHZ"),
+        "préfère": ("prefers (préférer)", "verb", "pray-FEHR"),
+        "sam": ("Sam (a man's name)",), "sirop": ("syrup", "noun, masculine", "see-ROH"),
+        "sucre": ("sugar", "noun, masculine", "SÜKR"), "une": ("a",),
+        "vont": ("go (aller)", "verb", "vohn"),
     },
     "a1-hiver-montreal": {
         "ce": ("this",), "matin": ("morning", "noun, masculine", "mah-TA(N)"),

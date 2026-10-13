@@ -1,0 +1,43 @@
+{
+  "id": "a1-u14-grammar-b",
+  "unit": "a1-u14",
+  "unitTitle": "Free time and simple plans",
+  "title": "Grammar: aimer and préférer with an infinitive",
+  "subtitle": "Unit 14: Free time and simple plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use the infinitive for an activity verb",
+      "headers": [
+        "Say",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "J'aime patiner.",
+          "I like skating."
+        ],
+        [
+          "Tu aimes chanter.",
+          "You like singing."
+        ],
+        [
+          "Elle préfère écouter de la musique.",
+          "She prefers listening to music."
+        ],
+        [
+          "Nous aimons jouer au hockey.",
+          "We like playing hockey."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "aimer and préférer with an infinitive",
+      "body": "• After aimer or préférer, keep the next action in the infinitive: aimer patiner; préférer regarder un film.\n• In J'aime écouter, aime changes for the person, but écouter stays in its dictionary form.\n• A noun names the thing you like; an infinitive names the activity you like doing."
+    }
+  ]
+}
