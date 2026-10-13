@@ -43,3 +43,8 @@ server/*.db
 /docs/v3/design/*.pdf
 /flutter_app/artifacts/look/
 /flutter_app/artifacts/peek/
+/flutter_app/artifacts/e2e_all/
+/flutter_app/artifacts/refpeek/
+/flutter_app/artifacts/glance/
+/flutter_app/artifacts/bookpeek/
+/content/tcf/book/__pycache__/
