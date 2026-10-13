@@ -140,7 +140,20 @@ class GeminiLiveService {
   // click, or the gap between two words.
   static const _liveTutorSilenceDurationMs = 1800;
 
-  int get _contextCompressionTriggerTokens => liveTutorMode || isTrial
+  // Lesson coach: enough room for a short back-and-forth about the current
+  // card (a minute or so of speech), small enough that later turns stay cheap.
+  static const _lessonCoachCompressionTriggerTokens = 3000;
+  static const _lessonCoachCompressionTargetTokens = 1500;
+  // Google's default end-of-speech wait is tuned for fast assistants. A learner
+  // forming a French sentence pauses longer, but this app's old 2.5 second
+  // default makes the tutor feel slow and absent.
+  static const _lessonCoachSilenceDurationMs = 1300;
+
+  bool get _isLessonCoach => sessionType == LiveSessionType.lessonCoach;
+
+  int get _contextCompressionTriggerTokens => _isLessonCoach
+      ? _lessonCoachCompressionTriggerTokens
+      : liveTutorMode || isTrial
       ? (liveTutorMode
             ? _liveTutorCompressionTriggerTokens
             : _trialCompressionTriggerTokens)
@@ -154,7 +167,9 @@ class GeminiLiveService {
             : _compactGuidedCompressionTriggerTokens
       : _defaultContextCompressionTriggerTokens;
 
-  int get _contextCompressionTargetTokens => liveTutorMode || isTrial
+  int get _contextCompressionTargetTokens => _isLessonCoach
+      ? _lessonCoachCompressionTargetTokens
+      : liveTutorMode || isTrial
       ? (liveTutorMode
             ? _liveTutorCompressionTargetTokens
             : _trialCompressionTargetTokens)
@@ -632,6 +647,16 @@ class GeminiLiveService {
       // learner turn.
       return LivePrompts.compactOnboardingCalibration(persona: _persona);
     }
+    if (_isLessonCoach) {
+      var coachPrompt = LivePrompts.compactLessonCoach(persona: _persona);
+      final ctx = lessonContext;
+      if (ctx != null && ctx.trim().isNotEmpty) {
+        coachPrompt +=
+            '\n\nCURRENT APP STEP (latest screen):\n'
+            '${_boundDynamicContext(ctx, _lessonContextLimit)}';
+      }
+      return coachPrompt;
+    }
     if (compactGuidedContext &&
         (sessionType == LiveSessionType.speakingGuided ||
             sessionType == LiveSessionType.vocabStage ||
@@ -789,7 +814,7 @@ class GeminiLiveService {
         : '(Note de contexte silencieuse pour toi, ne réponds pas directement à '
               'ceci, utilise-le seulement pour orienter la suite de la conversation) : $note';
     if (expectReply) {
-      if (liveTutorMode) {
+      if (liveTutorMode || _isLessonCoach) {
         // Keep app-directed Live tutor turns deterministic and complete. A
         // realtime text note without an explicit boundary can leave the model
         // waiting for the learner's microphone turn.
@@ -854,7 +879,13 @@ class GeminiLiveService {
     if (tools.isNotEmpty) {
       generationConfig['temperature'] = 0.65;
     }
-    if (liveTutorMode) {
+    if (_isLessonCoach) {
+      // A safety ceiling, not a target: the prompt decides how long a reply
+      // is. 1000 audio tokens is about 40 seconds of speech, enough for a full
+      // spoken explanation without ever cutting her off mid-sentence.
+      generationConfig['maxOutputTokens'] = 1000;
+      generationConfig['thinkingConfig'] = {'thinkingLevel': 'minimal'};
+    } else if (liveTutorMode) {
       // Live API setup config cannot change on an open socket. Keep a hard
       // safety ceiling high enough for a complete spoken explanation (audio
       // output is tokenized over time); the prompt keeps ordinary replies short
@@ -891,7 +922,9 @@ class GeminiLiveService {
           'startOfSpeechSensitivity': 'START_SENSITIVITY_LOW',
           'endOfSpeechSensitivity': 'END_SENSITIVITY_LOW',
           'prefixPaddingMs': 300,
-          'silenceDurationMs': liveTutorMode
+          'silenceDurationMs': _isLessonCoach
+              ? _lessonCoachSilenceDurationMs
+              : liveTutorMode
               ? _liveTutorSilenceDurationMs
               : 2500,
         },

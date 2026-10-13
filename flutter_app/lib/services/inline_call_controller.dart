@@ -38,6 +38,7 @@ class InlineCallController {
     this.onUserTranscript,
     this.onTutorTranscript,
     this.onTurnComplete,
+    this.onTutorTranscriptDelta,
     this.tools = const [],
     this.onToolCall,
     this.manualLearnerTurns = false,
@@ -72,6 +73,11 @@ class InlineCallController {
   final void Function(String text)? onUserTranscript;
   final void Function(String text)? onTutorTranscript;
   final VoidCallback? onTurnComplete;
+
+  /// Marie's words as they are spoken, a few at a time, before the turn ends.
+  /// Hosts that show a live caption use this; [onTutorTranscript] only fires
+  /// once the whole turn is complete.
+  final void Function(String delta)? onTutorTranscriptDelta;
 
   /// Optional structured events emitted by Gemini during a Live turn.
   final List<AgentTool> tools;
@@ -405,6 +411,8 @@ class InlineCallController {
     g.onTranscriptDelta = (delta) {
       if (!_isCurrentGeneration(generation)) return;
       _externalNarrationTranscript?.call(delta);
+      if (_externalNarrationCompletion == null)
+        onTutorTranscriptDelta?.call(delta);
     };
     g.onInterrupted = () {
       if (!_isCurrentGeneration(generation)) return;

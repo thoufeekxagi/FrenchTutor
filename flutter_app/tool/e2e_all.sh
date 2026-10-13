@@ -27,6 +27,7 @@ TESTS=(
   "v3_lesson_test.dart|--dart-define=E2E_SHELL=true|600"
   "v3_course_walk_test.dart|--dart-define=E2E_SHELL=true ${WALK_ONLY_DEFINE}|${WALK_MAX}"
   "v3_resume_test.dart|--dart-define=E2E_SHELL=true|600"
+  "v3_marie_test.dart|--dart-define=E2E_SHELL=true --dart-define=E2E_FAKE_AUDIO=true --dart-define=E2E_MARIE_IDLE_SECONDS=6|600"
   "v3_story_test.dart|--dart-define=E2E_SHELL=true --dart-define=E2E_FAKE_AUDIO=true|900"
 )
 

@@ -63,7 +63,12 @@ void main() {
     await probe.capture(tester, '02_explain');
     expect(await texts(tester), contains('Silent letters'));
     var l = await labels(tester);
-    expect(l, containsAll(['Hear petit', 'Ask Marie', 'Close lesson']));
+    expect(l, containsAll(['Hear petit', 'Close lesson']));
+    expect(
+      l.any((x) => x.startsWith('Talk to ')),
+      isTrue,
+      reason: 'the call button is missing',
+    );
     await press(tester, 'Continue');
 
     // Word steps.

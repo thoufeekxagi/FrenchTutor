@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../design/app_router.dart';
 import '../../design/tokens.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
-import '../../screens/speak/speaking_practice_screen.dart';
 import '../../widgets/adaptive/adaptive.dart' show PSHaptics;
 import '../../widgets/tts_play_button.dart';
+import '../marie/v3_marie_dock.dart';
+import '../marie/v3_marie_session.dart';
 import '../ui/v3_ui.dart';
 import 'v3_course.dart';
 import 'v3_lesson.dart';
@@ -28,18 +28,67 @@ import 'v3_lesson.dart';
 /// selected tutor's voice (saved after it is made once). Ask Marie opens the
 /// live tutor with the current step as context.
 class V3LessonPlayer extends ConsumerStatefulWidget {
-  const V3LessonPlayer({super.key, required this.lesson, this.startAt = 0});
+  const V3LessonPlayer({
+    super.key,
+    required this.lesson,
+    this.startAt = 0,
+    @visibleForTesting this.marie,
+  });
 
   final V3Lesson lesson;
 
   /// Step to start from when the learner left this lesson half way.
   final int startAt;
 
+  /// Tests pass a scripted Marie. Production builds the real one.
+  final V3MarieSession? marie;
+
   @override
   ConsumerState<V3LessonPlayer> createState() => _V3LessonPlayerState();
 }
 
-class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
+class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
+    with WidgetsBindingObserver {
+  late final V3MarieSession _marie;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _marie =
+        widget.marie ??
+        V3MarieSession.create(
+          store: () => ref.read(learningStoreProvider),
+          context: _marieContext,
+        );
+    _marie.addListener(_onMarie);
+  }
+
+  void _onMarie() {
+    if (!mounted) return;
+    setState(() {});
+    final note = _marie.endedNote;
+    if (note != null) {
+      _marie.clearEndedNote();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(note)));
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) =>
+      _marie.handleLifecycle(state);
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _marie.removeListener(_onMarie);
+    // A scripted Marie passed in by a test belongs to the test.
+    if (widget.marie == null) _marie.dispose();
+    super.dispose();
+  }
+
   late int _index = widget.startAt.clamp(0, widget.lesson.steps.length - 1);
   var _lastAdvance = DateTime.fromMillisecondsSinceEpoch(0);
   int? _selected;
@@ -83,6 +132,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
     }
     correct ? PSHaptics.success() : HapticFeedback.heavyImpact();
     setState(() => _checked = true);
+    _marie.screenUpdated();
   }
 
   void _next() {
@@ -94,6 +144,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
     _lastAdvance = now;
     if (_index == _lesson.steps.length - 1) {
       unawaited(V3Progress.markDone(_lesson.id));
+      unawaited(_marie.end());
       setState(() => _complete = true);
       return;
     }
@@ -103,64 +154,72 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
       _checked = false;
     });
     unawaited(V3Progress.savePosition(_lesson.id, _index));
+    _marie.screenChanged();
   }
 
+  /// What Marie knows about the screen, replaced on every step. Small on
+  /// purpose: it is re-sent whenever the step changes.
   String _marieContext() {
-    final b = StringBuffer('LESSON: ${_lesson.title}. ');
+    String cut(String v, [int max = 700]) =>
+        v.length <= max ? v : '${v.substring(0, max)}...';
+    final level = LivePrompts.normalizeLevel(
+      ref.read(learningStoreProvider).profile().level,
+    );
+    final b = StringBuffer(
+      'LEARNER LEVEL: $level. LESSON: ${_lesson.title} '
+      '(step ${_index + 1} of ${_lesson.steps.length}). ',
+    );
     switch (_step) {
       case V3ExplainStep s:
-        b.write('CURRENT STEP (explanation): ${s.title}. ${s.body}');
+        b.write('ON SCREEN (explanation): ${s.title}. ${cut(s.body)}');
+        if (s.examples.isNotEmpty) {
+          b.write(
+            ' Examples: ${s.examples.take(6).map((e) => '${e.fr} = ${e.en}').join('; ')}.',
+          );
+        }
       case V3WordStep s:
-        b.write('CURRENT STEP (new word): "${s.fr}" means "${s.en}".');
-        if (s.exampleFr.isNotEmpty) b.write(' Example: ${s.exampleFr}');
+        b.write('ON SCREEN (new word): "${s.fr}" means "${s.en}".');
+        if (s.sound.isNotEmpty) b.write(' Sound guide shown: ${s.sound}.');
+        if (s.exampleFr.isNotEmpty) {
+          b.write(' Example shown: ${s.exampleFr} (${s.exampleEn}).');
+        }
       case V3PhraseStep s:
-        b.write('CURRENT STEP (phrase to say): "${s.fr}" means "${s.en}".');
+        b.write(
+          'ON SCREEN (phrase to say aloud): "${s.fr}" means "${s.en}". '
+          'If the learner says it, give pronunciation feedback.',
+        );
       case V3TableStep s:
         b.write(
-          'CURRENT STEP (reference table): ${s.title}. Columns: ${s.headers.join(', ')}. First rows: ${s.rows.take(6).map((r) => r.join(' | ')).join('; ')}.',
+          'ON SCREEN (reference table): ${s.title}. Columns: ${s.headers.join(', ')}. '
+          'Rows: ${s.rows.take(8).map((r) => r.join(' | ')).join('; ')}.',
         );
       case V3ChooseStep s:
         b.write(
-          'CURRENT STEP (question): ${s.prompt} ${s.promptFr}. Options: ${s.options.join(' / ')}.',
+          'ON SCREEN (question): ${s.prompt} ${s.promptFr}. '
+          'Options: ${s.options.join(' / ')}. ',
         );
-        if (_checked) {
-          b.write(' The correct answer is: ${s.options[s.answer]}.');
-        }
+        b.write(
+          _checked
+              ? 'ANSWERED: the learner chose "${s.options[_selected ?? 0]}"; the '
+                    'correct answer is "${s.options[s.answer]}". You may explain.'
+              : 'NOT ANSWERED YET: do not reveal the answer; hint or explain the rule.',
+        );
       case V3ListenStep s:
         b.write(
-          'CURRENT STEP (listening question): ${s.question} Options: ${s.options.join(' / ')}.',
+          'ON SCREEN (listening question): ${s.question} '
+          'Options: ${s.options.join(' / ')}. ',
         );
-        if (_checked) b.write(' The audio said: "${s.fr}".');
+        b.write(
+          _checked
+              ? 'ANSWERED: the audio said "${s.fr}"; the correct answer is '
+                    '"${s.options[s.answer]}". You may explain.'
+              : 'NOT ANSWERED YET: do not reveal the audio text or the answer.',
+        );
     }
-    b.write(
-      ' Help the learner with this step. Do not reveal an unanswered quiz answer.',
-    );
     return b.toString();
   }
 
-  Future<void> _askMarie() async {
-    final level = ref.read(learningStoreProvider).profile().level;
-    await AppRouter.push<Object?>(
-      context,
-      (_) => SpeakingPracticeScreen(
-        autoStart: true,
-        request: SpeakingPracticeRequest(
-          mode: SpeakingMode.freeTalk,
-          topic: _lesson.title,
-          level: LivePrompts.normalizeLevel(level),
-          goal: 'tef_canada',
-          durationMinutes: 5,
-          lessonContext: _marieContext(),
-          stage: 'lesson',
-          sessionTopic: 'Lesson: ${_lesson.title}',
-          kickoffMessage:
-              'I am in the middle of a lesson. Help me with the current step in simple English, with the French spoken clearly.',
-          popResultImmediately: true,
-        ),
-      ),
-      fullscreenDialog: true,
-    );
-  }
+  void _toggleMarie() => unawaited(_marie.toggle(context));
 
   @override
   Widget build(BuildContext context) {
@@ -199,34 +258,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
                 child: V3Segments(count: _lesson.steps.length, current: _index),
               ),
               const SizedBox(width: 14),
-              V3Pressable(
-                key: const ValueKey('lesson.askMarie'),
-                label: 'Ask Marie',
-                onTap: _askMarie,
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: DesignTokens.primarySoft,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.mic_rounded,
-                        size: 18,
-                        color: DesignTokens.primary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Ask Marie',
-                        textScaler: const TextScaler.linear(1),
-                        style: V3Type.strong(13.5, DesignTokens.primary),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              V3MarieCallButton(session: _marie, onTap: _toggleMarie),
             ],
           ),
         ),
@@ -251,6 +283,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer> {
             ),
           ),
         ),
+        V3MarieDock(session: _marie),
         _bottomBar(),
       ],
     );
