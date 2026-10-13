@@ -1,0 +1,80 @@
+{
+  "id": "a1-u11-reading",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Reading practice",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the low today?",
+      "options": [
+        "Minus 2 degrees",
+        "Minus 20 degrees",
+        "Minus 12 degrees",
+        "12 degrees"
+      ],
+      "answer": 2,
+      "explain": "The minus sign and 12 give minus twelve degrees.",
+      "promptFr": "MONTRÉAL · Aujourd'hui : neige et vent · Minimum : -12 degrés"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the high?",
+      "options": [
+        "3 degrees",
+        "Minus 4 degrees",
+        "4 degrees",
+        "Minus 3 degrees"
+      ],
+      "answer": 0,
+      "explain": "The maximum is 3 degrees.",
+      "promptFr": "BULLETIN MÉTÉO · Maximum : 3 degrés · Minimum : -4 degrés"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What condition is mentioned?",
+      "options": [
+        "Heavy rain",
+        "A snowstorm",
+        "Strong sunshine",
+        "Ice on the sidewalk"
+      ],
+      "answer": 3,
+      "explain": "The notice says verglas sur le trottoir.",
+      "promptFr": "AVERTISSEMENT · Verglas sur le trottoir"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What should the reader take?",
+      "options": [
+        "Winter boots",
+        "An umbrella",
+        "A shovel",
+        "A tuque"
+      ],
+      "answer": 1,
+      "explain": "The notice says Prenez un parapluie.",
+      "promptFr": "PRÉVISION · Demain : pluie · Prenez un parapluie"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is the air temperature?",
+      "options": [
+        "12 degrees",
+        "20 degrees",
+        "Minus 12 degrees",
+        "Minus 20 degrees"
+      ],
+      "answer": 2,
+      "explain": "The line Température de l'air gives minus 12 degrees; the feels-like value is minus 20 degrees.",
+      "promptFr": "TEMPÉRATURE RESSENTIE · -20 degrés · Température de l'air : -12 degrés"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "a1-u11-listening",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Listening practice",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Aujourd'hui, le maximum est de cinq degrés.",
+      "question": "What is the high today?",
+      "options": [
+        "50 degrees",
+        "5 degrees",
+        "15 degrees",
+        "0 degrees"
+      ],
+      "answer": 1,
+      "explain": "Cinq degrés is five degrees."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il fait moins huit degrés ce matin.",
+      "question": "What is the temperature?",
+      "options": [
+        "Minus 18 degrees",
+        "80 degrees",
+        "Minus 8 degrees",
+        "8 degrees"
+      ],
+      "answer": 2,
+      "explain": "Moins huit is minus eight."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je prends un parapluie et un imperméable.",
+      "question": "What is the speaker taking?",
+      "options": [
+        "An umbrella and a raincoat",
+        "A tuque and mittens",
+        "A scarf and winter boots",
+        "A shovel and a coat"
+      ],
+      "answer": 0,
+      "explain": "The speaker names un parapluie et un imperméable."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Il y a du verglas sur la rue.",
+      "question": "What is on the street?",
+      "options": [
+        "Rain",
+        "Fog",
+        "Snowflakes",
+        "Ice"
+      ],
+      "answer": 3,
+      "explain": "Le verglas is ice on a road or sidewalk."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le bulletin annonce une tempête de neige demain.",
+      "question": "What is expected tomorrow?",
+      "options": [
+        "Fog only",
+        "A snowstorm",
+        "A heat wave",
+        "A sunny day"
+      ],
+      "answer": 1,
+      "explain": "The forecast says une tempête de neige demain."
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "a1-u11-write-speak",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Write and speak",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a short weather message",
+      "body": "Write 3 or 4 short lines. Say today's weather and temperature, then name one item of clothing you wear or take.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour. Aujourd'hui, il fait moins cinq degrés et il y a du vent. Je porte un manteau et je prends mes gants. À bientôt.\n\nCheck:\n• Use il fait + adjective for the weather.\n• Say moins before a temperature below zero.\n• Choose porter for what you wear and prendre for what you bring."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Get ready for the weather",
+      "body": "Answer a friend who asks about the weather. Give the temperature, describe one condition, and say what you wear and take.\n\n• Say the minus sign as moins.\n• Use il fait or il y a for a weather description.\n• End with one clear clothing or item phrase."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Il fait moins dix degrés. Il y a du vent et de la neige. Je porte un manteau et une tuque. Je prends mes mitaines.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

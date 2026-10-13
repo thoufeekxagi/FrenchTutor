@@ -1,0 +1,198 @@
+{
+  "id": "a1-u11-words-3",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Words: winter clothes",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une tuque",
+      "en": "knit winter hat (common in Québec and Canada)",
+      "sound": "ün tük",
+      "exampleFr": "Je porte une tuque.",
+      "exampleEn": "I wear a tuque."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une écharpe",
+      "en": "scarf",
+      "sound": "ün ay-SHARP",
+      "exampleFr": "Je porte une écharpe.",
+      "exampleEn": "I wear a scarf."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "des mitaines (f. pl.)",
+      "en": "mittens (common in Québec and Canada)",
+      "say": "des mitaines",
+      "sound": "day mee-TEHN",
+      "exampleFr": "Je prends mes mitaines.",
+      "exampleEn": "I take my mittens."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "des gants (m. pl.)",
+      "en": "gloves",
+      "say": "des gants",
+      "sound": "day gah(n)",
+      "exampleFr": "Je prends des gants.",
+      "exampleEn": "I take gloves."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "des bottes d'hiver (f. pl.)",
+      "en": "winter boots",
+      "say": "des bottes d'hiver",
+      "sound": "day boht dee-VEHR",
+      "exampleFr": "Je porte des bottes d'hiver.",
+      "exampleEn": "I wear winter boots."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un manteau d'hiver",
+      "en": "winter coat",
+      "sound": "uh(n) mah(n)-TOH dee-VEHR",
+      "exampleFr": "Je porte un manteau d'hiver.",
+      "exampleEn": "I wear a winter coat."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un cache-cou",
+      "en": "neck warmer",
+      "sound": "uh(n) kash-KOO",
+      "exampleFr": "Le cache-cou est chaud.",
+      "exampleEn": "The neck warmer is warm."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "des bas chauds (m. pl.)",
+      "en": "warm socks (common Canadian usage)",
+      "say": "des bas chauds",
+      "sound": "day bah shoh",
+      "exampleFr": "Je prends des bas chauds.",
+      "exampleEn": "I take warm socks."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une tuque",
+      "options": [
+        "gloves",
+        "knit winter hat (common in Québec and Canada)",
+        "neck warmer",
+        "scarf"
+      ],
+      "answer": 1,
+      "explain": "une tuque means knit winter hat (common in Québec and Canada)."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une écharpe",
+      "options": [
+        "winter boots",
+        "warm socks (common Canadian usage)",
+        "mittens (common in Québec and Canada)",
+        "scarf"
+      ],
+      "answer": 3,
+      "explain": "une écharpe means scarf."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "des mitaines (f. pl.)",
+      "options": [
+        "winter coat",
+        "mittens (common in Québec and Canada)",
+        "gloves",
+        "neck warmer"
+      ],
+      "answer": 1,
+      "explain": "des mitaines (f. pl.) means mittens (common in Québec and Canada)."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "des gants (m. pl.)",
+      "options": [
+        "neck warmer",
+        "scarf",
+        "winter boots",
+        "gloves"
+      ],
+      "answer": 3,
+      "explain": "des gants (m. pl.) means gloves."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "des bottes d'hiver (f. pl.)",
+      "options": [
+        "warm socks (common Canadian usage)",
+        "winter boots",
+        "mittens (common in Québec and Canada)",
+        "gloves"
+      ],
+      "answer": 1,
+      "explain": "des bottes d'hiver (f. pl.) means winter boots."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un manteau d'hiver",
+      "options": [
+        "gloves",
+        "neck warmer",
+        "scarf",
+        "winter coat"
+      ],
+      "answer": 3,
+      "explain": "un manteau d'hiver means winter coat."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une écharpe",
+      "question": "Which word did you hear?",
+      "options": [
+        "des gants",
+        "une écharpe",
+        "une tuque",
+        "des mitaines"
+      ],
+      "answer": 1,
+      "explain": "You heard une écharpe: scarf."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "des mitaines",
+      "question": "Which word did you hear?",
+      "options": [
+        "un cache-cou",
+        "une écharpe",
+        "des gants",
+        "des mitaines"
+      ],
+      "answer": 3,
+      "explain": "You heard des mitaines: mittens (common in Québec and Canada)."
+    }
+  ]
+}

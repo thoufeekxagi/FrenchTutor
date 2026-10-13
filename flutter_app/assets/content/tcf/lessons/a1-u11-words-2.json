@@ -1,0 +1,172 @@
+{
+  "id": "a1-u11-words-2",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Words: read the forecast",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une prévision",
+      "en": "forecast",
+      "sound": "ün pray-vee-ZYOH(N)",
+      "exampleFr": "La prévision est pour demain.",
+      "exampleEn": "The forecast is for tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un bulletin météo",
+      "en": "weather report",
+      "sound": "uh(n) bü-leh-TAN may-tay-oh",
+      "exampleFr": "Je lis le bulletin météo.",
+      "exampleEn": "I read the weather report."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un degré",
+      "en": "a degree",
+      "sound": "uh(n) duh-GRAY",
+      "exampleFr": "Il fait dix degrés.",
+      "exampleEn": "It is ten degrees."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "zéro",
+      "en": "zero",
+      "sound": "zay-ROH",
+      "exampleFr": "Il fait zéro degré.",
+      "exampleEn": "It is zero degrees."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "moins",
+      "en": "minus, below zero",
+      "sound": "mwa(n)",
+      "exampleFr": "Il fait moins cinq degrés.",
+      "exampleEn": "It is minus five degrees."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la température ressentie",
+      "en": "feels-like temperature",
+      "sound": "lah tah(n)-pay-rah-TÜR ruh-sah(n)-TEE",
+      "exampleFr": "La température ressentie est de moins dix degrés.",
+      "exampleEn": "The feels-like temperature is minus ten degrees."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le maximum",
+      "en": "high, maximum",
+      "sound": "luh mahk-see-MOHM",
+      "exampleFr": "Le maximum est de huit degrés.",
+      "exampleEn": "The high is eight degrees."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le minimum",
+      "en": "low, minimum",
+      "sound": "luh mee-nee-MOHM",
+      "exampleFr": "Le minimum est de moins trois degrés.",
+      "exampleEn": "The low is minus three degrees."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une prévision",
+      "options": [
+        "zero",
+        "forecast",
+        "high, maximum",
+        "weather report"
+      ],
+      "answer": 1,
+      "explain": "une prévision means forecast."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un bulletin météo",
+      "options": [
+        "minus, below zero",
+        "low, minimum",
+        "a degree",
+        "weather report"
+      ],
+      "answer": 3,
+      "explain": "un bulletin météo means weather report."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un degré",
+      "options": [
+        "feels-like temperature",
+        "a degree",
+        "forecast",
+        "zero"
+      ],
+      "answer": 1,
+      "explain": "un degré means a degree."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "zéro",
+      "options": [
+        "high, maximum",
+        "weather report",
+        "low, minimum",
+        "zero"
+      ],
+      "answer": 3,
+      "explain": "zéro means zero."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "moins",
+      "options": [
+        "low, minimum",
+        "minus, below zero",
+        "a degree",
+        "feels-like temperature"
+      ],
+      "answer": 1,
+      "explain": "moins means minus, below zero."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la température ressentie",
+      "options": [
+        "forecast",
+        "zero",
+        "high, maximum",
+        "feels-like temperature"
+      ],
+      "answer": 3,
+      "explain": "la température ressentie means feels-like temperature."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "In Canadian forecasts, le refroidissement éolien is a calculated wind-chill value. It describes how cold the wind can make it feel; it does not change the air-temperature reading. This lesson uses température ressentie as the beginner-friendly label."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "a1-u11-dialogues",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Dialogues",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the air temperature and the wind chill separately. Then notice how the speaker connects the forecast to clothing."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Checking the forecast",
+      "body": "Julie and Sam check a fictional Montréal forecast.",
+      "examples": [
+        {
+          "fr": "Quel temps fait-il aujourd'hui ?",
+          "en": "Julie: How is the weather today?"
+        },
+        {
+          "fr": "Il fait moins vingt-cinq degrés. Il y a du vent.",
+          "en": "Sam: It is minus twenty-five degrees. It is windy."
+        },
+        {
+          "fr": "Et la température ressentie ?",
+          "en": "Julie: And the feels-like temperature?"
+        },
+        {
+          "fr": "Moins trente degrés.",
+          "en": "Sam: Minus thirty degrees."
+        },
+        {
+          "fr": "Je prends ma tuque et mes mitaines.",
+          "en": "Julie: I am taking my tuque and mittens."
+        },
+        {
+          "fr": "Moi, je prends mes gants et mon manteau d'hiver.",
+          "en": "Sam: I am taking my gloves and winter coat."
+        },
+        {
+          "fr": "Il y a du verglas sur le trottoir.",
+          "en": "Julie: There is ice on the sidewalk."
+        },
+        {
+          "fr": "Je marche lentement.",
+          "en": "Sam: I walk slowly."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "What should I take?",
+      "body": "A friend asks what to wear and bring on a rainy day.",
+      "examples": [
+        {
+          "fr": "Il fait frais et il y a de la pluie.",
+          "en": "Sam: It is cool and raining."
+        },
+        {
+          "fr": "Je porte un imperméable.",
+          "en": "Julie: I am wearing a raincoat."
+        },
+        {
+          "fr": "Tu prends un parapluie ?",
+          "en": "Sam: Are you taking an umbrella?"
+        },
+        {
+          "fr": "Oui, je prends un parapluie.",
+          "en": "Julie: Yes, I am taking an umbrella."
+        },
+        {
+          "fr": "Et les bottes ?",
+          "en": "Sam: And the boots?"
+        },
+        {
+          "fr": "Je prends mes bottes.",
+          "en": "Julie: I am taking my boots."
+        },
+        {
+          "fr": "D'accord. Il y a beaucoup de pluie.",
+          "en": "Sam: Okay. There is a lot of rain."
+        },
+        {
+          "fr": "Oui. Je marche lentement.",
+          "en": "Julie: Yes. I walk slowly."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the air temperature in the first conversation?",
+      "options": [
+        "Zero degrees",
+        "25 degrees",
+        "Minus 25 degrees",
+        "Minus 30 degrees"
+      ],
+      "answer": 2,
+      "explain": "Sam says moins vingt-cinq degrés."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the feels-like temperature?",
+      "options": [
+        "Minus 30 degrees",
+        "Minus 25 degrees",
+        "Zero degrees",
+        "30 degrees"
+      ],
+      "answer": 0,
+      "explain": "Sam says moins trente degrés for the feels-like temperature."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does Julie take for the cold?",
+      "options": [
+        "A dress and shoes",
+        "An umbrella and a book",
+        "A scarf and sunglasses",
+        "A tuque and mittens"
+      ],
+      "answer": 3,
+      "explain": "Julie says she takes sa tuque et ses mitaines."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What is the weather like in the second conversation?",
+      "options": [
+        "Mild and snowy",
+        "Cool and rainy",
+        "Hot and sunny",
+        "Cold and foggy"
+      ],
+      "answer": 1,
+      "explain": "Sam says Il fait frais et il pleut."
+    }
+  ]
+}

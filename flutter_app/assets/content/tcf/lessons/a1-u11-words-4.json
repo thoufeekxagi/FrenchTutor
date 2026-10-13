@@ -1,0 +1,194 @@
+{
+  "id": "a1-u11-words-4",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Words: what to wear and do",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "porter",
+      "en": "to wear",
+      "sound": "por-TAY",
+      "exampleFr": "Je porte mon manteau.",
+      "exampleEn": "I wear my coat."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "prendre",
+      "en": "to take, bring",
+      "sound": "pra(n)dr",
+      "exampleFr": "Je prends un parapluie.",
+      "exampleEn": "I take an umbrella."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un parapluie",
+      "en": "umbrella",
+      "sound": "uh(n) pah-rah-PLÜ-ee",
+      "exampleFr": "Je prends un parapluie.",
+      "exampleEn": "I take an umbrella."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un imperméable",
+      "en": "raincoat",
+      "sound": "uh(n) a(n)-pehr-may-AHBL",
+      "exampleFr": "Je porte un imperméable.",
+      "exampleEn": "I wear a raincoat."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une pelle",
+      "en": "shovel",
+      "sound": "ün pehl",
+      "exampleFr": "La pelle est près de la porte.",
+      "exampleEn": "The shovel is near the door."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "déneiger",
+      "en": "to clear snow",
+      "sound": "day-nay-ZHAY",
+      "exampleFr": "Je déneige l'entrée.",
+      "exampleEn": "I clear snow from the entrance."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "marcher",
+      "en": "to walk",
+      "sound": "mahr-SHAY",
+      "exampleFr": "Je marche sur le trottoir.",
+      "exampleEn": "I walk on the sidewalk."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "sortir",
+      "en": "to go out",
+      "sound": "sor-TEER",
+      "exampleFr": "Je sors après le dîner.",
+      "exampleEn": "I go out after lunch."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "porter",
+      "options": [
+        "raincoat",
+        "to wear",
+        "to walk",
+        "to take, bring"
+      ],
+      "answer": 1,
+      "explain": "porter means to wear."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "prendre",
+      "options": [
+        "shovel",
+        "to go out",
+        "umbrella",
+        "to take, bring"
+      ],
+      "answer": 3,
+      "explain": "prendre means to take, bring."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un parapluie",
+      "options": [
+        "to clear snow",
+        "umbrella",
+        "to wear",
+        "raincoat"
+      ],
+      "answer": 1,
+      "explain": "un parapluie means umbrella."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un imperméable",
+      "options": [
+        "to walk",
+        "to take, bring",
+        "shovel",
+        "raincoat"
+      ],
+      "answer": 3,
+      "explain": "un imperméable means raincoat."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une pelle",
+      "options": [
+        "to go out",
+        "shovel",
+        "umbrella",
+        "to clear snow"
+      ],
+      "answer": 1,
+      "explain": "une pelle means shovel."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "déneiger",
+      "options": [
+        "to wear",
+        "raincoat",
+        "to walk",
+        "to clear snow"
+      ],
+      "answer": 3,
+      "explain": "déneiger means to clear snow."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "prendre",
+      "question": "Which word did you hear?",
+      "options": [
+        "un imperméable",
+        "prendre",
+        "déneiger",
+        "sortir"
+      ],
+      "answer": 1,
+      "explain": "You heard prendre: to take, bring."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un imperméable",
+      "question": "Which word did you hear?",
+      "options": [
+        "un imperméable",
+        "déneiger",
+        "sortir",
+        "prendre"
+      ],
+      "answer": 0,
+      "explain": "You heard un imperméable: raincoat."
+    }
+  ]
+}

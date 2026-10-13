@@ -1,0 +1,140 @@
+{
+  "id": "a1-u11-checkpoint",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Checkpoint",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which sentence means “It is cold”?",
+      "options": [
+        "C'est froid.",
+        "Il y a froid.",
+        "Il fait froid.",
+        "Il est froid."
+      ],
+      "answer": 2,
+      "explain": "Use il fait froid for the weather."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which sentence means “It is windy”?",
+      "options": [
+        "Il y a du vent.",
+        "Il fait du vent.",
+        "Il est du vent.",
+        "Il y a vent."
+      ],
+      "answer": 0,
+      "explain": "Use il y a du vent."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Je ___ une tuque. (prendre)",
+      "options": [
+        "prend",
+        "prenez",
+        "prennent",
+        "prends"
+      ],
+      "answer": 3,
+      "explain": "With je, use prends."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Elle ___ ses bottes. (prendre)",
+      "options": [
+        "prenez",
+        "prend",
+        "prends",
+        "prenons"
+      ],
+      "answer": 1,
+      "explain": "With elle, use prend."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does une tuque mean?",
+      "options": [
+        "An umbrella",
+        "A shovel",
+        "A knit winter hat",
+        "A scarf"
+      ],
+      "answer": 2,
+      "explain": "A tuque is a knit winter hat."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does des mitaines mean?",
+      "options": [
+        "Mittens",
+        "Gloves",
+        "Boots",
+        "Socks"
+      ],
+      "answer": 0,
+      "explain": "Des mitaines are mittens."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Which item do you take when it rains?",
+      "options": [
+        "Une tuque",
+        "Une pelle",
+        "Un cache-cou",
+        "Un parapluie"
+      ],
+      "answer": 3,
+      "explain": "An umbrella is un parapluie."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What does le verglas mean?",
+      "options": [
+        "A warm wind",
+        "Ice on a road or sidewalk",
+        "Fog",
+        "A snowflake"
+      ],
+      "answer": 1,
+      "explain": "Le verglas is ice on a road or sidewalk."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What does température ressentie mean?",
+      "options": [
+        "The amount of snow",
+        "The time of sunrise",
+        "Feels-like temperature",
+        "The daily high"
+      ],
+      "answer": 2,
+      "explain": "It tells how cold or warm the weather feels."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "In a Canadian weather forecast, which temperature scale is used?",
+      "options": [
+        "Celsius",
+        "Fahrenheit only",
+        "Kelvin",
+        "There is no temperature scale"
+      ],
+      "answer": 0,
+      "explain": "Canadian weather forecasts use degrees Celsius."
+    }
+  ]
+}

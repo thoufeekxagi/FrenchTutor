@@ -1,0 +1,148 @@
+{
+  "id": "a1-u11-phrases",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Phrases",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Use a short weather phrase, then give a temperature or condition. You can also name the clothes you wear or take when you go out."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Quel temps fait-il ?",
+      "en": "How is the weather?",
+      "tip": "Say it: kehl tah(n) feh-teel"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Il fait froid aujourd'hui.",
+      "en": "It is cold today.",
+      "tip": "Say it: eel feh frwah oh-zhoor-DWEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Il fait moins vingt-cinq degrés.",
+      "en": "It is minus twenty-five degrees.",
+      "tip": "Say it: eel feh mwa(n) va(n)t-sa(n)k duh-GRAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Il y a du vent et de la neige.",
+      "en": "It is windy and snowy.",
+      "tip": "Say it: eel yah dü vah(n) ay duh lah nezh"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Il neige ce matin.",
+      "en": "It is snowing this morning.",
+      "tip": "Say it: eel nezh suh mah-TA(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Je porte un manteau d'hiver.",
+      "en": "I am wearing a winter coat.",
+      "tip": "Say it: zhuh port uh(n) mah(n)-TOH dee-VEHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je prends ma tuque et mes mitaines.",
+      "en": "I take my tuque and mittens.",
+      "tip": "Say it: zhuh pra(n) mah tük ay may mee-TEHN"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Le trottoir est glissant.",
+      "en": "The sidewalk is slippery.",
+      "tip": "Say it: luh troh-TWAHR eh glee-SAH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Je marche lentement.",
+      "en": "I walk slowly.",
+      "tip": "Say it: zhuh marsh lah(n)t-MAH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Il pleut ce matin.",
+      "en": "It is raining this morning.",
+      "tip": "Say it: eel pluh suh mah-TA(N)"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Quel temps fait-il ?",
+      "options": [
+        "It is windy and snowy.",
+        "How is the weather?",
+        "I take my tuque and mittens.",
+        "It is raining this morning."
+      ],
+      "answer": 1,
+      "explain": "Quel temps fait-il ? means How is the weather?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Il fait moins vingt-cinq degrés.",
+      "options": [
+        "I am wearing a winter coat.",
+        "It is minus twenty-five degrees.",
+        "I walk slowly.",
+        "It is cold today."
+      ],
+      "answer": 1,
+      "explain": "Il fait moins vingt-cinq degrés. means It is minus twenty-five degrees.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Il neige ce matin.",
+      "options": [
+        "The sidewalk is slippery.",
+        "It is snowing this morning.",
+        "How is the weather?",
+        "It is windy and snowy."
+      ],
+      "answer": 1,
+      "explain": "Il neige ce matin. means It is snowing this morning.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je prends ma tuque et mes mitaines.",
+      "options": [
+        "It is raining this morning.",
+        "I take my tuque and mittens.",
+        "It is minus twenty-five degrees.",
+        "I am wearing a winter coat."
+      ],
+      "answer": 1,
+      "explain": "Je prends ma tuque et mes mitaines. means I take my tuque and mittens.."
+    }
+  ]
+}

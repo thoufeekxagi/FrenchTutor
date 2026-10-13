@@ -1,0 +1,194 @@
+{
+  "id": "a1-u11-words-1",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Words: weather outside",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la météo",
+      "en": "weather, weather forecast",
+      "sound": "lah may-tay-oh",
+      "exampleFr": "La météo est ici.",
+      "exampleEn": "The weather forecast is here."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le soleil",
+      "en": "sun, sunshine",
+      "sound": "luh soh-LAY",
+      "exampleFr": "Le soleil est chaud.",
+      "exampleEn": "The sun is warm."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un nuage",
+      "en": "cloud",
+      "sound": "uh(n) nü-AHZH",
+      "exampleFr": "Un nuage est dans le ciel.",
+      "exampleEn": "A cloud is in the sky."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le vent",
+      "en": "wind",
+      "sound": "luh vah(n)",
+      "exampleFr": "Le vent est fort.",
+      "exampleEn": "The wind is strong."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la pluie",
+      "en": "rain",
+      "sound": "lah plwee",
+      "exampleFr": "La pluie est froide.",
+      "exampleEn": "The rain is cold."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la neige",
+      "en": "snow",
+      "sound": "lah nezh",
+      "exampleFr": "La neige est blanche.",
+      "exampleEn": "The snow is white."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un orage",
+      "en": "storm, thunderstorm",
+      "sound": "uh(n) oh-RAHZH",
+      "exampleFr": "Il y a un orage.",
+      "exampleEn": "There is a storm."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "le temps",
+      "en": "weather",
+      "sound": "luh tah(n)",
+      "exampleFr": "Quel temps fait-il ?",
+      "exampleEn": "How is the weather?"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la météo",
+      "options": [
+        "wind",
+        "weather, weather forecast",
+        "storm, thunderstorm",
+        "sun, sunshine"
+      ],
+      "answer": 1,
+      "explain": "la météo means weather, weather forecast."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le soleil",
+      "options": [
+        "rain",
+        "weather",
+        "cloud",
+        "sun, sunshine"
+      ],
+      "answer": 3,
+      "explain": "le soleil means sun, sunshine."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un nuage",
+      "options": [
+        "snow",
+        "cloud",
+        "weather, weather forecast",
+        "wind"
+      ],
+      "answer": 1,
+      "explain": "un nuage means cloud."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le vent",
+      "options": [
+        "storm, thunderstorm",
+        "sun, sunshine",
+        "rain",
+        "wind"
+      ],
+      "answer": 3,
+      "explain": "le vent means wind."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la pluie",
+      "options": [
+        "weather",
+        "rain",
+        "cloud",
+        "snow"
+      ],
+      "answer": 1,
+      "explain": "la pluie means rain."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la neige",
+      "options": [
+        "weather, weather forecast",
+        "wind",
+        "storm, thunderstorm",
+        "snow"
+      ],
+      "answer": 3,
+      "explain": "la neige means snow."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le soleil",
+      "question": "Which word did you hear?",
+      "options": [
+        "le vent",
+        "le soleil",
+        "la neige",
+        "le temps"
+      ],
+      "answer": 1,
+      "explain": "You heard le soleil: sun, sunshine."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le vent",
+      "question": "Which word did you hear?",
+      "options": [
+        "le vent",
+        "la neige",
+        "le temps",
+        "le soleil"
+      ],
+      "answer": 0,
+      "explain": "You heard le vent: wind."
+    }
+  ]
+}

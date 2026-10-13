@@ -1,0 +1,144 @@
+{
+  "id": "a1-u11-grammar-a",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Grammar: il fait + a weather word",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "il fait + a weather word",
+      "body": "French often uses il fait for weather and temperature. The word il is part of the expression; it does not mean a particular man."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Describe the weather with il fait",
+      "headers": [
+        "French",
+        "English"
+      ],
+      "rows": [
+        [
+          "Il fait beau.",
+          "The weather is nice."
+        ],
+        [
+          "Il fait chaud.",
+          "It is hot."
+        ],
+        [
+          "Il fait froid.",
+          "It is cold."
+        ],
+        [
+          "Il fait frais.",
+          "It is cool."
+        ],
+        [
+          "Il fait doux.",
+          "It is mild."
+        ],
+        [
+          "Il fait mauvais.",
+          "The weather is bad."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Present tense of faire",
+      "headers": [
+        "Subject",
+        "faire"
+      ],
+      "rows": [
+        [
+          "je",
+          "fais"
+        ],
+        [
+          "tu",
+          "fais"
+        ],
+        [
+          "il / elle / on",
+          "fait"
+        ],
+        [
+          "nous",
+          "faisons"
+        ],
+        [
+          "vous",
+          "faites"
+        ],
+        [
+          "ils / elles",
+          "font"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "il fait + a weather word",
+      "body": "• For weather, use il fait + adjective: Il fait froid; il fait beau.\n• Use il y a + noun for another common pattern: Il y a du vent; il y a de la neige (review from Unit 10).\n• You may also hear the set phrases il pleut (it is raining) and il neige (it is snowing)."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "It is cold.",
+      "options": [
+        "Il y a froid.",
+        "C'est froid.",
+        "Il fait froid.",
+        "Il est froid."
+      ],
+      "answer": 2,
+      "explain": "Use il fait + adjective for this weather phrase."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "It is windy.",
+      "options": [
+        "Il y a du vent.",
+        "Il y a vent.",
+        "Il est du vent.",
+        "C'est vent."
+      ],
+      "answer": 0,
+      "explain": "Use il y a + noun: Il y a du vent."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "It is snowing.",
+      "options": [
+        "Il fait neige.",
+        "Il est neige.",
+        "C'est neige.",
+        "Il neige."
+      ],
+      "answer": 3,
+      "explain": "Il neige is the set phrase for it is snowing."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "It is mild.",
+      "options": [
+        "Il y a doux.",
+        "Il fait doux.",
+        "Il fait dou.",
+        "Il est doux."
+      ],
+      "answer": 1,
+      "explain": "Doux means mild; say il fait doux."
+    }
+  ]
+}

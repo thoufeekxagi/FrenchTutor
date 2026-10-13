@@ -1,0 +1,277 @@
+{
+  "id": "a1-hiver-montreal",
+  "title": "Un matin d'hiver",
+  "titleEn": "A winter morning",
+  "level": "A1",
+  "minutes": 3,
+  "summary": "Julie checks a Montréal winter forecast and walks carefully on an icy sidewalk.",
+  "unit": "a1-u11",
+  "sentences": [
+    {
+      "fr": "Ce matin, il fait moins vingt-cinq degrés à Montréal.",
+      "en": "This morning, it is minus twenty-five degrees in Montréal.",
+      "note": "The example forecast is fictional. The temperature and wind-chill values are practice numbers, not a live Montréal forecast."
+    },
+    {
+      "fr": "Il y a du vent et de la neige.",
+      "en": "It is windy and snowy."
+    },
+    {
+      "fr": "Julie lit le bulletin météo.",
+      "en": "Julie reads the weather report."
+    },
+    {
+      "fr": "La température ressentie est de moins trente degrés.",
+      "en": "The feels-like temperature is minus thirty degrees."
+    },
+    {
+      "fr": "Elle prend sa tuque, ses mitaines et ses bottes d'hiver.",
+      "en": "She takes her tuque, mittens and winter boots."
+    },
+    {
+      "fr": "Elle porte un manteau et une écharpe.",
+      "en": "She wears a coat and a scarf."
+    },
+    {
+      "fr": "Il y a du verglas sur le trottoir.",
+      "en": "There is ice on the sidewalk."
+    },
+    {
+      "fr": "Julie marche lentement et ne glisse pas.",
+      "en": "Julie walks slowly and does not slip."
+    }
+  ],
+  "words": {
+    "ce": {
+      "en": "this"
+    },
+    "matin": {
+      "en": "morning",
+      "pos": "noun, masculine",
+      "sound": "mah-TA(N)"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "fait": {
+      "en": "is (faire, in a weather phrase)",
+      "pos": "verb",
+      "sound": "feh"
+    },
+    "moins": {
+      "en": "minus"
+    },
+    "vingt-cinq": {
+      "en": "twenty-five",
+      "pos": "number"
+    },
+    "degrés": {
+      "en": "degrees",
+      "pos": "noun, masculine plural"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "montréal": {
+      "en": "Montréal"
+    },
+    "y": {
+      "en": "there (in il y a)"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "vent": {
+      "en": "wind",
+      "pos": "noun, masculine",
+      "sound": "vah(n)"
+    },
+    "et": {
+      "en": "and"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "la": {
+      "en": "the"
+    },
+    "neige": {
+      "en": "snow",
+      "pos": "noun, feminine",
+      "sound": "nezh"
+    },
+    "julie": {
+      "en": "Julie (a woman's name)"
+    },
+    "lit": {
+      "en": "reads (lire)",
+      "pos": "verb",
+      "sound": "lee"
+    },
+    "le": {
+      "en": "the"
+    },
+    "bulletin": {
+      "en": "report, bulletin",
+      "pos": "noun, masculine",
+      "sound": "bü-leh-TAN"
+    },
+    "météo": {
+      "en": "weather",
+      "pos": "noun, feminine",
+      "sound": "may-tay-oh"
+    },
+    "température": {
+      "en": "temperature",
+      "pos": "noun, feminine",
+      "sound": "tah(n)-pay-rah-TÜR"
+    },
+    "ressentie": {
+      "en": "felt, feels-like",
+      "pos": "adjective",
+      "sound": "ruh-sah(n)-TEE"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "trente": {
+      "en": "thirty",
+      "pos": "number"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "prend": {
+      "en": "takes (prendre)",
+      "pos": "verb",
+      "sound": "pra(n)"
+    },
+    "sa": {
+      "en": "her"
+    },
+    "tuque": {
+      "en": "knit winter hat",
+      "pos": "noun, feminine",
+      "sound": "tük"
+    },
+    "ses": {
+      "en": "her (plural)"
+    },
+    "mitaines": {
+      "en": "mittens",
+      "pos": "noun, feminine plural",
+      "sound": "mee-TEHN"
+    },
+    "bottes": {
+      "en": "boots",
+      "pos": "noun, feminine plural",
+      "sound": "boht"
+    },
+    "d'hiver": {
+      "en": "of winter"
+    },
+    "porte": {
+      "en": "wears (porter)",
+      "pos": "verb",
+      "sound": "port"
+    },
+    "un": {
+      "en": "a, one"
+    },
+    "manteau": {
+      "en": "coat",
+      "pos": "noun, masculine",
+      "sound": "mah(n)-TOH"
+    },
+    "une": {
+      "en": "a, one"
+    },
+    "écharpe": {
+      "en": "scarf",
+      "pos": "noun, feminine",
+      "sound": "ay-SHARP"
+    },
+    "verglas": {
+      "en": "ice on a road or sidewalk",
+      "pos": "noun, masculine",
+      "sound": "vehr-GLAH"
+    },
+    "sur": {
+      "en": "on"
+    },
+    "trottoir": {
+      "en": "sidewalk",
+      "pos": "noun, masculine",
+      "sound": "troh-TWAHR"
+    },
+    "marche": {
+      "en": "walks (marcher)",
+      "pos": "verb",
+      "sound": "marsh"
+    },
+    "lentement": {
+      "en": "slowly"
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "glisse": {
+      "en": "slips (glisser)",
+      "pos": "verb",
+      "sound": "glees"
+    },
+    "pas": {
+      "en": "not"
+    }
+  },
+  "keywords": [
+    "tuque",
+    "mitaines",
+    "bottes",
+    "manteau",
+    "verglas",
+    "trottoir"
+  ],
+  "quiz": [
+    {
+      "prompt": "What is the air temperature in the story?",
+      "options": [
+        "Zero degrees",
+        "25 degrees",
+        "Minus 25 degrees",
+        "Minus 30 degrees"
+      ],
+      "answer": 2,
+      "explain": "The first sentence says moins vingt-cinq degrés."
+    },
+    {
+      "prompt": "What is the feels-like temperature?",
+      "options": [
+        "Minus 30 degrees",
+        "Minus 25 degrees",
+        "Zero degrees",
+        "30 degrees"
+      ],
+      "answer": 0,
+      "explain": "The story gives moins trente degrés as the feels-like temperature."
+    },
+    {
+      "prompt": "What does Julie wear?",
+      "options": [
+        "A dress and sandals",
+        "A raincoat and a hat",
+        "A sweater and a skirt",
+        "A coat and a scarf"
+      ],
+      "answer": 3,
+      "explain": "She wears un manteau et une écharpe."
+    }
+  ]
+}

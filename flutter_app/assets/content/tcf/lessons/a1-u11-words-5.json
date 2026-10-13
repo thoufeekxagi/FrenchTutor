@@ -1,0 +1,167 @@
+{
+  "id": "a1-u11-words-5",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Words: winter conditions",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le verglas",
+      "en": "black ice, ice on a road or sidewalk",
+      "sound": "luh vehr-GLAH",
+      "exampleFr": "Il y a du verglas sur la rue.",
+      "exampleEn": "There is ice on the street."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une tempête de neige",
+      "en": "snowstorm",
+      "sound": "ün tah(n)-PEHT duh nezh",
+      "exampleFr": "La tempête de neige est forte.",
+      "exampleEn": "The snowstorm is strong."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le brouillard",
+      "en": "fog",
+      "sound": "luh broo-YAHR",
+      "exampleFr": "Il y a du brouillard.",
+      "exampleEn": "There is fog."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la glace",
+      "en": "ice",
+      "sound": "lah glass",
+      "exampleFr": "La glace est sur le trottoir.",
+      "exampleEn": "The ice is on the sidewalk."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "glisser",
+      "en": "to slip, slide",
+      "sound": "glee-SAY",
+      "exampleFr": "Elle ne glisse pas sur la glace.",
+      "exampleEn": "She does not slip on the ice."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un flocon",
+      "en": "snowflake",
+      "sound": "uh(n) floh-KOH(N)",
+      "exampleFr": "Un flocon tombe sur le manteau.",
+      "exampleEn": "A snowflake falls on the coat."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un avertissement",
+      "en": "warning, alert",
+      "sound": "uh(n) ah-vehr-tee-SMAH(N)",
+      "exampleFr": "Je lis l'avertissement météo.",
+      "exampleEn": "I read the weather warning."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "glissant / glissante",
+      "en": "slippery",
+      "say": "glissant, glissante",
+      "sound": "glee-SAH(N) / glee-SAH(N)T",
+      "exampleFr": "Le trottoir est glissant.",
+      "exampleEn": "The sidewalk is slippery."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le verglas",
+      "options": [
+        "warning, alert",
+        "black ice, ice on a road or sidewalk",
+        "snowstorm",
+        "to slip, slide"
+      ],
+      "answer": 1,
+      "explain": "le verglas means black ice, ice on a road or sidewalk."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une tempête de neige",
+      "options": [
+        "to slip, slide",
+        "slippery",
+        "fog",
+        "snowstorm"
+      ],
+      "answer": 3,
+      "explain": "une tempête de neige means snowstorm."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le brouillard",
+      "options": [
+        "snowflake",
+        "fog",
+        "black ice, ice on a road or sidewalk",
+        "ice"
+      ],
+      "answer": 1,
+      "explain": "le brouillard means fog."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la glace",
+      "options": [
+        "warning, alert",
+        "snowstorm",
+        "to slip, slide",
+        "ice"
+      ],
+      "answer": 3,
+      "explain": "la glace means ice."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "glisser",
+      "options": [
+        "slippery",
+        "to slip, slide",
+        "fog",
+        "snowflake"
+      ],
+      "answer": 1,
+      "explain": "glisser means to slip, slide."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un flocon",
+      "options": [
+        "black ice, ice on a road or sidewalk",
+        "ice",
+        "warning, alert",
+        "snowflake"
+      ],
+      "answer": 3,
+      "explain": "un flocon means snowflake."
+    }
+  ]
+}

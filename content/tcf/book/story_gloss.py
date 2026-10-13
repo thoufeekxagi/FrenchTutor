@@ -25,6 +25,8 @@ STORY_META = {
                    keywords=["centre-ville", "musée", "banque", "place", "l'autobus", "l'arrêt"]),
     "a1-u10": dict(id="a1-logement-julie", minutes=3, summary="Julie reads a rental ad, visits a furnished 3 ½ and signs a lease.",
                    keywords=["annonce", "appartement", "chambre", "chauffage", "clé", "bail"]),
+    "a1-u11": dict(id="a1-hiver-montreal", minutes=3, summary="Julie checks a Montréal winter forecast and walks carefully on an icy sidewalk.",
+                   keywords=["tuque", "mitaines", "bottes", "manteau", "verglas", "trottoir"]),
 }
 
 STORY_GLOSS = {
@@ -176,5 +178,28 @@ STORY_GLOSS = {
         "clé": ("key", "noun, feminine", "klay"), "signe": ("signs (signer)", "verb", "seen-YAY"),
         "bail": ("lease", "noun, masculine", "bahy"), "elle": ("she", "pronoun"),
         "déménage": ("moves house (déménager)", "verb", "day-may-nahzh"), "juillet": ("July", "month", "zhwee-YEH"),
+    },
+    "a1-hiver-montreal": {
+        "ce": ("this",), "matin": ("morning", "noun, masculine", "mah-TA(N)"),
+        "il": ("it, he", "pronoun"), "fait": ("is (faire, in a weather phrase)", "verb", "feh"),
+        "moins": ("minus",), "vingt-cinq": ("twenty-five", "number"), "degrés": ("degrees", "noun, masculine plural"),
+        "à": ("in, at",), "montréal": ("Montréal",), "y": ("there (in il y a)",),
+        "a": ("has (avoir)", "verb"), "du": ("some (partitive form)",), "vent": ("wind", "noun, masculine", "vah(n)"),
+        "et": ("and",), "de": ("of; some",), "la": ("the",),
+        "neige": ("snow", "noun, feminine", "nezh"), "julie": ("Julie (a woman's name)",),
+        "lit": ("reads (lire)", "verb", "lee"), "le": ("the",),
+        "bulletin": ("report, bulletin", "noun, masculine", "bü-leh-TAN"), "météo": ("weather", "noun, feminine", "may-tay-oh"),
+        "température": ("temperature", "noun, feminine", "tah(n)-pay-rah-TÜR"),
+        "ressentie": ("felt, feels-like", "adjective", "ruh-sah(n)-TEE"), "est": ("is (être)", "verb"),
+        "trente": ("thirty", "number"), "elle": ("she", "pronoun"), "prend": ("takes (prendre)", "verb", "pra(n)"),
+        "sa": ("her",), "tuque": ("knit winter hat", "noun, feminine", "tük"),
+        "ses": ("her (plural)",), "mitaines": ("mittens", "noun, feminine plural", "mee-TEHN"),
+        "bottes": ("boots", "noun, feminine plural", "boht"), "d'hiver": ("of winter",),
+        "porte": ("wears (porter)", "verb", "port"), "un": ("a, one",),
+        "manteau": ("coat", "noun, masculine", "mah(n)-TOH"), "une": ("a, one",),
+        "écharpe": ("scarf", "noun, feminine", "ay-SHARP"), "verglas": ("ice on a road or sidewalk", "noun, masculine", "vehr-GLAH"),
+        "sur": ("on",), "trottoir": ("sidewalk", "noun, masculine", "troh-TWAHR"),
+        "marche": ("walks (marcher)", "verb", "marsh"), "lentement": ("slowly",),
+        "ne": ("not (used with pas)",), "pas": ("not",), "glisse": ("slips (glisser)", "verb", "glees"),
     },
 }

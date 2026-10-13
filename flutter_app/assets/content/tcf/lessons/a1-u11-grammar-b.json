@@ -1,0 +1,117 @@
+{
+  "id": "a1-u11-grammar-b",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "Grammar: prendre: take or bring something",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "prendre: take or bring something",
+      "body": "Use prendre when you take something with you. It is irregular, so learn the forms as a group. To say that clothes are on your body, use porter: Je porte un manteau."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Present tense of prendre",
+      "headers": [
+        "Person",
+        "prendre",
+        "Example"
+      ],
+      "rows": [
+        [
+          "je",
+          "prends",
+          "Je prends un parapluie."
+        ],
+        [
+          "tu",
+          "prends",
+          "Tu prends tes gants."
+        ],
+        [
+          "il / elle / on",
+          "prend",
+          "Elle prend ses bottes."
+        ],
+        [
+          "nous",
+          "prenons",
+          "Nous prenons le bus."
+        ],
+        [
+          "vous",
+          "prenez",
+          "Vous prenez une tuque."
+        ],
+        [
+          "ils / elles",
+          "prennent",
+          "Ils prennent leurs manteaux."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "prendre: take or bring something",
+      "body": "• Remember the different endings: je prends, tu prends, il prend, nous prenons, vous prenez, ils prennent.\n• Use prendre for something you take or bring: Je prends un parapluie.\n• Use porter for what you wear: Elle porte un manteau d'hiver.\n• In Canadian French, bas is commonly used for socks. Je prends des bas chauds means I take warm socks."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je ___ une tuque.",
+      "options": [
+        "prenez",
+        "prennent",
+        "prends",
+        "prend"
+      ],
+      "answer": 2,
+      "explain": "With je, use prends."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Elle ___ ses bottes.",
+      "options": [
+        "prend",
+        "prends",
+        "prenons",
+        "prenez"
+      ],
+      "answer": 0,
+      "explain": "With elle, use prend."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Nous ___ un parapluie.",
+      "options": [
+        "prenez",
+        "prend",
+        "prennent",
+        "prenons"
+      ],
+      "answer": 3,
+      "explain": "With nous, use prenons."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which sentence says “They take their coats”?",
+      "options": [
+        "Ils prenons leurs manteaux.",
+        "Ils prennent leurs manteaux.",
+        "Ils prenez leurs manteaux.",
+        "Ils prend leurs manteaux."
+      ],
+      "answer": 1,
+      "explain": "With ils, the form is prennent."
+    }
+  ]
+}

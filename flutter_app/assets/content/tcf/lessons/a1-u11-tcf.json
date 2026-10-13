@@ -1,0 +1,114 @@
+{
+  "id": "a1-u11-tcf",
+  "unit": "a1-u11",
+  "unitTitle": "Weather and clothes",
+  "title": "TCF corner",
+  "subtitle": "Unit 11: Weather and clothes",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Il fait zéro degré et il neige.",
+      "question": "What is the weather like?",
+      "options": [
+        "Zero degrees and snow",
+        "Minus ten degrees and rain",
+        "Ten degrees and sun",
+        "Zero degrees and fog"
+      ],
+      "answer": 0,
+      "explain": "The speaker says zéro degré and il neige."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je porte des bottes d'hiver et un manteau.",
+      "question": "What is the person wearing?",
+      "options": [
+        "A scarf and sandals",
+        "A raincoat and gloves",
+        "A tuque and a dress",
+        "Winter boots and a coat"
+      ],
+      "answer": 3,
+      "explain": "The speaker says des bottes d'hiver et un manteau."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La température ressentie est de moins dix-huit degrés.",
+      "question": "What is the feels-like temperature?",
+      "options": [
+        "8 degrees",
+        "Minus 18 degrees",
+        "Minus 8 degrees",
+        "18 degrees"
+      ],
+      "answer": 1,
+      "explain": "Moins dix-huit is minus eighteen."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Prenez une tuque et des mitaines.",
+      "question": "What should the listener take?",
+      "options": [
+        "A shovel and boots",
+        "A scarf and sunglasses",
+        "A tuque and mittens",
+        "A raincoat and umbrella"
+      ],
+      "answer": 2,
+      "explain": "The speaker says une tuque et des mitaines."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the high in Ottawa?",
+      "options": [
+        "10 degrees",
+        "Minus 10 degrees",
+        "1 degree",
+        "20 degrees"
+      ],
+      "answer": 0,
+      "explain": "The maximum is 10 °C.",
+      "promptFr": "OTTAWA · Aujourd'hui : soleil · Maximum : 10 degrés"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the person take?",
+      "options": [
+        "A scarf and umbrella",
+        "A shovel and boots",
+        "A tuque and a raincoat",
+        "Gloves and a coat"
+      ],
+      "answer": 3,
+      "explain": "The message names mes gants et mon manteau.",
+      "promptFr": "MESSAGE · Il fait froid. Je prends mes gants et mon manteau."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is forecast for this evening?",
+      "options": [
+        "A warm sunny evening",
+        "A snowstorm",
+        "A thunderstorm",
+        "Fog"
+      ],
+      "answer": 1,
+      "explain": "The notice says tempête de neige ce soir.",
+      "promptFr": "AVERTISSEMENT · Tempête de neige ce soir"
+    }
+  ]
+}
