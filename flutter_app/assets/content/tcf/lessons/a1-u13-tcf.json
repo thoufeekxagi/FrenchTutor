@@ -1,0 +1,114 @@
+{
+  "id": "a1-u13-tcf",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "TCF corner",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "J'ai mal au genou.",
+      "question": "What hurts?",
+      "options": [
+        "The knee",
+        "The head",
+        "The back",
+        "The throat"
+      ],
+      "answer": 0,
+      "explain": "The speaker says au genou."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Depuis quand avez-vous mal ? Depuis lundi.",
+      "question": "When did the pain begin?",
+      "options": [
+        "Yesterday",
+        "On Friday",
+        "Today",
+        "On Monday"
+      ],
+      "answer": 3,
+      "explain": "The person answers depuis lundi."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je voudrais un rendez-vous à la clinique.",
+      "question": "What does the person want?",
+      "options": [
+        "A class schedule",
+        "A clinic appointment",
+        "A job interview",
+        "A pharmacy receipt"
+      ],
+      "answer": 1,
+      "explain": "The person asks for un rendez-vous à la clinique."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Info-Santé 811, option 1.",
+      "question": "Which number is mentioned for a non-urgent health problem in Québec?",
+      "options": [
+        "311",
+        "411",
+        "811, option 1",
+        "911"
+      ],
+      "answer": 2,
+      "explain": "The recording says Info-Santé 811, option 1."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What hurts?",
+      "options": [
+        "The hand",
+        "The foot",
+        "The neck",
+        "The back"
+      ],
+      "answer": 0,
+      "explain": "The message says à la main.",
+      "promptFr": "MESSAGE · J'ai mal à la main depuis ce matin."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Who can the reader ask about the label?",
+      "options": [
+        "The bus driver",
+        "The teacher",
+        "The receptionist",
+        "A pharmacist"
+      ],
+      "answer": 3,
+      "explain": "The notice names the pharmacien and the étiquette.",
+      "promptFr": "PHARMACIE · Pharmacien · Étiquette"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which number is for a non-urgent health question?",
+      "options": [
+        "411",
+        "811",
+        "911",
+        "311"
+      ],
+      "answer": 1,
+      "explain": "The notice pairs Info-Santé 811 with non urgent.",
+      "promptFr": "QUÉBEC · Info-Santé 811 : non urgent · 911 : urgence"
+    }
+  ]
+}

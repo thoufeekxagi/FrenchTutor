@@ -191,6 +191,19 @@
     "a1-u12-write-speak.json",
     "a1-u12-tcf.json",
     "a1-u12-checkpoint.json",
+    "a1-u13-words-1.json",
+    "a1-u13-words-2.json",
+    "a1-u13-words-3.json",
+    "a1-u13-words-4.json",
+    "a1-u13-words-5.json",
+    "a1-u13-phrases.json",
+    "a1-u13-grammar-a.json",
+    "a1-u13-dialogues.json",
+    "a1-u13-listening.json",
+    "a1-u13-reading.json",
+    "a1-u13-write-speak.json",
+    "a1-u13-tcf.json",
+    "a1-u13-checkpoint.json",
     "dev_sample.json"
   ]
 }

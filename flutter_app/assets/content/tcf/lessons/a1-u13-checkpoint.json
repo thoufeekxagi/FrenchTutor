@@ -1,0 +1,140 @@
+{
+  "id": "a1-u13-checkpoint",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Checkpoint",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does le dos mean?",
+      "options": [
+        "The throat",
+        "The eye",
+        "The back",
+        "The knee"
+      ],
+      "answer": 2,
+      "explain": "Le dos means the back."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which phrase means “My head hurts”?",
+      "options": [
+        "J'ai mal à la tête.",
+        "Je suis tête.",
+        "J'ai la tête mal.",
+        "Je mal à la tête."
+      ],
+      "answer": 0,
+      "explain": "Use avoir mal à: J'ai mal à la tête."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "J'ai mal ___ dos.",
+      "options": [
+        "à la",
+        "aux",
+        "à l'",
+        "au"
+      ],
+      "answer": 3,
+      "explain": "À + le contracts to au."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "J'ai mal ___ gorge.",
+      "options": [
+        "à l'",
+        "à la",
+        "au",
+        "aux"
+      ],
+      "answer": 1,
+      "explain": "La gorge is feminine singular: use à la."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "J'ai mal ___ yeux.",
+      "options": [
+        "à la",
+        "à l'",
+        "aux",
+        "au"
+      ],
+      "answer": 2,
+      "explain": "Les yeux is plural: use aux."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does une pharmacie mean?",
+      "options": [
+        "A pharmacy",
+        "A clinic",
+        "A waiting room",
+        "An ambulance"
+      ],
+      "answer": 0,
+      "explain": "Une pharmacie is a pharmacy."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "What does une ordonnance mean?",
+      "options": [
+        "An appointment",
+        "A health card",
+        "A dose",
+        "A prescription"
+      ],
+      "answer": 3,
+      "explain": "Une ordonnance is a prescription."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "In Québec, which line handles a non-urgent health question?",
+      "options": [
+        "411",
+        "811, option 1",
+        "911",
+        "311"
+      ],
+      "answer": 1,
+      "explain": "Québec's Info-Santé 811, option 1, handles non-urgent health questions."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which number is for an emergency needing immediate help in Québec?",
+      "options": [
+        "311",
+        "411",
+        "911",
+        "811"
+      ],
+      "answer": 2,
+      "explain": "Call 911 for an emergency that needs immediate help."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "What does depuis hier mean?",
+      "options": [
+        "Since yesterday",
+        "Tomorrow",
+        "Every day",
+        "For one week"
+      ],
+      "answer": 0,
+      "explain": "Depuis hier means since yesterday."
+    }
+  ]
+}

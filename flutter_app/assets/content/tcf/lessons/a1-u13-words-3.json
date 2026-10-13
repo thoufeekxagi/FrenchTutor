@@ -1,0 +1,215 @@
+{
+  "id": "a1-u13-words-3",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Words: describe how you feel",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un rhume",
+      "en": "a cold",
+      "sound": "uh(n) rüm",
+      "exampleFr": "J'ai un rhume.",
+      "exampleEn": "I have a cold."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une toux",
+      "en": "a cough",
+      "sound": "ün too",
+      "exampleFr": "J'ai une toux.",
+      "exampleEn": "I have a cough."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "tousser",
+      "en": "to cough",
+      "sound": "too-SAY",
+      "exampleFr": "Je tousse.",
+      "exampleEn": "I cough."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une fièvre",
+      "en": "a fever",
+      "sound": "ün FYEVR",
+      "exampleFr": "J'ai de la fièvre.",
+      "exampleEn": "I have a fever."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "malade",
+      "en": "sick, ill",
+      "sound": "mah-LAHD",
+      "exampleFr": "Je suis malade.",
+      "exampleEn": "I am sick."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "fatigué / fatiguée",
+      "en": "tired",
+      "say": "fatigué, fatiguée",
+      "sound": "fah-tee-GAY / fah-tee-GAY",
+      "exampleFr": "Je suis fatiguée.",
+      "exampleEn": "I am tired."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "blessé / blessée",
+      "en": "injured",
+      "say": "blessé, blessée",
+      "sound": "bleh-SAY / bleh-SAY",
+      "exampleFr": "Il est blessé.",
+      "exampleEn": "He is injured."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la santé",
+      "en": "health",
+      "sound": "lah sah(n)-TAY",
+      "exampleFr": "J'ai un problème de santé.",
+      "exampleEn": "I have a health problem."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "depuis",
+      "en": "since, for (a length of time)",
+      "sound": "duh-PWEE",
+      "exampleFr": "J'ai mal depuis hier.",
+      "exampleEn": "It has hurt since yesterday."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "urgent / urgente",
+      "en": "urgent",
+      "say": "urgent, urgente",
+      "sound": "ür-ZHAH(N) / ür-ZHAH(N)T",
+      "exampleFr": "C'est urgent.",
+      "exampleEn": "It is urgent."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un rhume",
+      "options": [
+        "a fever",
+        "a cold",
+        "injured",
+        "urgent"
+      ],
+      "answer": 1,
+      "explain": "un rhume means a cold."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une toux",
+      "options": [
+        "sick, ill",
+        "health",
+        "a cold",
+        "a cough"
+      ],
+      "answer": 3,
+      "explain": "une toux means a cough."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "tousser",
+      "options": [
+        "tired",
+        "to cough",
+        "since, for (a length of time)",
+        "sick, ill"
+      ],
+      "answer": 1,
+      "explain": "tousser means to cough."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une fièvre",
+      "options": [
+        "injured",
+        "urgent",
+        "to cough",
+        "a fever"
+      ],
+      "answer": 3,
+      "explain": "une fièvre means a fever."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "malade",
+      "options": [
+        "health",
+        "sick, ill",
+        "a cold",
+        "a fever"
+      ],
+      "answer": 1,
+      "explain": "malade means sick, ill."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "fatigué / fatiguée",
+      "options": [
+        "since, for (a length of time)",
+        "a cough",
+        "sick, ill",
+        "tired"
+      ],
+      "answer": 3,
+      "explain": "fatigué / fatiguée means tired."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une toux",
+      "question": "Which word did you hear?",
+      "options": [
+        "une fièvre",
+        "une toux",
+        "la santé",
+        "un rhume"
+      ],
+      "answer": 1,
+      "explain": "You heard une toux: a cough."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une fièvre",
+      "question": "Which word did you hear?",
+      "options": [
+        "une fièvre",
+        "la santé",
+        "un rhume",
+        "tousser"
+      ],
+      "answer": 0,
+      "explain": "You heard une fièvre: a fever."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "a1-u13-phrases",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Phrases",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Use avoir mal à plus a body part. The small word changes to match the article: au, à la, à l' or aux."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "J'ai mal à la tête.",
+      "en": "My head hurts.",
+      "tip": "Say it: zhay mahl ah lah teht"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'ai mal au dos.",
+      "en": "My back hurts.",
+      "tip": "Say it: zhay mahl oh doh"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "J'ai mal à la gorge.",
+      "en": "My throat hurts.",
+      "tip": "Say it: zhay mahl ah lah gorzh"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "J'ai mal à l'oreille.",
+      "en": "My ear hurts.",
+      "tip": "Say it: zhay mahl ah loh-RAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "J'ai mal aux yeux.",
+      "en": "My eyes hurt.",
+      "tip": "Say it: zhay mahl oh zyuh"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "J'ai mal au ventre depuis hier.",
+      "en": "My stomach has hurt since yesterday.",
+      "tip": "Say it: zhay mahl oh vah(n)tr duh-PWEE yeh-R"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je suis malade et fatigué.",
+      "en": "I am sick and tired.",
+      "tip": "Say it: zhuh swee mah-LAHD ay fah-tee-GAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "J'ai un rhume et une toux.",
+      "en": "I have a cold and a cough.",
+      "tip": "Say it: zhay uh(n) rüm ay ün too"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Je voudrais un rendez-vous.",
+      "en": "I would like an appointment.",
+      "tip": "Say it: zhuh voo-DREH uh(n) rah(n)-day-VOO"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Pouvez-vous expliquer la notice ?",
+      "en": "Can you explain the leaflet?",
+      "tip": "Say it: poo-vay-voo ehk-splee-KAY lah noh-TEES"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai mal à la tête.",
+      "options": [
+        "I am sick and tired.",
+        "My head hurts.",
+        "Can you explain the leaflet?",
+        "My stomach has hurt since yesterday."
+      ],
+      "answer": 1,
+      "explain": "J'ai mal à la tête. means My head hurts.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai mal à la gorge.",
+      "options": [
+        "My stomach has hurt since yesterday.",
+        "My throat hurts.",
+        "I would like an appointment.",
+        "My eyes hurt."
+      ],
+      "answer": 1,
+      "explain": "J'ai mal à la gorge. means My throat hurts.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai mal aux yeux.",
+      "options": [
+        "I have a cold and a cough.",
+        "My eyes hurt.",
+        "My head hurts.",
+        "My ear hurts."
+      ],
+      "answer": 1,
+      "explain": "J'ai mal aux yeux. means My eyes hurt.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis malade et fatigué.",
+      "options": [
+        "Can you explain the leaflet?",
+        "I am sick and tired.",
+        "My throat hurts.",
+        "My stomach has hurt since yesterday."
+      ],
+      "answer": 1,
+      "explain": "Je suis malade et fatigué. means I am sick and tired.."
+    }
+  ]
+}

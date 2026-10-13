@@ -1,0 +1,80 @@
+{
+  "id": "a1-u13-reading",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Reading practice",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When is this clinic open?",
+      "options": [
+        "Monday only, 4 p.m. to midnight",
+        "Every day, 9 a.m. to 5 p.m.",
+        "Monday to Friday, 8 a.m. to 4 p.m.",
+        "Saturday and Sunday, 8 a.m. to noon"
+      ],
+      "answer": 2,
+      "explain": "The notice gives weekdays from 8 h to 16 h.",
+      "promptFr": "CLINIQUE SANS RENDEZ-VOUS · Lundi au vendredi · 8 h à 16 h"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is 811 option 1 for in Québec?",
+      "options": [
+        "A non-urgent health question",
+        "An immediate emergency",
+        "A bus schedule",
+        "A pharmacy bill"
+      ],
+      "answer": 0,
+      "explain": "The notice labels Info-Santé 811, option 1 as non-urgent.",
+      "promptFr": "QUÉBEC · Info-Santé 811 · Option 1 · Non urgent"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which number should the reader call for immediate emergency help?",
+      "options": [
+        "811",
+        "311",
+        "411",
+        "911"
+      ],
+      "answer": 3,
+      "explain": "The notice pairs urgence with 911.",
+      "promptFr": "URGENCE · 911"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What should the patient show at reception?",
+      "options": [
+        "A school diploma",
+        "A health insurance card",
+        "A job application",
+        "A weather report"
+      ],
+      "answer": 1,
+      "explain": "The notice asks for the carte d'assurance maladie.",
+      "promptFr": "RÉCEPTION · Carte d'assurance maladie · Nom et date de naissance"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Who can the reader ask about the leaflet and label?",
+      "options": [
+        "A bus driver",
+        "A teacher",
+        "A pharmacist",
+        "A receptionist"
+      ],
+      "answer": 2,
+      "explain": "The notice says parlez au pharmacien.",
+      "promptFr": "PHARMACIE · Parlez au pharmacien · Notice et étiquette"
+    }
+  ]
+}

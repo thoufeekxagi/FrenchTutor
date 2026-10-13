@@ -1,0 +1,197 @@
+{
+  "id": "a1-u13-grammar-a",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Grammar: Ask one simple question (review g10 and g19)",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Ask one simple question (review g10 and g19)",
+      "body": "French uses avoir mal à + a body part to say that something hurts. You already know the present tense of avoir. Match à to the article before the body word."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use au, à la, à l' or aux",
+      "headers": [
+        "Body word",
+        "Say",
+        "English"
+      ],
+      "rows": [
+        [
+          "le dos",
+          "J'ai mal au dos.",
+          "My back hurts."
+        ],
+        [
+          "la tête",
+          "J'ai mal à la tête.",
+          "My head hurts."
+        ],
+        [
+          "l'oreille",
+          "J'ai mal à l'oreille.",
+          "My ear hurts."
+        ],
+        [
+          "les yeux",
+          "J'ai mal aux yeux.",
+          "My eyes hurt."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Ask one simple question (review g10 and g19)",
+      "body": "• Start with j'ai mal à. Keep mal the same: J'ai mal au dos; j'ai mal à la tête.\n• For le, join à + le to make au: à + le dos → au dos.\n• For la, keep à la; before a vowel, use à l': à la gorge; à l'oreille.\n• For a plural body word with les, use aux: à + les yeux → aux yeux.\n• Use avoir for the person: j'ai mal; tu as mal; elle a mal."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Watch out",
+      "body": "Say J'ai mal à la tête for a general headache. Say J'ai mal à une dent when one tooth hurts. This is only a language pattern; a health professional can help with medical questions."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "My back hurts.",
+      "options": [
+        "J'ai mal aux dos.",
+        "Je suis mal au dos.",
+        "J'ai mal au dos.",
+        "J'ai mal à le dos."
+      ],
+      "answer": 2,
+      "explain": "Le dos follows au: à + le = au."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "My throat hurts.",
+      "options": [
+        "J'ai mal à la gorge.",
+        "J'ai mal au gorge.",
+        "J'ai mal aux gorge.",
+        "J'ai la mal gorge."
+      ],
+      "answer": 0,
+      "explain": "La gorge is feminine singular: use à la."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "My ear hurts.",
+      "options": [
+        "J'ai mal au oreille.",
+        "J'ai mal aux oreille.",
+        "Je suis mal à l'oreille.",
+        "J'ai mal à l'oreille."
+      ],
+      "answer": 3,
+      "explain": "Before a vowel, à la becomes à l'."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "My eyes hurt.",
+      "options": [
+        "J'ai mal à la yeux.",
+        "J'ai mal aux yeux.",
+        "J'ai mal au yeux.",
+        "J'ai mal à les yeux."
+      ],
+      "answer": 1,
+      "explain": "Les yeux is plural: use aux."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Ask one simple question (review g10 and g19)",
+      "body": "You can use a familiar question pattern to ask for help. In a clinic or pharmacy, vous is a polite choice when speaking to someone you do not know."
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Simple questions and requests",
+      "headers": [
+        "Ask",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Où avez-vous mal ?",
+          "Where does it hurt?"
+        ],
+        [
+          "Depuis quand ?",
+          "Since when?"
+        ],
+        [
+          "Pouvez-vous m'aider ?",
+          "Can you help me?"
+        ],
+        [
+          "Je voudrais un rendez-vous.",
+          "I would like an appointment."
+        ]
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "You want to ask where the person has pain.",
+      "options": [
+        "Où êtes-vous mal ?",
+        "Combien avez-vous mal ?",
+        "Où avez-vous mal ?",
+        "Quand avez-vous mal ?"
+      ],
+      "answer": 2,
+      "explain": "Où asks for the place; avoir mal is the phrase for pain."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "You want to ask when the pain started.",
+      "options": [
+        "Depuis quand ?",
+        "À quelle heure est le médecin ?",
+        "Où est la pharmacie ?",
+        "Qui est malade ?"
+      ],
+      "answer": 0,
+      "explain": "Depuis quand ? asks since when."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "You want to ask politely for help.",
+      "options": [
+        "Vous pouvez m'aide ?",
+        "Pouvez-vous m'aidez ?",
+        "Pouvez vous aider moi ?",
+        "Pouvez-vous m'aider ?"
+      ],
+      "answer": 3,
+      "explain": "Use pouvez-vous + infinitive: m'aider."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "You want to ask politely for an appointment.",
+      "options": [
+        "Je voudrais le rendez-vous hier.",
+        "Je voudrais un rendez-vous.",
+        "Je veux un rendez-vous, madame!",
+        "Je voudrais rendez-vous un."
+      ],
+      "answer": 1,
+      "explain": "Je voudrais is a polite request."
+    }
+  ]
+}

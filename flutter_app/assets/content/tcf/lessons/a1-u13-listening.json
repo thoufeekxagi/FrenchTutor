@@ -1,0 +1,86 @@
+{
+  "id": "a1-u13-listening",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Listening practice",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "J'ai mal au dos depuis hier.",
+      "question": "What hurts?",
+      "options": [
+        "The speaker's knee",
+        "The speaker's back",
+        "The speaker's throat",
+        "The speaker's hand"
+      ],
+      "answer": 1,
+      "explain": "The speaker says au dos."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La pharmacie est près de la clinique.",
+      "question": "Where is the pharmacy?",
+      "options": [
+        "At the hospital",
+        "At the bus station",
+        "Near the clinic",
+        "Near the school"
+      ],
+      "answer": 2,
+      "explain": "The speaker says près de la clinique."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je voudrais parler à la pharmacienne.",
+      "question": "Who does the person want to speak with?",
+      "options": [
+        "The pharmacist",
+        "The receptionist",
+        "The teacher",
+        "The manager"
+      ],
+      "answer": 0,
+      "explain": "The speaker asks for la pharmacienne."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Votre rendez-vous est à dix heures.",
+      "question": "What time is the appointment?",
+      "options": [
+        "9:00",
+        "12:00",
+        "16:00",
+        "10:00"
+      ],
+      "answer": 3,
+      "explain": "The recording says dix heures."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le numéro d'urgence est le 911.",
+      "question": "Which number is for an emergency in this message?",
+      "options": [
+        "411",
+        "911",
+        "811",
+        "311"
+      ],
+      "answer": 1,
+      "explain": "The recording identifies le 911 as the emergency number."
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "id": "a1-u13-words-4",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Words: at the pharmacy",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 9,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une pharmacie",
+      "en": "pharmacy",
+      "sound": "ün far-mah-SEE",
+      "exampleFr": "La pharmacie est près de la clinique.",
+      "exampleEn": "The pharmacy is near the clinic."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un pharmacien / une pharmacienne",
+      "en": "a pharmacist",
+      "say": "un pharmacien, une pharmacienne",
+      "sound": "uh(n) far-mah-SYA(N) / ün far-mah-SYEN",
+      "exampleFr": "La pharmacienne est ici.",
+      "exampleEn": "The pharmacist is here."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un médicament",
+      "en": "a medication",
+      "sound": "uh(n) may-dee-kah-MAH(N)",
+      "exampleFr": "Je montre le médicament.",
+      "exampleEn": "I show the medication."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une ordonnance",
+      "en": "a prescription",
+      "sound": "ün or-doh-NAH(N)S",
+      "exampleFr": "J'ai une ordonnance.",
+      "exampleEn": "I have a prescription."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une dose",
+      "en": "a dose",
+      "sound": "ün dohz",
+      "exampleFr": "Je lis la dose sur l'étiquette.",
+      "exampleEn": "I read the dose on the label."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un comprimé",
+      "en": "a tablet, pill",
+      "sound": "uh(n) kohn-pree-MAY",
+      "exampleFr": "Le comprimé est dans la boîte.",
+      "exampleEn": "The tablet is in the box."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une étiquette",
+      "en": "a label",
+      "sound": "ün ay-tee-KEHT",
+      "exampleFr": "L'étiquette est sur la boîte.",
+      "exampleEn": "The label is on the box."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une notice",
+      "en": "a medication information leaflet",
+      "sound": "ün noh-TEES",
+      "exampleFr": "Je lis la notice.",
+      "exampleEn": "I read the information leaflet."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un conseil",
+      "en": "advice",
+      "sound": "uh(n) kohn-SAY",
+      "exampleFr": "Je demande un conseil au pharmacien.",
+      "exampleEn": "I ask the pharmacist for advice."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "expliquer",
+      "en": "to explain",
+      "sound": "ehks-plee-KAY",
+      "exampleFr": "La pharmacienne explique la notice.",
+      "exampleEn": "The pharmacist explains the leaflet."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une pharmacie",
+      "options": [
+        "a prescription",
+        "pharmacy",
+        "a label",
+        "to explain"
+      ],
+      "answer": 1,
+      "explain": "une pharmacie means pharmacy."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un pharmacien / une pharmacienne",
+      "options": [
+        "a dose",
+        "a medication information leaflet",
+        "pharmacy",
+        "a pharmacist"
+      ],
+      "answer": 3,
+      "explain": "un pharmacien / une pharmacienne means a pharmacist."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un médicament",
+      "options": [
+        "a tablet, pill",
+        "a medication",
+        "advice",
+        "a pharmacist"
+      ],
+      "answer": 1,
+      "explain": "un médicament means a medication."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une ordonnance",
+      "options": [
+        "a label",
+        "to explain",
+        "a medication",
+        "a prescription"
+      ],
+      "answer": 3,
+      "explain": "une ordonnance means a prescription."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une dose",
+      "options": [
+        "a medication information leaflet",
+        "a dose",
+        "pharmacy",
+        "a prescription"
+      ],
+      "answer": 1,
+      "explain": "une dose means a dose."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un comprimé",
+      "options": [
+        "advice",
+        "a pharmacist",
+        "a dose",
+        "a tablet, pill"
+      ],
+      "answer": 3,
+      "explain": "un comprimé means a tablet, pill."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un médicament",
+      "question": "Which word did you hear?",
+      "options": [
+        "une dose",
+        "un médicament",
+        "une étiquette",
+        "un conseil"
+      ],
+      "answer": 1,
+      "explain": "You heard un médicament: a medication."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un comprimé",
+      "question": "Which word did you hear?",
+      "options": [
+        "une notice",
+        "un comprimé",
+        "expliquer",
+        "un médicament"
+      ],
+      "answer": 1,
+      "explain": "You heard un comprimé: a tablet, pill."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Watch out",
+      "body": "Ask a pharmacist or another qualified health professional when you need help understanding a medication or its label. This lesson teaches the words for asking; it does not give dosing or treatment instructions."
+    }
+  ]
+}

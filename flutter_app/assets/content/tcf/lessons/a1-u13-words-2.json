@@ -1,0 +1,212 @@
+{
+  "id": "a1-u13-words-2",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Words: lower body and other parts",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une jambe",
+      "en": "leg",
+      "sound": "ün zhah(n)b",
+      "exampleFr": "J'ai mal à la jambe.",
+      "exampleEn": "My leg hurts."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un genou",
+      "en": "knee",
+      "sound": "uh(n) zhuh-NOO",
+      "exampleFr": "J'ai mal au genou.",
+      "exampleEn": "My knee hurts."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un pied",
+      "en": "foot",
+      "sound": "uh(n) pyay",
+      "exampleFr": "J'ai mal au pied.",
+      "exampleEn": "My foot hurts."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le dos",
+      "en": "back",
+      "sound": "luh doh",
+      "exampleFr": "J'ai mal au dos.",
+      "exampleEn": "My back hurts."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le ventre",
+      "en": "stomach, belly",
+      "sound": "luh vah(n)tr",
+      "exampleFr": "J'ai mal au ventre.",
+      "exampleEn": "My stomach hurts."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la gorge",
+      "en": "throat",
+      "sound": "lah gorzh",
+      "exampleFr": "J'ai mal à la gorge.",
+      "exampleEn": "My throat hurts."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une dent",
+      "en": "tooth",
+      "sound": "ün dah(n)",
+      "exampleFr": "J'ai mal à une dent.",
+      "exampleEn": "One of my teeth hurts."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une épaule",
+      "en": "shoulder",
+      "sound": "ün ay-POHL",
+      "exampleFr": "J'ai mal à l'épaule.",
+      "exampleEn": "My shoulder hurts."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un doigt de pied",
+      "en": "toe",
+      "sound": "uh(n) dwah duh pyay",
+      "exampleFr": "J'ai mal à un doigt de pied.",
+      "exampleEn": "One of my toes hurts."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "le corps",
+      "en": "body",
+      "sound": "luh kor",
+      "exampleFr": "Le corps est ici.",
+      "exampleEn": "The body is here."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une jambe",
+      "options": [
+        "back",
+        "leg",
+        "tooth",
+        "body"
+      ],
+      "answer": 1,
+      "explain": "une jambe means leg."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un genou",
+      "options": [
+        "stomach, belly",
+        "shoulder",
+        "leg",
+        "knee"
+      ],
+      "answer": 3,
+      "explain": "un genou means knee."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un pied",
+      "options": [
+        "throat",
+        "foot",
+        "toe",
+        "knee"
+      ],
+      "answer": 1,
+      "explain": "un pied means foot."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le dos",
+      "options": [
+        "tooth",
+        "body",
+        "foot",
+        "back"
+      ],
+      "answer": 3,
+      "explain": "le dos means back."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le ventre",
+      "options": [
+        "shoulder",
+        "stomach, belly",
+        "leg",
+        "back"
+      ],
+      "answer": 1,
+      "explain": "le ventre means stomach, belly."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la gorge",
+      "options": [
+        "toe",
+        "knee",
+        "stomach, belly",
+        "throat"
+      ],
+      "answer": 3,
+      "explain": "la gorge means throat."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un genou",
+      "question": "Which word did you hear?",
+      "options": [
+        "le dos",
+        "un genou",
+        "la gorge",
+        "une épaule"
+      ],
+      "answer": 1,
+      "explain": "You heard un genou: knee."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le ventre",
+      "question": "Which word did you hear?",
+      "options": [
+        "une dent",
+        "le ventre",
+        "le corps",
+        "un genou"
+      ],
+      "answer": 1,
+      "explain": "You heard le ventre: stomach, belly."
+    }
+  ]
+}

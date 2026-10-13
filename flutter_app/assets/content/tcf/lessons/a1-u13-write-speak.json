@@ -1,0 +1,35 @@
+{
+  "id": "a1-u13-write-speak",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Write and speak",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a short clinic message",
+      "body": "Write 3 or 4 short lines. Ask for an appointment, say what hurts and when it started. Do not try to diagnose the cause.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour. Je voudrais un rendez-vous. J'ai mal à la gorge depuis hier. Merci de me répondre.\n\nCheck:\n• Begin with a polite greeting.\n• Use j'ai mal à + body part.\n• Use depuis with a time such as hier."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Talk to a receptionist",
+      "body": "Tell a clinic receptionist one body part that hurts and when it started. Ask for an appointment or to speak with a health professional.\n\n• Use j'ai mal au / à la / à l' / aux.\n• Say when it started with depuis.\n• Use a polite request with je voudrais."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. J'ai mal au ventre depuis hier. Je voudrais un rendez-vous, s'il vous plaît.",
+      "en": "Model answer. Say it in your own words after.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

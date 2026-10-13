@@ -29,6 +29,8 @@ STORY_META = {
                    keywords=["tuque", "mitaines", "bottes", "manteau", "verglas", "trottoir"]),
     "a1-u12": dict(id="a1-premier-jour", minutes=3, summary="Sam takes the bus to his first day at work and meets his manager, Karine.",
                    keywords=["travail", "l'autobus", "bureau", "gérante", "manteau", "premier"]),
+    "a1-u13": dict(id="a1-rendez-vous-clinique", minutes=3, summary="Samira checks in at a clinic and describes a headache and fever.",
+                   keywords=["rendez-vous", "clinique", "salle", "carte", "tête", "fièvre"]),
 }
 
 STORY_GLOSS = {
@@ -193,6 +195,20 @@ STORY_GLOSS = {
         "prends": ("take (prendre)", "verb"), "s'appelle": ("is called (s'appeler)", "verb"),
         "sept": ("seven", "number"), "suis": ("am (être)", "verb"),
         "travail": ("work", "noun, masculine", "tra-VAHY"), "un": ("a",), "une": ("a",),
+    },
+    "a1-rendez-vous-clinique": {
+        "attend": ("waits for (attendre)", "verb", "ah-tah(n)"),
+        "clinique": ("clinic", "noun, feminine", "kli-NEEK"),
+        "d'assurance": ("of health insurance",), "d'attente": ("of waiting",),
+        "de": ("of",), "est": ("is (être)", "verb"),
+        "fièvre": ("fever", "noun, feminine", "FYEVR"), "hier": ("yesterday", "day adverb"),
+        "j'ai": ("I have (avoir)", "verb"), "le": ("the",), "mal": ("pain", "noun, masculine"),
+        "maladie": ("illness, disease", "noun, feminine", "mah-lah-DEE"),
+        "montre": ("shows (montrer)", "verb", "mohnt"),
+        "prend": ("takes (prendre)", "verb", "pra(n)"),
+        "réceptionniste": ("receptionist", "noun", "ray-sehp-syoh-NEEST"),
+        "sa": ("her",), "salle": ("room", "noun, feminine", "sal"),
+        "samira": ("Samira (a woman's name)",), "son": ("her (masculine noun)",), "un": ("a",),
     },
     "a1-hiver-montreal": {
         "ce": ("this",), "matin": ("morning", "noun, masculine", "mah-TA(N)"),

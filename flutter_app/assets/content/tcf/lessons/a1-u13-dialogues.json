@@ -1,0 +1,132 @@
+{
+  "id": "a1-u13-dialogues",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Dialogues",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "These are language models for asking for help. Listen for the symptom, the body part and the next question; the dialogue does not diagnose or recommend treatment."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "At the pharmacy",
+      "body": "Samira asks a pharmacist to explain a medication label.",
+      "examples": [
+        {
+          "fr": "Bonjour. J'ai mal à la gorge depuis hier.",
+          "en": "Samira: Hello. My throat has hurt since yesterday."
+        },
+        {
+          "fr": "Bonjour. Avez-vous une ordonnance ?",
+          "en": "Pharmacienne: Hello. Do you have a prescription?"
+        },
+        {
+          "fr": "Non. Pouvez-vous m'expliquer cette notice ?",
+          "en": "Samira: No. Can you explain this leaflet to me?"
+        },
+        {
+          "fr": "Oui. Je peux vous expliquer la notice et l'étiquette.",
+          "en": "Pharmacienne: Yes. I can explain the leaflet and the label to you."
+        },
+        {
+          "fr": "Merci. Pouvez-vous m'expliquer la dose ?",
+          "en": "Samira: Thank you. Can you explain the dose to me?"
+        },
+        {
+          "fr": "Bien sûr. Je vais vous expliquer.",
+          "en": "Pharmacienne: Of course. I will explain it to you."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "At the clinic reception",
+      "body": "Samira checks in for her appointment.",
+      "examples": [
+        {
+          "fr": "Bonjour, madame. Votre nom, s'il vous plaît ?",
+          "en": "Réceptionniste: Hello, ma'am. Your name, please?"
+        },
+        {
+          "fr": "Samira Haddad. J'ai un rendez-vous.",
+          "en": "Samira: Samira Haddad. I have an appointment."
+        },
+        {
+          "fr": "Votre carte d'assurance maladie, s'il vous plaît.",
+          "en": "Réceptionniste: Your health insurance card, please."
+        },
+        {
+          "fr": "Voici ma carte. J'ai mal à la tête depuis hier.",
+          "en": "Samira: Here is my card. My head has hurt since yesterday."
+        },
+        {
+          "fr": "Merci. La salle d'attente est à droite.",
+          "en": "Réceptionniste: Thank you. The waiting room is on the right."
+        },
+        {
+          "fr": "Merci beaucoup.",
+          "en": "Samira: Thank you very much."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does Samira want the pharmacist to explain?",
+      "options": [
+        "A job application",
+        "A weather forecast",
+        "The medication notice and dose",
+        "Her bus schedule"
+      ],
+      "answer": 2,
+      "explain": "She asks about the notice and the dose shown on the label."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the receptionist ask Samira to show?",
+      "options": [
+        "Her health insurance card",
+        "Her résumé",
+        "Her class schedule",
+        "A rental listing"
+      ],
+      "answer": 0,
+      "explain": "The receptionist asks for her carte d'assurance maladie."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where is the waiting room?",
+      "options": [
+        "At the pharmacy",
+        "At the bus stop",
+        "On the left",
+        "On the right"
+      ],
+      "answer": 3,
+      "explain": "The receptionist says à droite."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "How long has Samira's head hurt?",
+      "options": [
+        "For one year",
+        "Since yesterday",
+        "For one month",
+        "Since Monday"
+      ],
+      "answer": 1,
+      "explain": "She says depuis hier."
+    }
+  ]
+}

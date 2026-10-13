@@ -1,0 +1,213 @@
+{
+  "id": "a1-u13-words-1",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Words: head and upper body",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la tête",
+      "en": "head",
+      "sound": "lah teht",
+      "exampleFr": "J'ai mal à la tête.",
+      "exampleEn": "My head hurts."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le visage",
+      "en": "face",
+      "sound": "luh vee-ZAHZH",
+      "exampleFr": "Le visage est ici.",
+      "exampleEn": "The face is here."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "les yeux (m. pl.)",
+      "en": "eyes",
+      "say": "les yeux",
+      "sound": "lay zyuh",
+      "exampleFr": "J'ai mal aux yeux.",
+      "exampleEn": "My eyes hurt."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une oreille",
+      "en": "ear",
+      "sound": "ün oh-RAY",
+      "exampleFr": "J'ai mal à l'oreille.",
+      "exampleEn": "My ear hurts."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "le nez",
+      "en": "nose",
+      "sound": "luh nay",
+      "exampleFr": "J'ai mal au nez.",
+      "exampleEn": "My nose hurts."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la bouche",
+      "en": "mouth",
+      "sound": "lah boosh",
+      "exampleFr": "La bouche est ici.",
+      "exampleEn": "The mouth is here."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "le cou",
+      "en": "neck",
+      "sound": "luh koo",
+      "exampleFr": "J'ai mal au cou.",
+      "exampleEn": "My neck hurts."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un bras",
+      "en": "arm",
+      "sound": "uh(n) brah",
+      "exampleFr": "J'ai mal au bras.",
+      "exampleEn": "My arm hurts."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une main",
+      "en": "hand",
+      "sound": "ün ma(n)",
+      "exampleFr": "J'ai mal à la main.",
+      "exampleEn": "My hand hurts."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "un doigt",
+      "en": "finger",
+      "sound": "uh(n) dwah",
+      "exampleFr": "J'ai mal au doigt.",
+      "exampleEn": "My finger hurts."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la tête",
+      "options": [
+        "ear",
+        "head",
+        "neck",
+        "finger"
+      ],
+      "answer": 1,
+      "explain": "la tête means head."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le visage",
+      "options": [
+        "nose",
+        "arm",
+        "head",
+        "face"
+      ],
+      "answer": 3,
+      "explain": "le visage means face."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "les yeux (m. pl.)",
+      "options": [
+        "mouth",
+        "eyes",
+        "hand",
+        "face"
+      ],
+      "answer": 1,
+      "explain": "les yeux (m. pl.) means eyes."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une oreille",
+      "options": [
+        "neck",
+        "finger",
+        "eyes",
+        "ear"
+      ],
+      "answer": 3,
+      "explain": "une oreille means ear."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le nez",
+      "options": [
+        "arm",
+        "nose",
+        "head",
+        "ear"
+      ],
+      "answer": 1,
+      "explain": "le nez means nose."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la bouche",
+      "options": [
+        "hand",
+        "face",
+        "nose",
+        "mouth"
+      ],
+      "answer": 3,
+      "explain": "la bouche means mouth."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le visage",
+      "question": "Which word did you hear?",
+      "options": [
+        "une oreille",
+        "le visage",
+        "la bouche",
+        "un bras"
+      ],
+      "answer": 1,
+      "explain": "You heard le visage: face."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "le nez",
+      "question": "Which word did you hear?",
+      "options": [
+        "le cou",
+        "le nez",
+        "une main",
+        "la tête"
+      ],
+      "answer": 1,
+      "explain": "You heard le nez: nose."
+    }
+  ]
+}

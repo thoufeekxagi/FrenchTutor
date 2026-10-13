@@ -1,0 +1,191 @@
+{
+  "id": "a1-u13-words-5",
+  "unit": "a1-u13",
+  "unitTitle": "Health and services",
+  "title": "Words: at a clinic and getting help",
+  "subtitle": "Unit 13: Health and services",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une clinique",
+      "en": "a clinic",
+      "sound": "ün klee-NEEK",
+      "exampleFr": "La clinique est ici.",
+      "exampleEn": "The clinic is here."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "sans rendez-vous",
+      "en": "without an appointment; walk-in",
+      "sound": "sah(n) rah(n)-day-VOO",
+      "exampleFr": "La clinique est sans rendez-vous.",
+      "exampleEn": "The clinic is walk-in."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "Info-Santé 811, option 1",
+      "en": "Québec's phone line for a non-urgent health question",
+      "sound": "een-foh-sah(n)-TAY weet uh(n) uh(n), op-SYOH(N) ün",
+      "exampleFr": "Info-Santé 811, option 1.",
+      "exampleEn": "Info-Santé 811, option 1."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une réceptionniste",
+      "en": "a receptionist",
+      "sound": "ün ray-sehp-syoh-NEEST",
+      "exampleFr": "La réceptionniste parle avec Samira.",
+      "exampleEn": "The receptionist speaks with Samira."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un médecin / une médecin",
+      "en": "a doctor, physician",
+      "say": "un médecin, une médecin",
+      "sound": "uh(n) mayd-SA(N) / ün mayd-SA(N)",
+      "exampleFr": "Le médecin arrive bientôt.",
+      "exampleEn": "The doctor will arrive soon."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une infirmière",
+      "en": "a nurse",
+      "sound": "ün a(n)-feer-MYEHR",
+      "exampleFr": "L'infirmière pose une question.",
+      "exampleEn": "The nurse asks a question."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une salle d'attente",
+      "en": "a waiting room",
+      "sound": "ün sahl dah-TANT",
+      "exampleFr": "La salle d'attente est calme.",
+      "exampleEn": "The waiting room is quiet."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une carte d'assurance maladie",
+      "en": "a health insurance card (Québec)",
+      "sound": "ün kahrt dah-sü-RAH(N)S mah-lah-DEE",
+      "exampleFr": "Je montre ma carte d'assurance maladie.",
+      "exampleEn": "I show my health insurance card."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une urgence",
+      "en": "an emergency; an emergency department",
+      "sound": "ün ür-ZHAH(N)S",
+      "exampleFr": "C'est une urgence.",
+      "exampleEn": "It is an emergency."
+    },
+    {
+      "type": "word",
+      "id": "w10",
+      "fr": "une ambulance",
+      "en": "an ambulance",
+      "sound": "ün ah(n)-bü-LAH(N)S",
+      "exampleFr": "L'ambulance arrive.",
+      "exampleEn": "The ambulance is arriving."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une clinique",
+      "options": [
+        "a receptionist",
+        "a clinic",
+        "a waiting room",
+        "an ambulance"
+      ],
+      "answer": 1,
+      "explain": "une clinique means a clinic."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "sans rendez-vous",
+      "options": [
+        "a doctor, physician",
+        "a health insurance card (Québec)",
+        "a clinic",
+        "without an appointment; walk-in"
+      ],
+      "answer": 3,
+      "explain": "sans rendez-vous means without an appointment; walk-in."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Info-Santé 811, option 1",
+      "options": [
+        "a nurse",
+        "Québec's phone line for a non-urgent health question",
+        "an emergency; an emergency department",
+        "without an appointment; walk-in"
+      ],
+      "answer": 1,
+      "explain": "Info-Santé 811, option 1 means Québec's phone line for a non-urgent health question."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une réceptionniste",
+      "options": [
+        "a waiting room",
+        "an ambulance",
+        "Québec's phone line for a non-urgent health question",
+        "a receptionist"
+      ],
+      "answer": 3,
+      "explain": "une réceptionniste means a receptionist."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un médecin / une médecin",
+      "options": [
+        "a health insurance card (Québec)",
+        "a doctor, physician",
+        "a clinic",
+        "a receptionist"
+      ],
+      "answer": 1,
+      "explain": "un médecin / une médecin means a doctor, physician."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une infirmière",
+      "options": [
+        "an emergency; an emergency department",
+        "without an appointment; walk-in",
+        "a doctor, physician",
+        "a nurse"
+      ],
+      "answer": 3,
+      "explain": "une infirmière means a nurse."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "In Québec, a clinique sans rendez-vous sees people without a scheduled appointment, but hours, availability and how to access a clinic can change. In Québec, call 811, option 1 for a non-urgent health question; call 911 for an emergency that needs immediate help. Other provinces and territories may use different health-line services."
+    }
+  ]
+}
