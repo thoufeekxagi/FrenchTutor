@@ -49,21 +49,36 @@ void main() {
       ),
     );
 
-    // Let the gate restore local state and mount onboarding, then wait out the
-    // V3 launch splash (1.7s) so it advances to the welcome page.
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 2500));
-    await tester.pumpAndSettle();
+    // Let the gate restore local state and mount onboarding.
+    await tester.pump(const Duration(milliseconds: 600));
 
-    // Deliberate order: a fresh learner experiences the product first, and is
-    // asked to create an account only at the END of onboarding. Never an
-    // account wall up front.
-    expect(find.text('ParleSprint'), findsOneWidget);
+    // Deliberate order: a fresh learner experiences the product first and is
+    // asked to create an account only after onboarding. Never a wall up front.
+    expect(find.text('Hello'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
 
-    await tester.tap(find.text('Get started'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('How much French'), findsOneWidget);
+    Future<void> tapKey(String key) async {
+      await tester.tap(find.byKey(ValueKey(key)));
+      // The page slide starts on the next frame, then runs 380 ms.
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 900));
+    }
+
+    // Greeting, then the three value screens.
+    await tapKey('onboarding.helloContinue');
+    expect(find.text('One clear course.'), findsOneWidget);
+    await tapKey('onboarding.courseContinue');
+    expect(find.textContaining('TCF Canada'), findsWidgets);
+    await tapKey('onboarding.goalContinue');
+    expect(find.text('Practice every lesson with Marie.'), findsOneWidget);
+    await tapKey('onboarding.practiceContinue');
+
+    // Setup: a first name (optional), the optional exam date, then the level.
+    expect(find.text('What should we call you?'), findsOneWidget);
+    await tapKey('onboarding.nameSkip');
+    expect(find.text('When is your TCF Canada exam?'), findsOneWidget);
+    await tapKey('onboarding.examDateSkip');
+    expect(find.text('What is your current French level?'), findsOneWidget);
     expect(find.text('Continue with Google'), findsNothing);
   });
 

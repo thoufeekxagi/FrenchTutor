@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/main.dart' as app;
 import 'package:french_tutor/v3/story/v3_story.dart';
@@ -54,6 +55,9 @@ void main() {
   }
 
   Future<void> openStory(WidgetTester tester, V3Story story) async {
+    // Stories are listed by level, so pick the story's level first.
+    await press(tester, story.level);
+    await tester.pump(const Duration(milliseconds: 400));
     await waitContains(tester, story.title);
     final all = await labels(tester);
     final label = all.firstWhere(
@@ -107,9 +111,23 @@ void main() {
     await prefs.setBool(v3Key('v3_story_hear_words'), true);
     await prefs.setBool('session_translate_sentences', true);
     V3StoryAudio.debugLog.clear();
-    final stories = await V3Stories.load();
-    expect(stories.length, greaterThanOrEqualTo(4));
+    final allStories = await V3Stories.load();
+    expect(allStories.length, greaterThanOrEqualTo(4));
+    const storyFilter = String.fromEnvironment('E2E_STORY_ONLY');
+    final stories = storyFilter.isEmpty
+        ? allStories
+        : allStories
+              .where(
+                (story) =>
+                    story.id == storyFilter || story.id.startsWith(storyFilter),
+              )
+              .toList();
+    expect(stories, isNotEmpty, reason: 'E2E_STORY_ONLY matched no story');
     final first = stories.first;
+    final firstUnit = first.sentences.expand((s) => s.units).first;
+    final alternateUnit = first.sentences
+        .expand((s) => s.units)
+        .firstWhere((unit) => unit.key != firstUnit.key);
 
     app.main();
 
@@ -132,7 +150,7 @@ void main() {
     );
     expect(await texts(tester), containsAll(['A1', 'A2', 'B1', 'B2']));
     expect(
-      l.any((x) => x.startsWith(stories[1].title)),
+      l.any((x) => x.startsWith(allStories[1].title)),
       isTrue,
       reason: 'second story card missing',
     );
@@ -158,20 +176,21 @@ void main() {
     );
 
     // ---- Tap a word: small card above the word, and the word is spoken --
-    await press(tester, 'Word femme');
+    await press(tester, 'Word ${firstUnit.key}');
     await probe.capture(tester, '03_word_card');
     t = await texts(tester);
-    expect(t, contains('woman'), reason: 'meaning card did not appear');
+    final firstMeaning = first.words[firstUnit.key]!.en;
+    expect(t, contains(firstMeaning), reason: 'meaning card did not appear');
     expect(await labels(tester), contains('Hear word'));
     expect(
       V3StoryAudio.debugLog,
-      contains('word:femme'),
+      contains('word:${firstUnit.key}'),
       reason: 'hear words is on, so the tap must speak the word',
     );
-    await press(tester, 'Word femme'); // tapping again closes the card
+    await press(tester, 'Word ${firstUnit.key}'); // tapping again closes it
     expect(
       await texts(tester),
-      isNot(contains('woman')),
+      isNot(contains(firstMeaning)),
       reason: 'card did not close',
     );
 
@@ -187,16 +206,17 @@ void main() {
     await tester.tapAt(const Offset(200, 90)); // tap outside to close
     await tester.pump(const Duration(milliseconds: 700));
     V3StoryAudio.debugLog.clear();
-    await press(tester, 'Word valise');
-    expect(await texts(tester), contains('suitcase'));
+    await press(tester, 'Word ${alternateUnit.key}');
+    final alternateMeaning = first.words[alternateUnit.key]!.en;
+    expect(await texts(tester), contains(alternateMeaning));
     expect(
       V3StoryAudio.debugLog,
-      isNot(contains('word:valise')),
+      isNot(contains('word:${alternateUnit.key}')),
       reason: 'hear words is off, so the tap must stay silent',
     );
     await press(tester, 'Hear word'); // the card's own speaker still works
-    expect(V3StoryAudio.debugLog, contains('word:valise'));
-    await press(tester, 'Word valise');
+    expect(V3StoryAudio.debugLog, contains('word:${alternateUnit.key}'));
+    await press(tester, 'Word ${alternateUnit.key}');
 
     // ---- Translation toggle ---------------------------------------------
     await press(tester, 'Translation on');
@@ -215,7 +235,7 @@ void main() {
     // Tapping a word selected its sentence, so playback starts from there,
     // the same way the legacy reader reads from the line you picked.
     final from = first.sentences.indexWhere(
-      (s) => s.units.any((u) => u.key == 'valise'),
+      (s) => s.units.any((u) => u.key == alternateUnit.key),
     );
     expect(V3StoryAudio.debugLog, contains('play:$from'));
     await probe.waitForLabel(
@@ -238,6 +258,10 @@ void main() {
     expect(await labels(tester), contains('Speed 1x'));
 
     // ---- Words tab ------------------------------------------------------
+    // The tabs are at the top of the page. Playback follows the sentence and
+    // scrolls them out of view, so go back to the top first, as a learner would.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 2500));
+    await tester.pump(const Duration(milliseconds: 600));
     await press(tester, 'Words');
     await probe.capture(tester, '06_words');
     final kw = first.keywords.first;
@@ -261,17 +285,21 @@ void main() {
       await answerQuiz(tester, story);
       await press(tester, 'Done');
     }
-    await waitContains(tester, first.title);
-    await probe.settle(tester, timeout: const Duration(seconds: 8));
-    await probe.capture(tester, '08_all_read');
-    l = await labels(tester);
     for (final story in stories) {
+      await press(tester, story.level);
+      await tester.pump(const Duration(milliseconds: 400));
+      await waitContains(tester, story.title);
+      l = await labels(tester);
       expect(
         l.any((x) => x.startsWith(story.title) && x.endsWith(', read')),
         isTrue,
         reason: '${story.title} is not marked as read',
       );
     }
+    await press(tester, first.level);
+    await waitContains(tester, first.title);
+    await probe.settle(tester, timeout: const Duration(seconds: 8));
+    await probe.capture(tester, '08_all_read');
     expect(
       await V3StoryProgress.done(),
       containsAll(stories.map((s) => s.id)),
@@ -287,12 +315,12 @@ void main() {
     await waitContains(tester, first.title);
     await probe.capture(tester, '09_dark_list');
     await openStory(tester, first);
-    await press(tester, 'Word femme');
+    await press(tester, 'Word ${firstUnit.key}');
     await probe.capture(tester, '10_dark_word_card');
-    expect(await texts(tester), contains('woman'));
+    expect(await texts(tester), contains(firstMeaning));
 
     // Leave the device in light mode.
-    await press(tester, 'Word femme');
+    await press(tester, 'Word ${firstUnit.key}');
     await press(tester, 'Back');
     await press(tester, 'Me');
     await press(tester, 'Dark mode');

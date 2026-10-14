@@ -56,11 +56,11 @@ void main() {
     app.main();
     await probe.waitForLabel(
       tester,
-      'Start lesson',
+      'Continue path',
       timeout: const Duration(seconds: 60),
     );
     await probe.settle(tester, timeout: const Duration(seconds: 12));
-    await press(tester, 'Start lesson');
+    await press(tester, 'Continue path');
     await probe.waitForLabel(tester, 'Talk to $name');
     await probe.capture(tester, '00_lesson_before_call');
 
@@ -175,7 +175,7 @@ void main() {
     await probe.waitForLabel(tester, 'End call');
     final before = V3MarieSession.debugLog.where((e) => e == 'end').length;
     await press(tester, 'Close lesson');
-    await probe.waitForLabel(tester, 'Resume lesson');
+    await probe.waitForLabel(tester, 'Continue path');
     expect(
       V3MarieSession.debugLog.where((e) => e == 'end').length,
       before + 1,

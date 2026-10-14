@@ -41,11 +41,11 @@ void main() {
     app.main();
     await probe.waitForLabel(
       tester,
-      'Start lesson',
+      'Continue path',
       timeout: const Duration(seconds: 60),
     );
     await probe.settle(tester, timeout: const Duration(seconds: 12));
-    await press(tester, 'Start lesson');
+    await press(tester, 'Continue path');
 
     // Three steps in. The 4th word must be on screen after resuming.
     for (var i = 0; i < 3; i++) {
@@ -77,16 +77,15 @@ void main() {
 
     // Leave, and come back.
     await press(tester, 'Close lesson');
-    await probe.waitForLabel(tester, 'Resume lesson');
+    await probe.waitForLabel(tester, 'Continue path');
     await probe.settle(tester, timeout: const Duration(seconds: 6));
     await probe.capture(tester, '01_resume_offered');
     expect(
-      (await texts(tester)).any((e) => e.toString().contains('STEP 5 OF')),
+      (await texts(tester)).any((e) => e.toString() == 'CONTINUE PATH'),
       isTrue,
-      reason:
-          'Resume must offer the furthest step reached, not the step reviewed',
+      reason: 'the home card must offer the unfinished lesson',
     );
-    await press(tester, 'Resume lesson');
+    await press(tester, 'Continue path');
     await probe.capture(tester, '02_resumed');
     expect(
       await texts(tester),

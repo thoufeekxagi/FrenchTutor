@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/main.dart' as app;
 import 'package:french_tutor/v3/lesson/v3_course.dart';
@@ -27,6 +28,25 @@ void main() {
     await tester.pump(const Duration(milliseconds: 650));
   }
 
+  /// Long reading passages push the answers below the screen. A learner
+  /// scrolls to them; the walker does the same until the option is on screen.
+  Future<void> scrollToLabel(WidgetTester tester, String label) async {
+    final screenHeight = tester.view.physicalSize.height;
+    for (var i = 0; i < 8; i++) {
+      final hits = (probe.describe(tester)['tappable']! as List)
+          .cast<Map>()
+          .where((e) => e['label'] == label)
+          .toList();
+      if (hits.isNotEmpty) {
+        final rect = hits.first['rect'] as Map;
+        final bottom = (rect['y'] as num) + (rect['h'] as num);
+        if (bottom < screenHeight * 0.80) return;
+      }
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -450));
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+  }
+
   testWidgets('v3 course walk: every lesson, every step', (tester) async {
     final semantics = tester.ensureSemantics();
     final prefs = await SharedPreferences.getInstance();
@@ -52,14 +72,14 @@ void main() {
     app.main();
     await probe.waitForLabel(
       tester,
-      'Start lesson',
+      'Continue path',
       timeout: const Duration(seconds: 60),
     );
     await probe.settle(tester, timeout: const Duration(seconds: 15));
 
     for (final lesson in lessons) {
       // Learn offers this lesson next.
-      await probe.waitForLabel(tester, 'Start lesson');
+      await probe.waitForLabel(tester, 'Continue path');
       await probe.settle(
         tester,
         timeout: const Duration(seconds: 8),
@@ -70,7 +90,7 @@ void main() {
         contains(lesson.title),
         reason: 'Learn did not offer "${lesson.title}" next',
       );
-      await press(tester, 'Start lesson');
+      await press(tester, 'Continue path');
 
       for (final step in lesson.steps) {
         final tag = '${lesson.id}_${step.id}';
@@ -80,6 +100,7 @@ void main() {
             if (step == lesson.steps.first) {
               await probe.capture(tester, '${tag}_question');
             }
+            await scrollToLabel(tester, s.options[s.answer]);
             await press(tester, s.options[s.answer]);
             await press(tester, 'Check');
             expect(
@@ -92,6 +113,7 @@ void main() {
             if (step == lesson.steps.first) {
               await probe.capture(tester, '${tag}_question');
             }
+            await scrollToLabel(tester, s.options[s.answer]);
             await press(tester, s.options[s.answer]);
             await press(tester, 'Check');
             expect(

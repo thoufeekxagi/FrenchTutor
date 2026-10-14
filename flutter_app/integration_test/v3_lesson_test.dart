@@ -50,13 +50,13 @@ void main() {
     // Learn offers the sample lesson first.
     await probe.waitForLabel(
       tester,
-      'Start lesson',
+      'Continue path',
       timeout: const Duration(seconds: 60),
     );
     await probe.settle(tester, timeout: const Duration(seconds: 15));
     await probe.capture(tester, '01_learn_hero');
     expect(await texts(tester), contains('Sample lesson: Bonjour'));
-    await press(tester, 'Start lesson');
+    await press(tester, 'Continue path');
 
     // Explain step.
     await probe.waitForLabel(tester, 'Continue');

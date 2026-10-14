@@ -37,6 +37,39 @@ void main() {
     });
   });
 
+  group('Profile saving', () {
+    test('skipping reminders (no days, no time) saves instead of crashing', () {
+      // Regression: onboarding's "Skip for now" saved an empty day list,
+      // which was written as NULL into a NOT NULL column and threw, so a new
+      // learner could not finish onboarding.
+      final store = LearningStore(sqlite3.openInMemory());
+      final profile = store.profile()
+        ..level = 'b1'
+        ..reminderTime = null
+        ..preferredDays = [];
+      expect(() => store.saveProfile(profile), returnsNormally);
+      final back = store.profile();
+      expect(back.level, 'b1');
+      expect(back.reminderTime, isNull);
+      expect(
+        back.preferredDays,
+        isNotEmpty,
+        reason: 'falls back to the default plan',
+      );
+    });
+
+    test('chosen days and time round-trip', () {
+      final store = LearningStore(sqlite3.openInMemory());
+      final profile = store.profile()
+        ..reminderTime = '19:00'
+        ..preferredDays = ['mon', 'wed', 'fri'];
+      store.saveProfile(profile);
+      final back = store.profile();
+      expect(back.reminderTime, '19:00');
+      expect(back.preferredDays, ['mon', 'wed', 'fri']);
+    });
+  });
+
   group('SRS grading', () {
     late LearningStore store;
     late SRSService srs;

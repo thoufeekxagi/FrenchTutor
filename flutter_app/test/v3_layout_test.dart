@@ -10,7 +10,7 @@ import 'package:french_tutor/v3/lesson/v3_lesson_player.dart';
 /// Every step of several real lessons must lay out without overflow on a small
 /// phone, an iPad (portrait and landscape) and at large text.
 void main() {
-  const lessons = [
+  final lessons = <String>[
     's0-02',
     's0-06',
     'a1-u01-words-1',
@@ -20,8 +20,22 @@ void main() {
     'a1-u04-tcf',
     'a1-u05-reading',
   ];
+  final a2UnitOne =
+      Directory('assets/content/tcf/lessons')
+          .listSync()
+          .whereType<File>()
+          .where(
+            (file) =>
+                file.path.endsWith('.json') &&
+                file.uri.pathSegments.last.startsWith('a2-u01-'),
+          )
+          .map((file) => file.uri.pathSegments.last.replaceFirst('.json', ''))
+          .toList()
+        ..sort();
+  lessons.addAll(a2UnitOne);
   const sizes = {
     'small phone': Size(320, 568),
+    'phone': Size(390, 844),
     'iPad portrait': Size(810, 1080),
     'iPad landscape': Size(1080, 810),
   };
