@@ -1,0 +1,78 @@
+{
+  "id": "b2-u10-phrases",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Phrases",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "These chunks help you organize a real response. Choose the one that matches your meaning, say it from memory, and replace the topic details with your own."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "les deux intervenants s'entendent sur…",
+      "en": "both speakers agree on…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "l'un propose…, tandis que l'autre…",
+      "en": "one proposes…, while the other…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "y revenir plus tard",
+      "en": "to return to it later",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "en tenir compte",
+      "en": "to take it into account",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "ce point mérite d'être précisé",
+      "en": "this point deserves to be clarified",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "cela dit, il faut aussi…",
+      "en": "that said, we also need to…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "dans le compte rendu, …",
+      "en": "in the summary, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "pour éviter de confondre les deux points, …",
+      "en": "to avoid confusing the two points, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

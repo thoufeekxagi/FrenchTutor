@@ -1,0 +1,148 @@
+{
+  "id": "b1-u11-words-3",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un événement marquant",
+      "en": "a memorable event",
+      "sound": "uh(n) ay-veh-nuh-mahn mar-KAH(N)",
+      "exampleFr": "La remise des certificats a été un événement marquant.",
+      "exampleEn": "The certificate ceremony was a memorable event."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "justifier son choix",
+      "en": "to justify one's choice",
+      "sound": "zhüs-tee-fee-YAY sohn shwah",
+      "exampleFr": "Dans le texte, elle justifie son choix par deux raisons.",
+      "exampleEn": "In the text, she justifies her choice with two reasons."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un point commun",
+      "en": "a point in common",
+      "sound": "uh(n) pwa(n) koh-MUH(N)",
+      "exampleFr": "Les deux activités ont un point commun important.",
+      "exampleEn": "The two activities have an important point in common."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un point de divergence",
+      "en": "a point of disagreement",
+      "sound": "uh(n) pwa(n) duh dee-vehr-ZHAHNS",
+      "exampleFr": "Le coût est un point de divergence entre les groupes.",
+      "exampleEn": "Cost is a point of disagreement between the groups."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "en premier lieu",
+      "en": "first of all",
+      "sound": "ahn pruh-MYAY lyuh",
+      "exampleFr": "En premier lieu, nous avons vérifié la salle.",
+      "exampleEn": "First of all, we checked the room."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "d'une part",
+      "en": "on the one hand",
+      "sound": "dün par",
+      "exampleFr": "D'une part, l'activité est gratuite; d'autre part, elle est loin.",
+      "exampleEn": "On the one hand, the activity is free; on the other, it is far away."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un événement marquant",
+      "options": [
+        "a point of disagreement",
+        "a memorable event",
+        "to justify one's choice",
+        "a point in common"
+      ],
+      "answer": 1,
+      "explain": "un événement marquant means a memorable event."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "justifier son choix",
+      "options": [
+        "first of all",
+        "a point in common",
+        "a point of disagreement",
+        "to justify one's choice"
+      ],
+      "answer": 3,
+      "explain": "justifier son choix means to justify one's choice."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un point commun",
+      "options": [
+        "on the one hand",
+        "a point in common",
+        "first of all",
+        "a memorable event"
+      ],
+      "answer": 1,
+      "explain": "un point commun means a point in common."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de divergence",
+      "options": [
+        "a memorable event",
+        "first of all",
+        "on the one hand",
+        "a point of disagreement"
+      ],
+      "answer": 3,
+      "explain": "un point de divergence means a point of disagreement."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "en premier lieu",
+      "options": [
+        "to justify one's choice",
+        "first of all",
+        "on the one hand",
+        "a memorable event"
+      ],
+      "answer": 1,
+      "explain": "en premier lieu means first of all."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "d'une part",
+      "options": [
+        "a point in common",
+        "a memorable event",
+        "a point of disagreement",
+        "on the one hand"
+      ],
+      "answer": 3,
+      "explain": "d'une part means on the one hand."
+    }
+  ]
+}

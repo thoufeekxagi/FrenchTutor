@@ -1,0 +1,166 @@
+{
+  "id": "a2-u09-words-2",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Words: tickets and trip planning",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une borne libre-service",
+      "en": "a self-service kiosk",
+      "sound": "ün born leebr sehr-VEES",
+      "exampleFr": "À la gare, j'achète mon billet à une borne libre-service.",
+      "exampleEn": "At the station, I buy my ticket at a self-service kiosk."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un numéro de réservation",
+      "en": "a booking number",
+      "sound": "uh(n) nü-may-ROH duh ray-zehr-vah-SYOH(N)",
+      "exampleFr": "Je note le numéro de réservation.",
+      "exampleEn": "I write down the booking number."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un billet à tarif réduit",
+      "en": "a reduced-fare ticket",
+      "sound": "uh(n) bee-YEH ah tah-REE ruh-DÜEE",
+      "exampleFr": "Je cherche un billet à tarif réduit pour le trajet.",
+      "exampleEn": "I look for a reduced-fare ticket for the trip."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un reçu de paiement",
+      "en": "a payment receipt",
+      "sound": "uh(n) ruh-SÜ duh peh-MAH(N)",
+      "exampleFr": "Je garde le reçu de paiement.",
+      "exampleEn": "I keep the payment receipt."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une place réservée",
+      "en": "a reserved seat",
+      "sound": "ün plahs ray-zehr-VAY",
+      "exampleFr": "La place réservée est près de la fenêtre.",
+      "exampleEn": "The reserved seat is near the window."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une heure de départ",
+      "en": "a departure time",
+      "sound": "ün uhr duh day-PAHR",
+      "exampleFr": "Je vérifie l'heure de départ sur l'horaire.",
+      "exampleEn": "I check the departure time on the schedule."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une heure d'arrivée",
+      "en": "an arrival time",
+      "sound": "ün uhr dah-ree-VAY",
+      "exampleFr": "L'horaire indique l'heure d'arrivée.",
+      "exampleEn": "The schedule shows the arrival time."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un billet de train",
+      "en": "a train ticket",
+      "sound": "uh(n) bee-YEH duh tra(n)",
+      "exampleFr": "J'achète un billet de train pour Montréal.",
+      "exampleEn": "I buy a train ticket to Montréal."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une borne libre-service",
+      "options": [
+        "a payment receipt",
+        "a self-service kiosk",
+        "an arrival time",
+        "a booking number"
+      ],
+      "answer": 1,
+      "explain": "une borne libre-service means a self-service kiosk."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un numéro de réservation",
+      "options": [
+        "a reserved seat",
+        "a train ticket",
+        "a reduced-fare ticket",
+        "a booking number"
+      ],
+      "answer": 3,
+      "explain": "un numéro de réservation means a booking number."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un billet à tarif réduit",
+      "options": [
+        "a departure time",
+        "a reduced-fare ticket",
+        "a self-service kiosk",
+        "a payment receipt"
+      ],
+      "answer": 1,
+      "explain": "un billet à tarif réduit means a reduced-fare ticket."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un reçu de paiement",
+      "options": [
+        "an arrival time",
+        "a booking number",
+        "a reserved seat",
+        "a payment receipt"
+      ],
+      "answer": 3,
+      "explain": "un reçu de paiement means a payment receipt."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une place réservée",
+      "options": [
+        "a train ticket",
+        "a reserved seat",
+        "a reduced-fare ticket",
+        "a departure time"
+      ],
+      "answer": 1,
+      "explain": "une place réservée means a reserved seat."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une heure de départ",
+      "options": [
+        "a self-service kiosk",
+        "a payment receipt",
+        "a booking number",
+        "a departure time"
+      ],
+      "answer": 3,
+      "explain": "une heure de départ means a departure time."
+    }
+  ]
+}

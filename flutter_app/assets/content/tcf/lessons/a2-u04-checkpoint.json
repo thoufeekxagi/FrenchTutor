@@ -1,0 +1,140 @@
+{
+  "id": "a2-u04-checkpoint",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which ending completes nous parl___ in the imparfait?",
+      "options": [
+        "-ions",
+        "-ons",
+        "-er",
+        "-ait"
+      ],
+      "answer": 0,
+      "explain": "With nous, the imparfait ending is -ions: nous parlions."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the imparfait form of être with elle.",
+      "options": [
+        "était",
+        "est",
+        "a été",
+        "être"
+      ],
+      "answer": 0,
+      "explain": "The imparfait form is elle était."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does une averse mean?",
+      "options": [
+        "A shower of rain",
+        "A sunny break",
+        "A clear night",
+        "A light wind"
+      ],
+      "answer": 0,
+      "explain": "Une averse is a shower of rain."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which phrase signals a repeated habit?",
+      "options": [
+        "Chaque matin",
+        "Tout à coup",
+        "À la fin",
+        "Hier soir"
+      ],
+      "answer": 0,
+      "explain": "Chaque matin signals repetition."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Complete: À cette époque, nous ___ près du centre.",
+      "options": [
+        "habitions",
+        "habitons",
+        "avons habité",
+        "habiter"
+      ],
+      "answer": 0,
+      "explain": "A past routine uses nous habitions."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Which sentence describes a past scene?",
+      "options": [
+        "La salle était calme.",
+        "La salle est calme demain.",
+        "La salle sera calme.",
+        "La salle a calmé."
+      ],
+      "answer": 0,
+      "explain": "Était calme describes a past state."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "How do you usually form the imparfait stem for parler?",
+      "options": [
+        "Take parlons, remove -ons",
+        "Take parlé, remove -é",
+        "Add -ait to the infinitive",
+        "Use the future stem"
+      ],
+      "answer": 0,
+      "explain": "Use the present nous form parlons, remove -ons, then add the ending."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What is the imparfait stem of être?",
+      "options": [
+        "ét-",
+        "som-",
+        "av-",
+        "ser-"
+      ],
+      "answer": 0,
+      "explain": "Être uses the irregular stem ét- in the imparfait."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which phrase means 'a familiar building'?",
+      "options": [
+        "un immeuble ancien",
+        "une file d'attente",
+        "un reçu",
+        "une demande"
+      ],
+      "answer": 0,
+      "explain": "Un immeuble ancien means an older building."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "What is the best transfer check?",
+      "options": [
+        "Describe a different past routine with notes closed",
+        "Copy a paragraph exactly",
+        "Memorize only the English meanings",
+        "Repeat one ending without a subject"
+      ],
+      "answer": 0,
+      "explain": "A new routine with notes closed checks independent retrieval and transfer."
+    }
+  ]
+}

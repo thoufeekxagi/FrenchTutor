@@ -1,0 +1,194 @@
+{
+  "id": "a2-u10-words-3",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Words: amounts and measurements",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un gramme",
+      "en": "a gram",
+      "sound": "uh(n) grahm",
+      "exampleFr": "La recette demande un gramme de sel.",
+      "exampleEn": "The recipe calls for one gram of salt."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une livre",
+      "en": "a pound",
+      "sound": "ün leevr",
+      "exampleFr": "La recette demande une livre de pommes de terre.",
+      "exampleEn": "The recipe calls for a pound of potatoes."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une tasse à mesurer",
+      "en": "a measuring cup",
+      "sound": "ün tahs ah muh-zü-RAY",
+      "exampleFr": "J'utilise une tasse à mesurer pour la farine.",
+      "exampleEn": "I use a measuring cup for the flour."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un verre doseur",
+      "en": "a measuring jug",
+      "sound": "uh(n) vehr doh-ZUHR",
+      "exampleFr": "Je verse le lait avec un verre doseur.",
+      "exampleEn": "I pour the milk using a measuring jug."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une quantité suffisante",
+      "en": "a sufficient amount",
+      "sound": "ün kah(n)-tee-TAY sü-fee-ZAH(N)T",
+      "exampleFr": "Ajoute une quantité suffisante d'eau.",
+      "exampleEn": "Add a sufficient amount of water."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une moitié",
+      "en": "a half",
+      "sound": "ün mwah-TYAY",
+      "exampleFr": "Il me reste la moitié du pot.",
+      "exampleEn": "I have half the jar left."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un quart",
+      "en": "a quarter",
+      "sound": "uh(n) kahr",
+      "exampleFr": "Ajoute un quart de tasse d'huile.",
+      "exampleEn": "Add a quarter cup of oil."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une poignée",
+      "en": "a handful",
+      "sound": "ün pwah-NYAY",
+      "exampleFr": "J'ajoute une poignée de lentilles à la soupe.",
+      "exampleEn": "I add a handful of lentils to the soup."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un gramme",
+      "options": [
+        "a measuring jug",
+        "a gram",
+        "a quarter",
+        "a pound"
+      ],
+      "answer": 1,
+      "explain": "un gramme means a gram."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une livre",
+      "options": [
+        "a sufficient amount",
+        "a handful",
+        "a measuring cup",
+        "a pound"
+      ],
+      "answer": 3,
+      "explain": "une livre means a pound."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une tasse à mesurer",
+      "options": [
+        "a half",
+        "a measuring cup",
+        "a gram",
+        "a quarter"
+      ],
+      "answer": 1,
+      "explain": "une tasse à mesurer means a measuring cup."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un verre doseur",
+      "options": [
+        "a quarter",
+        "a pound",
+        "a sufficient amount",
+        "a measuring jug"
+      ],
+      "answer": 3,
+      "explain": "un verre doseur means a measuring jug."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une quantité suffisante",
+      "options": [
+        "a handful",
+        "a sufficient amount",
+        "a measuring cup",
+        "a half"
+      ],
+      "answer": 1,
+      "explain": "une quantité suffisante means a sufficient amount."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une moitié",
+      "options": [
+        "a gram",
+        "a measuring jug",
+        "a quarter",
+        "a half"
+      ],
+      "answer": 3,
+      "explain": "une moitié means a half."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une livre",
+      "question": "Which word did you hear?",
+      "options": [
+        "un quart",
+        "une livre",
+        "un gramme",
+        "une moitié"
+      ],
+      "answer": 1,
+      "explain": "You heard une livre: a pound."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une moitié",
+      "question": "Which word did you hear?",
+      "options": [
+        "une poignée",
+        "une livre",
+        "un quart",
+        "une moitié"
+      ],
+      "answer": 3,
+      "explain": "You heard une moitié: a half."
+    }
+  ]
+}

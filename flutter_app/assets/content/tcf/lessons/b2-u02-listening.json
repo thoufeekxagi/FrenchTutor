@@ -1,0 +1,58 @@
+{
+  "id": "b2-u02-listening",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le porte-parole dit que le projet sera évalué après six mois. Il précise que les premiers chiffres ne suffiront pas à mesurer tous les effets.",
+      "question": "What limitation does the spokesperson mention?",
+      "options": [
+        "The project has already been cancelled",
+        "The first figures will not measure every effect",
+        "No figures will be collected",
+        "The evaluation lasts six years"
+      ],
+      "answer": 1,
+      "explain": "The speaker says the first figures will not capture every effect."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Selon une source citée par le média, le coût pourrait augmenter. Le ministère n'a pas confirmé cette estimation.",
+      "question": "How certain is the cost increase?",
+      "options": [
+        "It is a personal preference",
+        "It has already been paid",
+        "It is a final official result",
+        "It is an unconfirmed estimate"
+      ],
+      "answer": 3,
+      "explain": "The estimate is attributed to a source and is not confirmed by the ministry."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "L'enquête a été menée auprès de volontaires. La journaliste rappelle que cet échantillon ne représente pas nécessairement toute la population.",
+      "question": "What does the journalist caution?",
+      "options": [
+        "No one volunteered",
+        "The survey measured a final outcome",
+        "The sample may not represent the whole population",
+        "The journalist conducted no interview"
+      ],
+      "answer": 2,
+      "explain": "The sample consists of volunteers and may not be representative."
+    }
+  ]
+}

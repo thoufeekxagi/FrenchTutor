@@ -1,0 +1,446 @@
+{
+  "id": "a2-listen-detour",
+  "title": "La ligne est interrompue",
+  "titleEn": "The bus route is interrupted",
+  "level": "A2",
+  "mode": "listening",
+  "minutes": 4,
+  "summary": "A service interruption changes Awa's commute; she checks the notice, asks a driver, and reaches work with a backup route.",
+  "unit": "a2-u03",
+  "sentences": [
+    {
+      "fr": "Awa part tôt pour son travail, comme chaque mardi.",
+      "en": "Awa leaves early for work, as she does every Tuesday."
+    },
+    {
+      "fr": "À l'arrêt, elle voit un avis : la ligne est interrompue près du pont.",
+      "en": "At the stop, she sees a notice: the route is interrupted near the bridge."
+    },
+    {
+      "fr": "Le détour ajoute vingt minutes au trajet.",
+      "en": "The detour adds twenty minutes to the commute."
+    },
+    {
+      "fr": "Awa demande au chauffeur quelle correspondance prendre.",
+      "en": "Awa asks the driver which connection to take."
+    },
+    {
+      "fr": "Il lui conseille de descendre au marché et de prendre le tramway.",
+      "en": "He advises her to get off at the market and take the tram."
+    },
+    {
+      "fr": "Elle envoie un message à sa responsable pour prévenir de son retard.",
+      "en": "She messages her manager to warn her she will be late."
+    },
+    {
+      "fr": "La responsable répond que l'équipe commence par une réunion en ligne.",
+      "en": "The manager replies that the team is starting with an online meeting."
+    },
+    {
+      "fr": "Awa prend le détour sans se presser.",
+      "en": "Awa takes the detour without rushing."
+    },
+    {
+      "fr": "Elle arrive avant la réunion et garde l'avis pour le trajet du soir.",
+      "en": "She arrives before the meeting and keeps the notice for the evening commute."
+    }
+  ],
+  "words": {
+    "awa": {
+      "en": "Awa (a woman's name)",
+      "pos": "name"
+    },
+    "part": {
+      "en": "part; share",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "tôt": {
+      "en": "early",
+      "pos": "adverb"
+    },
+    "pour": {
+      "en": "for"
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "travail": {
+      "en": "work",
+      "pos": "noun, masculine",
+      "sound": "tra-VAHY"
+    },
+    "comme": {
+      "en": "as; like; since",
+      "pos": "connector",
+      "note": "Meaning depends on the clause."
+    },
+    "chaque": {
+      "en": "each, every",
+      "pos": "determiner"
+    },
+    "mardi": {
+      "en": "Tuesday",
+      "pos": "noun, masculine",
+      "sound": "mahr-DEE"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "l'arrêt": {
+      "en": "the stop",
+      "pos": "noun, masculine",
+      "sound": "lah-reh"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "voit": {
+      "en": "sees",
+      "pos": "verb",
+      "lemma": "voir",
+      "note": "Present form of voir."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "avis": {
+      "en": "notice",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "avis"
+    },
+    "la": {
+      "en": "the"
+    },
+    "ligne": {
+      "en": "route; line",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ligne"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "interrompue": {
+      "en": "interrupted",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "interrompu",
+      "note": "Feminine form of interrompu."
+    },
+    "près": {
+      "en": "near; close to",
+      "pos": "preposition / adverb"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "pont": {
+      "en": "bridge",
+      "sound": "luh poh(n)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "pont"
+    },
+    "le": {
+      "en": "the"
+    },
+    "détour": {
+      "en": "detour",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "détour"
+    },
+    "ajoute": {
+      "en": "adds",
+      "pos": "verb",
+      "lemma": "ajouter",
+      "note": "Present form of ajouter."
+    },
+    "vingt": {
+      "en": "twenty",
+      "pos": "number"
+    },
+    "minutes": {
+      "en": "minutes",
+      "pos": "noun, feminine",
+      "lemma": "minute",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "trajet": {
+      "en": "a journey; a trip",
+      "sound": "uh(n) trah-ZHAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "trajet"
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "demande"
+    },
+    "chauffeur": {
+      "en": "driver",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "chauffeur"
+    },
+    "quelle": {
+      "en": "which; what",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "quel",
+      "note": "Feminine singular form of quel."
+    },
+    "correspondance": {
+      "en": "connection; transfer",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "correspondance"
+    },
+    "prendre": {
+      "en": "to take",
+      "pos": "verb",
+      "lemma": "prendre",
+      "note": "Infinitive."
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "conseille": {
+      "en": "advises",
+      "pos": "verb",
+      "lemma": "conseiller",
+      "note": "Present form of conseiller."
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "descendre": {
+      "en": "to get off; go down",
+      "pos": "verb",
+      "lemma": "descendre",
+      "note": "Infinitive."
+    },
+    "marché": {
+      "en": "market",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "marché"
+    },
+    "et": {
+      "en": "and"
+    },
+    "tramway": {
+      "en": "tram",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "tramway"
+    },
+    "envoie": {
+      "en": "sends",
+      "pos": "verb",
+      "lemma": "envoyer",
+      "note": "Present form of envoyer."
+    },
+    "message": {
+      "en": "message",
+      "sound": "luh meh-SAHZH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "message"
+    },
+    "sa": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Feminine singular noun form."
+    },
+    "responsable": {
+      "en": "manager; person in charge",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "responsable",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "prévenir": {
+      "en": "to inform; warn",
+      "pos": "verb",
+      "lemma": "prévenir",
+      "note": "Infinitive."
+    },
+    "retard": {
+      "en": "delay",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "retard"
+    },
+    "répond": {
+      "en": "replies; responds",
+      "pos": "verb",
+      "lemma": "répondre",
+      "note": "Present form of répondre."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "l'équipe": {
+      "en": "team",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "équipe",
+      "note": "Elided la before a vowel."
+    },
+    "commence": {
+      "en": "starts (commencer)",
+      "pos": "verb"
+    },
+    "par": {
+      "en": "by"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "réunion": {
+      "en": "meeting",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "réunion"
+    },
+    "en": {
+      "en": "on, during"
+    },
+    "prend": {
+      "en": "takes (prendre)",
+      "pos": "verb",
+      "sound": "pra(n)"
+    },
+    "sans": {
+      "en": "without",
+      "pos": "preposition"
+    },
+    "se": {
+      "en": "oneself; reflexive pronoun",
+      "pos": "pronoun"
+    },
+    "presser": {
+      "en": "to rush",
+      "pos": "verb",
+      "lemma": "se presser",
+      "note": "Infinitive of the reflexive verb se presser."
+    },
+    "arrive": {
+      "en": "arrives (arriver)",
+      "pos": "verb",
+      "sound": "ah-REEV"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "garde": {
+      "en": "keeps",
+      "pos": "verb",
+      "lemma": "garder",
+      "note": "Present form of garder."
+    },
+    "l'avis": {
+      "en": "notice",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "avis",
+      "note": "Elided le before a vowel."
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine",
+      "sound": "swahr",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "soir"
+    }
+  },
+  "keywords": [
+    "détour",
+    "trajet",
+    "chauffeur",
+    "correspondance",
+    "interrompue"
+  ],
+  "quiz": [
+    {
+      "prompt": "What caused the delay?",
+      "options": [
+        "A route interruption near the bridge",
+        "A missed alarm",
+        "A crowded market",
+        "A late meeting"
+      ],
+      "answer": 0,
+      "explain": "The route is interrupted near the bridge."
+    },
+    {
+      "prompt": "What route does the driver recommend?",
+      "options": [
+        "Get off at the market and take the tram",
+        "Walk across the bridge",
+        "Wait for the same bus",
+        "Take a taxi to the office"
+      ],
+      "answer": 0,
+      "explain": "The driver suggests the market stop and the tram."
+    },
+    {
+      "prompt": "Why can Awa arrive before the meeting?",
+      "options": [
+        "The team begins online.",
+        "The detour is cancelled.",
+        "Her manager picks her up.",
+        "The meeting moves to the evening."
+      ],
+      "answer": 0,
+      "explain": "The team starts with an online meeting, giving her time to arrive."
+    }
+  ]
+}

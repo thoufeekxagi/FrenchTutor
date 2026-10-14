@@ -1,0 +1,80 @@
+{
+  "id": "a2-u09-reading",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should travellers do?",
+      "options": [
+        "Take the detour by the intersection",
+        "Wait at the public library",
+        "Ask for a reserved seat",
+        "Go to the community centre on foot"
+      ],
+      "answer": 0,
+      "explain": "The notice says the express line does not go to the terminus; the detour is by the intersection.",
+      "promptFr": "AVIS DE SERVICE — La ligne express ne va pas au terminus. Prenez le détour par le carrefour."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is the arrival time?",
+      "options": [
+        "13:45",
+        "13:20",
+        "14:00",
+        "12:45"
+      ],
+      "answer": 0,
+      "explain": "The ticket information gives an arrival time of 13 h 45.",
+      "promptFr": "Billet : un aller-retour pour le centre communautaire. Départ : 13 h 20. Arrivée : 13 h 45."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does Karim need?",
+      "options": [
+        "The meeting-point address",
+        "A one-way ticket",
+        "A service update",
+        "A reserved seat"
+      ],
+      "answer": 0,
+      "explain": "Karim asks for the meeting-point address.",
+      "promptFr": "Bonjour, je suis au terminus. Peux-tu me donner l'adresse du point de rencontre ? — Karim"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where will Nadia wait?",
+      "options": [
+        "Near the main entrance",
+        "At the train platform",
+        "At the temporary stop",
+        "Inside the station"
+      ],
+      "answer": 0,
+      "explain": "The notice says she will wait near the main entrance.",
+      "promptFr": "RENDEZ-VOUS — Nadia attend le groupe près de l'entrée principale. Le centre communautaire est dans la rue parallèle."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Where is the new stop?",
+      "options": [
+        "Near the intersection",
+        "At the library",
+        "At the final stop",
+        "At the main entrance"
+      ],
+      "answer": 0,
+      "explain": "The notice places the new stop near the intersection.",
+      "promptFr": "Mise à jour : le trajet change. Le nouvel arrêt est près du carrefour. Départ : 13 h 20."
+    }
+  ]
+}

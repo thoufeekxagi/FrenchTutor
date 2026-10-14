@@ -1,0 +1,172 @@
+{
+  "id": "a2-u08-words-6",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Words: status and readiness",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "incomplet",
+      "en": "incomplete",
+      "sound": "a(n)-kohn-PLEH",
+      "exampleFr": "Le dossier est incomplet.",
+      "exampleEn": "The file is incomplete."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "à jour",
+      "en": "up to date",
+      "sound": "ah zhoor",
+      "exampleFr": "La liste est à jour.",
+      "exampleEn": "The list is up to date."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "prêt à remettre",
+      "en": "ready to hand in",
+      "sound": "preh ah ruh-MEHTR",
+      "exampleFr": "Le rapport est prêt à remettre.",
+      "exampleEn": "The report is ready to hand in."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "à corriger",
+      "en": "to be corrected",
+      "sound": "ah koh-ree-ZHAY",
+      "exampleFr": "La version est encore à corriger.",
+      "exampleEn": "The version still needs correction."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "confidentiel",
+      "en": "confidential",
+      "sound": "kohn-fee-dah(n)-SYEHL",
+      "exampleFr": "Le dossier est confidentiel.",
+      "exampleEn": "The file is confidential."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "bien organisé",
+      "en": "well organized",
+      "sound": "byah(n) or-gah-nee-ZAY",
+      "exampleFr": "Le compte rendu est bien organisé.",
+      "exampleEn": "The report is well organized."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "finalisé",
+      "en": "finalized",
+      "sound": "fee-nah-lee-ZAY",
+      "exampleFr": "Le plan sera finalisé demain.",
+      "exampleEn": "The outline will be finalized tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "en pièce jointe",
+      "en": "attached",
+      "sound": "ah(n) pyess zhWA(N)t",
+      "exampleFr": "Le fichier est en pièce jointe.",
+      "exampleEn": "The file is attached."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "incomplet",
+      "options": [
+        "to be corrected",
+        "incomplete",
+        "finalized",
+        "up to date"
+      ],
+      "answer": 1,
+      "explain": "incomplet means incomplete."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "à jour",
+      "options": [
+        "confidential",
+        "attached",
+        "ready to hand in",
+        "up to date"
+      ],
+      "answer": 3,
+      "explain": "à jour means up to date."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "prêt à remettre",
+      "options": [
+        "well organized",
+        "ready to hand in",
+        "incomplete",
+        "to be corrected"
+      ],
+      "answer": 1,
+      "explain": "prêt à remettre means ready to hand in."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "à corriger",
+      "options": [
+        "finalized",
+        "up to date",
+        "confidential",
+        "to be corrected"
+      ],
+      "answer": 3,
+      "explain": "à corriger means to be corrected."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "confidentiel",
+      "options": [
+        "attached",
+        "confidential",
+        "ready to hand in",
+        "well organized"
+      ],
+      "answer": 1,
+      "explain": "confidentiel means confidential."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "bien organisé",
+      "options": [
+        "incomplete",
+        "to be corrected",
+        "finalized",
+        "well organized"
+      ],
+      "answer": 3,
+      "explain": "bien organisé means well organized."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: status and readiness",
+      "body": "Course and workplace file-sharing practices differ by school and employer. These examples are fictional; confidential information should be shared only through the channel approved by the organization."
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "id": "a2-u10-grammar-a",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Grammar: Replace the item and keep the amount",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Replace the item and keep the amount",
+      "body": "When the food or item is already clear, en can replace a phrase with de or a quantity phrase. Keep the amount after the verb when the amount matters: des pommes → j'en prends; un kilo de pommes → j'en prends un kilo."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Read each quantity and its unit together. This helps you understand the amount before you replace the food with en.",
+      "headers": [
+        "Useful form",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Un paquet suffit.",
+          "One packet is enough."
+        ],
+        [
+          "Je prends deux barquettes de fraises.",
+          "I am taking two punnets of strawberries."
+        ],
+        [
+          "Nous gardons la moitié pour demain.",
+          "We are keeping half for tomorrow."
+        ],
+        [
+          "Je réchauffe le plat préparé.",
+          "I am reheating the prepared dish."
+        ],
+        [
+          "Une portion individuelle est prévue.",
+          "An individual serving is planned."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Place en before the verb it belongs to. With aller + infinitive, put it before the infinitive: je vais en acheter. Keep a useful amount or number after the verb.",
+      "headers": [
+        "Full phrase",
+        "Short form",
+        "What stays"
+      ],
+      "rows": [
+        [
+          "Je prends des lentilles.",
+          "J'en prends.",
+          "The item is clear from context."
+        ],
+        [
+          "Je veux du lait végétal.",
+          "J'en veux.",
+          "The item is clear from context."
+        ],
+        [
+          "Je prends une barquette de fraises.",
+          "J'en prends une barquette.",
+          "The package amount stays."
+        ],
+        [
+          "Je prends deux yaourts.",
+          "J'en prends deux.",
+          "The number stays."
+        ],
+        [
+          "Je vais acheter un kilo de tomates.",
+          "Je vais en acheter un kilo.",
+          "The amount stays after the infinitive."
+        ],
+        [
+          "Je prends de la sauce.",
+          "J'en prends la moitié.",
+          "The amount stays after the verb."
+        ],
+        [
+          "Je ne prends pas de lentilles.",
+          "Je n'en prends pas.",
+          "In the negative, ne comes before en."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Replace the item and keep the amount",
+      "body": "• Use en to avoid repeating a thing introduced with de, du, de la, des, or a quantity phrase: des fraises → j'en prends.\n• Keep the quantity when it carries information: un kilo → j'en prends un kilo; quatre → j'en prends quatre.\n• Put en before the verb: j'en veux; il en reste. With aller + infinitive, put it before the infinitive: je vais en prendre.\n• In a simple negative, use ne + en + verb + pas: je n'en prends pas.\n• Here, practise en with food and quantities. Other uses of en exist; do not infer every one from these examples.\n• Write one sentence about an amount you buy, underline what en replaces, and retrieve it later without looking."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Tu achètes des fraises ? Oui, j'___ achète.",
+      "options": [
+        "en",
+        "y",
+        "lui",
+        "les"
+      ],
+      "answer": 0,
+      "explain": "En replaces des fraises."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Je prends une barquette de fraises. Je ___ prends une barquette.",
+      "options": [
+        "en",
+        "y",
+        "leur",
+        "la"
+      ],
+      "answer": 0,
+      "explain": "En replaces de fraises; the package quantity une barquette stays."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the correct near-future form for 'I will buy one kilogram of tomatoes.'",
+      "options": [
+        "Je vais en acheter un kilo.",
+        "Je vais acheter en un kilo.",
+        "J'en vais acheter un kilo.",
+        "Je vais un kilo en acheter."
+      ],
+      "answer": 0,
+      "explain": "With aller + infinitive, put en before the infinitive and keep the quantity after it."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Choose the correct negative sentence for 'I am not taking any lentils.'",
+      "options": [
+        "Je n'en prends pas.",
+        "Je ne prends en pas.",
+        "Je en ne prends pas.",
+        "Je n'en pas prends."
+      ],
+      "answer": 0,
+      "explain": "The pattern is ne + en + verb + pas."
+    }
+  ]
+}

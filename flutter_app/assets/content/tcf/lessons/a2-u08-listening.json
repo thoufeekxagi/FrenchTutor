@@ -1,0 +1,86 @@
+{
+  "id": "a2-u08-listening",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La version finale ? Je la corrige avant midi. Le compte rendu, le tuteur va le relire cet après-midi.",
+      "question": "What will the speaker correct before noon?",
+      "options": [
+        "The final version",
+        "The meeting report",
+        "The attendance sheet",
+        "The class outline"
+      ],
+      "answer": 0,
+      "explain": "La refers to la version finale."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Les documents sont dans le dossier. Nous allons les classer par date, puis envoyer le dossier au comité.",
+      "question": "What will the team do with the documents?",
+      "options": [
+        "File them by date",
+        "Print them in colour",
+        "Delete them",
+        "Send them to the clinic"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the team will file them by date."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le fichier joint ? Je vais l'enregistrer maintenant. La copie de travail reste dans le dossier.",
+      "question": "What will the speaker save?",
+      "options": [
+        "The attached file",
+        "The working copy",
+        "The final report",
+        "The meeting agenda"
+      ],
+      "answer": 0,
+      "explain": "L' refers to le fichier joint."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "La formatrice demande la liste de corrections. Nadia va la joindre au dossier de projet.",
+      "question": "What will Nadia attach to the project file?",
+      "options": [
+        "The correction list",
+        "The audio recording",
+        "The final report",
+        "The attendance sheet"
+      ],
+      "answer": 0,
+      "explain": "La refers to la liste de corrections."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le compte rendu n'est pas prêt. Sam va le relire ce soir et le remettre vendredi.",
+      "question": "When will Sam hand in the report?",
+      "options": [
+        "Friday",
+        "Tonight",
+        "Before noon",
+        "Next week"
+      ],
+      "answer": 0,
+      "explain": "Sam will reread it tonight and hand it in Friday."
+    }
+  ]
+}

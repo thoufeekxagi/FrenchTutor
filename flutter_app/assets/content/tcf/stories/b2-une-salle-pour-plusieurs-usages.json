@@ -1,0 +1,408 @@
+{
+  "id": "b2-une-salle-pour-plusieurs-usages",
+  "title": "Une salle pour plusieurs usages",
+  "titleEn": "One room for several purposes",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "Three neighbours disagree about a community room, then identify shared priorities and a way to test competing needs.",
+  "unit": "b2-u10",
+  "sentences": [
+    {
+      "fr": "Le centre communautaire devait décider comment utiliser une grande salle après le départ d'un organisme locataire.",
+      "en": "The community centre had to decide how to use a large room after a tenant organization moved out."
+    },
+    {
+      "fr": "Mina souhaitait y installer des tables de travail, tandis que Louis préférait un espace calme pour lire.",
+      "en": "Mina wanted to set up work tables there, while Louis preferred a quiet reading space."
+    },
+    {
+      "fr": "Awa rappelait que les groupes qui organisaient des activités le soir avaient aussi besoin d'un lieu accessible.",
+      "en": "Awa noted that groups holding evening activities also needed an accessible space."
+    },
+    {
+      "fr": "Les trois personnes reconnaissaient que la salle ne pouvait pas répondre en même temps à toutes les demandes.",
+      "en": "All three recognized that the room could not meet every request at the same time."
+    },
+    {
+      "fr": "Elles ont proposé un horaire partagé, avec des périodes calmes et des plages réservées aux activités de groupe.",
+      "en": "They proposed a shared schedule, with quiet periods and time slots reserved for group activities."
+    },
+    {
+      "fr": "Avant de retenir cette formule, le centre devait vérifier les coûts de rangement et demander l'avis des groupes concernés.",
+      "en": "Before adopting this arrangement, the centre needed to check storage costs and ask the affected groups."
+    },
+    {
+      "fr": "Le compte rendu a présenté le compromis comme une piste à évaluer, et non comme une décision déjà approuvée.",
+      "en": "The summary presented the compromise as an option to evaluate, not as a decision already approved.",
+      "note": "A balanced summary reports a proposal's status accurately; an idea under review is not yet an approved decision."
+    }
+  ],
+  "words": {
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "communautaire": {
+      "en": "community",
+      "pos": "adjective"
+    },
+    "devait": {
+      "en": "had to; was supposed to"
+    },
+    "décider": {
+      "en": "to decide"
+    },
+    "comment": {
+      "en": "how",
+      "sound": "koh-MAH(N)"
+    },
+    "utiliser": {
+      "en": "to use"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "grande": {
+      "en": "tall, big",
+      "sound": "grah(n)d"
+    },
+    "salle": {
+      "en": "room; hall",
+      "pos": "noun, feminine"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "départ": {
+      "en": "departure"
+    },
+    "d'un": {
+      "en": "of a; of one (masculine)",
+      "pos": "contraction"
+    },
+    "organisme": {
+      "en": "organization"
+    },
+    "locataire": {
+      "en": "tenant"
+    },
+    "mina": {
+      "en": "Mina (a woman's name)"
+    },
+    "souhaitait": {
+      "en": "wanted; hoped"
+    },
+    "y": {
+      "en": "there; to that place",
+      "pos": "pronoun"
+    },
+    "installer": {
+      "en": "to set up",
+      "sound": "an-stah-LAY"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "tables": {
+      "en": "tables"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "travail": {
+      "en": "work"
+    },
+    "tandis": {
+      "en": "whereas; while"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "louis": {
+      "en": "Louis (a man's name)"
+    },
+    "préférait": {
+      "en": "preferred"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "espace": {
+      "en": "space"
+    },
+    "calme": {
+      "en": "quiet; calm"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "lire": {
+      "en": "to read"
+    },
+    "awa": {
+      "en": "Awa (a woman's name)"
+    },
+    "rappelait": {
+      "en": "reminded; noted"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "groupes": {
+      "en": "groups"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "organisaient": {
+      "en": "organized; were organizing"
+    },
+    "activités": {
+      "en": "activities"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "avaient": {
+      "en": "had"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "besoin": {
+      "en": "a need"
+    },
+    "lieu": {
+      "en": "place; location"
+    },
+    "accessible": {
+      "en": "accessible"
+    },
+    "trois": {
+      "en": "three"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "reconnaissaient": {
+      "en": "recognized"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "pouvait": {
+      "en": "could"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "répondre": {
+      "en": "to answer, reply",
+      "sound": "ray-POH(N)dr"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "même": {
+      "en": "same; even"
+    },
+    "temps": {
+      "en": "weather"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "toutes": {
+      "en": "all, everyone",
+      "sound": "toot"
+    },
+    "demandes": {
+      "en": "requests"
+    },
+    "elles": {
+      "en": "they",
+      "sound": "el"
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "proposé": {
+      "en": "proposed"
+    },
+    "horaire": {
+      "en": "schedule",
+      "sound": "loh-REHR"
+    },
+    "partagé": {
+      "en": "shared"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "périodes": {
+      "en": "periods"
+    },
+    "calmes": {
+      "en": "quiet"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "plages": {
+      "en": "time slots"
+    },
+    "réservées": {
+      "en": "reserved"
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "groupe": {
+      "en": "group"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "retenir": {
+      "en": "to keep; to choose"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "formule": {
+      "en": "format; arrangement"
+    },
+    "vérifier": {
+      "en": "to check, verify",
+      "sound": "vay-ree-FYAY"
+    },
+    "coûts": {
+      "en": "costs"
+    },
+    "rangement": {
+      "en": "storage"
+    },
+    "demander": {
+      "en": "to ask",
+      "sound": "duh-mah(n)-DAY"
+    },
+    "l'avis": {
+      "en": "the notice",
+      "pos": "noun, masculine"
+    },
+    "concernés": {
+      "en": "concerned; affected"
+    },
+    "compte": {
+      "en": "an account; report"
+    },
+    "rendu": {
+      "en": "report; made"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "présenté": {
+      "en": "presented"
+    },
+    "compromis": {
+      "en": "a compromise"
+    },
+    "comme": {
+      "en": "as; like; since"
+    },
+    "piste": {
+      "en": "option; avenue"
+    },
+    "évaluer": {
+      "en": "to assess; to evaluate"
+    },
+    "non": {
+      "en": "no",
+      "sound": "noh(n)"
+    },
+    "décision": {
+      "en": "decision"
+    },
+    "déjà": {
+      "en": "already"
+    },
+    "approuvée": {
+      "en": "approved"
+    }
+  },
+  "keywords": [
+    "centre",
+    "salle",
+    "travail",
+    "groupes",
+    "activités",
+    "horaire",
+    "périodes",
+    "compromis"
+  ],
+  "quiz": [
+    {
+      "prompt": "What did Mina want to put in the room?",
+      "options": [
+        "A new bus stop",
+        "A permanent stage",
+        "Work tables",
+        "A private office"
+      ],
+      "answer": 2,
+      "explain": "The second sentence says Mina wanted work tables."
+    },
+    {
+      "prompt": "What did all three people recognize?",
+      "options": [
+        "Every group preferred quiet reading",
+        "The room had no storage costs",
+        "The centre had already approved a schedule",
+        "The room could not meet every request at once"
+      ],
+      "answer": 3,
+      "explain": "The fourth sentence gives the shared recognition."
+    },
+    {
+      "prompt": "How did the summary describe the proposed compromise?",
+      "options": [
+        "As a permanent rule already in effect",
+        "As an option to evaluate, not an approved decision",
+        "As a plan to close the centre",
+        "As a choice made by Mina alone"
+      ],
+      "answer": 1,
+      "explain": "The final sentence explicitly labels it as a proposal still to evaluate."
+    }
+  ]
+}

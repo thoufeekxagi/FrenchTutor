@@ -1,0 +1,52 @@
+{
+  "id": "b1-u07-reading",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What will be communicated after registration?",
+      "options": [
+        "The coordinator's question",
+        "The room address",
+        "The workshop topic",
+        "The final number of participants"
+      ],
+      "answer": 3,
+      "explain": "The final participant number will come after registration.",
+      "promptFr": "Extrait du compte rendu — La coordonnatrice a confirmé que l'atelier aurait lieu le 12 juin. Elle a demandé si la salle pouvait accueillir vingt personnes. Le nombre final de participants sera communiqué après la période d'inscription."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should readers do?",
+      "options": [
+        "Cancel their registration immediately",
+        "Check the official notice before changing registration",
+        "Assume the course is cancelled",
+        "Forward the message to everyone"
+      ],
+      "answer": 1,
+      "explain": "The organization says no change is confirmed and asks readers to check the official notice.",
+      "promptFr": "Message transféré — « Le cours du samedi est annulé. » Note de l'organisme : aucun changement n'a été confirmé. Veuillez consulter l'avis officiel avant de modifier votre inscription."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What has the committee decided?",
+      "options": [
+        "Nothing yet; it will study the question",
+        "It has cancelled the evening course",
+        "It has confirmed online classes",
+        "It has changed the route"
+      ],
+      "answer": 0,
+      "explain": "The committee says it will study the question but has made no decision.",
+      "promptFr": "Une participante a expliqué que le trajet était difficile le soir. Elle a demandé si une option en ligne serait proposée. Le comité a répondu qu'il étudierait la question, sans prendre de décision aujourd'hui."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "a2-u06-listening",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le studio coûte mille trois cent cinquante dollars. L'appartement d'une chambre est plus spacieux, mais il coûte cent dollars de plus.",
+      "question": "Which home costs less?",
+      "options": [
+        "The studio",
+        "The one-bedroom",
+        "Both cost the same",
+        "The recording gives no price"
+      ],
+      "answer": 0,
+      "explain": "The studio is $1,350; the one-bedroom costs $100 more."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La buanderie est au sous-sol. La laveuse et la sécheuse sont dans cette salle.",
+      "question": "Where are the washer and dryer?",
+      "options": [
+        "In the basement laundry room",
+        "Inside one apartment",
+        "In the parking garage",
+        "At the bus stop"
+      ],
+      "answer": 0,
+      "explain": "The speaker says they are in the basement laundry room."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je cherche un logement paisible près du train. Le studio est moins grand, mais son trajet est plus court.",
+      "question": "Why does the speaker prefer the studio?",
+      "options": [
+        "It has a shorter trip.",
+        "It has a larger bedroom.",
+        "It has a private balcony.",
+        "It has indoor parking."
+      ],
+      "answer": 0,
+      "explain": "The speaker says the studio has the shorter trip."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Le loyer comprend le chauffage central et l'eau. Les frais d'électricité sont en plus.",
+      "question": "Which cost is extra?",
+      "options": [
+        "Electricity",
+        "Water",
+        "Central heating",
+        "The laundry room"
+      ],
+      "answer": 0,
+      "explain": "The message says electricity costs are extra."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le logement B est aussi près de l'épicerie que le logement A, mais il est plus éloigné de l'arrêt d'autobus.",
+      "question": "Which home is farther from the bus stop?",
+      "options": [
+        "Home B",
+        "Home A",
+        "They are the same distance",
+        "The recording does not say"
+      ],
+      "answer": 0,
+      "explain": "The speaker says home B is farther from the bus stop."
+    }
+  ]
+}

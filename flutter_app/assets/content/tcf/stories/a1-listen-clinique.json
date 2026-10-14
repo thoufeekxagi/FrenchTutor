@@ -1,0 +1,282 @@
+{
+  "id": "a1-listen-clinique",
+  "title": "Le rendez-vous déplacé",
+  "titleEn": "The changed appointment",
+  "level": "A1",
+  "mode": "listening",
+  "minutes": 3,
+  "summary": "A clinic calls with a schedule change, and Sam confirms the new time by repeating it.",
+  "unit": "a1-u06",
+  "sentences": [
+    {
+      "fr": "Sam a un rendez-vous à la clinique lundi.",
+      "en": "Sam has an appointment at the clinic on Monday."
+    },
+    {
+      "fr": "La clinique téléphone le matin.",
+      "en": "The clinic calls in the morning."
+    },
+    {
+      "fr": "Le médecin n'est pas disponible à dix heures.",
+      "en": "The doctor is not available at ten o’clock."
+    },
+    {
+      "fr": "La réception propose onze heures.",
+      "en": "The receptionist suggests eleven o’clock."
+    },
+    {
+      "fr": "Sam demande : « C'est bien lundi, à onze heures ? »",
+      "en": "Sam asks, “That is Monday at eleven, right?”"
+    },
+    {
+      "fr": "La réception confirme l'heure.",
+      "en": "The receptionist confirms the time."
+    },
+    {
+      "fr": "Sam note le changement dans son calendrier.",
+      "en": "Sam writes the change in his calendar."
+    },
+    {
+      "fr": "Il remercie la réception et termine l'appel.",
+      "en": "He thanks the receptionist and ends the call."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a person's name)",
+      "pos": "proper name"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "rendez-vous": {
+      "en": "appointment",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "rendez-vous"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "la": {
+      "en": "the"
+    },
+    "clinique": {
+      "en": "clinic",
+      "pos": "noun, feminine",
+      "sound": "kli-NEEK",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "clinique"
+    },
+    "lundi": {
+      "en": "Monday",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "lundi",
+      "note": "Days of the week are masculine in French."
+    },
+    "téléphone": {
+      "en": "telephone",
+      "sound": "luh tay-lay-FOHN",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "téléphone"
+    },
+    "le": {
+      "en": "the"
+    },
+    "matin": {
+      "en": "morning",
+      "pos": "noun, masculine",
+      "sound": "mah-TA(N)",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "matin"
+    },
+    "médecin": {
+      "en": "a doctor, physician",
+      "sound": "uh(n) mayd-SA(N)",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "médecin"
+    },
+    "n'est": {
+      "en": "is not",
+      "pos": "verb"
+    },
+    "pas": {
+      "en": "not"
+    },
+    "disponible": {
+      "en": "available",
+      "pos": "adjective",
+      "number": "singular",
+      "lemma": "disponible",
+      "note": "Same written form for masculine and feminine singular."
+    },
+    "dix": {
+      "en": "ten",
+      "pos": "number"
+    },
+    "heures": {
+      "en": "hours, o'clock",
+      "pos": "noun, feminine plural"
+    },
+    "réception": {
+      "en": "reception desk; receptionist",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "réception"
+    },
+    "propose": {
+      "en": "suggests",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Present form of proposer."
+    },
+    "onze": {
+      "en": "eleven",
+      "pos": "number"
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "demande"
+    },
+    "c'est": {
+      "en": "it is; this is",
+      "pos": "fixed phrase",
+      "note": "Contraction of ce + est."
+    },
+    "bien": {
+      "en": "well",
+      "pos": "adverb"
+    },
+    "confirme": {
+      "en": "confirms (confirmer)",
+      "pos": "verb",
+      "sound": "koh(n)-FEERM"
+    },
+    "l'heure": {
+      "en": "time; hour",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "heure",
+      "note": "Elided la before a vowel."
+    },
+    "note": {
+      "en": "writes down; notes",
+      "pos": "verb",
+      "lemma": "noter",
+      "note": "Present form of noter."
+    },
+    "changement": {
+      "en": "a change",
+      "sound": "uh(n) shahnzh-MAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "changement"
+    },
+    "dans": {
+      "en": "in"
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "calendrier": {
+      "en": "calendar",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "calendrier"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "remercie": {
+      "en": "thanks",
+      "pos": "verb",
+      "lemma": "remercier",
+      "note": "Present form of remercier."
+    },
+    "et": {
+      "en": "and"
+    },
+    "termine": {
+      "en": "finishes",
+      "pos": "verb",
+      "lemma": "terminer",
+      "note": "Present form of terminer."
+    },
+    "l'appel": {
+      "en": "call",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "appel",
+      "note": "Elided le before a vowel."
+    }
+  },
+  "keywords": [
+    "clinique",
+    "rendez-vous",
+    "lundi",
+    "onze",
+    "confirme"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why does the clinic call?",
+      "options": [
+        "The doctor is unavailable at ten.",
+        "Sam forgot his card.",
+        "The clinic is closed all week.",
+        "The appointment is in another city."
+      ],
+      "answer": 0,
+      "explain": "The doctor is not available at the original time."
+    },
+    {
+      "prompt": "What new time is offered?",
+      "options": [
+        "Eleven o’clock",
+        "Nine o’clock",
+        "Noon",
+        "Two o’clock"
+      ],
+      "answer": 0,
+      "explain": "The receptionist offers eleven o’clock."
+    },
+    {
+      "prompt": "How does Sam remember the change?",
+      "options": [
+        "He writes it in his calendar.",
+        "He sends a letter.",
+        "He asks his neighbour.",
+        "He changes his phone number."
+      ],
+      "answer": 0,
+      "explain": "He notes the new time in his calendar."
+    }
+  ]
+}

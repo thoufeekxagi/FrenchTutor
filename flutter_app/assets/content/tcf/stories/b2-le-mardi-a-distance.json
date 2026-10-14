@@ -1,0 +1,386 @@
+{
+  "id": "b2-le-mardi-a-distance",
+  "title": "Le mardi à distance",
+  "titleEn": "Tuesdays at a distance",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "A small workplace trial gives a team useful evidence about flexible schedules, but not a universal answer.",
+  "unit": "b2-u01",
+  "sentences": [
+    {
+      "fr": "Dans une équipe de douze personnes, la direction a permis le travail à distance le mardi pendant huit semaines.",
+      "en": "In a twelve-person team, management allowed remote work on Tuesdays for eight weeks."
+    },
+    {
+      "fr": "Le bilan a montré que les déplacements avaient diminué, mais que les échanges spontanés étaient aussi moins fréquents.",
+      "en": "The review showed that commutes had decreased, but spontaneous exchanges were also less frequent."
+    },
+    {
+      "fr": "Une collègue a conclu que le dispositif améliorait la concentration, tandis qu'un autre a dit manquer les discussions rapides.",
+      "en": "One colleague concluded the arrangement improved concentration, while another said they missed quick discussions."
+    },
+    {
+      "fr": "La responsable a rappelé que les réponses venaient d'une seule équipe et ne représentaient pas tous les postes.",
+      "en": "The manager noted that the responses came from one team and did not represent every role.",
+      "note": "The passage separates observed changes from conclusions; a small trial does not by itself show what will work in every workplace."
+    },
+    {
+      "fr": "Le groupe a donc proposé de garder le mardi à distance tout en réservant une courte rencontre en personne le jeudi.",
+      "en": "The group therefore proposed keeping Tuesday remote while reserving a short in-person meeting on Thursday."
+    },
+    {
+      "fr": "Cette formule pourrait convenir si les tâches nécessitant une coordination restent planifiées à l'avance.",
+      "en": "This arrangement could work if tasks that require coordination are scheduled in advance."
+    },
+    {
+      "fr": "Après un autre mois, l'équipe comparera les mêmes indicateurs avant de recommander une règle plus générale.",
+      "en": "After another month, the team will compare the same indicators before recommending a broader rule."
+    }
+  ],
+  "words": {
+    "dans": {
+      "en": "in",
+      "sound": "dah(n)"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "équipe": {
+      "en": "team"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "douze": {
+      "en": "twelve"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "direction": {
+      "en": "management; direction"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "permis": {
+      "en": "allowed; permitted"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "travail": {
+      "en": "work"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "distance": {
+      "en": "distance"
+    },
+    "mardi": {
+      "en": "Tuesday",
+      "sound": "mahr-DEE"
+    },
+    "pendant": {
+      "en": "during; while"
+    },
+    "huit": {
+      "en": "eight"
+    },
+    "semaines": {
+      "en": "weeks"
+    },
+    "bilan": {
+      "en": "review; assessment"
+    },
+    "montré": {
+      "en": "showed"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "déplacements": {
+      "en": "trips; commutes"
+    },
+    "avaient": {
+      "en": "had"
+    },
+    "diminué": {
+      "en": "decreased"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "échanges": {
+      "en": "exchanges; discussions"
+    },
+    "spontanés": {
+      "en": "spontaneous"
+    },
+    "étaient": {
+      "en": "were"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "moins": {
+      "en": "minus, below zero",
+      "sound": "mwa(n)"
+    },
+    "fréquents": {
+      "en": "frequent"
+    },
+    "collègue": {
+      "en": "a coworker"
+    },
+    "conclu": {
+      "en": "concluded"
+    },
+    "dispositif": {
+      "en": "arrangement; system"
+    },
+    "améliorait": {
+      "en": "improved"
+    },
+    "concentration": {
+      "en": "concentration"
+    },
+    "tandis": {
+      "en": "whereas; while"
+    },
+    "qu'un": {
+      "en": "that a; than a"
+    },
+    "autre": {
+      "en": "other; another"
+    },
+    "dit": {
+      "en": "says",
+      "sound": "dee"
+    },
+    "manquer": {
+      "en": "to miss",
+      "sound": "mahn-KAY"
+    },
+    "discussions": {
+      "en": "discussions"
+    },
+    "rapides": {
+      "en": "quick; rapid"
+    },
+    "responsable": {
+      "en": "coordinator; person in charge"
+    },
+    "rappelé": {
+      "en": "reminded"
+    },
+    "réponses": {
+      "en": "answers; responses"
+    },
+    "venaient": {
+      "en": "came"
+    },
+    "d'une": {
+      "en": "of a; of one (feminine)",
+      "pos": "contraction"
+    },
+    "seule": {
+      "en": "alone; only"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "représentaient": {
+      "en": "represented"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "tous": {
+      "en": "all, everyone",
+      "sound": "toos"
+    },
+    "postes": {
+      "en": "positions; jobs"
+    },
+    "groupe": {
+      "en": "group"
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "proposé": {
+      "en": "proposed"
+    },
+    "garder": {
+      "en": "to keep"
+    },
+    "tout": {
+      "en": "all; whole"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "réservant": {
+      "en": "reserving"
+    },
+    "courte": {
+      "en": "short"
+    },
+    "rencontre": {
+      "en": "meeting"
+    },
+    "personne": {
+      "en": "person"
+    },
+    "jeudi": {
+      "en": "Thursday",
+      "sound": "zhuh-DEE"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "formule": {
+      "en": "format; arrangement"
+    },
+    "pourrait": {
+      "en": "could; might"
+    },
+    "convenir": {
+      "en": "to suit"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "tâches": {
+      "en": "tasks"
+    },
+    "nécessitant": {
+      "en": "requiring"
+    },
+    "coordination": {
+      "en": "coordination"
+    },
+    "restent": {
+      "en": "remain"
+    },
+    "planifiées": {
+      "en": "scheduled"
+    },
+    "l'avance": {
+      "en": "in advance"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "mois": {
+      "en": "month; months"
+    },
+    "l'équipe": {
+      "en": "the team",
+      "pos": "noun, feminine"
+    },
+    "comparera": {
+      "en": "will compare"
+    },
+    "mêmes": {
+      "en": "same"
+    },
+    "indicateurs": {
+      "en": "indicators"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "recommander": {
+      "en": "to recommend"
+    },
+    "règle": {
+      "en": "rule"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "générale": {
+      "en": "general"
+    }
+  },
+  "keywords": [
+    "équipe",
+    "bilan",
+    "déplacements",
+    "échanges",
+    "dispositif",
+    "réponses",
+    "indicateurs"
+  ],
+  "quiz": [
+    {
+      "prompt": "What changed during the eight-week trial?",
+      "options": [
+        "The work week became shorter",
+        "Every team stopped meeting",
+        "Commuting decreased and spontaneous exchanges became less frequent",
+        "The team added a new office"
+      ],
+      "answer": 2,
+      "explain": "The review reported those two changes."
+    },
+    {
+      "prompt": "Why did the manager qualify the responses?",
+      "options": [
+        "The indicators were never recorded",
+        "They came from one team, not every type of role",
+        "No one had answered the questions",
+        "The trial lasted a full year"
+      ],
+      "answer": 1,
+      "explain": "The manager explicitly limited what the responses could represent."
+    },
+    {
+      "prompt": "What will the team do before making a broader recommendation?",
+      "options": [
+        "Compare the same indicators after another month",
+        "End all in-person meetings",
+        "Change the indicators each week",
+        "Assume the first result applies everywhere"
+      ],
+      "answer": 0,
+      "explain": "The final sentence describes the planned comparison."
+    }
+  ]
+}

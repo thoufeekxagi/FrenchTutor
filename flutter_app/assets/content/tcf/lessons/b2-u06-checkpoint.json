@@ -1,0 +1,75 @@
+{
+  "id": "b2-u06-checkpoint",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does le consentement mean?",
+      "options": [
+        "Consent",
+        "A setting",
+        "A delay",
+        "A source"
+      ],
+      "answer": 0,
+      "explain": "Le consentement means consent."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which pattern describes an unreal past?",
+      "options": [
+        "si + futur → passé composé",
+        "si + plus-que-parfait → conditionnel passé",
+        "si + impératif → présent",
+        "si + conditionnel → imparfait"
+      ],
+      "answer": 1,
+      "explain": "The unreal-past pattern pairs plus-que-parfait with conditional past."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Can a hypothetical outcome be reported as a proven effect?",
+      "options": [
+        "Only in a headline",
+        "Only if a user agrees",
+        "Yes, every conditional proves a result",
+        "No; it remains a hypothetical unless evidence supports it"
+      ],
+      "answer": 3,
+      "explain": "A hypothetical is not evidence of a measured outcome."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does à condition que require?",
+      "options": [
+        "A list of nouns",
+        "A past narrative",
+        "A condition; typically subjunctive in the following clause",
+        "A quotation"
+      ],
+      "answer": 2,
+      "explain": "À condition que introduces a condition and takes the subjunctive."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Why keep an alternative to a digital service?",
+      "options": [
+        "Access needs may differ",
+        "Every user has the same device",
+        "Alternatives make consent impossible",
+        "The service never needs testing"
+      ],
+      "answer": 0,
+      "explain": "Different access needs can require another route."
+    }
+  ]
+}

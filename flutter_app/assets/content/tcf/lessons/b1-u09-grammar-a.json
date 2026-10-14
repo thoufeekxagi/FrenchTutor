@@ -1,0 +1,87 @@
+{
+  "id": "b1-u09-grammar-a",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Grammar: Passive voice, impersonal on and the gerund",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Passive voice, impersonal on and the gerund",
+      "body": "Use the passive when the result or process matters more than the person doing it: Les places sont attribuées par tirage. Use on for a natural general account when the actor is not named: On remet un reçu. The gerund is en + present participle and normally keeps the same subject as the main clause: En remplissant le formulaire, vous confirmez votre présence. Do not use it when another person is doing the second action. Prefer an active sentence when it is clearer to say who did the action."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Passive voice, impersonal on and the gerund",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Action matters",
+          "être + past participle",
+          "Les badges ont été distribués à l'entrée.",
+          "Badges were handed out at the entrance."
+        ],
+        [
+          "General process",
+          "on + verb",
+          "On remet un reçu après l'inscription.",
+          "A receipt is given after registration."
+        ],
+        [
+          "Method; same subject",
+          "en + present participle",
+          "En participant, j'ai rencontré des voisins.",
+          "By taking part, I met neighbours."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the passive sentence.",
+      "options": [
+        "On a remis les badges.",
+        "Les bénévoles ont distribué les badges.",
+        "Les badges ont été distribués à l'entrée.",
+        "Distribuer les badges est facile."
+      ],
+      "answer": 2,
+      "explain": "The subject receives the action: les badges ont été distribués."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which sentence uses on for a general procedure?",
+      "options": [
+        "Le reçu a été remis hier.",
+        "On remet un reçu après l'inscription.",
+        "Nadia remet un reçu.",
+        "Nous avons remis le reçu à Nadia."
+      ],
+      "answer": 1,
+      "explain": "The sentence describes a general process without naming the actor."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When is a gerund subject clear?",
+      "options": [
+        "The same subject does both actions",
+        "The phrase is always passive",
+        "The main clause has no verb",
+        "A different person does each action"
+      ],
+      "answer": 0,
+      "explain": "The gerund normally shares the subject of the main clause."
+    }
+  ]
+}

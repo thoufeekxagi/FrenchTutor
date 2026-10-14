@@ -1,0 +1,134 @@
+{
+  "id": "a2-u10-phrases",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Say the full phrase, then shorten it with en. Write one personal shopping example in your notes and change only the amount; the listener should still understand what you mean."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Des fraises ? J'en prends une barquette.",
+      "en": "Strawberries? I am taking a punnet.",
+      "tip": "Say it: day frehz; zhah(n) prahn ün bah-REHT"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Du lait végétal ? J'en prends un litre.",
+      "en": "Plant-based milk? I am taking a litre of it.",
+      "tip": "Say it: dü leh vay-zhay-TAHL; zhah(n) prahn uh(n) leetr"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Tu veux des lentilles ? Oui, j'en veux.",
+      "en": "Do you want lentils? Yes, I want some.",
+      "tip": "Say it: tü vuh day lah(n)-TEE-yuh; wee, zhah(n) vuh"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Combien de yaourts ? J'en prends quatre.",
+      "en": "How many yogurts? I am taking four.",
+      "tip": "Say it: koh(n)-BYAH(N) duh yah-OOR; zhah(n) prahn kahtr"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Il reste du pain ? Oui, il en reste la moitié.",
+      "en": "Is there bread left? Yes, half of it is left.",
+      "tip": "Say it: eel rehst dü pa(n); wee, eel ah(n) rehst ün mwah-TYAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Je vais acheter des tomates; je vais en prendre six.",
+      "en": "I am going to buy tomatoes; I will take six.",
+      "tip": "Say it: zhuh veh ahsh-TAY day toh-MAHT; zhuh veh ah(n) prahn-druh sees"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Tu prends du fromage ? J'en prends un morceau.",
+      "en": "Are you taking cheese? I am taking a piece.",
+      "tip": "Say it: tü prahn dü froh-MAHZH; zhah(n) prahn uh(n) mohr-SOH"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Ce produit est trop cher. Je n'en prends pas.",
+      "en": "This product is too expensive. I am not taking any.",
+      "tip": "Say it: suh proh-DÜEE eh troh shehr; zhuh nah(n) prahn pah"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Des fraises ? J'en prends une barquette.",
+      "options": [
+        "Is there bread left? Yes, half of it is left.",
+        "Strawberries? I am taking a punnet.",
+        "Do you want lentils? Yes, I want some.",
+        "I am going to buy tomatoes; I will take six."
+      ],
+      "answer": 1,
+      "explain": "Des fraises ? J'en prends une barquette. means Strawberries? I am taking a punnet.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Tu veux des lentilles ? Oui, j'en veux.",
+      "options": [
+        "I am going to buy tomatoes; I will take six.",
+        "Do you want lentils? Yes, I want some.",
+        "Strawberries? I am taking a punnet.",
+        "How many yogurts? I am taking four."
+      ],
+      "answer": 1,
+      "explain": "Tu veux des lentilles ? Oui, j'en veux. means Do you want lentils? Yes, I want some.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Il reste du pain ? Oui, il en reste la moitié.",
+      "options": [
+        "This product is too expensive. I am not taking any.",
+        "Is there bread left? Yes, half of it is left.",
+        "I am going to buy tomatoes; I will take six.",
+        "Strawberries? I am taking a punnet."
+      ],
+      "answer": 1,
+      "explain": "Il reste du pain ? Oui, il en reste la moitié. means Is there bread left? Yes, half of it is left.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Tu prends du fromage ? J'en prends un morceau.",
+      "options": [
+        "Is there bread left? Yes, half of it is left.",
+        "Are you taking cheese? I am taking a piece.",
+        "Do you want lentils? Yes, I want some.",
+        "I am going to buy tomatoes; I will take six."
+      ],
+      "answer": 1,
+      "explain": "Tu prends du fromage ? J'en prends un morceau. means Are you taking cheese? I am taking a piece.."
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "id": "a2-u12-words-1",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Words: a week that changes",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un changement de disponibilité",
+      "en": "a change in availability",
+      "sound": "uh(n) shah(n)zh-MAH(N) duh dees-poh-nee-bee-lee-TAY",
+      "exampleFr": "Je signale un changement de disponibilité à mon équipe.",
+      "exampleEn": "I tell my team about a change in my availability."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un horaire provisoire",
+      "en": "a temporary schedule",
+      "sound": "uh(n) oh-REHR proh-vee-ZWAHR",
+      "exampleFr": "Je note l'horaire provisoire dans mon agenda.",
+      "exampleEn": "I write the temporary schedule in my calendar."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une réunion déplacée",
+      "en": "a rescheduled meeting",
+      "sound": "ün ray-ü-NYOH(N) day-plah-SAY",
+      "exampleFr": "La réunion est déplacée à jeudi.",
+      "exampleEn": "The meeting is rescheduled to Thursday."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un imprévu de dernière minute",
+      "en": "a last-minute surprise",
+      "sound": "uh(n) a(n)-pray-VÜ duh dehr-NYEHR mee-NÜT",
+      "exampleFr": "Un imprévu de dernière minute change mes plans.",
+      "exampleEn": "A last-minute surprise changes my plans."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un rendez-vous annulé",
+      "en": "a cancelled appointment",
+      "sound": "uh(n) rah(n)-day-voo ah-nü-LAY",
+      "exampleFr": "Je reçois un message au sujet du rendez-vous annulé.",
+      "exampleEn": "I receive a message about the cancelled appointment."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un nouvel itinéraire",
+      "en": "a new route",
+      "sound": "uh(n) noo-VEHL ee-tee-nay-REHR",
+      "exampleFr": "Je choisis un nouvel itinéraire pour aller au centre.",
+      "exampleEn": "I choose a new route to get to the centre."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un point de départ différent",
+      "en": "a different starting point",
+      "sound": "uh(n) pwa(n) duh day-PAHR dee-fay-RAH(N)",
+      "exampleFr": "Le bus part d'un point de départ différent.",
+      "exampleEn": "The bus leaves from a different starting point."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une solution de rechange",
+      "en": "an alternative solution",
+      "sound": "ün soh-lü-SYOH(N) duh ruh-SHA(N)ZH",
+      "exampleFr": "Je cherche une solution de rechange pour jeudi.",
+      "exampleEn": "I am looking for an alternative for Thursday."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un changement de disponibilité",
+      "options": [
+        "a last-minute surprise",
+        "a change in availability",
+        "a different starting point",
+        "a temporary schedule"
+      ],
+      "answer": 1,
+      "explain": "un changement de disponibilité means a change in availability."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un horaire provisoire",
+      "options": [
+        "a cancelled appointment",
+        "an alternative solution",
+        "a rescheduled meeting",
+        "a temporary schedule"
+      ],
+      "answer": 3,
+      "explain": "un horaire provisoire means a temporary schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une réunion déplacée",
+      "options": [
+        "a new route",
+        "a rescheduled meeting",
+        "a change in availability",
+        "a last-minute surprise"
+      ],
+      "answer": 1,
+      "explain": "une réunion déplacée means a rescheduled meeting."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un imprévu de dernière minute",
+      "options": [
+        "a different starting point",
+        "a temporary schedule",
+        "a cancelled appointment",
+        "a last-minute surprise"
+      ],
+      "answer": 3,
+      "explain": "un imprévu de dernière minute means a last-minute surprise."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un rendez-vous annulé",
+      "options": [
+        "an alternative solution",
+        "a cancelled appointment",
+        "a rescheduled meeting",
+        "a new route"
+      ],
+      "answer": 1,
+      "explain": "un rendez-vous annulé means a cancelled appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un nouvel itinéraire",
+      "options": [
+        "a change in availability",
+        "a last-minute surprise",
+        "a different starting point",
+        "a new route"
+      ],
+      "answer": 3,
+      "explain": "un nouvel itinéraire means a new route."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "b1-u10-tcf",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La rencontre commence à dix heures trente au lieu de dix heures. Les participants doivent entrer par la porte nord. Si vous arrivez après le début, demandez l'organisateur à l'accueil.",
+      "question": "Where should late arrivals ask for the organizer?",
+      "options": [
+        "In the parking lot",
+        "At reception",
+        "At the bus terminal",
+        "At the south entrance"
+      ],
+      "answer": 1,
+      "explain": "Late arrivals should ask at reception."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "L'inscription est facultative, mais les personnes qui souhaitent recevoir le document doivent donner leur adresse courriel. La salle se trouve au deuxième étage.",
+      "question": "What should someone provide to receive the document?",
+      "options": [
+        "A bus pass",
+        "A phone number",
+        "A paper form",
+        "An email address"
+      ],
+      "answer": 3,
+      "explain": "The speaker says an email address is needed to receive the document."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is optional?",
+      "options": [
+        "Registration",
+        "The meeting time",
+        "The room number",
+        "Using the north entrance"
+      ],
+      "answer": 0,
+      "explain": "The notice says registration is optional.",
+      "promptFr": "RENCONTRE D'INFORMATION — Samedi, 10 h 30, salle 204. Entrée par la porte nord. L'inscription est facultative. Pour obtenir le document de présentation, laissez votre adresse courriel à l'accueil."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which two details does the writer want?",
+      "options": [
+        "A new date and the cost",
+        "Elevator access and whom to contact on arrival",
+        "The organizer's name and phone number",
+        "A copy of the presentation and a refund"
+      ],
+      "answer": 1,
+      "explain": "The writer asks about elevator access and the contact person.",
+      "promptFr": "Message — J'ai compris que l'atelier avait été déplacé, mais je ne sais pas si le nouveau local est accessible par ascenseur. Pourriez-vous confirmer ce point et me dire à qui m'adresser à mon arrivée ?"
+    }
+  ]
+}

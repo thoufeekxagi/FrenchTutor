@@ -1,0 +1,49 @@
+{
+  "id": "b1-u07-write-speak",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word account for classmates about a meeting or discussion you attended. Report one statement and one question accurately, say what was confirmed and what remains open, and add your reaction.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "La semaine dernière, j'ai participé à une rencontre sur les horaires du centre communautaire. La coordonnatrice a expliqué que l'équipe voulait mieux répondre aux besoins des participants. Une personne a demandé si une séance du samedi serait organisée. La coordonnatrice a répondu qu'elle vérifierait les disponibilités avant de prendre une décision. Elle a aussi précisé que les heures actuelles resteraient en place pendant cette vérification. Pour ma part, je trouve utile que le groupe consulte les membres, parce que les horaires de travail sont différents. Toutefois, il ne faut pas présenter l'option du samedi comme une décision déjà confirmée. Le compte rendu devrait indiquer les prochaines étapes et la date à laquelle une réponse sera donnée. J'ai proposé qu'un court sondage soit envoyé par courriel. Ainsi, chacun pourra donner son avis avant que l'équipe choisisse une formule.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Attribute each statement and question to the right person.\n• Separate confirmed information from a suggestion or open question.\n• Keep your reaction distinct from the reported information."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. Ask a fictional event organizer what was decided at a recent meeting. Prepare for two minutes; ask about the date, what is confirmed, whether registration is needed and when the remaining questions will be answered. Interact for 3 minutes 30, then summarize one answer and ask the organizer to confirm it.\n\n• Attribute the information: who said it, and was it confirmed?\n• Use si for a reported yes/no question.\n• Summarize and verify an answer before ending the interaction."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de la rencontre de la semaine dernière. Pourriez-vous me dire ce qui a été décidé ? Est-ce que la date est confirmée ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'aimerais savoir si l'inscription est obligatoire. Une personne a demandé si une option en ligne serait offerte. Est-ce qu'une réponse a été donnée ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si j'ai bien compris, l'équipe doit encore vérifier la disponibilité de la salle. Quand pensez-vous pouvoir confirmer ce point ? Merci; je vais noter que la décision reste en attente.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

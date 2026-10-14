@@ -1,0 +1,148 @@
+{
+  "id": "b2-u12-words-4",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une information concordante",
+      "en": "corroborating information",
+      "sound": "ün ehn-for-mah-SYOH(N) kohn-kor-DAHNT",
+      "exampleFr": "Le second texte apporte une information concordante.",
+      "exampleEn": "The second text provides corroborating information."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une réserve importante",
+      "en": "an important caveat",
+      "sound": "ün ray-ZEHRV ehn-por-TAHNT",
+      "exampleFr": "La synthèse mentionne une réserve importante.",
+      "exampleEn": "The synthesis mentions an important caveat."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un lien de cause à effet",
+      "en": "a cause-and-effect link",
+      "sound": "uh(n) lyeh(n) duh kohz ah ay-FEH",
+      "exampleFr": "Les sources ne démontrent pas un lien de cause à effet.",
+      "exampleEn": "The sources do not demonstrate a cause-and-effect link."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "présenter fidèlement",
+      "en": "to represent accurately",
+      "sound": "pray-zahn-TAY fee-dehl-MAH(N)",
+      "exampleFr": "Il faut présenter fidèlement l'idée de chaque auteur.",
+      "exampleEn": "Each author's idea needs to be represented accurately."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "distinguer les faits des avis",
+      "en": "to distinguish facts from opinions",
+      "sound": "dees-tahn-GAY lay feh day-zah-VEE",
+      "exampleFr": "La rédaction doit distinguer les faits des avis.",
+      "exampleEn": "The writing should distinguish facts from opinions."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "considérer un contrepoint",
+      "en": "to consider a counterpoint",
+      "sound": "kohn-see-day-RAY uh(n) kohn-truh-pweh(n)",
+      "exampleFr": "Le candidat peut considérer un contrepoint sans l'adopter.",
+      "exampleEn": "The candidate can consider a counterpoint without adopting it."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une information concordante",
+      "options": [
+        "to represent accurately",
+        "corroborating information",
+        "an important caveat",
+        "a cause-and-effect link"
+      ],
+      "answer": 1,
+      "explain": "une information concordante means corroborating information."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une réserve importante",
+      "options": [
+        "to distinguish facts from opinions",
+        "a cause-and-effect link",
+        "to represent accurately",
+        "an important caveat"
+      ],
+      "answer": 3,
+      "explain": "une réserve importante means an important caveat."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un lien de cause à effet",
+      "options": [
+        "to consider a counterpoint",
+        "a cause-and-effect link",
+        "to represent accurately",
+        "to distinguish facts from opinions"
+      ],
+      "answer": 1,
+      "explain": "un lien de cause à effet means a cause-and-effect link."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "présenter fidèlement",
+      "options": [
+        "corroborating information",
+        "to distinguish facts from opinions",
+        "to consider a counterpoint",
+        "to represent accurately"
+      ],
+      "answer": 3,
+      "explain": "présenter fidèlement means to represent accurately."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "distinguer les faits des avis",
+      "options": [
+        "an important caveat",
+        "to distinguish facts from opinions",
+        "to consider a counterpoint",
+        "corroborating information"
+      ],
+      "answer": 1,
+      "explain": "distinguer les faits des avis means to distinguish facts from opinions."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "considérer un contrepoint",
+      "options": [
+        "a cause-and-effect link",
+        "corroborating information",
+        "an important caveat",
+        "to consider a counterpoint"
+      ],
+      "answer": 3,
+      "explain": "considérer un contrepoint means to consider a counterpoint."
+    }
+  ]
+}

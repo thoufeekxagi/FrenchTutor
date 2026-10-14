@@ -1,0 +1,72 @@
+{
+  "id": "b1-u07-dialogues",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Notes from a meeting",
+      "body": "Two colleagues check what was decided and what remains a proposal.",
+      "examples": [
+        {
+          "fr": "Qu'est-ce qui a été décidé au sujet de l'horaire ?",
+          "en": "Mina: What was decided about the schedule?"
+        },
+        {
+          "fr": "La responsable a précisé que l'essai commencerait en juin.",
+          "en": "Luc: The coordinator clarified that the trial would start in June."
+        },
+        {
+          "fr": "A-t-elle confirmé le nouvel horaire ?",
+          "en": "Mina: Did she confirm the new schedule?"
+        },
+        {
+          "fr": "Non. Elle a dit que le groupe devait d'abord vérifier les disponibilités.",
+          "en": "Luc: No. She said the group first needed to check availability."
+        },
+        {
+          "fr": "Alors, je vais écrire que la date est prévue, mais pas définitive.",
+          "en": "Mina: Then I will write that the date is planned but not final."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Checking a rumour",
+      "body": "A friend asks whether a shared message is confirmed.",
+      "examples": [
+        {
+          "fr": "J'ai entendu dire que le centre fermerait le vendredi.",
+          "en": "Sam: I heard that the centre might close on Friday."
+        },
+        {
+          "fr": "Qui a annoncé ce changement ?",
+          "en": "Awa: Who announced this change?"
+        },
+        {
+          "fr": "Je ne sais pas. Le message ne donne aucune source.",
+          "en": "Sam: I don't know. The message gives no source."
+        },
+        {
+          "fr": "La coordonnatrice a dit que rien n'était décidé.",
+          "en": "Awa: The coordinator said nothing had been decided."
+        },
+        {
+          "fr": "D'accord, je ne transmettrai pas la rumeur comme un fait.",
+          "en": "Sam: Okay, I will not pass the rumour along as a fact."
+        }
+      ]
+    }
+  ]
+}

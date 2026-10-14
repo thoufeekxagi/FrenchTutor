@@ -1,0 +1,72 @@
+{
+  "id": "b2-u02-tcf",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le porte-parole dit que le projet sera évalué après six mois. Il précise que les premiers chiffres ne suffiront pas à mesurer tous les effets.",
+      "question": "What limitation does the spokesperson mention?",
+      "options": [
+        "No figures will be collected",
+        "The first figures will not measure every effect",
+        "The project has already been cancelled",
+        "The evaluation lasts six years"
+      ],
+      "answer": 1,
+      "explain": "The speaker says the first figures will not capture every effect."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Selon une source citée par le média, le coût pourrait augmenter. Le ministère n'a pas confirmé cette estimation.",
+      "question": "How certain is the cost increase?",
+      "options": [
+        "It is an unconfirmed estimate",
+        "It is a final official result",
+        "It has already been paid",
+        "It is a personal preference"
+      ],
+      "answer": 0,
+      "explain": "The estimate is attributed to a source and is not confirmed by the ministry."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which detail is not final?",
+      "options": [
+        "The budget",
+        "The pilot start",
+        "The plan to examine results",
+        "The length of the first phase"
+      ],
+      "answer": 0,
+      "explain": "The notice says there is no final budget yet.",
+      "promptFr": "Un communiqué fictif annonce le lancement d'un projet pilote. Il précise que la première phase durera quatre mois et que les résultats seront rendus publics après examen. Le document ne donne pas encore de budget final. Un média rapporte qu'un coût plus élevé est possible, mais cette estimation n'a pas été confirmée par l'organisme responsable. Le lecteur doit donc distinguer l'annonce officielle de l'estimation rapportée."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why is the conclusion limited?",
+      "options": [
+        "The results were not published",
+        "Participants volunteered themselves",
+        "The survey had no question",
+        "No one answered"
+      ],
+      "answer": 1,
+      "explain": "Self-selection limits how broadly the findings can be generalized.",
+      "promptFr": "Une enquête menée auprès de 180 volontaires révèle que plusieurs répondants souhaitent des horaires plus prévisibles. Les auteurs indiquent cependant que les participants se sont inscrits eux-mêmes. Le résultat renseigne sur ces répondants; il ne permet pas, à lui seul, de décrire toutes les personnes concernées."
+    }
+  ]
+}

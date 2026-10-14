@@ -1,0 +1,166 @@
+{
+  "id": "a2-u12-words-2",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Words: listen and read for exam clues",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un document joint",
+      "en": "an attached document",
+      "sound": "uh(n) doh-kü-MAH(N) zhWA(N)",
+      "exampleFr": "Je joins le document à ma demande.",
+      "exampleEn": "I attach the document to my request."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un extrait audio",
+      "en": "an audio excerpt",
+      "sound": "uh(n) ehk-TRAY oh-DYOH",
+      "exampleFr": "J'écoute un court extrait audio avant de répondre.",
+      "exampleEn": "I listen to a short audio excerpt before answering."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une information précise",
+      "en": "a specific piece of information",
+      "sound": "ün a(n)-for-mah-SYOH(N) pray-SEEZ",
+      "exampleFr": "Je cherche une information précise dans le message.",
+      "exampleEn": "I look for a specific piece of information in the message."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une idée principale",
+      "en": "a main idea",
+      "sound": "ün ee-DAY pree(n)-see-PAHL",
+      "exampleFr": "Je note l'idée principale après la première écoute.",
+      "exampleEn": "I note the main idea after the first listen."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un détail pertinent",
+      "en": "a relevant detail",
+      "sound": "uh(n) day-TAI pehr-tee-NAH(N)",
+      "exampleFr": "J'ajoute un détail pertinent pour expliquer mon choix.",
+      "exampleEn": "I add a relevant detail to explain my choice."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un point de vue différent",
+      "en": "a different point of view",
+      "sound": "uh(n) pwa(n) duh VÜ dee-fay-RAH(N)",
+      "exampleFr": "Le deuxième message présente un point de vue différent.",
+      "exampleEn": "The second message presents a different point of view."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un argument simple",
+      "en": "a simple argument",
+      "sound": "uh(n) ahr-gü-MAH(N) SA(N)PL",
+      "exampleFr": "Je donne un argument simple pour justifier ma réponse.",
+      "exampleEn": "I give a simple argument to justify my answer."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une réponse complète",
+      "en": "a complete answer",
+      "sound": "ün ray-POHNS kohn-PLEHT",
+      "exampleFr": "Ma réponse complète contient un fait et une raison.",
+      "exampleEn": "My complete answer contains a fact and a reason."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un document joint",
+      "options": [
+        "a main idea",
+        "an attached document",
+        "a simple argument",
+        "an audio excerpt"
+      ],
+      "answer": 1,
+      "explain": "un document joint means an attached document."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un extrait audio",
+      "options": [
+        "a relevant detail",
+        "a complete answer",
+        "a specific piece of information",
+        "an audio excerpt"
+      ],
+      "answer": 3,
+      "explain": "un extrait audio means an audio excerpt."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une information précise",
+      "options": [
+        "a different point of view",
+        "a specific piece of information",
+        "an attached document",
+        "a main idea"
+      ],
+      "answer": 1,
+      "explain": "une information précise means a specific piece of information."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une idée principale",
+      "options": [
+        "a simple argument",
+        "an audio excerpt",
+        "a relevant detail",
+        "a main idea"
+      ],
+      "answer": 3,
+      "explain": "une idée principale means a main idea."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un détail pertinent",
+      "options": [
+        "a complete answer",
+        "a relevant detail",
+        "a specific piece of information",
+        "a different point of view"
+      ],
+      "answer": 1,
+      "explain": "un détail pertinent means a relevant detail."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de vue différent",
+      "options": [
+        "an attached document",
+        "a main idea",
+        "a simple argument",
+        "a different point of view"
+      ],
+      "answer": 3,
+      "explain": "un point de vue différent means a different point of view."
+    }
+  ]
+}

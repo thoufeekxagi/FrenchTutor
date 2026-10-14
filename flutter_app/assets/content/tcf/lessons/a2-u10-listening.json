@@ -1,0 +1,86 @@
+{
+  "id": "a2-u10-listening",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je prends un sachet de lentilles et deux barquettes de fraises. Le prix des fraises est au kilo.",
+      "question": "How many strawberry punnets does the speaker take?",
+      "options": [
+        "Two",
+        "One",
+        "Three",
+        "Four"
+      ],
+      "answer": 0,
+      "explain": "The recording says deux barquettes."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Du lait végétal ? J'en prends un litre. La boisson sans sucre reste au magasin.",
+      "question": "How much plant-based milk does the speaker take?",
+      "options": [
+        "One litre",
+        "One gram",
+        "One glass",
+        "One bottle of water"
+      ],
+      "answer": 0,
+      "explain": "The quantity kept after en is un litre."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le plat préparé ne convient pas à mon régime. Je vais en choisir un autre.",
+      "question": "Why does the speaker choose another dish?",
+      "options": [
+        "The prepared dish does not suit the diet",
+        "The price per kilogram is missing",
+        "The store is closing",
+        "The package is too large"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the prepared dish does not suit the diet."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Il reste une moitié de la sauce. Nous en gardons une moitié pour demain.",
+      "question": "How much sauce will the group keep?",
+      "options": [
+        "Half",
+        "A quarter",
+        "A litre",
+        "A handful"
+      ],
+      "answer": 0,
+      "explain": "The speaker says they will keep half."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le produit est en promotion, mais la date de péremption est demain.",
+      "question": "What should the shopper notice about the product?",
+      "options": [
+        "Its best-before date is tomorrow",
+        "Its price per kilogram is missing",
+        "It is an imported product",
+        "The receipt is itemized"
+      ],
+      "answer": 0,
+      "explain": "The recording says the best-before date is tomorrow."
+    }
+  ]
+}

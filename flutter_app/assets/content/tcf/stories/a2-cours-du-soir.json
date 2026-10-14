@@ -1,0 +1,340 @@
+{
+  "id": "a2-cours-du-soir",
+  "title": "Le cours du soir de Nadia",
+  "titleEn": "Nadia's evening class",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Nadia plans an evening course and internship application around her work schedule.",
+  "unit": "a2-u05",
+  "sentences": [
+    {
+      "fr": "Nadia travaille dans un centre de formation.",
+      "en": "Nadia works at a training centre."
+    },
+    {
+      "fr": "Le mois prochain, elle va suivre un cours de français après son travail.",
+      "en": "Next month, she is going to take a French class after work."
+    },
+    {
+      "fr": "Le cours a lieu le mardi et le jeudi, de dix-huit heures à vingt heures.",
+      "en": "The class meets on Tuesdays and Thursdays, from six to eight p.m."
+    },
+    {
+      "fr": "Elle prépare aussi une candidature pour un stage dans un bureau.",
+      "en": "She is also preparing an application for an internship in an office."
+    },
+    {
+      "fr": "La date limite est le quinze novembre; elle va soumettre son dossier vendredi.",
+      "en": "The deadline is November fifteenth; she is going to submit her application on Friday."
+    },
+    {
+      "fr": "Si le groupe est complet, elle choisira une autre formation du soir.",
+      "en": "If the group is full, she will choose another evening course."
+    },
+    {
+      "fr": "La conseillère va écrire à Nadia quand l'horaire sera confirmé.",
+      "en": "The adviser is going to write to Nadia when the schedule is confirmed."
+    },
+    {
+      "fr": "Nadia aura deux cours par semaine et un jour de travail.",
+      "en": "Nadia will have two classes per week and one work day."
+    }
+  ],
+  "words": {
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "name"
+    },
+    "travaille": {
+      "en": "works",
+      "pos": "verb"
+    },
+    "dans": {
+      "en": "in",
+      "pos": "preposition"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "centre": {
+      "en": "centre",
+      "pos": "noun, masculine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "formation": {
+      "en": "course; training",
+      "pos": "noun, feminine"
+    },
+    "le": {
+      "en": "the (masculine)",
+      "pos": "article"
+    },
+    "mois": {
+      "en": "month",
+      "pos": "noun, masculine"
+    },
+    "prochain": {
+      "en": "next",
+      "pos": "adjective"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "va": {
+      "en": "is going to",
+      "pos": "verb"
+    },
+    "suivre": {
+      "en": "to take; follow",
+      "pos": "verb"
+    },
+    "cours": {
+      "en": "class",
+      "pos": "noun, masculine"
+    },
+    "français": {
+      "en": "French",
+      "pos": "noun"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "son": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "travail": {
+      "en": "work",
+      "pos": "noun, masculine"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "lieu": {
+      "en": "place",
+      "pos": "noun, masculine"
+    },
+    "mardi": {
+      "en": "Tuesday",
+      "sound": "mahr-DEE"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "jeudi": {
+      "en": "Thursday",
+      "sound": "zhuh-DEE"
+    },
+    "dix-huit": {
+      "en": "eighteen",
+      "pos": "number"
+    },
+    "heures": {
+      "en": "hours; o'clock",
+      "pos": "noun"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "vingt": {
+      "en": "twenty",
+      "pos": "number"
+    },
+    "prépare": {
+      "en": "is preparing",
+      "pos": "verb"
+    },
+    "aussi": {
+      "en": "also",
+      "pos": "adverb"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "candidature": {
+      "en": "application",
+      "pos": "noun, feminine"
+    },
+    "pour": {
+      "en": "for",
+      "pos": "preposition"
+    },
+    "stage": {
+      "en": "internship",
+      "pos": "noun, masculine"
+    },
+    "bureau": {
+      "en": "an office; a desk"
+    },
+    "la": {
+      "en": "the (feminine)",
+      "pos": "article"
+    },
+    "date": {
+      "en": "date",
+      "pos": "noun, feminine"
+    },
+    "limite": {
+      "en": "deadline; limit",
+      "pos": "noun/adjective"
+    },
+    "est": {
+      "en": "is; has (être)",
+      "pos": "verb"
+    },
+    "quinze": {
+      "en": "fifteen",
+      "pos": "number"
+    },
+    "novembre": {
+      "en": "November",
+      "pos": "month"
+    },
+    "soumettre": {
+      "en": "to submit",
+      "pos": "verb"
+    },
+    "dossier": {
+      "en": "application file",
+      "pos": "noun, masculine"
+    },
+    "vendredi": {
+      "en": "Friday",
+      "pos": "day"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun, masculine"
+    },
+    "complet": {
+      "en": "full",
+      "pos": "adjective"
+    },
+    "choisira": {
+      "en": "will choose",
+      "pos": "verb"
+    },
+    "autre": {
+      "en": "another",
+      "pos": "determiner"
+    },
+    "du": {
+      "en": "of the",
+      "pos": "contraction"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine"
+    },
+    "conseillère": {
+      "en": "adviser",
+      "pos": "noun, feminine"
+    },
+    "écrire": {
+      "en": "to write",
+      "sound": "ay-KREER"
+    },
+    "quand": {
+      "en": "when",
+      "pos": "connector"
+    },
+    "l'horaire": {
+      "en": "schedule",
+      "sound": "loh-REHR"
+    },
+    "sera": {
+      "en": "will be",
+      "pos": "verb"
+    },
+    "confirmé": {
+      "en": "confirmed",
+      "pos": "adjective"
+    },
+    "aura": {
+      "en": "will have; will take place",
+      "pos": "verb"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "par": {
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    "semaine": {
+      "en": "week, weekday period"
+    },
+    "jour": {
+      "en": "day",
+      "pos": "noun, masculine"
+    }
+  },
+  "keywords": [
+    "formation",
+    "l'horaire",
+    "limite",
+    "candidature",
+    "stage"
+  ],
+  "quiz": [
+    {
+      "prompt": "When will Nadia's class take place?",
+      "options": [
+        "Tuesday and Thursday evenings",
+        "Every weekday morning",
+        "Saturday afternoons",
+        "Monday and Wednesday at noon"
+      ],
+      "answer": 0,
+      "explain": "The story gives Tuesdays and Thursdays from six to eight p.m."
+    },
+    {
+      "prompt": "When is the application deadline?",
+      "options": [
+        "November 15",
+        "November 5",
+        "December 15",
+        "October 15"
+      ],
+      "answer": 0,
+      "explain": "The fifth sentence says the deadline is November fifteenth."
+    },
+    {
+      "prompt": "What will Nadia do if the group is full?",
+      "options": [
+        "Choose another evening course",
+        "Cancel her application",
+        "Work a night shift",
+        "Ask for a certificate"
+      ],
+      "answer": 0,
+      "explain": "The condition and result are in the sixth sentence."
+    },
+    {
+      "prompt": "What will the adviser send after the schedule is confirmed?",
+      "options": [
+        "An email",
+        "A paper certificate",
+        "A new application",
+        "A transcript"
+      ],
+      "answer": 0,
+      "explain": "The adviser will send Nadia a courriel, an email."
+    }
+  ]
+}

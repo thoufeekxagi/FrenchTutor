@@ -1,0 +1,58 @@
+{
+  "id": "b2-u10-listening",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Mina propose une ouverture en soirée, tandis que Louis s'inquiète des trajets tardifs. Ils s'entendent toutefois sur la nécessité de demander l'avis des usagers.",
+      "question": "What do Mina and Louis agree on?",
+      "options": [
+        "Asking users for their views",
+        "Ending public transport",
+        "Choosing one final proposal today",
+        "Opening the room every night"
+      ],
+      "answer": 0,
+      "explain": "They agree on consulting users."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Nous avons parlé des horaires. Nous en reparlerons après avoir reçu les commentaires.",
+      "question": "What does en refer to?",
+      "options": [
+        "The deadline",
+        "The schedules",
+        "The comments",
+        "The room"
+      ],
+      "answer": 1,
+      "explain": "En parler refers back to des horaires."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le compte rendu indiquera les points adoptés. Pour le désaccord sur le transport, nous y reviendrons au prochain échange.",
+      "question": "What will happen to the transport disagreement?",
+      "options": [
+        "It will be transferred to another group",
+        "It will be removed from the record",
+        "It will be revisited at the next exchange",
+        "It has already been resolved"
+      ],
+      "answer": 2,
+      "explain": "The speaker says they will return to the transport disagreement later."
+    }
+  ]
+}

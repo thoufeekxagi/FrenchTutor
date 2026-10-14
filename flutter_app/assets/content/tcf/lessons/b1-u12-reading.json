@@ -1,0 +1,52 @@
+{
+  "id": "b1-u12-reading",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should members do before June 20?",
+      "options": [
+        "Share a preference and explain a constraint",
+        "Cancel their membership",
+        "Pay for the new schedule",
+        "Register for a confirmed Saturday session"
+      ],
+      "answer": 0,
+      "explain": "The note invites members to share a preference and constraint.",
+      "promptFr": "NOTE DU COMITÉ — Plusieurs options sont à l'étude : une séance le samedi, une activité en ligne ou un horaire partagé. Aucune décision n'a été prise. Les membres peuvent transmettre une préférence et expliquer une contrainte avant le 20 juin."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why was another room chosen?",
+      "options": [
+        "The group had cancelled",
+        "The first room was inaccessible",
+        "The first room was too large",
+        "The activity was online"
+      ],
+      "answer": 1,
+      "explain": "The first room was inaccessible.",
+      "promptFr": "Compte rendu — La première salle avait été réservée avant que l'organisatrice apprenne qu'elle était inaccessible. Une autre salle a été choisie. Le groupe a commencé avec quinze minutes de retard, mais chaque participant a pu prendre part à l'activité."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How should the comments be interpreted?",
+      "options": [
+        "As a final vote by every member",
+        "As an official decision",
+        "As individual experiences, not a representative survey",
+        "As proof that online access always works"
+      ],
+      "answer": 2,
+      "explain": "The note explicitly says the comments are not a representative survey.",
+      "promptFr": "Deux participants soutiennent l'option en ligne parce qu'elle réduit le trajet. Une autre personne rappelle que certains membres n'ont pas de connexion stable. Le compte rendu présente ces commentaires comme des expériences individuelles, pas comme une enquête représentative."
+    }
+  ]
+}

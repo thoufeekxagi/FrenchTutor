@@ -1,0 +1,56 @@
+{
+  "id": "b1-u01-write-speak",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word post for classmates about a time a plan changed unexpectedly. Recount what had happened before the change, describe the main events and explain your reaction or what you learned. Use clear time markers; do not copy the model.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "La semaine dernière, notre groupe devait présenter un projet à dix-huit heures. Avant notre arrivée, l'enseignante avait appris que la salle informatique était fermée. Elle avait donc réservé un autre local, mais le message envoyé au groupe n'était pas arrivé à tout le monde. Quand je suis entré dans le bâtiment, plusieurs personnes attendaient encore devant l'ancienne salle. Un collègue a téléphoné à l'accueil et nous a indiqué le nouveau local. Nous avons commencé avec vingt minutes de retard. Au départ, j'étais inquiet parce que notre présentation utilisait des images préparées sur un ordinateur. Heureusement, une autre personne avait enregistré les fichiers sur une clé USB. Finalement, nous avons présenté le projet sans devoir annuler. Depuis, je confirme les changements avant de partir et je garde une copie de mes documents.\n\nCheck:\n• Official Task 2 range: 120–150 words; count after drafting.\n• Make the earlier event and the main event easy to distinguish.\n• Use the plus-que-parfait only for an event earlier than another past point.\n• Include a relevant reaction or lesson and check the audience."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. You are a participant calling an organizer after a schedule change. Prepare for two minutes; then ask about the new time, room, materials, late arrival and an alternative if you cannot attend. Interact for 3 minutes 30. Marie should reveal details in stages and change one detail so you must follow up.\n\n• Task 2 is an information-seeking interaction, not a monologue.\n• Use two minutes to list information gaps, not to write a full script.\n• React to the answer you hear and form a useful follow-up."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de l'atelier. Pourriez-vous me confirmer la nouvelle heure ? Et dans quelle salle aura-t-il lieu ?",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Est-ce qu'il faut apporter les documents que nous avions préparés ? Si j'arrive après le début, pourrai-je quand même participer ?",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je n'ai pas reçu le premier message; pourriez-vous me dire quand le changement a été annoncé ? Si j'ai bien compris, la rencontre commence à dix-huit heures trente, c'est exact ?",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Merci, je vais noter la nouvelle adresse.",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

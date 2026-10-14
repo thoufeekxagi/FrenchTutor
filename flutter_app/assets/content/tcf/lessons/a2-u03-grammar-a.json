@@ -1,0 +1,112 @@
+{
+  "id": "a2-u03-grammar-a",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Grammar: Five high-value irregular forms with avoir",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Five high-value irregular forms with avoir",
+      "body": "Unit 2 introduced the passé composé with avoir and regular -er participles. This unit adds five common irregular forms used with avoir and a starter set of common verbs used with être. Learn the whole verb pattern, not just the participle."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Passé composé: present avoir + past participle",
+      "headers": [
+        "Infinitive",
+        "Past participle",
+        "Example"
+      ],
+      "rows": [
+        [
+          "faire",
+          "fait",
+          "J'ai fait une demande."
+        ],
+        [
+          "prendre",
+          "pris",
+          "Nous avons pris le train."
+        ],
+        [
+          "voir",
+          "vu",
+          "Elle a vu le numéro."
+        ],
+        [
+          "lire",
+          "lu",
+          "Vous avez lu le message."
+        ],
+        [
+          "avoir",
+          "eu",
+          "J'ai eu une réponse."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Five high-value irregular forms with avoir",
+      "body": "• Learn the participle as part of a pair: prendre → pris, then retrieve j'ai pris from memory.\n• The subject changes avoir (j'ai, tu as, elle a, nous avons); keep the participle form shown in these examples.\n• Put a time or order word beside the action so the listener knows when it happened.\n• Do not guess the irregular form from the infinitive: voir becomes vu, not voi or voyé."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Hier, j'___ le message deux fois.",
+      "options": [
+        "ai lu",
+        "ai lire",
+        "suis lu",
+        "lis hier"
+      ],
+      "answer": 0,
+      "explain": "For lire, the past participle is lu: j'ai lu."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Nous ___ le train à huit heures.",
+      "options": [
+        "avons pris",
+        "avons prendre",
+        "sommes pris",
+        "prenons hier"
+      ],
+      "answer": 0,
+      "explain": "Use avoir with the irregular participle pris."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Elle ___ un détail sur le billet.",
+      "options": [
+        "a vu",
+        "a voir",
+        "est vu",
+        "voit hier"
+      ],
+      "answer": 0,
+      "explain": "Voir becomes vu: elle a vu."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Tu ___ une demande au guichet.",
+      "options": [
+        "as fait",
+        "as faire",
+        "es fait",
+        "fais hier"
+      ],
+      "answer": 0,
+      "explain": "The irregular past participle of faire is fait."
+    }
+  ]
+}

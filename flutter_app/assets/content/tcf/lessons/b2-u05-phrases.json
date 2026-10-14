@@ -1,0 +1,78 @@
+{
+  "id": "b2-u05-phrases",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Phrases",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "These chunks help you organize a real response. Choose the one that matches your meaning, say it from memory, and replace the topic details with your own."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Il est essentiel que…",
+      "en": "It is essential that…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Il est possible que…",
+      "en": "It is possible that…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je ne suis pas certain que…",
+      "en": "I am not certain that…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je comprends que…, toutefois…",
+      "en": "I understand that…, however…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Pourriez-vous préciser si… ?",
+      "en": "Could you clarify whether…?",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Sauf erreur de ma part, …",
+      "en": "Unless I am mistaken, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Il vaut mieux vérifier auprès de…",
+      "en": "It is better to verify with…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Si j'ai bien compris, la prochaine étape est…",
+      "en": "If I understood correctly, the next step is…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

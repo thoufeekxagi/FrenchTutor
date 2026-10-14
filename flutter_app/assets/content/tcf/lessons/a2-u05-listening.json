@@ -1,0 +1,86 @@
+{
+  "id": "a2-u05-listening",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La formation du soir commence le 4 novembre. La date limite pour envoyer le formulaire est le 28 octobre.",
+      "question": "What is the last day to send the form?",
+      "options": [
+        "October 28",
+        "November 4",
+        "October 4",
+        "November 28"
+      ],
+      "answer": 0,
+      "explain": "The speaker gives October 28 as the deadline."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je vais participer à l'entretien vendredi matin. Si l'heure change, la conseillère va m'envoyer un courriel.",
+      "question": "What will the adviser do if the time changes?",
+      "options": [
+        "Send an email",
+        "Cancel the interview",
+        "Change the course level",
+        "Submit the application"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the adviser will email if the time changes."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Nous choisirons le groupe après l'entretien. La formation va commencer en janvier.",
+      "question": "When will the course begin?",
+      "options": [
+        "In January",
+        "In November",
+        "After the interview",
+        "Next Monday"
+      ],
+      "answer": 0,
+      "explain": "The recording says the course will start in January."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Je ne vais pas suivre le cours intensif cet été. Je vais m'inscrire à la formation du soir en septembre.",
+      "question": "Which course will the speaker enrol in?",
+      "options": [
+        "The evening course in September",
+        "The intensive summer course",
+        "A weekend workshop in July",
+        "The winter course in January"
+      ],
+      "answer": 0,
+      "explain": "The speaker plans to enrol in the evening course in September."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Votre candidature restera en attente jusqu'à lundi. Nous allons confirmer la date de l'entretien par courriel.",
+      "question": "How will the interview date be confirmed?",
+      "options": [
+        "By email",
+        "In a phone call today",
+        "On the course website",
+        "In a paper letter"
+      ],
+      "answer": 0,
+      "explain": "The notice says the date will be confirmed by email."
+    }
+  ]
+}

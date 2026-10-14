@@ -1,0 +1,52 @@
+{
+  "id": "b2-u03-reading",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is offered at the end of the pathway?",
+      "options": [
+        "A new language test",
+        "A placement, subject to availability",
+        "Automatic recognition for everyone",
+        "A full-time job"
+      ],
+      "answer": 1,
+      "explain": "The notice says an internship is offered at the end, subject to availability.",
+      "promptFr": "Le programme de perfectionnement s'adresse aux adultes qui souhaitent consolider leurs compétences en communication. Les cours ont lieu deux soirs par semaine. Les personnes dont l'expérience est pertinente peuvent demander une reconnaissance de leurs acquis, selon les critères publiés. Le stage auquel plusieurs participants s'intéressent est offert à la fin du parcours, sous réserve de disponibilité. La date à laquelle les demandes doivent être déposées figure dans le calendrier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the text recommend checking?",
+      "options": [
+        "Whether everyone prefers theory",
+        "The number of available jobs",
+        "Only the program's name",
+        "Schedules and prerequisites"
+      ],
+      "answer": 3,
+      "explain": "The learner should check schedules and prerequisites.",
+      "promptFr": "Deux programmes semblent comparables. Le premier, auquel on peut s'inscrire à l'automne, comprend davantage de travaux pratiques. Le second donne plus de temps aux notions théoriques. Ce qui importe pour une personne qui travaille déjà, c'est de vérifier les horaires et les préalables. Le document ne permet pas de dire qu'un choix convient à tous."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why is the candidate contacting the listed person?",
+      "options": [
+        "To ask about recognition of her experience",
+        "To withdraw her application",
+        "To change the program's start date",
+        "To confirm an internship assignment"
+      ],
+      "answer": 0,
+      "explain": "She is awaiting an answer about recognition of her experience.",
+      "promptFr": "La candidate a envoyé le dossier que le programme demandait, mais elle attend encore une réponse sur la reconnaissance de son expérience. Elle s'adressera à la personne dont les coordonnées apparaissent dans le guide. Ce qui la rassure, c'est que la date limite n'est pas imminente."
+    }
+  ]
+}

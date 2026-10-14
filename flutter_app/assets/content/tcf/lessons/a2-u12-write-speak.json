@@ -1,0 +1,49 @@
+{
+  "id": "a2-u12-write-speak",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Explain a change and make a plan",
+      "body": "Write 60–120 French words to a classmate. Explain one schedule or route change, say what happened and what you plan to do next, give one reason for your choice, and ask for one missing detail politely. This capstone uses the official Task 1 word range, but the prompt remains original practice material.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour Sam, La réunion est jeudi à 18 h, pas mardi. Mardi, je travaille jusqu'à 17 h. Il pleuvait quand le bus est arrivé hier, et j'ai lu l'avis puis pris un nouvel itinéraire. La deuxième option est plus longue, mais le point de départ est plus près du centre. Je vais y aller après mon cours. Pourriez-vous confirmer l'entrée principale ? Je vais prévenir les membres du groupe et leur envoyer l'horaire provisoire. Merci, Nadia\n\nCheck:\n• Address the right person and make the purpose clear.\n• Connect a past event, the new plan and one reason.\n• Use one polite request and make its reference clear.\n• Keep the message within 60–120 words for this Task 1-style practice.\n• Close your notes and write a second message with new dates and a different problem."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Tell Marie about a changing week",
+      "body": "Part 1: speak for up to two minutes about your real or invented week; Marie asks two follow-up questions you have not seen. Part 2: complete a short information-gap role-play about a changed appointment or route. Part 3: give a supported 30-second opinion about which option you would choose and one reason. The last two are learning previews, not a claim that you can yet complete the full official oral tasks.\n\n• Start with the main idea and add the reason or detail the listener needs.\n• When Marie asks an unseen follow-up, answer it directly before adding extra information.\n• Use a repair phrase if you lose a word: Je veux dire…; Pourriez-vous répéter ?.\n• On the retry, change the situation and answer without copying the model."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Cette semaine, je travaille et je suis un cours de français. Mardi, un imprévu a changé mon horaire. Il pleuvait quand le bus est arrivé, et j'ai pris un nouvel itinéraire.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je vais demander l'heure à l'employée et confirmer le point de départ. Je préfère la deuxième option parce qu'elle est plus simple, mais elle est plus longue.",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je voudrais aussi prévenir mon groupe.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

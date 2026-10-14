@@ -1,0 +1,93 @@
+{
+  "id": "b2-u04-grammar-a",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Grammar: Past timeline: background, event and earlier cause",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Past timeline: background, event and earlier cause",
+      "body": "Choose the past tense from the timeline, not from an English translation. The imparfait gives a background or repeated situation; the passé composé advances the story with a completed event; the plus-que-parfait marks something that had already happened before that event. The conditionnel passé can evaluate a missed option (il aurait fallu consulter…), but it does not prove what would have happened. Keep the sequence explicit with avant que, après que, à la suite de and time markers."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Past timeline: background, event and earlier cause",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Background / ongoing",
+          "imparfait",
+          "Le quartier manquait d'espaces calmes.",
+          "The neighbourhood lacked quiet spaces."
+        ],
+        [
+          "Completed change",
+          "passé composé",
+          "La ville a fermé une voie pendant les travaux.",
+          "The city closed a lane during construction."
+        ],
+        [
+          "Earlier cause",
+          "plus-que-parfait",
+          "Les résidents avaient déjà signalé le bruit.",
+          "Residents had already reported the noise."
+        ],
+        [
+          "Hindsight",
+          "conditionnel passé",
+          "Il aurait fallu prévoir un accès temporaire.",
+          "A temporary entrance should have been planned."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which tense gives background?",
+      "options": [
+        "conditionnel passé",
+        "passé composé",
+        "plus-que-parfait",
+        "imparfait"
+      ],
+      "answer": 3,
+      "explain": "The imparfait commonly describes background or repeated situations."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Residents had already complained before work began. Which tense marks the earlier action?",
+      "options": [
+        "futur simple",
+        "présent",
+        "plus-que-parfait",
+        "impératif"
+      ],
+      "answer": 2,
+      "explain": "The plus-que-parfait marks the action that preceded the past event."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does il aurait fallu express here?",
+      "options": [
+        "A past recommendation or missed necessity",
+        "A confirmed future event",
+        "A repeated habit",
+        "A direct order"
+      ],
+      "answer": 0,
+      "explain": "The conditional past can express what would have been necessary."
+    }
+  ]
+}

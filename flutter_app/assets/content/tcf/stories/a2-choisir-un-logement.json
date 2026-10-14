@@ -1,0 +1,370 @@
+{
+  "id": "a2-choisir-un-logement",
+  "title": "Quel logement choisir ?",
+  "titleEn": "Which home should she choose?",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Nadia compares two fictional homes against her travel and budget needs.",
+  "unit": "a2-u06",
+  "sentences": [
+    {
+      "fr": "Nadia cherche un logement près d'une bibliothèque et d'un arrêt d'autobus.",
+      "en": "Nadia is looking for a home near a library and a bus stop."
+    },
+    {
+      "fr": "L'annonce A décrit un studio pour mille trois cent cinquante dollars par mois.",
+      "en": "Listing A describes a studio for $1,350 a month."
+    },
+    {
+      "fr": "La buanderie est dans l'immeuble, mais il n'y a pas de laveuse dans le studio.",
+      "en": "The laundry room is in the building, but there is no washer in the studio."
+    },
+    {
+      "fr": "L'annonce B décrit un appartement d'une chambre plus spacieux, avec une laveuse et un balcon privé.",
+      "en": "Listing B describes a more spacious one-bedroom, with a washer and a private balcony."
+    },
+    {
+      "fr": "Le logement B coûte cent dollars de plus par mois que le logement A.",
+      "en": "Home B costs one hundred dollars more per month than home A."
+    },
+    {
+      "fr": "Nadia préfère un trajet court et un loyer abordable; elle ne cherche pas un balcon.",
+      "en": "Nadia prefers a short trip and affordable rent; she is not looking for a balcony."
+    },
+    {
+      "fr": "Elle va visiter les deux logements samedi et vérifier les frais d'électricité.",
+      "en": "She is going to visit both homes Saturday and check the electricity costs."
+    },
+    {
+      "fr": "Après la visite, elle choisira le studio si le quartier est paisible.",
+      "en": "After the visit, she will choose the studio if the neighbourhood is peaceful."
+    }
+  ],
+  "words": {
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "name"
+    },
+    "cherche": {
+      "en": "is looking for",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "logement": {
+      "en": "home; accommodation",
+      "pos": "noun, masculine"
+    },
+    "près": {
+      "en": "near",
+      "pos": "preposition"
+    },
+    "d'une": {
+      "en": "of a; of one (feminine)",
+      "pos": "contraction"
+    },
+    "bibliothèque": {
+      "en": "library",
+      "pos": "noun, feminine"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "d'un": {
+      "en": "of a; of one (masculine)",
+      "pos": "contraction"
+    },
+    "arrêt": {
+      "en": "stop",
+      "pos": "noun, masculine"
+    },
+    "d'autobus": {
+      "en": "bus",
+      "sound": "loh-toh-BÜS"
+    },
+    "l'annonce": {
+      "en": "the advertisement; the notice",
+      "pos": "noun, feminine"
+    },
+    "a": {
+      "en": "has; there is",
+      "pos": "verb"
+    },
+    "décrit": {
+      "en": "describes",
+      "pos": "verb"
+    },
+    "studio": {
+      "en": "studio apartment",
+      "pos": "noun, masculine"
+    },
+    "pour": {
+      "en": "for",
+      "pos": "preposition"
+    },
+    "mille": {
+      "en": "one thousand",
+      "pos": "number"
+    },
+    "trois": {
+      "en": "three",
+      "pos": "number"
+    },
+    "cent": {
+      "en": "hundred",
+      "pos": "number"
+    },
+    "cinquante": {
+      "en": "fifty",
+      "pos": "number"
+    },
+    "dollars": {
+      "en": "dollars",
+      "pos": "noun"
+    },
+    "par": {
+      "en": "per",
+      "pos": "preposition"
+    },
+    "mois": {
+      "en": "month",
+      "pos": "noun, masculine"
+    },
+    "la": {
+      "en": "the (feminine)",
+      "pos": "article"
+    },
+    "buanderie": {
+      "en": "laundry room",
+      "pos": "noun, feminine"
+    },
+    "est": {
+      "en": "is; has (être)",
+      "pos": "verb"
+    },
+    "dans": {
+      "en": "in",
+      "pos": "preposition"
+    },
+    "l'immeuble": {
+      "en": "apartment building",
+      "sound": "la-MUHBL"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "il": {
+      "en": "there; it",
+      "pos": "pronoun"
+    },
+    "n'y": {
+      "en": "not there; not to that place",
+      "pos": "negation and pronoun"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "laveuse": {
+      "en": "washing machine",
+      "pos": "noun, feminine"
+    },
+    "le": {
+      "en": "the (masculine)",
+      "pos": "article"
+    },
+    "b": {
+      "en": "option B",
+      "pos": "label"
+    },
+    "appartement": {
+      "en": "apartment",
+      "pos": "noun, masculine"
+    },
+    "chambre": {
+      "en": "bedroom",
+      "pos": "noun, feminine"
+    },
+    "plus": {
+      "en": "more",
+      "pos": "adverb"
+    },
+    "spacieux": {
+      "en": "spacious",
+      "pos": "adjective"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "balcon": {
+      "en": "balcony",
+      "pos": "noun, masculine"
+    },
+    "privé": {
+      "en": "private",
+      "pos": "adjective"
+    },
+    "coûte": {
+      "en": "costs",
+      "pos": "verb"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "préfère": {
+      "en": "prefers (préférer)",
+      "pos": "verb"
+    },
+    "trajet": {
+      "en": "trip",
+      "pos": "noun, masculine"
+    },
+    "court": {
+      "en": "short",
+      "pos": "adjective"
+    },
+    "loyer": {
+      "en": "rent",
+      "pos": "noun, masculine"
+    },
+    "abordable": {
+      "en": "affordable",
+      "pos": "adjective"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "ne": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "va": {
+      "en": "is going to",
+      "pos": "verb"
+    },
+    "visiter": {
+      "en": "to visit",
+      "pos": "verb"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "logements": {
+      "en": "homes; accommodations",
+      "pos": "noun, masculine plural"
+    },
+    "samedi": {
+      "en": "Saturday",
+      "pos": "day"
+    },
+    "vérifier": {
+      "en": "to check",
+      "pos": "verb"
+    },
+    "frais": {
+      "en": "costs",
+      "pos": "noun, masculine plural"
+    },
+    "d'électricité": {
+      "en": "electricity",
+      "sound": "lay-lek-tree-see-TAY"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "visite": {
+      "en": "visit",
+      "pos": "noun, feminine"
+    },
+    "choisira": {
+      "en": "will choose",
+      "pos": "verb"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "quartier": {
+      "en": "neighbourhood",
+      "pos": "noun, masculine"
+    },
+    "paisible": {
+      "en": "peaceful",
+      "pos": "adjective"
+    }
+  },
+  "keywords": [
+    "studio",
+    "buanderie",
+    "loyer",
+    "trajet",
+    "balcon"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does Nadia want to be near?",
+      "options": [
+        "A library and a bus stop",
+        "A train station and a clinic",
+        "A school and a parking garage",
+        "A shopping centre and a park"
+      ],
+      "answer": 0,
+      "explain": "The first sentence names a library and a bus stop."
+    },
+    {
+      "prompt": "What feature does only listing B mention?",
+      "options": [
+        "A washer in the home",
+        "A laundry room in the building",
+        "A bus stop nearby",
+        "A lower monthly rent"
+      ],
+      "answer": 0,
+      "explain": "Listing B has a washer; listing A has a building laundry room but no washer in the studio."
+    },
+    {
+      "prompt": "Why might Nadia choose the studio?",
+      "options": [
+        "It has lower rent and suits her priorities.",
+        "It has a private balcony.",
+        "It is larger than listing B.",
+        "Electricity is included in its price."
+      ],
+      "answer": 0,
+      "explain": "She wants a short trip and affordable rent and does not need a balcony."
+    },
+    {
+      "prompt": "What will Nadia check before deciding?",
+      "options": [
+        "The electricity costs",
+        "The class schedule",
+        "The lease end date",
+        "The bus ticket price"
+      ],
+      "answer": 0,
+      "explain": "The last two sentences say she will check electricity costs after visiting."
+    }
+  ]
+}

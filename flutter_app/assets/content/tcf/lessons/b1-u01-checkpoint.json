@@ -1,0 +1,75 @@
+{
+  "id": "b1-u01-checkpoint",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which form marks an event completed before another past event?",
+      "options": [
+        "Présent",
+        "Futur simple",
+        "Plus-que-parfait",
+        "Impératif"
+      ],
+      "answer": 2,
+      "explain": "The plus-que-parfait marks the earlier completed event."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "In Quand elle est arrivée, le cours avait commencé, which happened first?",
+      "options": [
+        "She called the group",
+        "She arrived",
+        "The course ended",
+        "The course started"
+      ],
+      "answer": 3,
+      "explain": "The course had started before she arrived."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which form best describes an ongoing past background?",
+      "options": [
+        "Conditionnel présent",
+        "Imparfait",
+        "Futur simple",
+        "Subjonctif"
+      ],
+      "answer": 1,
+      "explain": "The imparfait sets a past background or ongoing situation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What should you do with an unclear timeline?",
+      "options": [
+        "Add a time marker or state which event came first",
+        "Remove the main event",
+        "Use every past tense in every sentence",
+        "Change the story to the future"
+      ],
+      "answer": 0,
+      "explain": "A time marker or explicit ordering helps the reader follow the account."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which habit is useful for a new-context retry?",
+      "options": [
+        "Memorize the model exactly",
+        "Repeat only the same quiz",
+        "Retell a changed event with notes closed",
+        "Translate every sentence first"
+      ],
+      "answer": 2,
+      "explain": "A changed prompt with notes closed checks transfer."
+    }
+  ]
+}

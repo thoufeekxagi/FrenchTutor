@@ -1,0 +1,72 @@
+{
+  "id": "b1-u05-dialogues",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Feedback for a centre",
+      "body": "A participant explains what would make a fictional activity accessible.",
+      "examples": [
+        {
+          "fr": "Je souhaite que les rencontres commencent un peu plus tôt.",
+          "en": "Awa: I hope the meetings start a little earlier."
+        },
+        {
+          "fr": "Est-ce que le transport pose un problème ?",
+          "en": "Coordonnatrice: Is transportation a problem?"
+        },
+        {
+          "fr": "Oui. Il faut que le dernier autobus soit encore disponible.",
+          "en": "Awa: Yes. The last bus needs to still be available."
+        },
+        {
+          "fr": "Je vais vérifier les horaires.",
+          "en": "Coordonnatrice: I will check the schedules."
+        },
+        {
+          "fr": "Merci. Je suis contente que vous preniez le temps d'écouter les membres.",
+          "en": "Awa: Thank you. I am glad you are taking time to listen to members."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A preference about a class",
+      "body": "Two learners discuss a practical course change.",
+      "examples": [
+        {
+          "fr": "Je préfère que le groupe garde une option en ligne.",
+          "en": "Sam: I prefer the group to keep an online option."
+        },
+        {
+          "fr": "C'est important que les personnes à distance puissent poser des questions.",
+          "en": "Mina: It is important that remote participants can ask questions."
+        },
+        {
+          "fr": "Oui. Je veux aussi participer aux activités en personne.",
+          "en": "Sam: Yes. I also want to take part in the in-person activities."
+        },
+        {
+          "fr": "Alors, il faut que le centre explique les deux formules.",
+          "en": "Mina: Then the centre needs to explain both formats."
+        },
+        {
+          "fr": "Je suis d'accord. Je vais envoyer un commentaire aujourd'hui.",
+          "en": "Sam: I agree. I will send feedback today."
+        }
+      ]
+    }
+  ]
+}

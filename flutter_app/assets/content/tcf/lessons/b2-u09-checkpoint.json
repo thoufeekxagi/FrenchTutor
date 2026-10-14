@@ -1,0 +1,75 @@
+{
+  "id": "b2-u09-checkpoint",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is une estimation?",
+      "options": [
+        "A witness",
+        "A feature",
+        "A workshop",
+        "An estimate"
+      ],
+      "answer": 3,
+      "explain": "Une estimation is an estimate."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Does an average describe every person?",
+      "options": [
+        "Only in a headline",
+        "No; it may hide variation",
+        "Only when rounded",
+        "Yes, automatically"
+      ],
+      "answer": 1,
+      "explain": "An average does not show every individual's experience."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should a cautious report identify?",
+      "options": [
+        "A universal conclusion",
+        "An unnamed claim",
+        "Its assumptions and limits",
+        "Only a recommendation"
+      ],
+      "answer": 2,
+      "explain": "Assumptions and limitations help readers judge the claim."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which phrase introduces a possible explanation?",
+      "options": [
+        "Cela pourrait s'expliquer par…",
+        "Cela prouve définitivement…",
+        "Il est impossible que…",
+        "À la date de demain…"
+      ],
+      "answer": 0,
+      "explain": "The conditional phrase marks a possible explanation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "When is nominalization useful?",
+      "options": [
+        "To guarantee neutrality",
+        "To replace all verbs",
+        "Whenever it hides the source",
+        "When it makes a comparison concise and the actor stays clear"
+      ],
+      "answer": 3,
+      "explain": "Nominalization can be concise, but the actor should remain clear."
+    }
+  ]
+}

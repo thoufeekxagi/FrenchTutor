@@ -1,0 +1,366 @@
+{
+  "id": "b2-le-bilan-du-repas-de-quartier",
+  "title": "Le bilan du repas de quartier",
+  "titleEn": "The neighbourhood meal review",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "Volunteers compare two fictional event totals, then explain why a lower amount of waste does not prove which change caused it.",
+  "unit": "b2-u07",
+  "sentences": [
+    {
+      "fr": "Après un repas de quartier, l'équipe a pesé les restes pour vérifier si son nouveau système de portions aidait.",
+      "en": "After a neighbourhood meal, the team weighed leftovers to check whether its new portion system helped."
+    },
+    {
+      "fr": "Lors du premier événement, elle avait mesuré vingt-quatre kilogrammes de déchets; au suivant, elle en a mesuré dix-huit.",
+      "en": "At the first event, it had measured twenty-four kilograms of waste; at the next, it measured eighteen."
+    },
+    {
+      "fr": "La différence était de six kilogrammes, mais le deuxième repas avait accueilli moins de personnes.",
+      "en": "The difference was six kilograms, but the second meal had fewer attendees."
+    },
+    {
+      "fr": "De plus, les bénévoles avaient aussi changé la taille des contenants et donné les surplus à une autre activité.",
+      "en": "In addition, volunteers had also changed container sizes and given surplus food to another activity."
+    },
+    {
+      "fr": "Le bilan signalait donc une baisse mesurée sans attribuer tout le changement au nouveau système.",
+      "en": "The review therefore reported a measured decrease without attributing all of the change to the new system."
+    },
+    {
+      "fr": "L'équipe a décidé de noter le nombre de repas servis et les quantités transférées lors du prochain essai.",
+      "en": "The team decided to record the number of meals served and the amounts transferred during the next trial."
+    },
+    {
+      "fr": "Elle pourrait alors comparer des événements plus semblables avant de recommander une pratique permanente.",
+      "en": "It could then compare more similar events before recommending a permanent practice.",
+      "note": "A measured difference is not automatically proof of cause; compare similar events and track other changes that could affect the result."
+    }
+  ],
+  "words": {
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "repas": {
+      "en": "meal"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "quartier": {
+      "en": "neighbourhood"
+    },
+    "l'équipe": {
+      "en": "the team",
+      "pos": "noun, feminine"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "pesé": {
+      "en": "weighed"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "restes": {
+      "en": "leftovers"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "vérifier": {
+      "en": "to check, verify",
+      "sound": "vay-ree-FYAY"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "nouveau": {
+      "en": "new",
+      "sound": "noo-VOH"
+    },
+    "système": {
+      "en": "system"
+    },
+    "portions": {
+      "en": "portions"
+    },
+    "aidait": {
+      "en": "was helping"
+    },
+    "lors": {
+      "en": "when; during"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "premier": {
+      "en": "the first"
+    },
+    "événement": {
+      "en": "an event"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "avait": {
+      "en": "had"
+    },
+    "mesuré": {
+      "en": "measured"
+    },
+    "vingt-quatre": {
+      "en": "twenty-four"
+    },
+    "kilogrammes": {
+      "en": "kilograms"
+    },
+    "déchets": {
+      "en": "waste"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "suivant": {
+      "en": "next; following"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "dix-huit": {
+      "en": "eighteen"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "différence": {
+      "en": "difference"
+    },
+    "était": {
+      "en": "was"
+    },
+    "six": {
+      "en": "six"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "deuxième": {
+      "en": "second; second one"
+    },
+    "accueilli": {
+      "en": "welcomed; hosted"
+    },
+    "moins": {
+      "en": "minus, below zero",
+      "sound": "mwa(n)"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "bénévoles": {
+      "en": "volunteers"
+    },
+    "avaient": {
+      "en": "had"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "changé": {
+      "en": "changed"
+    },
+    "taille": {
+      "en": "size"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "contenants": {
+      "en": "containers"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "donné": {
+      "en": "gave; given"
+    },
+    "surplus": {
+      "en": "surplus; extra amount"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "autre": {
+      "en": "other; another"
+    },
+    "activité": {
+      "en": "activity"
+    },
+    "bilan": {
+      "en": "review; assessment"
+    },
+    "signalait": {
+      "en": "reported; indicated"
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "baisse": {
+      "en": "decrease"
+    },
+    "mesurée": {
+      "en": "measured"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "attribuer": {
+      "en": "to attribute"
+    },
+    "tout": {
+      "en": "all; whole"
+    },
+    "changement": {
+      "en": "a change"
+    },
+    "décidé": {
+      "en": "decided"
+    },
+    "noter": {
+      "en": "to write down",
+      "sound": "noh-TAY"
+    },
+    "nombre": {
+      "en": "number, quantity"
+    },
+    "servis": {
+      "en": "served"
+    },
+    "quantités": {
+      "en": "amounts; quantities"
+    },
+    "transférées": {
+      "en": "transferred"
+    },
+    "prochain": {
+      "en": "next",
+      "sound": "proh-SHA(N)"
+    },
+    "essai": {
+      "en": "a trial"
+    },
+    "pourrait": {
+      "en": "could; might"
+    },
+    "alors": {
+      "en": "then; so"
+    },
+    "comparer": {
+      "en": "to compare",
+      "sound": "kohn-pah-RAY"
+    },
+    "événements": {
+      "en": "events"
+    },
+    "semblables": {
+      "en": "similar"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "recommander": {
+      "en": "to recommend"
+    },
+    "pratique": {
+      "en": "practical; useful"
+    },
+    "permanente": {
+      "en": "permanent"
+    }
+  },
+  "keywords": [
+    "restes",
+    "système",
+    "portions",
+    "événement",
+    "différence",
+    "baisse",
+    "essai"
+  ],
+  "quiz": [
+    {
+      "prompt": "What was the difference between the two waste measurements?",
+      "options": [
+        "Eighteen kilograms",
+        "Twenty-four kilograms",
+        "Six kilograms",
+        "Thirty kilograms"
+      ],
+      "answer": 2,
+      "explain": "The text gives 24 kilograms for the first event and 18 for the second."
+    },
+    {
+      "prompt": "Why could the team not attribute the full change to the portion system?",
+      "options": [
+        "The team had not weighed anything",
+        "Attendance and other practices also changed",
+        "The containers were identical",
+        "The second event served more people"
+      ],
+      "answer": 1,
+      "explain": "The second event had fewer people and volunteers changed other practices."
+    },
+    {
+      "prompt": "What will the team record during the next trial?",
+      "options": [
+        "Meals served and amounts transferred",
+        "Opinions from people who did not attend",
+        "The cost of every volunteer's commute",
+        "Only the event title"
+      ],
+      "answer": 0,
+      "explain": "The sixth sentence lists what the team will record."
+    }
+  ]
+}

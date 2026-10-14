@@ -1,0 +1,148 @@
+{
+  "id": "b1-u08-words-2",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un suivi",
+      "en": "a follow-up",
+      "sound": "uh(n) sü-ee-vee",
+      "exampleFr": "Je vais faire un suivi vendredi.",
+      "exampleEn": "I will follow up on Friday."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une condition",
+      "en": "a condition; requirement",
+      "sound": "ün kohn-dee-SYOH(N)",
+      "exampleFr": "Une condition doit être remplie avant l'inscription.",
+      "exampleEn": "A requirement must be met before registration."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "se renseigner",
+      "en": "to get information",
+      "sound": "suh rah(n)-sayn-YAY",
+      "exampleFr": "Elle se renseigne avant d'envoyer le formulaire.",
+      "exampleEn": "She gets information before sending the form."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "préciser",
+      "en": "to specify",
+      "sound": "pray-see-ZAY",
+      "exampleFr": "Pourriez-vous préciser le délai de réponse ?",
+      "exampleEn": "Could you specify the response time?"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "joindre",
+      "en": "to contact; reach",
+      "sound": "zhwah(n)dr",
+      "exampleFr": "Vous pouvez joindre le service le matin.",
+      "exampleEn": "You can contact the service in the morning."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "auprès de",
+      "en": "with; from (an organization/person)",
+      "sound": "oh-preh duh",
+      "exampleFr": "Je vais vérifier cette règle auprès du centre.",
+      "exampleEn": "I will check this rule with the centre."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un suivi",
+      "options": [
+        "to specify",
+        "a follow-up",
+        "a condition; requirement",
+        "to get information"
+      ],
+      "answer": 1,
+      "explain": "un suivi means a follow-up."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une condition",
+      "options": [
+        "to contact; reach",
+        "to get information",
+        "to specify",
+        "a condition; requirement"
+      ],
+      "answer": 3,
+      "explain": "une condition means a condition; requirement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "se renseigner",
+      "options": [
+        "with; from (an organization/person)",
+        "to get information",
+        "to specify",
+        "to contact; reach"
+      ],
+      "answer": 1,
+      "explain": "se renseigner means to get information."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "préciser",
+      "options": [
+        "a follow-up",
+        "to contact; reach",
+        "with; from (an organization/person)",
+        "to specify"
+      ],
+      "answer": 3,
+      "explain": "préciser means to specify."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "joindre",
+      "options": [
+        "a condition; requirement",
+        "to contact; reach",
+        "with; from (an organization/person)",
+        "a follow-up"
+      ],
+      "answer": 1,
+      "explain": "joindre means to contact; reach."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "auprès de",
+      "options": [
+        "to get information",
+        "a follow-up",
+        "a condition; requirement",
+        "with; from (an organization/person)"
+      ],
+      "answer": 3,
+      "explain": "auprès de means with; from (an organization/person)."
+    }
+  ]
+}

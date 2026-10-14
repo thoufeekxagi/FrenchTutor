@@ -1,0 +1,176 @@
+{
+  "id": "b1-u07-words-2",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un compte",
+      "en": "an account; report",
+      "sound": "uh(n) koh(n)t",
+      "exampleFr": "Le message ne donne pas de compte vérifié.",
+      "exampleEn": "The message does not provide a verified account."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un point de vue",
+      "en": "a point of view",
+      "sound": "uh(n) pwa(n) duh VÜ",
+      "exampleFr": "Il a expliqué son point de vue pendant la réunion.",
+      "exampleEn": "He explained his point of view during the meeting."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "affirmer",
+      "en": "to state; assert",
+      "sound": "ah-feer-MAY",
+      "exampleFr": "La participante a affirmé que la salle était accessible.",
+      "exampleEn": "The participant stated that the room was accessible."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "préciser",
+      "en": "to clarify; specify",
+      "sound": "pray-see-ZAY",
+      "exampleFr": "L'organisateur a précisé que l'inscription restait facultative.",
+      "exampleEn": "The organizer clarified that registration remained optional."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "rapporter",
+      "en": "to report; recount",
+      "sound": "rah-por-TAY",
+      "exampleFr": "Je rapporte les faits sans ajouter de rumeur.",
+      "exampleEn": "I report the facts without adding a rumour."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "selon",
+      "en": "according to",
+      "sound": "suh-LOH(N)",
+      "exampleFr": "Selon la responsable, la décision n'est pas définitive.",
+      "exampleEn": "According to the coordinator, the decision is not final."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un compte",
+      "options": [
+        "to clarify; specify",
+        "an account; report",
+        "a point of view",
+        "to state; assert"
+      ],
+      "answer": 1,
+      "explain": "un compte means an account; report."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de vue",
+      "options": [
+        "to report; recount",
+        "to state; assert",
+        "to clarify; specify",
+        "a point of view"
+      ],
+      "answer": 3,
+      "explain": "un point de vue means a point of view."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "affirmer",
+      "options": [
+        "according to",
+        "to state; assert",
+        "to clarify; specify",
+        "to report; recount"
+      ],
+      "answer": 1,
+      "explain": "affirmer means to state; assert."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "préciser",
+      "options": [
+        "an account; report",
+        "to report; recount",
+        "according to",
+        "to clarify; specify"
+      ],
+      "answer": 3,
+      "explain": "préciser means to clarify; specify."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "rapporter",
+      "options": [
+        "a point of view",
+        "to report; recount",
+        "according to",
+        "to state; assert"
+      ],
+      "answer": 1,
+      "explain": "rapporter means to report; recount."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "selon",
+      "options": [
+        "to state; assert",
+        "an account; report",
+        "a point of view",
+        "according to"
+      ],
+      "answer": 3,
+      "explain": "selon means according to."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "affirmer",
+      "question": "Which word did you hear?",
+      "options": [
+        "rapporter",
+        "affirmer",
+        "un compte",
+        "préciser"
+      ],
+      "answer": 1,
+      "explain": "You heard affirmer: to state; assert."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "préciser",
+      "question": "Which word did you hear?",
+      "options": [
+        "selon",
+        "affirmer",
+        "rapporter",
+        "préciser"
+      ],
+      "answer": 3,
+      "explain": "You heard préciser: to clarify; specify."
+    }
+  ]
+}

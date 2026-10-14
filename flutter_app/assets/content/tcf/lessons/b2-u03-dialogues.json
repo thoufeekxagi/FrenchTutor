@@ -1,0 +1,80 @@
+{
+  "id": "b2-u03-dialogues",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Comparing two programs",
+      "body": "A learner asks a counsellor in a fictional adult-learning centre about two options.",
+      "examples": [
+        {
+          "fr": "Je compare deux programmes qui offrent des cours du soir.",
+          "en": "Étudiante: I am comparing two programs that offer evening classes."
+        },
+        {
+          "fr": "Lequel correspond au poste auquel vous vous intéressez ?",
+          "en": "Conseillère: Which one matches the position you are interested in?"
+        },
+        {
+          "fr": "Celui dont les cours comprennent un stage m'attire davantage.",
+          "en": "Étudiante: The one whose courses include a placement appeals to me more."
+        },
+        {
+          "fr": "Avez-vous vérifié les préalables auxquels le programme fait référence ?",
+          "en": "Conseillère: Have you checked the prerequisites the program refers to?"
+        },
+        {
+          "fr": "Oui. Ce qui me manque, c'est une attestation récente.",
+          "en": "Étudiante: Yes. What I am missing is a recent certificate."
+        },
+        {
+          "fr": "La personne à qui vous écrirez pourra préciser les documents requis.",
+          "en": "Conseillère: The person you write to can clarify which documents are required."
+        },
+        {
+          "fr": "Je vais poser la question avant la date à laquelle le dossier doit être remis.",
+          "en": "Étudiante: I will ask before the date the file must be submitted."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A colleague gives feedback",
+      "body": "A colleague helps clarify a career choice.",
+      "examples": [
+        {
+          "fr": "Le poste que tu as repéré correspond à ton expérience.",
+          "en": "Marc: The position you found matches your experience."
+        },
+        {
+          "fr": "Oui, mais les tâches dont il est question sont nouvelles pour moi.",
+          "en": "Awa: Yes, but the tasks being discussed are new to me."
+        },
+        {
+          "fr": "La formation à laquelle tu peux t'inscrire couvre ces tâches.",
+          "en": "Marc: The training you can enrol in covers those tasks."
+        },
+        {
+          "fr": "Ce qui me préoccupe, c'est le calendrier.",
+          "en": "Awa: What concerns me is the schedule."
+        },
+        {
+          "fr": "Tu pourrais demander à la personne qui coordonne le programme.",
+          "en": "Marc: You could ask the person coordinating the program."
+        }
+      ]
+    }
+  ]
+}

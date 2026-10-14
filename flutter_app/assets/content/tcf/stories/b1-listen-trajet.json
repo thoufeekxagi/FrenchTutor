@@ -1,0 +1,575 @@
+{
+  "id": "b1-listen-trajet",
+  "title": "Le trajet réorganisé",
+  "titleEn": "A commute reorganized",
+  "level": "B1",
+  "mode": "listening",
+  "minutes": 5,
+  "summary": "A temporary transit closure disrupts a caregiver's routine, and she compares realistic options with the people who depend on her timing.",
+  "unit": "b1-u10",
+  "sentences": [
+    {
+      "fr": "Des travaux ont fermé une station que Léa utilisait pour aller chercher son père après son rendez-vous.",
+      "en": "Construction closed a station Léa used to pick up her father after his appointment."
+    },
+    {
+      "fr": "La première annonce indiquait un détour, sans préciser la durée du trajet.",
+      "en": "The first notice gave a detour but did not specify how long the trip would take."
+    },
+    {
+      "fr": "Plutôt que de choisir la première solution proposée en ligne, Léa a comparé l'autobus, le train et la marche.",
+      "en": "Rather than choose the first option suggested online, Léa compared the bus, train, and walking."
+    },
+    {
+      "fr": "Le trajet à pied était trop long pour son père, tandis que l'autobus exigeait une correspondance incertaine.",
+      "en": "The walk was too long for her father, while the bus required an uncertain connection."
+    },
+    {
+      "fr": "Elle a appelé le centre de transport pour vérifier les horaires adaptés.",
+      "en": "She called the transit centre to check accessible schedules."
+    },
+    {
+      "fr": "Un agent lui a conseillé une station voisine avec un ascenseur en service.",
+      "en": "An agent recommended a nearby station with a working elevator."
+    },
+    {
+      "fr": "Léa a transmis l'itinéraire à son père et lui a demandé de confirmer le point de rencontre.",
+      "en": "Léa sent the route to her father and asked him to confirm the meeting point."
+    },
+    {
+      "fr": "Ils se sont retrouvés sans attendre dehors, malgré la pluie.",
+      "en": "They met without having to wait outside, despite the rain."
+    },
+    {
+      "fr": "Léa a gardé le numéro du centre, car les travaux devaient durer plusieurs semaines.",
+      "en": "Léa kept the centre's number because the construction was expected to last several weeks."
+    }
+  ],
+  "words": {
+    "des": {
+      "en": "some; of the"
+    },
+    "travaux": {
+      "en": "construction work; repairs",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "travail",
+      "note": "Plural of travail."
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "fermé": {
+      "en": "closed",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "fermé",
+      "note": "Masculine singular form of fermé."
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "station": {
+      "en": "station",
+      "sound": "lah stah-SYOH(N)",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "station"
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "léa": {
+      "en": "Léa (a woman's name)",
+      "pos": "proper name"
+    },
+    "utilisait": {
+      "en": "used",
+      "pos": "verb",
+      "lemma": "utiliser",
+      "note": "Imperfect form of utiliser."
+    },
+    "pour": {
+      "en": "for"
+    },
+    "aller": {
+      "en": "to go",
+      "pos": "verb",
+      "lemma": "aller",
+      "note": "Infinitive."
+    },
+    "chercher": {
+      "en": "to look for",
+      "pos": "verb",
+      "lemma": "chercher",
+      "note": "Infinitive."
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "père": {
+      "en": "father",
+      "sound": "luh pehR",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "père"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "rendez-vous": {
+      "en": "appointment",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "rendez-vous"
+    },
+    "la": {
+      "en": "the"
+    },
+    "première": {
+      "en": "first",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "premier",
+      "note": "Feminine form of premier."
+    },
+    "annonce": {
+      "en": "rental listing",
+      "pos": "noun, feminine",
+      "sound": "ah-NOH(N)S",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "annonce"
+    },
+    "indiquait": {
+      "en": "indicated; stated",
+      "pos": "verb",
+      "lemma": "indiquer",
+      "note": "Imperfect form of indiquer."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "détour": {
+      "en": "detour",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "détour"
+    },
+    "sans": {
+      "en": "without",
+      "pos": "preposition"
+    },
+    "préciser": {
+      "en": "to specify; clarify",
+      "pos": "verb",
+      "lemma": "préciser",
+      "note": "Infinitive."
+    },
+    "durée": {
+      "en": "duration",
+      "pos": "noun, feminine"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "trajet": {
+      "en": "a journey; a trip",
+      "sound": "uh(n) trah-ZHAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "trajet"
+    },
+    "plutôt": {
+      "en": "rather; instead",
+      "pos": "adverb"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "choisir": {
+      "en": "to choose",
+      "pos": "verb",
+      "lemma": "choisir",
+      "note": "Infinitive."
+    },
+    "solution": {
+      "en": "solution",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "proposée": {
+      "en": "proposed",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Feminine form of the past participle proposé."
+    },
+    "en": {
+      "en": "on, during"
+    },
+    "ligne": {
+      "en": "route; line",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ligne"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "comparé": {
+      "en": "compared",
+      "pos": "verb",
+      "lemma": "comparer",
+      "note": "Past participle of comparer."
+    },
+    "l'autobus": {
+      "en": "bus",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "le": {
+      "en": "the"
+    },
+    "train": {
+      "en": "train",
+      "sound": "luh tra(n)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "train"
+    },
+    "et": {
+      "en": "and"
+    },
+    "marche": {
+      "en": "walks (marcher)",
+      "pos": "verb",
+      "sound": "marsh"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "pied": {
+      "en": "foot",
+      "pos": "noun, masculine",
+      "sound": "pyay",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "pied"
+    },
+    "était": {
+      "en": "was (être)",
+      "pos": "verb"
+    },
+    "trop": {
+      "en": "too; too much",
+      "pos": "adverb"
+    },
+    "long": {
+      "en": "long",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "long",
+      "note": "Masculine singular form."
+    },
+    "tandis": {
+      "en": "whereas; while",
+      "pos": "connector",
+      "note": "Usually followed by que."
+    },
+    "exigeait": {
+      "en": "required",
+      "pos": "verb",
+      "lemma": "exiger",
+      "note": "Imperfect form of exiger."
+    },
+    "correspondance": {
+      "en": "connection; transfer",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "correspondance"
+    },
+    "incertaine": {
+      "en": "uncertain",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "incertain",
+      "note": "Feminine form of incertain."
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "appelé": {
+      "en": "called (appeler)",
+      "pos": "verb"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "transport": {
+      "en": "transport",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "transport"
+    },
+    "vérifier": {
+      "en": "to check; verify",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Infinitive."
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "horaires": {
+      "en": "schedules",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "horaire",
+      "note": "Plural of horaire."
+    },
+    "adaptés": {
+      "en": "accessible; adapted",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "adapté",
+      "note": "Masculine plural form."
+    },
+    "agent": {
+      "en": "agent; staff member",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "agent",
+      "note": "Grammatical masculine; the role may be held by any gender."
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "conseillé": {
+      "en": "advised",
+      "pos": "verb",
+      "lemma": "conseiller",
+      "note": "Past participle of conseiller."
+    },
+    "voisine": {
+      "en": "neighbour",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "voisin",
+      "note": "Feminine form of voisin."
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "ascenseur": {
+      "en": "elevator",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "ascenseur"
+    },
+    "service": {
+      "en": "service",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "transmis": {
+      "en": "sent; passed along",
+      "pos": "verb",
+      "lemma": "transmettre",
+      "note": "Past participle of transmettre."
+    },
+    "l'itinéraire": {
+      "en": "route; itinerary",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "itinéraire"
+    },
+    "demandé": {
+      "en": "asked; requested",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Past participle of demander."
+    },
+    "confirmer": {
+      "en": "to confirm",
+      "pos": "verb",
+      "lemma": "confirmer",
+      "note": "Infinitive."
+    },
+    "point": {
+      "en": "dot",
+      "pos": "noun, masculine",
+      "sound": "pwa(n)",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "point"
+    },
+    "rencontre": {
+      "en": "meeting; encounter",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "ils": {
+      "en": "they",
+      "pos": "pronoun"
+    },
+    "se": {
+      "en": "oneself; reflexive pronoun",
+      "pos": "pronoun"
+    },
+    "sont": {
+      "en": "are (être)",
+      "pos": "verb"
+    },
+    "retrouvés": {
+      "en": "met again; found",
+      "pos": "verb",
+      "lemma": "se retrouver / retrouver",
+      "note": "Masculine plural past participle; here, met one another."
+    },
+    "attendre": {
+      "en": "to wait",
+      "pos": "verb",
+      "lemma": "attendre",
+      "note": "Infinitive."
+    },
+    "dehors": {
+      "en": "outside",
+      "pos": "adverb"
+    },
+    "malgré": {
+      "en": "despite",
+      "pos": "preposition"
+    },
+    "pluie": {
+      "en": "rain",
+      "sound": "lah plwee",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "pluie"
+    },
+    "gardé": {
+      "en": "kept",
+      "pos": "verb",
+      "lemma": "garder",
+      "note": "Past participle of garder."
+    },
+    "numéro": {
+      "en": "number",
+      "sound": "luh nü-may-ROH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "numéro"
+    },
+    "car": {
+      "en": "because; for",
+      "pos": "connector",
+      "note": "Introduces a reason or explanation."
+    },
+    "devaient": {
+      "en": "had to; were supposed to",
+      "pos": "verb",
+      "lemma": "devoir",
+      "note": "Imperfect form of devoir."
+    },
+    "durer": {
+      "en": "to last",
+      "pos": "verb",
+      "lemma": "durer",
+      "note": "Infinitive."
+    },
+    "plusieurs": {
+      "en": "several",
+      "pos": "determiner / pronoun"
+    },
+    "semaines": {
+      "en": "week, weekday period",
+      "sound": "lah suh-MEHN",
+      "lemma": "semaine",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    }
+  },
+  "keywords": [
+    "travaux",
+    "trajet",
+    "détour",
+    "correspondance",
+    "train"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why does Léa reject the walking option?",
+      "options": [
+        "It is too long for her father.",
+        "The station is closed to pedestrians.",
+        "It costs too much.",
+        "It arrives after the appointment."
+      ],
+      "answer": 0,
+      "explain": "She considers the walk too long for her father."
+    },
+    {
+      "prompt": "What does the transit agent recommend?",
+      "options": [
+        "A nearby station with a working elevator",
+        "A direct walk through the station",
+        "The same uncertain bus connection",
+        "A taxi for every trip"
+      ],
+      "answer": 0,
+      "explain": "The agent recommends a nearby station with an elevator."
+    },
+    {
+      "prompt": "Why does Léa keep the centre's number?",
+      "options": [
+        "The work will last several weeks.",
+        "She lost the route message.",
+        "Her father needs a new appointment.",
+        "The centre is moving."
+      ],
+      "answer": 0,
+      "explain": "The construction will continue for several weeks."
+    }
+  ]
+}

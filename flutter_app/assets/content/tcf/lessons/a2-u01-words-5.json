@@ -1,0 +1,182 @@
+{
+  "id": "a2-u01-words-5",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Words: clarify and repair",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "clarifier",
+      "en": "to clarify",
+      "sound": "klah-ree-fee-YAY",
+      "exampleFr": "Je veux clarifier le nouvel horaire.",
+      "exampleEn": "I want to clarify the new schedule."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "préciser",
+      "en": "to specify; clarify",
+      "sound": "pray-see-ZAY",
+      "exampleFr": "Pouvez-vous préciser l'heure ?",
+      "exampleEn": "Can you specify the time?"
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "autrement dit",
+      "en": "in other words",
+      "sound": "oh-truh-mah(n) DEE",
+      "exampleFr": "Autrement dit, le cours finit à midi.",
+      "exampleEn": "In other words, class ends at noon."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "si j'ai bien compris",
+      "en": "if I understood correctly",
+      "sound": "see zhay byah(n) kohn-pree",
+      "exampleFr": "Si j'ai bien compris, tu es libre jeudi.",
+      "exampleEn": "If I understood correctly, you are free Thursday."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "ça dépend de",
+      "en": "it depends on",
+      "sound": "sah day-pah(n) duh",
+      "exampleFr": "Ça dépend de mon horaire.",
+      "exampleEn": "It depends on my schedule."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "en revanche",
+      "en": "however; on the other hand",
+      "sound": "ah(n) ruh-VAHNSH",
+      "exampleFr": "Je travaille lundi; en revanche, je suis libre mardi.",
+      "exampleEn": "I work Monday; however, I am free Tuesday."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "vouloir dire",
+      "en": "to mean",
+      "sound": "vwoh-LWAHR DEER",
+      "exampleFr": "Qu'est-ce que tu veux dire ?",
+      "exampleEn": "What do you mean?"
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "préparer",
+      "en": "to prepare",
+      "sound": "pray-pah-RAY",
+      "exampleFr": "Je prépare mes notes avant le cours.",
+      "exampleEn": "I prepare my notes before class."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "confus / confuse",
+      "en": "confused; unclear",
+      "say": "confus, confuse",
+      "sound": "kohn-FÜ / kohn-FÜZ",
+      "exampleFr": "Je suis confuse au sujet de l'heure.",
+      "exampleEn": "I am confused about the time."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "clarifier",
+      "options": [
+        "if I understood correctly",
+        "to clarify",
+        "to mean",
+        "in other words"
+      ],
+      "answer": 1,
+      "explain": "clarifier means to clarify."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "préciser",
+      "options": [
+        "it depends on",
+        "to prepare",
+        "in other words",
+        "to specify; clarify"
+      ],
+      "answer": 3,
+      "explain": "préciser means to specify; clarify."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "autrement dit",
+      "options": [
+        "confused; unclear",
+        "in other words",
+        "if I understood correctly",
+        "it depends on"
+      ],
+      "answer": 1,
+      "explain": "autrement dit means in other words."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "si j'ai bien compris",
+      "options": [
+        "to mean",
+        "to clarify",
+        "it depends on",
+        "if I understood correctly"
+      ],
+      "answer": 3,
+      "explain": "si j'ai bien compris means if I understood correctly."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "ça dépend de",
+      "options": [
+        "to prepare",
+        "it depends on",
+        "to specify; clarify",
+        "however; on the other hand"
+      ],
+      "answer": 1,
+      "explain": "ça dépend de means it depends on."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "en revanche",
+      "options": [
+        "confused; unclear",
+        "to mean",
+        "to prepare",
+        "however; on the other hand"
+      ],
+      "answer": 3,
+      "explain": "en revanche means however; on the other hand."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "In Canada",
+      "body": "Use the same clear standard French across Canada. Work schedules, class schedules and service hours vary by location; the examples here are invented for practice."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "a2-u04-tcf",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Quand nous habitions près du parc, les enfants jouaient près de l'entrée après l'école.",
+      "question": "Where did the children use to play?",
+      "options": [
+        "Near the entrance",
+        "Inside the library",
+        "At the bus station",
+        "At the office"
+      ],
+      "answer": 0,
+      "explain": "The recording says they played near the entrance."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La salle avait une grande fenêtre et restait calme si le ciel était couvert.",
+      "question": "What made the room bright?",
+      "options": [
+        "A large window",
+        "A white door",
+        "A balcony",
+        "A street lamp"
+      ],
+      "answer": 0,
+      "explain": "The speaker mentions a large window."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Chaque vendredi, Awa retrouvait sa sœur après le travail dans un café près du métro.",
+      "question": "When did Awa meet her sister?",
+      "options": [
+        "Every Friday after work",
+        "Every Monday before class",
+        "Each Sunday morning",
+        "Only in winter"
+      ],
+      "answer": 0,
+      "explain": "The recording says chaque vendredi, après le travail."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When did the shop use to open?",
+      "options": [
+        "Early on Saturday",
+        "Late on Sunday",
+        "At noon on Friday",
+        "Every weekday evening"
+      ],
+      "answer": 0,
+      "explain": "The note says it opened early on Saturday.",
+      "promptFr": "Souvenir · À l'époque, le commerce ouvrait tôt le samedi. Il était près de la rivière."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What was near the park?",
+      "options": [
+        "A pedestrian crossing",
+        "A bus stop",
+        "A school",
+        "A café"
+      ],
+      "answer": 0,
+      "explain": "The second sentence mentions a pedestrian crossing near the park.",
+      "promptFr": "La maison était petite mais calme. Il y avait un passage piéton près du parc."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "At what time did the person use to get home?",
+      "options": [
+        "At 6 p.m.",
+        "At 8 a.m.",
+        "At noon",
+        "At 10 p.m."
+      ],
+      "answer": 0,
+      "explain": "The message says à 18 h.",
+      "promptFr": "Chaque soir, je rentrais à 18 h. Le trajet était court quand la rue était calme."
+    }
+  ]
+}

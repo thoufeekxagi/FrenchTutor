@@ -1,0 +1,364 @@
+{
+  "id": "b1-un-atelier-a-plusieurs-horaires",
+  "title": "Un atelier à plusieurs horaires",
+  "titleEn": "A workshop at more than one time",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "A neighbourhood group tests a practical way to make an evening activity easier to attend.",
+  "unit": "b1-u03",
+  "sentences": [
+    {
+      "fr": "Le centre de quartier organisait un atelier le jeudi soir, mais plusieurs membres finissaient tard au travail.",
+      "en": "The neighbourhood centre held a workshop on Thursday evening, but several members finished work late."
+    },
+    {
+      "fr": "Mina a proposé d'essayer deux horaires pendant un mois plutôt que de changer le programme pour toute l'année.",
+      "en": "Mina proposed trying two time slots for one month instead of changing the program for the whole year."
+    },
+    {
+      "fr": "Le groupe a accepté, à condition que des bénévoles puissent ouvrir la salle les deux soirs.",
+      "en": "The group agreed, provided volunteers could open the room on both evenings."
+    },
+    {
+      "fr": "Une participante qui habitait loin a choisi la séance du samedi, tandis qu'un parent a préféré le jeudi.",
+      "en": "A participant who lived far away chose the Saturday session, while a parent preferred Thursday."
+    },
+    {
+      "fr": "Mina a noté les présences et demandé aux personnes absentes ce qui les avait empêchées de venir.",
+      "en": "Mina recorded attendance and asked people who were absent what had prevented them from coming."
+    },
+    {
+      "fr": "Le samedi a attiré plus de monde, mais le groupe était aussi plus petit ce jour-là.",
+      "en": "Saturday attracted more people, but the group was also smaller that day.",
+      "note": "A small trial can inform a decision, but attendance alone may not explain why people did or did not come."
+    },
+    {
+      "fr": "Avant de choisir un horaire permanent, le centre comparera les réponses et les coûts de chaque séance.",
+      "en": "Before choosing a permanent schedule, the centre will compare the responses and costs for each session."
+    }
+  ],
+  "words": {
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "quartier": {
+      "en": "neighbourhood"
+    },
+    "organisait": {
+      "en": "organized; was organizing"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "atelier": {
+      "en": "a workshop"
+    },
+    "jeudi": {
+      "en": "Thursday",
+      "sound": "zhuh-DEE"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "plusieurs": {
+      "en": "several"
+    },
+    "membres": {
+      "en": "members"
+    },
+    "finissaient": {
+      "en": "were finishing"
+    },
+    "tard": {
+      "en": "late",
+      "sound": "tahr"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "travail": {
+      "en": "work"
+    },
+    "mina": {
+      "en": "Mina (a woman's name)"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "proposé": {
+      "en": "proposed"
+    },
+    "d'essayer": {
+      "en": "to try",
+      "sound": "eh-seh-YAY"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "horaires": {
+      "en": "schedules"
+    },
+    "pendant": {
+      "en": "during; while"
+    },
+    "mois": {
+      "en": "month; months"
+    },
+    "plutôt": {
+      "en": "rather; instead"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "changer": {
+      "en": "to change"
+    },
+    "programme": {
+      "en": "a program of study"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "toute": {
+      "en": "all; whole"
+    },
+    "l'année": {
+      "en": "year",
+      "sound": "lah-NAY"
+    },
+    "groupe": {
+      "en": "group"
+    },
+    "accepté": {
+      "en": "accepted"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "condition": {
+      "en": "condition"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "bénévoles": {
+      "en": "volunteers"
+    },
+    "puissent": {
+      "en": "can; may be able to"
+    },
+    "ouvrir": {
+      "en": "to open"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "salle": {
+      "en": "room; hall",
+      "pos": "noun, feminine"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "soirs": {
+      "en": "evenings"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "participante": {
+      "en": "participant"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "habitait": {
+      "en": "lived"
+    },
+    "loin": {
+      "en": "far"
+    },
+    "choisi": {
+      "en": "chose"
+    },
+    "séance": {
+      "en": "session"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "samedi": {
+      "en": "Saturday",
+      "sound": "sahm-DEE"
+    },
+    "tandis": {
+      "en": "whereas; while"
+    },
+    "qu'un": {
+      "en": "that a; than a"
+    },
+    "parent": {
+      "en": "parent"
+    },
+    "préféré": {
+      "en": "preferred"
+    },
+    "noté": {
+      "en": "noted"
+    },
+    "présences": {
+      "en": "attendance"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "absentes": {
+      "en": "absent"
+    },
+    "ce": {
+      "en": "this; that (masculine)",
+      "pos": "determiner"
+    },
+    "avait": {
+      "en": "had"
+    },
+    "empêchées": {
+      "en": "prevented"
+    },
+    "venir": {
+      "en": "to come"
+    },
+    "attiré": {
+      "en": "attracted"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "monde": {
+      "en": "people; crowd"
+    },
+    "était": {
+      "en": "was"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "petit": {
+      "en": "small, short",
+      "sound": "puh-TEE"
+    },
+    "jour-là": {
+      "en": "that day"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "choisir": {
+      "en": "to choose",
+      "sound": "shwah-ZEER"
+    },
+    "horaire": {
+      "en": "schedule",
+      "sound": "loh-REHR"
+    },
+    "permanent": {
+      "en": "permanent"
+    },
+    "comparera": {
+      "en": "will compare"
+    },
+    "réponses": {
+      "en": "answers; responses"
+    },
+    "coûts": {
+      "en": "costs"
+    },
+    "chaque": {
+      "en": "each; every"
+    }
+  },
+  "keywords": [
+    "atelier",
+    "horaires",
+    "condition",
+    "bénévoles",
+    "séance",
+    "présences",
+    "coûts"
+  ],
+  "quiz": [
+    {
+      "prompt": "How long would the trial last?",
+      "options": [
+        "The whole year",
+        "One month",
+        "Until the centre moves",
+        "One week"
+      ],
+      "answer": 1,
+      "explain": "Mina proposed a one-month trial."
+    },
+    {
+      "prompt": "What condition did the group set?",
+      "options": [
+        "Volunteers must be able to open the room on both evenings",
+        "Every member must attend both sessions",
+        "The Saturday session must be cancelled",
+        "The centre must hire a new coordinator"
+      ],
+      "answer": 0,
+      "explain": "The group agreed only if volunteers could open the room on both evenings."
+    },
+    {
+      "prompt": "Why will the centre compare more information before deciding?",
+      "options": [
+        "The centre has already made a permanent choice",
+        "The costs are identical and need no review",
+        "The Saturday session had no participants",
+        "Attendance alone does not show the full picture"
+      ],
+      "answer": 3,
+      "explain": "The last sentences say the centre will compare responses and costs, not attendance alone."
+    }
+  ]
+}

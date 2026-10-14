@@ -1,0 +1,49 @@
+{
+  "id": "b1-u05-write-speak",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word message to a fictional community centre about an activity you attended. Describe one useful feature, explain one barrier and recommend a practical change. Use two or three common subjunctive frames where they fit the meaning.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "J'ai participé à l'atelier de conversation mardi soir. L'animatrice expliquait clairement les activités et la salle était agréable. Cependant, plusieurs personnes sont arrivées après le début parce que le dernier autobus passe tôt dans notre quartier. Je souhaite que le centre examine un horaire un peu plus tôt. Il serait aussi utile que les consignes soient envoyées la veille, afin que les nouveaux participants sachent quoi apporter. Je suis contente que le groupe propose des activités en petits groupes, car cela permet à chacun de parler. Il faut toutefois que les personnes qui suivent l'atelier en ligne puissent poser leurs questions. À mon avis, une séance d'essai à dix-huit heures serait une solution raisonnable. Il faudrait ensuite demander aux participants si le changement leur convient. Merci de tenir compte de ces suggestions lors de la prochaine planification.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Name the experience, barrier and practical recommendation.\n• Use the subjunctive after a suitable frame when the subject changes; use an infinitive when it stays the same.\n• Do not use a subjunctive simply to make the writing sound advanced."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. You are asking a fictional community centre what support is available for a course. Prepare for two minutes; ask about access, registration, schedule, online participation and how to share feedback. Interact for 3 minutes 30. Explain one need and follow up on the coordinator's answer.\n\n• Use a subjunctive frame only when you are expressing a wish, need or reaction.\n• State the practical need in simple language, then ask a relevant question.\n• The role-play remains an interaction; leave space for the other person's answer."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je voudrais poser quelques questions au sujet du cours. Est-ce que la salle est accessible sans marches ? Je souhaite aussi savoir s'il est possible de participer en ligne.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Il faut que je confirme mon horaire avant de m'inscrire. À quelle date la prochaine séance commencera-t-elle ? Pourriez-vous me dire comment envoyer un commentaire ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je suis contente que le centre propose plusieurs formules. Si j'ai bien compris, l'inscription peut se faire par téléphone. Est-ce exact ?",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

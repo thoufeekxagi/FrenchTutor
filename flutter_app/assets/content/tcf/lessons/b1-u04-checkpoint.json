@@ -1,0 +1,75 @@
+{
+  "id": "b1-u04-checkpoint",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which relative form connects a noun to a verb requiring de?",
+      "options": [
+        "qui",
+        "dont",
+        "que",
+        "où"
+      ],
+      "answer": 1,
+      "explain": "Use dont when the missing phrase requires de."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does auquel correspond to here?",
+      "options": [
+        "qui + que",
+        "de + laquelle",
+        "où + dont",
+        "à + lequel"
+      ],
+      "answer": 3,
+      "explain": "Auquel combines à and lequel."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which form is a relative subject?",
+      "options": [
+        "qui",
+        "dont",
+        "duquel",
+        "que"
+      ],
+      "answer": 0,
+      "explain": "Qui is the subject in this pattern."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "If a relative reference is unclear, what is a useful repair?",
+      "options": [
+        "Add more pronouns",
+        "Change the time",
+        "Repeat the noun",
+        "Remove the subject"
+      ],
+      "answer": 2,
+      "explain": "Repeating the noun is often clearer than forcing a pronoun."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which sentence has a clear referent?",
+      "options": [
+        "Le logement auquel j'ai visité est près du métro.",
+        "Le logement que j'ai visité est près du métro.",
+        "Le logement dont j'ai visité est près du métro.",
+        "Le logement où j'ai visité est près du métro."
+      ],
+      "answer": 1,
+      "explain": "The verb visiter takes a direct object, so que is correct."
+    }
+  ]
+}

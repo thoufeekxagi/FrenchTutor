@@ -1,0 +1,134 @@
+{
+  "id": "a2-u12-phrases",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Use the short phrases as tools, not as scripts. Write one version for your own week. Then change the date, destination and problem and explain the new plan without looking."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je n'ai pas compris le nouvel horaire. Pourriez-vous le répéter ?",
+      "en": "I did not understand the new schedule. Could you repeat it?",
+      "tip": "Say it: zhuh neh pah kohn-PREE luh noo-VEHL oh-REHR; poo-ree-YAY luh ray-pay-TAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Il pleuvait quand le bus est arrivé, donc je vais prendre un autre itinéraire.",
+      "en": "It was raining when the bus arrived, so I am going to take another route.",
+      "tip": "Say it: eel pluh-vay kah(n) luh büs eh tah-ree-VAY; dohnk zhuh veh prahn-druh uh(n) nohtr ee-tee-nay-REHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je lui demande le point de départ et je note l'heure.",
+      "en": "I ask them for the starting point and note the time.",
+      "tip": "Say it: zhuh LÜ-ee duh-MAH(N)D luh pwa(n) duh day-PAHR; zhuh noht luhr"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "La deuxième option est plus courte, mais la première est plus simple.",
+      "en": "The second option is shorter, but the first is simpler.",
+      "tip": "Say it: lah duh-ZYEHM ohp-SYOH(N) eh plü koort; meh lah pruh-MYEHR eh plü SA(N)PL"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je vais y aller après le cours et j'enverrai un message.",
+      "en": "I will go there after class and send a message.",
+      "tip": "Say it: zhuh veh zee ah-LAY ah-preh luh koor; zhah(n)-vayr-RAY uh(n) meh-SAHZH"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Je voudrais confirmer la prochaine étape.",
+      "en": "I would like to confirm the next step.",
+      "tip": "Say it: zhuh voo-DREH kohn-feer-MAY lah proh-SHEHN ay-TAHP"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "D'abord, je résume le problème; ensuite, je justifie mon choix.",
+      "en": "First, I summarize the problem; then, I justify my choice.",
+      "tip": "Say it: dah-BOHR zhuh ray-ZÜM luh proh-BLEHM; ah(n)-SWEEHT zhuh zhüs-tee-FEE moh(n) shwah"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Je sais faire cet essai sans aide, mais je dois revoir les pronoms.",
+      "en": "I can do this attempt without help, but I need to review the pronouns.",
+      "tip": "Say it: zhuh seh fehr sehr eh-SEH sah(n) ehd; meh zhuh dwah ruh-VWAHR lay proh-NOH(N)"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Je n'ai pas compris le nouvel horaire. Pourriez-vous le répéter ?",
+      "options": [
+        "The second option is shorter, but the first is simpler.",
+        "I did not understand the new schedule. Could you repeat it?",
+        "First, I summarize the problem; then, I justify my choice.",
+        "It was raining when the bus arrived, so I am going to take another route."
+      ],
+      "answer": 1,
+      "explain": "Je n'ai pas compris le nouvel horaire. Pourriez-vous le répéter ? means I did not understand the new schedule. Could you repeat it?."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je lui demande le point de départ et je note l'heure.",
+      "options": [
+        "I would like to confirm the next step.",
+        "I ask them for the starting point and note the time.",
+        "I did not understand the new schedule. Could you repeat it?",
+        "The second option is shorter, but the first is simpler."
+      ],
+      "answer": 1,
+      "explain": "Je lui demande le point de départ et je note l'heure. means I ask them for the starting point and note the time.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je vais y aller après le cours et j'enverrai un message.",
+      "options": [
+        "I can do this attempt without help, but I need to review the pronouns.",
+        "I will go there after class and send a message.",
+        "I ask them for the starting point and note the time.",
+        "I would like to confirm the next step."
+      ],
+      "answer": 1,
+      "explain": "Je vais y aller après le cours et j'enverrai un message. means I will go there after class and send a message.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "D'abord, je résume le problème; ensuite, je justifie mon choix.",
+      "options": [
+        "It was raining when the bus arrived, so I am going to take another route.",
+        "First, I summarize the problem; then, I justify my choice.",
+        "I will go there after class and send a message.",
+        "I can do this attempt without help, but I need to review the pronouns."
+      ],
+      "answer": 1,
+      "explain": "D'abord, je résume le problème; ensuite, je justifie mon choix. means First, I summarize the problem; then, I justify my choice.."
+    }
+  ]
+}

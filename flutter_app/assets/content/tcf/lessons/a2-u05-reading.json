@@ -1,0 +1,80 @@
+{
+  "id": "a2-u05-reading",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "By when must the form be submitted?",
+      "options": [
+        "October 28",
+        "November 4",
+        "October 18",
+        "November 28"
+      ],
+      "answer": 0,
+      "explain": "The notice gives October 28 as the deadline.",
+      "promptFr": "FORMATION DU SOIR — Début : 4 novembre. Les cours sont le mardi et le jeudi, de 18 h à 20 h. Date limite pour envoyer le formulaire : 28 octobre."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Has the applicant been accepted?",
+      "options": [
+        "No decision is given yet.",
+        "Yes, the application is accepted.",
+        "No, the application is refused.",
+        "The interview is cancelled."
+      ],
+      "answer": 0,
+      "explain": "The file is received and the application is pending; no decision is stated.",
+      "promptFr": "Votre dossier a été reçu. Votre candidature est en attente. Nous allons confirmer la date de l'entretien du 12 novembre par courriel."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When can someone register for the new group?",
+      "options": [
+        "Starting December 2",
+        "Starting January 2",
+        "Before the current group fills",
+        "After the course ends in March"
+      ],
+      "answer": 0,
+      "explain": "The notice says registration starts on December 2.",
+      "promptFr": "FORMATION DE FRANÇAIS — Le groupe de niveau 1 est complet. Un autre groupe commence en janvier. Inscription à partir du 2 décembre."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What should Nadia do?",
+      "options": [
+        "Reply before Wednesday",
+        "Arrive Tuesday at 11 a.m.",
+        "Submit a course portfolio",
+        "Choose a course level"
+      ],
+      "answer": 0,
+      "explain": "The message asks for a reply before Wednesday.",
+      "promptFr": "Bonjour Nadia, nouveau rendez-vous : jeudi à 11 h. Merci de répondre avant mercredi. — Le centre"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What should a candidate do if unable to attend?",
+      "options": [
+        "Reply before Wednesday to choose another date",
+        "Send a new transcript in January",
+        "Call after the interview",
+        "Cancel the application online"
+      ],
+      "answer": 0,
+      "explain": "The notice asks the candidate to reply before Wednesday to choose another date.",
+      "promptFr": "ENTRETIEN D'EMBAUCHE — Documents à apporter : votre CV et votre relevé de notes. Réponse avant mercredi pour choisir une autre date."
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "id": "a2-u07-checkpoint",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the relative pronoun for the subject: Le professionnel ___ répond aux questions.",
+      "options": [
+        "qui",
+        "que",
+        "où",
+        "qu'"
+      ],
+      "answer": 0,
+      "explain": "The professional does the action of answering, so use qui."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the relative pronoun for the direct object: Le message ___ le service envoie.",
+      "options": [
+        "que",
+        "qui",
+        "où",
+        "quand"
+      ],
+      "answer": 0,
+      "explain": "The service sends the message; the message receives the action, so use que."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the place pronoun: La clinique ___ j'ai rendez-vous.",
+      "options": [
+        "où",
+        "qui",
+        "que",
+        "qu'"
+      ],
+      "answer": 0,
+      "explain": "Use où for the place of the appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Complete before a vowel: La question ___ elle pose.",
+      "options": [
+        "qu'",
+        "qui",
+        "où",
+        "que"
+      ],
+      "answer": 0,
+      "explain": "Que becomes qu' before a vowel sound."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which sentence says 'the document that I prepare'?",
+      "options": [
+        "Le document que je prépare",
+        "Le document qui je prépare",
+        "Le document où je prépare",
+        "Le document qu'où je prépare"
+      ],
+      "answer": 0,
+      "explain": "The document receives the action of preparing, so use que."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Which sentence says 'the clinic where I have an appointment'?",
+      "options": [
+        "La clinique où j'ai rendez-vous",
+        "La clinique que j'ai rendez-vous",
+        "La clinique qui j'ai rendez-vous",
+        "La clinique qu'elle rendez-vous"
+      ],
+      "answer": 0,
+      "explain": "Use où for the place where the appointment happens."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "A form asks when a symptom appears. Which phrase fits?",
+      "options": [
+        "le moment où le symptôme apparaît",
+        "le moment qui le symptôme apparaît",
+        "le moment que apparaît le symptôme",
+        "le moment qu'où apparaît"
+      ],
+      "answer": 0,
+      "explain": "Où can refer to a time as well as a place."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Choose the sentence that joins 'The service called. The service follows my file.'",
+      "options": [
+        "Le service qui suit mon dossier a appelé.",
+        "Le service que suit mon dossier a appelé.",
+        "Le service où suit mon dossier a appelé.",
+        "Le service qu'il suit mon dossier a appelé."
+      ],
+      "answer": 0,
+      "explain": "The service is the subject of suit, so use qui."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What information is useful when describing a concern to a clinic?",
+      "options": [
+        "When it began and when it happens",
+        "A self-made diagnosis",
+        "A guess about the treatment",
+        "A friend's unrelated history"
+      ],
+      "answer": 0,
+      "explain": "The unit practises reporting neutral timing and observable details."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Where should you look for the clinic address if a notice says it is in the confirmation message?",
+      "options": [
+        "In the confirmation message",
+        "On a rent listing",
+        "In the symptom description",
+        "On a transit map"
+      ],
+      "answer": 0,
+      "explain": "Follow the notice's stated source for the address."
+    }
+  ]
+}

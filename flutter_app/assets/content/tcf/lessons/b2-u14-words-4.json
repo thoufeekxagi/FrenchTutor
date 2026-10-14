@@ -1,0 +1,148 @@
+{
+  "id": "b2-u14-words-4",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un repère linguistique",
+      "en": "a language cue; reference point",
+      "sound": "uh(n) ruh-PEHR lehn-gees-TEEK",
+      "exampleFr": "Un repère linguistique aide à retrouver le bon temps verbal.",
+      "exampleEn": "A language cue helps identify the right verb tense."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "corriger sa trajectoire",
+      "en": "to correct one's course",
+      "sound": "koh-ree-ZHAY sah trah-zhehk-TWAHR",
+      "exampleFr": "Après le retour, elle corrige sa trajectoire d'apprentissage.",
+      "exampleEn": "After the feedback, she adjusts her learning course."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "s'autoévaluer",
+      "en": "to self-assess",
+      "sound": "soh-toh-ay-vah-LÜ-AY",
+      "exampleFr": "Il s'autoévalue avec un sujet jamais pratiqué.",
+      "exampleEn": "He self-assesses with a prompt he has never practised."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une difficulté récurrente",
+      "en": "a recurring difficulty",
+      "sound": "ün dee-fee-kül-TAY ray-koo-RAHNT",
+      "exampleFr": "La difficulté récurrente concerne les questions indirectes.",
+      "exampleEn": "The recurring difficulty concerns indirect questions."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un critère d'évaluation",
+      "en": "an assessment criterion",
+      "sound": "uh(n) kree-TEHR day-vah-lü-ah-SYOH(N)",
+      "exampleFr": "Le critère d'évaluation porte sur la clarté, pas sur la vitesse.",
+      "exampleEn": "The assessment criterion concerns clarity, not speed."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "vérifier la cohérence",
+      "en": "to check coherence",
+      "sound": "vay-ree-fee-YAY lah koh-ay-RAHNS",
+      "exampleFr": "Elle vérifie la cohérence entre sa position et ses exemples.",
+      "exampleEn": "She checks the coherence between her position and examples."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un repère linguistique",
+      "options": [
+        "a recurring difficulty",
+        "a language cue; reference point",
+        "to correct one's course",
+        "to self-assess"
+      ],
+      "answer": 1,
+      "explain": "un repère linguistique means a language cue; reference point."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "corriger sa trajectoire",
+      "options": [
+        "an assessment criterion",
+        "to self-assess",
+        "a recurring difficulty",
+        "to correct one's course"
+      ],
+      "answer": 3,
+      "explain": "corriger sa trajectoire means to correct one's course."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "s'autoévaluer",
+      "options": [
+        "to check coherence",
+        "to self-assess",
+        "a recurring difficulty",
+        "an assessment criterion"
+      ],
+      "answer": 1,
+      "explain": "s'autoévaluer means to self-assess."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une difficulté récurrente",
+      "options": [
+        "a language cue; reference point",
+        "an assessment criterion",
+        "to check coherence",
+        "a recurring difficulty"
+      ],
+      "answer": 3,
+      "explain": "une difficulté récurrente means a recurring difficulty."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un critère d'évaluation",
+      "options": [
+        "to correct one's course",
+        "an assessment criterion",
+        "to check coherence",
+        "a language cue; reference point"
+      ],
+      "answer": 1,
+      "explain": "un critère d'évaluation means an assessment criterion."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "vérifier la cohérence",
+      "options": [
+        "to self-assess",
+        "a language cue; reference point",
+        "to correct one's course",
+        "to check coherence"
+      ],
+      "answer": 3,
+      "explain": "vérifier la cohérence means to check coherence."
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "id": "a2-u05-words-6",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Words: availability and next steps",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "joignable",
+      "en": "reachable",
+      "sound": "zhwah-NYAHBL",
+      "exampleFr": "Je serai joignable mardi après dix-huit heures.",
+      "exampleEn": "I will be reachable Tuesday after six p.m."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "complet",
+      "en": "full",
+      "sound": "kohn-PLEH",
+      "exampleFr": "Le groupe du soir sera bientôt complet.",
+      "exampleEn": "The evening group will be full soon."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "à distance",
+      "en": "remotely; at a distance",
+      "sound": "ah dees-TAH(N)S",
+      "exampleFr": "Je vais étudier à distance cet hiver.",
+      "exampleEn": "I am going to study remotely this winter."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "en présentiel",
+      "en": "in person",
+      "sound": "ah(n) pray-zah(n)-SYEHL",
+      "exampleFr": "Je vais suivre le cours en présentiel.",
+      "exampleEn": "I am going to take the class in person."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "en attente",
+      "en": "pending",
+      "sound": "ah(n) ah-TAH(N)t",
+      "exampleFr": "Ma demande restera en attente jusqu'à lundi.",
+      "exampleEn": "My request will remain pending until Monday."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "confirmé",
+      "en": "confirmed",
+      "sound": "kohn-feer-MAY",
+      "exampleFr": "L'horaire sera confirmé par courriel.",
+      "exampleEn": "The schedule will be confirmed by email."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "sous réserve de",
+      "en": "subject to",
+      "sound": "soo ray-ZEHRV duh",
+      "exampleFr": "L'inscription est possible sous réserve de places libres.",
+      "exampleEn": "Registration is possible subject to available places."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "à l'avance",
+      "en": "in advance",
+      "sound": "ah lah-VAH(N)S",
+      "exampleFr": "Je vais préparer les documents à l'avance.",
+      "exampleEn": "I am going to prepare the documents in advance."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "joignable",
+      "options": [
+        "in person",
+        "reachable",
+        "subject to",
+        "full"
+      ],
+      "answer": 1,
+      "explain": "joignable means reachable."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "complet",
+      "options": [
+        "pending",
+        "in advance",
+        "remotely; at a distance",
+        "full"
+      ],
+      "answer": 3,
+      "explain": "complet means full."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "à distance",
+      "options": [
+        "confirmed",
+        "remotely; at a distance",
+        "reachable",
+        "in person"
+      ],
+      "answer": 1,
+      "explain": "à distance means remotely; at a distance."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "en présentiel",
+      "options": [
+        "subject to",
+        "full",
+        "pending",
+        "in person"
+      ],
+      "answer": 3,
+      "explain": "en présentiel means in person."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "en attente",
+      "options": [
+        "in advance",
+        "pending",
+        "remotely; at a distance",
+        "confirmed"
+      ],
+      "answer": 1,
+      "explain": "en attente means pending."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "confirmé",
+      "options": [
+        "reachable",
+        "in person",
+        "subject to",
+        "confirmed"
+      ],
+      "answer": 3,
+      "explain": "confirmé means confirmed."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "complet",
+      "question": "Which word did you hear?",
+      "options": [
+        "en présentiel",
+        "complet",
+        "confirmé",
+        "joignable"
+      ],
+      "answer": 1,
+      "explain": "You heard complet: full."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "en présentiel",
+      "question": "Which word did you hear?",
+      "options": [
+        "en présentiel",
+        "confirmé",
+        "joignable",
+        "à distance"
+      ],
+      "answer": 0,
+      "explain": "You heard en présentiel: in person."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: availability and next steps",
+      "body": "Course names, hiring practices and application requirements vary by institution and employer. These examples are fictional; check the current school or employer notice before acting."
+    }
+  ]
+}

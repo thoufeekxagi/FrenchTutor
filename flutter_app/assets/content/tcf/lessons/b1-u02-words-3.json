@@ -1,0 +1,148 @@
+{
+  "id": "b1-u02-words-3",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un parcours professionnel",
+      "en": "a career path",
+      "sound": "uh(n) par-koor proh-feh-syoh-NEHL",
+      "exampleFr": "Son parcours professionnel comprend deux stages.",
+      "exampleEn": "Her career path includes two internships."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un employeur",
+      "en": "an employer",
+      "sound": "uh(n) ahn-plwah-YUHR",
+      "exampleFr": "L'employeur cherche une personne bilingue.",
+      "exampleEn": "The employer is looking for a bilingual person."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une compétence transférable",
+      "en": "a transferable skill",
+      "sound": "ün kohn-pay-tahns trahn-sfay-RAHBL",
+      "exampleFr": "La gestion du temps est une compétence transférable.",
+      "exampleEn": "Time management is a transferable skill."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une expérience concrète",
+      "en": "hands-on experience",
+      "sound": "ün ehk-spay-ree-ahns kohn-KREHT",
+      "exampleFr": "Le stage offre une expérience concrète en service à la clientèle.",
+      "exampleEn": "The internship offers hands-on customer-service experience."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un poste à temps partiel",
+      "en": "a part-time position",
+      "sound": "uh(n) pohst ah tah(n) par-SYEHL",
+      "exampleFr": "Elle cherche un poste à temps partiel pendant ses études.",
+      "exampleEn": "She is looking for a part-time position while studying."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une charge de travail",
+      "en": "a workload",
+      "sound": "ün sharzh duh trah-VAI",
+      "exampleFr": "La charge de travail augmente avant la date limite.",
+      "exampleEn": "The workload increases before the deadline."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un parcours professionnel",
+      "options": [
+        "hands-on experience",
+        "a career path",
+        "an employer",
+        "a transferable skill"
+      ],
+      "answer": 1,
+      "explain": "un parcours professionnel means a career path."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un employeur",
+      "options": [
+        "a part-time position",
+        "a transferable skill",
+        "hands-on experience",
+        "an employer"
+      ],
+      "answer": 3,
+      "explain": "un employeur means an employer."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une compétence transférable",
+      "options": [
+        "a workload",
+        "a transferable skill",
+        "hands-on experience",
+        "a part-time position"
+      ],
+      "answer": 1,
+      "explain": "une compétence transférable means a transferable skill."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une expérience concrète",
+      "options": [
+        "a career path",
+        "a part-time position",
+        "a workload",
+        "hands-on experience"
+      ],
+      "answer": 3,
+      "explain": "une expérience concrète means hands-on experience."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un poste à temps partiel",
+      "options": [
+        "an employer",
+        "a part-time position",
+        "a workload",
+        "a career path"
+      ],
+      "answer": 1,
+      "explain": "un poste à temps partiel means a part-time position."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une charge de travail",
+      "options": [
+        "a transferable skill",
+        "a career path",
+        "an employer",
+        "a workload"
+      ],
+      "answer": 3,
+      "explain": "une charge de travail means a workload."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "b1-u11-dialogues",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Planning a short account",
+      "body": "Two classmates turn an experience into a clear newsletter post.",
+      "examples": [
+        {
+          "fr": "J'ai écrit le début, mais je ne sais pas quoi garder ensuite.",
+          "en": "Awa: I wrote the beginning, but I don't know what to keep next."
+        },
+        {
+          "fr": "Réponds d'abord à la consigne : qu'est-ce qui s'est passé ?",
+          "en": "Sam: First answer the prompt: what happened?"
+        },
+        {
+          "fr": "Ensuite, je peux ajouter ce que j'ai apprécié.",
+          "en": "Awa: Then I can add what I appreciated."
+        },
+        {
+          "fr": "Oui, puis donne un commentaire lié à l'expérience.",
+          "en": "Sam: Yes, then add a comment related to the experience."
+        },
+        {
+          "fr": "Je vais vérifier l'ordre et le nombre de mots avant de réviser les accords.",
+          "en": "Awa: I will check the order and word count before revising agreement."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Revising the account",
+      "body": "A writer checks whether each sentence supports the task.",
+      "examples": [
+        {
+          "fr": "J'ai 148 mots, mais mon dernier paragraphe parle d'un autre sujet.",
+          "en": "Mina: I have 148 words, but my last paragraph is about another topic."
+        },
+        {
+          "fr": "Est-ce que cette idée répond à la consigne ?",
+          "en": "Luc: Does that idea answer the prompt?"
+        },
+        {
+          "fr": "Pas vraiment. Je vais la remplacer par une recommandation.",
+          "en": "Mina: Not really. I will replace it with a recommendation."
+        },
+        {
+          "fr": "Vérifie aussi les informations que tu as reçues.",
+          "en": "Luc: Also check the information you received."
+        },
+        {
+          "fr": "Oui, je vais corriger l'accord de reçues parce que le complément est avant.",
+          "en": "Mina: Yes, I will correct the agreement in reçues because the object is before it."
+        }
+      ]
+    }
+  ]
+}

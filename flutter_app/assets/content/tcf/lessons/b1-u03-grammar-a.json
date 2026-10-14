@@ -1,0 +1,87 @@
+{
+  "id": "b1-u03-grammar-a",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Grammar: Hypothetical condition: si + imparfait, conditionnel présent",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Hypothetical condition: si + imparfait, conditionnel présent",
+      "body": "Use si + imparfait to imagine a condition that is not presented as the current plan. Put the result in conditionnel présent: Si la rencontre commençait plus tôt, je pourrais venir. Do not put the conditional after si. For polite proposals, conditionnel présent also softens a request or suggestion: On pourrait essayer. This unit describes possibilities; it does not promise that the change will happen."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Hypothetical condition: si + imparfait, conditionnel présent",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Hypothetical condition",
+          "si + imparfait",
+          "Si le groupe changeait l'heure, …",
+          "If the group changed the time, …"
+        ],
+        [
+          "Possible result",
+          "conditionnel présent",
+          "… davantage de membres pourraient venir.",
+          "… more members could come."
+        ],
+        [
+          "Polite proposal",
+          "conditionnel présent",
+          "Je proposerais un essai d'un mois.",
+          "I would suggest a one-month trial."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Complete: Si la réunion ___ le samedi, Awa pourrait y participer.",
+      "options": [
+        "avait lieu",
+        "aurait lieu",
+        "aura lieu",
+        "a eu lieu"
+      ],
+      "answer": 0,
+      "explain": "Use imparfait after si in this hypothetical pattern."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which sentence uses the pattern correctly?",
+      "options": [
+        "Si on change l'heure, plus de personnes venaient hier.",
+        "Si on changerait l'heure, plus de personnes pourraient venir.",
+        "Si on changeait l'heure, plus de personnes pourraient venir.",
+        "Si on changera l'heure, plus de personnes pourraient venir."
+      ],
+      "answer": 2,
+      "explain": "The condition takes imparfait; the possible result takes conditionnel présent."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which phrase is a softened proposal?",
+      "options": [
+        "On essaie hier pendant un mois.",
+        "On pourrait essayer pendant un mois.",
+        "On doit certainement essayer.",
+        "On a essayé demain."
+      ],
+      "answer": 1,
+      "explain": "Conditionnel present makes this proposal less direct."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "a2-u05-tcf",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le cours intensif commence lundi 6 janvier. La séance d'information est jeudi à dix-huit heures.",
+      "question": "When is the information session?",
+      "options": [
+        "Thursday at 6 p.m.",
+        "Monday at 6 p.m.",
+        "January 6 at noon",
+        "Friday at 8 a.m."
+      ],
+      "answer": 0,
+      "explain": "The recording says Thursday at eighteen hours."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Vous aurez une réponse après l'entretien. Le centre va confirmer votre groupe par courriel vendredi.",
+      "question": "How will the centre confirm the group?",
+      "options": [
+        "By email",
+        "By text message",
+        "At the interview",
+        "In a paper form"
+      ],
+      "answer": 0,
+      "explain": "The centre will confirm the group by email."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je vais travailler en juillet. Je vais suivre la formation du soir à partir de septembre.",
+      "question": "When will the speaker start the evening course?",
+      "options": [
+        "In September",
+        "In July",
+        "Next week",
+        "In January"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the course begins in September."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When will places be confirmed?",
+      "options": [
+        "May 8",
+        "May 3",
+        "May 18",
+        "June 8"
+      ],
+      "answer": 0,
+      "explain": "The notice says the centre will confirm places on May 8.",
+      "promptFr": "INSCRIPTION — Date limite pour envoyer le formulaire : 3 mai. Le centre va confirmer les places par courriel le 8 mai."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should the reader do?",
+      "options": [
+        "Reply before Wednesday",
+        "Arrive Tuesday at 11",
+        "Send the application again",
+        "Choose a course level"
+      ],
+      "answer": 0,
+      "explain": "The message asks the reader to reply before Wednesday.",
+      "promptFr": "Bonjour Nadia, nouveau rendez-vous : jeudi à 11 h. Merci de répondre avant mercredi. — Le centre"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What documents should applicants send?",
+      "options": [
+        "A cover letter and a transcript",
+        "A portfolio and a certificate",
+        "A form and an email",
+        "A schedule and a CV"
+      ],
+      "answer": 0,
+      "explain": "The notice names a letter of motivation and a transcript.",
+      "promptFr": "STAGE EN BUREAU — Début en septembre. Documents à envoyer avant le 14 juin : une lettre de motivation et un relevé de notes. Entretien : 20 juin."
+    }
+  ]
+}

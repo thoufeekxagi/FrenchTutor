@@ -1,0 +1,176 @@
+{
+  "id": "b1-u08-words-1",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un renseignement",
+      "en": "information; a detail",
+      "sound": "uh(n) rah(n)-sayn-MAH(N)",
+      "exampleFr": "Je voudrais un renseignement sur les inscriptions.",
+      "exampleEn": "I would like information about registration."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une démarche",
+      "en": "a procedure; a step",
+      "sound": "ün day-MARSH",
+      "exampleFr": "La première démarche se fait en ligne.",
+      "exampleEn": "The first step is completed online."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une pièce d'identité",
+      "en": "an identity document",
+      "sound": "ün pyess dee-dahn-tee-TAY",
+      "exampleFr": "La pièce d'identité doit être présentée sur place.",
+      "exampleEn": "The identity document must be shown in person."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un formulaire",
+      "en": "a form",
+      "sound": "uh(n) for-mü-LEHR",
+      "exampleFr": "Le formulaire peut être envoyé par courriel.",
+      "exampleEn": "The form can be sent by email."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une preuve",
+      "en": "proof; evidence",
+      "sound": "ün pruhv",
+      "exampleFr": "Le service demande une preuve d'adresse.",
+      "exampleEn": "The service asks for proof of address."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un délai",
+      "en": "a time limit; delay",
+      "sound": "uh(n) day-LEH",
+      "exampleFr": "Le délai de réponse est d'environ cinq jours.",
+      "exampleEn": "The response time is about five days."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un renseignement",
+      "options": [
+        "a form",
+        "information; a detail",
+        "a procedure; a step",
+        "an identity document"
+      ],
+      "answer": 1,
+      "explain": "un renseignement means information; a detail."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une démarche",
+      "options": [
+        "proof; evidence",
+        "an identity document",
+        "a form",
+        "a procedure; a step"
+      ],
+      "answer": 3,
+      "explain": "une démarche means a procedure; a step."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une pièce d'identité",
+      "options": [
+        "a time limit; delay",
+        "an identity document",
+        "a form",
+        "proof; evidence"
+      ],
+      "answer": 1,
+      "explain": "une pièce d'identité means an identity document."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un formulaire",
+      "options": [
+        "information; a detail",
+        "proof; evidence",
+        "a time limit; delay",
+        "a form"
+      ],
+      "answer": 3,
+      "explain": "un formulaire means a form."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une preuve",
+      "options": [
+        "a procedure; a step",
+        "proof; evidence",
+        "a time limit; delay",
+        "information; a detail"
+      ],
+      "answer": 1,
+      "explain": "une preuve means proof; evidence."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un délai",
+      "options": [
+        "an identity document",
+        "information; a detail",
+        "a procedure; a step",
+        "a time limit; delay"
+      ],
+      "answer": 3,
+      "explain": "un délai means a time limit; delay."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une démarche",
+      "question": "Which word did you hear?",
+      "options": [
+        "une preuve",
+        "une démarche",
+        "un renseignement",
+        "un formulaire"
+      ],
+      "answer": 1,
+      "explain": "You heard une démarche: a procedure; a step."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un formulaire",
+      "question": "Which word did you hear?",
+      "options": [
+        "un délai",
+        "une démarche",
+        "une preuve",
+        "un formulaire"
+      ],
+      "answer": 3,
+      "explain": "You heard un formulaire: a form."
+    }
+  ]
+}

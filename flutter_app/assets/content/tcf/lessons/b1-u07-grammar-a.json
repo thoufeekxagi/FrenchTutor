@@ -1,0 +1,87 @@
+{
+  "id": "b1-u07-grammar-a",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Grammar: Indirect speech: report the source and preserve the claim",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Indirect speech: report the source and preserve the claim",
+      "body": "Use a reporting verb plus que for a statement and si for a yes/no question: Elle dit que la salle est libre; il a demandé si l'inscription était obligatoire. For a question word, keep that word: elle a demandé quand le cours commencerait. When the reporting verb is in the past, make only the basic time adjustment the context needs (est → était; sera → serait). Keep who said it clear, and do not turn a possibility into a confirmed fact."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Indirect speech: report the source and preserve the claim",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Statement",
+          "dire / expliquer que + clause",
+          "L'organisateur a expliqué que la salle ouvrait à 18 h.",
+          "The organizer explained that the room opened at 6 p.m."
+        ],
+        [
+          "Yes/no question",
+          "demander si + clause",
+          "Elle a demandé si l'inscription était obligatoire.",
+          "She asked whether registration was required."
+        ],
+        [
+          "Question word",
+          "demander + pourquoi / quand / où",
+          "Il a demandé quand le cours commencerait.",
+          "He asked when the class would begin."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Report: « Est-ce que l'inscription est obligatoire ? »",
+      "options": [
+        "Elle demande quand l'inscription obligatoire.",
+        "Elle a demandé si l'inscription était obligatoire.",
+        "Elle a demandé l'inscription obligatoire ?",
+        "Elle a demandé que l'inscription était obligatoire."
+      ],
+      "answer": 1,
+      "explain": "Use demander si to report a yes/no question."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Report: « Le cours commencera à 19 h. »",
+      "options": [
+        "Il a précisé que le cours commencerait à 19 h.",
+        "Il a demandé que le cours commencera à 19 h.",
+        "Il a précisé si le cours commencerait à 19 h.",
+        "Il précisait le cours de 19 h hier."
+      ],
+      "answer": 0,
+      "explain": "After a past reporting verb, the future commonly shifts to conditional in indirect speech."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which phrase marks the source?",
+      "options": [
+        "C'est forcément vrai que …",
+        "Personne n'a dit que …",
+        "Tout le monde sait que …",
+        "Selon la coordonnatrice, …"
+      ],
+      "answer": 3,
+      "explain": "Selon explicitly attributes the statement."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "b2-u14-listening",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Votre réponse compare les deux sources, mais la deuxième idée est attribuée au mauvais auteur. Corrigez l'attribution avant de modifier la conclusion.",
+      "question": "What should the learner correct first?",
+      "options": [
+        "Which author made the second point",
+        "The order of the title",
+        "The example's length",
+        "The conclusion's punctuation"
+      ],
+      "answer": 0,
+      "explain": "The feedback says the second idea is attributed to the wrong author."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Le candidat a bien compris l'enregistrement, mais il n'a pas répondu à la question sur la conséquence. Il doit revenir à la consigne et vérifier chaque partie.",
+      "question": "What is the main issue?",
+      "options": [
+        "The audio was too long",
+        "The candidate used a conditional",
+        "The recording had no conclusion",
+        "One requested part was not answered"
+      ],
+      "answer": 3,
+      "explain": "The candidate missed the part asking about a consequence."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Cette estimation pourrait être utile, à condition que l'échantillon soit représentatif. Le rapport ne donne pas cette information.",
+      "question": "What remains unknown?",
+      "options": [
+        "Whether the result is useful in theory",
+        "Whether the report contains an estimate",
+        "Whether the sample is representative",
+        "Whether a condition was stated"
+      ],
+      "answer": 2,
+      "explain": "The report does not say whether the sample is representative."
+    }
+  ]
+}

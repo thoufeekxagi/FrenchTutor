@@ -1,0 +1,166 @@
+{
+  "id": "a2-u09-words-1",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Words: stations and route information",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un plan du réseau",
+      "en": "a network map",
+      "sound": "uh(n) plah(n) dü ray-ZOH",
+      "exampleFr": "Je consulte le plan du réseau avant de partir.",
+      "exampleEn": "I check the network map before leaving."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un terminus",
+      "en": "a final stop",
+      "sound": "uh(n) tehr-mee-NÜS",
+      "exampleFr": "Le terminus est le dernier arrêt de la ligne.",
+      "exampleEn": "The terminus is the last stop on the line."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une liaison interurbaine",
+      "en": "an intercity connection",
+      "sound": "ün lee-EH-zohn a(n)-tehr-ühr-BEHN",
+      "exampleFr": "Je prends une liaison interurbaine pour aller dans une autre ville.",
+      "exampleEn": "I take an intercity connection to another city."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un service de remplacement",
+      "en": "a replacement service",
+      "sound": "uh(n) sehr-VEES duh rah(n)-plahs-MAH(N)",
+      "exampleFr": "Le service de remplacement part du terminus.",
+      "exampleEn": "The replacement service leaves from the terminus."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une ligne express",
+      "en": "an express line",
+      "sound": "ün leen ehk-PREHS",
+      "exampleFr": "La ligne express va directement au centre.",
+      "exampleEn": "The express line goes directly downtown."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un panneau d'affichage",
+      "en": "an information board",
+      "sound": "uh(n) pah-NOH dah-fee-SHAHZH",
+      "exampleFr": "Je lis les horaires sur le panneau d'affichage.",
+      "exampleEn": "I read the schedules on the information board."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un horaire de départ",
+      "en": "a departure schedule",
+      "sound": "uh(n) oh-REHR duh day-PAHR",
+      "exampleFr": "Je vérifie l'horaire de départ avant de réserver.",
+      "exampleEn": "I check the departure schedule before booking."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un arrêt provisoire",
+      "en": "a temporary stop",
+      "sound": "uh(n) ah-REH proh-vee-ZWAHR",
+      "exampleFr": "L'arrêt provisoire est près de la gare.",
+      "exampleEn": "The temporary stop is near the station."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un plan du réseau",
+      "options": [
+        "a replacement service",
+        "a network map",
+        "a departure schedule",
+        "a final stop"
+      ],
+      "answer": 1,
+      "explain": "un plan du réseau means a network map."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un terminus",
+      "options": [
+        "an express line",
+        "an intercity connection",
+        "an information board",
+        "a final stop"
+      ],
+      "answer": 3,
+      "explain": "un terminus means a final stop."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une liaison interurbaine",
+      "options": [
+        "an information board",
+        "an intercity connection",
+        "a network map",
+        "a replacement service"
+      ],
+      "answer": 1,
+      "explain": "une liaison interurbaine means an intercity connection."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un service de remplacement",
+      "options": [
+        "a departure schedule",
+        "a final stop",
+        "an express line",
+        "a replacement service"
+      ],
+      "answer": 3,
+      "explain": "un service de remplacement means a replacement service."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une ligne express",
+      "options": [
+        "a temporary stop",
+        "an express line",
+        "an intercity connection",
+        "an information board"
+      ],
+      "answer": 1,
+      "explain": "une ligne express means an express line."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un panneau d'affichage",
+      "options": [
+        "a network map",
+        "a replacement service",
+        "a departure schedule",
+        "an information board"
+      ],
+      "answer": 3,
+      "explain": "un panneau d'affichage means an information board."
+    }
+  ]
+}

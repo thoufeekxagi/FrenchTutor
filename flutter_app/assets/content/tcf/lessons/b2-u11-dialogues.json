@@ -1,0 +1,96 @@
+{
+  "id": "b2-u11-dialogues",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Ask about a community workshop",
+      "body": "The notice is fictional. The learner has two minutes to prepare and then asks the coordinator questions.",
+      "examples": [
+        {
+          "fr": "Bonjour, je vous appelle au sujet de l'atelier de samedi.",
+          "en": "Participant: Hello, I am calling about Saturday's workshop."
+        },
+        {
+          "fr": "Bonjour. Que souhaitez-vous savoir ?",
+          "en": "Coordonnatrice: Hello. What would you like to know?"
+        },
+        {
+          "fr": "Pourriez-vous préciser l'horaire et le tarif ?",
+          "en": "Participant: Could you clarify the schedule and price?"
+        },
+        {
+          "fr": "L'atelier commence à dix heures. Le matériel de base est compris.",
+          "en": "Coordonnatrice: The workshop begins at ten. Basic materials are included."
+        },
+        {
+          "fr": "Qu'entendez-vous par matériel de base ?",
+          "en": "Participant: What do you mean by basic materials?"
+        },
+        {
+          "fr": "Les outils sont fournis; les participants apportent leurs notes.",
+          "en": "Coordonnatrice: Tools are provided; participants bring their notes."
+        },
+        {
+          "fr": "Y a-t-il une autre date si je ne peux pas venir samedi ?",
+          "en": "Participant: Is there another date if I cannot come Saturday?"
+        },
+        {
+          "fr": "Une séance aura lieu le mois prochain, sous réserve de disponibilité.",
+          "en": "Coordonnatrice: A session will take place next month, subject to availability."
+        },
+        {
+          "fr": "Si j'ai bien compris, je dois confirmer ma place par courriel.",
+          "en": "Participant: If I understood correctly, I need to confirm my place by email."
+        },
+        {
+          "fr": "Exactement. Je vous enverrai les détails.",
+          "en": "Coordonnatrice: Exactly. I will send you the details."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Following an incomplete answer",
+      "body": "The coordinator gives a partial answer; the learner asks a relevant follow-up.",
+      "examples": [
+        {
+          "fr": "Est-ce que l'inscription comprend le matériel ?",
+          "en": "Awa: Does registration include the materials?"
+        },
+        {
+          "fr": "Elle comprend les outils de base.",
+          "en": "Agent: It includes the basic tools."
+        },
+        {
+          "fr": "Et les frais de transport sont-ils inclus ?",
+          "en": "Awa: And are transportation costs included?"
+        },
+        {
+          "fr": "Non, ils restent à la charge des participants.",
+          "en": "Agent: No, participants are responsible for those."
+        },
+        {
+          "fr": "Merci. Pourriez-vous me dire à qui écrire si je dois annuler ?",
+          "en": "Awa: Thank you. Could you tell me whom to write to if I need to cancel?"
+        },
+        {
+          "fr": "L'adresse de contact figure au bas de la confirmation.",
+          "en": "Agent: The contact address appears at the bottom of the confirmation."
+        }
+      ]
+    }
+  ]
+}

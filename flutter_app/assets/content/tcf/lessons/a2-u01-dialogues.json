@@ -1,0 +1,136 @@
+{
+  "id": "a2-u01-dialogues",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the main schedule first. Then notice how the speakers ask a follow-up question and check a detail instead of pretending they understood."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A schedule that changed",
+      "body": "Nadia and Sam compare their work and French-study weeks.",
+      "examples": [
+        {
+          "fr": "D'habitude, je révise le mardi soir, mais cette semaine j'ai un atelier.",
+          "en": "Nadia: I usually review on Tuesday evening, but this week I have a workshop."
+        },
+        {
+          "fr": "Tu as un atelier au travail ?",
+          "en": "Sam: Do you have a workshop at work?"
+        },
+        {
+          "fr": "Non, un atelier de français. Il commence à dix-huit heures.",
+          "en": "Nadia: No, a French workshop. It starts at six p.m."
+        },
+        {
+          "fr": "Si j'ai bien compris, tu ne peux pas réviser mardi.",
+          "en": "Sam: If I understood correctly, you can't review Tuesday."
+        },
+        {
+          "fr": "Oui, c'est ça. Je vais réviser mercredi parce que je suis libre.",
+          "en": "Nadia: Yes, that's right. I am going to review Wednesday because I am free."
+        },
+        {
+          "fr": "Et tu prends une pause quand ?",
+          "en": "Sam: And when do you take a break?"
+        },
+        {
+          "fr": "Je prends une pause après le travail, puis je me repose le soir.",
+          "en": "Nadia: I take a break after work, then I rest in the evening."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Clarify the meeting time",
+      "body": "A learner checks a class schedule with a classmate.",
+      "examples": [
+        {
+          "fr": "On planifie notre séance de français. Tu es libre jeudi ?",
+          "en": "Sam: We are planning our French session. Are you free Thursday?"
+        },
+        {
+          "fr": "Oui, mais je termine le travail à dix-sept heures.",
+          "en": "Julie: Yes, but I finish work at five p.m."
+        },
+        {
+          "fr": "Je veux dire jeudi à dix-huit heures.",
+          "en": "Sam: I mean Thursday at six p.m."
+        },
+        {
+          "fr": "Si j'ai bien compris, la séance commence à dix-huit heures ?",
+          "en": "Julie: If I understood correctly, the session starts at six p.m.?"
+        },
+        {
+          "fr": "Oui. D'abord, on révise le français; ensuite, on parle de notre semaine.",
+          "en": "Sam: Yes. First, we review French; then we talk about our week."
+        },
+        {
+          "fr": "D'accord. Je prends des notes et je prépare une question.",
+          "en": "Julie: Okay. I will take notes and prepare a question."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why does Nadia change her usual Tuesday review?",
+      "options": [
+        "She has a French workshop.",
+        "She is travelling.",
+        "She has a clinic appointment.",
+        "She is working all night."
+      ],
+      "answer": 0,
+      "explain": "Nadia says she has a French workshop on Tuesday."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When will Nadia review instead?",
+      "options": [
+        "Monday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "answer": 1,
+      "explain": "She says she will review on Wednesday because she is free."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What time does Julie finish work on Thursday?",
+      "options": [
+        "At 5 p.m.",
+        "At 6 p.m.",
+        "At 7 p.m.",
+        "At noon"
+      ],
+      "answer": 0,
+      "explain": "Julie says she finishes at seventeen hundred, or 5 p.m."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What will Sam and Julie do first?",
+      "options": [
+        "Prepare a meal",
+        "Read a notice",
+        "Review French",
+        "Call the teacher"
+      ],
+      "answer": 2,
+      "explain": "Sam says: D'abord, on révise le français."
+    }
+  ]
+}

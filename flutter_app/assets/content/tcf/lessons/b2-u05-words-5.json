@@ -1,0 +1,148 @@
+{
+  "id": "b2-u05-words-5",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une consultation spécialisée",
+      "en": "a specialist consultation",
+      "sound": "ün kohn-sül-tah-SYOH(N) spay-syah-lee-ZAY",
+      "exampleFr": "Une consultation spécialisée peut demander un délai.",
+      "exampleEn": "A specialist consultation may involve a wait."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "conformément à",
+      "en": "in accordance with",
+      "sound": "kohn-for-may-MAH(N) ah",
+      "exampleFr": "Le document est traité conformément à la procédure indiquée.",
+      "exampleEn": "The document is handled in accordance with the stated procedure."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "éviter de conclure",
+      "en": "to avoid concluding",
+      "sound": "ay-vee-TAY duh kohn-KLÜR",
+      "exampleFr": "Il faut éviter de conclure sans connaître le contexte.",
+      "exampleEn": "One should avoid drawing a conclusion without knowing the context."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "être orienté vers",
+      "en": "to be referred to",
+      "sound": "ehtr oh-ree-ahn-TAY vehr",
+      "exampleFr": "La personne peut être orientée vers un service approprié.",
+      "exampleEn": "The person may be referred to an appropriate service."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une limite d'interprétation",
+      "en": "a limitation in interpretation",
+      "sound": "ün lee-MEET dehn-tehr-pray-tah-SYOH(N)",
+      "exampleFr": "Le tableau présente une limite d'interprétation importante.",
+      "exampleEn": "The chart has an important limitation in interpretation."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un consentement éclairé",
+      "en": "informed consent",
+      "sound": "uh(n) kohn-sahnt-mahn ay-klay-RAY",
+      "exampleFr": "La notice explique le consentement éclairé en termes simples.",
+      "exampleEn": "The notice explains informed consent in plain language."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une consultation spécialisée",
+      "options": [
+        "to be referred to",
+        "a specialist consultation",
+        "in accordance with",
+        "to avoid concluding"
+      ],
+      "answer": 1,
+      "explain": "une consultation spécialisée means a specialist consultation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "conformément à",
+      "options": [
+        "a limitation in interpretation",
+        "to avoid concluding",
+        "to be referred to",
+        "in accordance with"
+      ],
+      "answer": 3,
+      "explain": "conformément à means in accordance with."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "éviter de conclure",
+      "options": [
+        "informed consent",
+        "to avoid concluding",
+        "to be referred to",
+        "a limitation in interpretation"
+      ],
+      "answer": 1,
+      "explain": "éviter de conclure means to avoid concluding."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "être orienté vers",
+      "options": [
+        "a specialist consultation",
+        "a limitation in interpretation",
+        "informed consent",
+        "to be referred to"
+      ],
+      "answer": 3,
+      "explain": "être orienté vers means to be referred to."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une limite d'interprétation",
+      "options": [
+        "in accordance with",
+        "a limitation in interpretation",
+        "informed consent",
+        "a specialist consultation"
+      ],
+      "answer": 1,
+      "explain": "une limite d'interprétation means a limitation in interpretation."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un consentement éclairé",
+      "options": [
+        "to avoid concluding",
+        "a specialist consultation",
+        "in accordance with",
+        "informed consent"
+      ],
+      "answer": 3,
+      "explain": "un consentement éclairé means informed consent."
+    }
+  ]
+}

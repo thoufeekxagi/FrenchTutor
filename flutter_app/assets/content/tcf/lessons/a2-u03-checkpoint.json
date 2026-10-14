@@ -1,0 +1,140 @@
+{
+  "id": "a2-u03-checkpoint",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which form is the past participle of faire?",
+      "options": [
+        "fait",
+        "fais",
+        "faire",
+        "faisait"
+      ],
+      "answer": 0,
+      "explain": "The irregular participle of faire is fait."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Complete: Nous ___ le train.",
+      "options": [
+        "avons pris",
+        "sommes prendre",
+        "avons prendre",
+        "prenons hier"
+      ],
+      "answer": 0,
+      "explain": "Use avoir plus the participle pris."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does un reçu mean?",
+      "options": [
+        "A receipt",
+        "A route",
+        "A platform",
+        "A workshop"
+      ],
+      "answer": 0,
+      "explain": "Un reçu is a receipt."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which phrase means 'for the first time'?",
+      "options": [
+        "pour la première fois",
+        "à la fin",
+        "tout à coup",
+        "à l'accueil"
+      ],
+      "answer": 0,
+      "explain": "Pour la première fois means for the first time."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Choose the correct sentence.",
+      "options": [
+        "J'ai lu le message.",
+        "J'ai lire le message.",
+        "Je suis lu le message.",
+        "Je lis hier le message."
+      ],
+      "answer": 0,
+      "explain": "The passé composé uses avoir plus the participle lu."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does une correspondance mean in a trip?",
+      "options": [
+        "A connection or transfer",
+        "A voice message",
+        "A receipt",
+        "An application"
+      ],
+      "answer": 0,
+      "explain": "In travel, a correspondance is a connection or transfer."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Which event happened second? 'D'abord, j'ai lu l'avis. Ensuite, j'ai pris le bus.'",
+      "options": [
+        "The speaker took the bus.",
+        "The speaker read the notice.",
+        "The workshop started.",
+        "The speaker got a receipt."
+      ],
+      "answer": 0,
+      "explain": "Ensuite means next, so taking the bus happened second."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What does j'ai eu une réponse mean?",
+      "options": [
+        "I got an answer.",
+        "I read an answer.",
+        "I saw an answer.",
+        "I made an answer."
+      ],
+      "answer": 0,
+      "explain": "Avoir has the irregular participle eu: j'ai eu une réponse."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Where do you look to find an event's main time in a short notice?",
+      "options": [
+        "At the date or time line",
+        "Only at the writer's name",
+        "At the longest word",
+        "At the closing greeting"
+      ],
+      "answer": 0,
+      "explain": "Scan the date or time line for the relevant schedule detail."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which action is a good transfer task after this lesson?",
+      "options": [
+        "Recount a different trip without notes",
+        "Copy the model exactly",
+        "Read only the English",
+        "Repeat one word without context"
+      ],
+      "answer": 0,
+      "explain": "A changed trip checks whether you can retrieve and use the language independently."
+    }
+  ]
+}

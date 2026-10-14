@@ -1,0 +1,99 @@
+{
+  "id": "a2-u04-grammar-b",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Grammar: Choose the tense by the job the idea does",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "The left column gives a setting, description or usual action. The right column presents one finished event.",
+      "headers": [
+        "Imparfait: background or repeated habit",
+        "Passé composé: completed event"
+      ],
+      "rows": [
+        [
+          "Le dimanche, nous préparions le repas.",
+          "Un dimanche, nous avons préparé le repas ensemble."
+        ],
+        [
+          "La salle était calme.",
+          "Le cours a commencé à neuf heures."
+        ],
+        [
+          "Il y avait une grande fenêtre.",
+          "J'ai lu le message avant le cours."
+        ],
+        [
+          "Je prenais le bus chaque matin.",
+          "Un matin, j'ai pris un autre bus."
+        ],
+        [
+          "Ma tante habitait près du collège.",
+          "Elle a visité le collège samedi."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Choose the tense by the job the idea does",
+      "body": "• Use the imparfait for a past setting, description, feeling or repeated habit: la salle était calme; chaque matin, je prenais le bus.\n• Use the passé composé to report a completed event: le cours a commencé; j'ai lu le message.\n• The same verb can take either form. Ask whether you are describing what was usual or telling what happened on one occasion.\n• Connect the two ideas with a time link: Je lisais quand le cours a commencé. The first action was in progress; the second is the event.\n• Do not choose only from a time word. Un dimanche can introduce a repeated routine or one particular Sunday; the meaning decides.\n• Draw one long background line and mark a finished event on it. Say the pair once with your notes, then once without them."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Every Sunday was the family's routine: Le dimanche, nous ___ le repas.",
+      "options": [
+        "préparions",
+        "avons préparé",
+        "préparons",
+        "préparer"
+      ],
+      "answer": 0,
+      "explain": "The sentence describes a repeated routine, so use the imparfait: préparions."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "One particular Sunday: Nous ___ le repas ensemble.",
+      "options": [
+        "avons préparé",
+        "préparions chaque dimanche",
+        "préparons",
+        "préparer"
+      ],
+      "answer": 0,
+      "explain": "This reports one completed event: avons préparé."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the natural background + event pair.",
+      "options": [
+        "La salle était calme quand le cours a commencé.",
+        "La salle est calme quand le cours a commencé hier.",
+        "La salle était calme quand le cours commencer.",
+        "La salle a été calme chaque matin quand le cours commence."
+      ],
+      "answer": 0,
+      "explain": "Était describes the scene; a commencé reports the completed event."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Je prenais le bus chaque matin tell you?",
+      "options": [
+        "A repeated past habit",
+        "One completed trip yesterday",
+        "A future plan",
+        "A polite request"
+      ],
+      "answer": 0,
+      "explain": "Chaque matin and the imparfait describe a repeated past habit."
+    }
+  ]
+}

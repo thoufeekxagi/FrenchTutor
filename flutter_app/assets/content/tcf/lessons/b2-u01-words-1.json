@@ -1,0 +1,148 @@
+{
+  "id": "b2-u01-words-1",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un enjeu",
+      "en": "a stake; an issue at stake",
+      "sound": "uh(n) ahn-ZHUH",
+      "exampleFr": "L'accès aux horaires flexibles est un enjeu important.",
+      "exampleEn": "Access to flexible schedules is an important issue."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un constat",
+      "en": "an observation; a finding",
+      "sound": "uh(n) kohn-STA",
+      "exampleFr": "Le premier constat concerne les trajets.",
+      "exampleEn": "The first finding concerns commutes."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un argument",
+      "en": "an argument; a reason",
+      "sound": "uh(n) ar-gü-MAH(N)",
+      "exampleFr": "Cet argument repose sur une expérience précise.",
+      "exampleEn": "This argument rests on a specific experience."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un contre-argument",
+      "en": "a counterargument",
+      "sound": "uh(n) kohn-trar-gü-MAH(N)",
+      "exampleFr": "Elle répond au contre-argument sans l'ignorer.",
+      "exampleEn": "She answers the counterargument without ignoring it."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une nuance",
+      "en": "a qualification; a nuance",
+      "sound": "ün nü-AH(N)S",
+      "exampleFr": "J'ajoute une nuance à ma position.",
+      "exampleEn": "I add a qualification to my position."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un compromis",
+      "en": "a compromise",
+      "sound": "uh(n) kohn-proh-MEE",
+      "exampleFr": "Un compromis pourrait aider les deux équipes.",
+      "exampleEn": "A compromise could help both teams."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un enjeu",
+      "options": [
+        "a counterargument",
+        "a stake; an issue at stake",
+        "an observation; a finding",
+        "an argument; a reason"
+      ],
+      "answer": 1,
+      "explain": "un enjeu means a stake; an issue at stake."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un constat",
+      "options": [
+        "a qualification; a nuance",
+        "an argument; a reason",
+        "a counterargument",
+        "an observation; a finding"
+      ],
+      "answer": 3,
+      "explain": "un constat means an observation; a finding."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un argument",
+      "options": [
+        "a compromise",
+        "an argument; a reason",
+        "a counterargument",
+        "a qualification; a nuance"
+      ],
+      "answer": 1,
+      "explain": "un argument means an argument; a reason."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un contre-argument",
+      "options": [
+        "a stake; an issue at stake",
+        "a qualification; a nuance",
+        "a compromise",
+        "a counterargument"
+      ],
+      "answer": 3,
+      "explain": "un contre-argument means a counterargument."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une nuance",
+      "options": [
+        "an observation; a finding",
+        "a qualification; a nuance",
+        "a compromise",
+        "a stake; an issue at stake"
+      ],
+      "answer": 1,
+      "explain": "une nuance means a qualification; a nuance."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un compromis",
+      "options": [
+        "an argument; a reason",
+        "a stake; an issue at stake",
+        "an observation; a finding",
+        "a compromise"
+      ],
+      "answer": 3,
+      "explain": "un compromis means a compromise."
+    }
+  ]
+}

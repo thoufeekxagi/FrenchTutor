@@ -1,0 +1,148 @@
+{
+  "id": "b2-u12-words-3",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un argument principal",
+      "en": "a main argument",
+      "sound": "uh(n) ar-gü-MAH(N) prehn-see-PAHL",
+      "exampleFr": "La synthèse présente l'argument principal de chaque texte.",
+      "exampleEn": "The synthesis presents the main argument of each text."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un élément de preuve",
+      "en": "a piece of evidence",
+      "sound": "uh(n) ay-lay-mahn duh preuv",
+      "exampleFr": "Chaque élément de preuve doit soutenir l'idée résumée.",
+      "exampleEn": "Each piece of evidence should support the summarized idea."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une limite méthodologique",
+      "en": "a methodological limitation",
+      "sound": "ün lee-MEET may-toh-doh-loh-ZHEEK",
+      "exampleFr": "La limite méthodologique réduit la portée de l'enquête.",
+      "exampleEn": "The methodological limitation reduces the scope of the survey."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une affirmation générale",
+      "en": "a general claim",
+      "sound": "ün ah-feer-mah-SYOH(N) zhay-nay-RAHL",
+      "exampleFr": "Une affirmation générale ne décrit pas tous les cas.",
+      "exampleEn": "A general claim does not describe every case."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un exemple représentatif",
+      "en": "a representative example",
+      "sound": "uh(n) ehk-ZAH(N)pl ruh-pray-zahn-tah-TEEF",
+      "exampleFr": "L'auteur choisit un exemple représentatif du groupe.",
+      "exampleEn": "The author chooses an example representative of the group."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un point de désaccord",
+      "en": "a point of disagreement",
+      "sound": "uh(n) pwa(n) duh day-zah-KOR",
+      "exampleFr": "Le coût constitue un point de désaccord entre les auteurs.",
+      "exampleEn": "Cost is a point of disagreement between the authors."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un argument principal",
+      "options": [
+        "a general claim",
+        "a main argument",
+        "a piece of evidence",
+        "a methodological limitation"
+      ],
+      "answer": 1,
+      "explain": "un argument principal means a main argument."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un élément de preuve",
+      "options": [
+        "a representative example",
+        "a methodological limitation",
+        "a general claim",
+        "a piece of evidence"
+      ],
+      "answer": 3,
+      "explain": "un élément de preuve means a piece of evidence."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une limite méthodologique",
+      "options": [
+        "a point of disagreement",
+        "a methodological limitation",
+        "a general claim",
+        "a representative example"
+      ],
+      "answer": 1,
+      "explain": "une limite méthodologique means a methodological limitation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une affirmation générale",
+      "options": [
+        "a main argument",
+        "a representative example",
+        "a point of disagreement",
+        "a general claim"
+      ],
+      "answer": 3,
+      "explain": "une affirmation générale means a general claim."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un exemple représentatif",
+      "options": [
+        "a piece of evidence",
+        "a representative example",
+        "a point of disagreement",
+        "a main argument"
+      ],
+      "answer": 1,
+      "explain": "un exemple représentatif means a representative example."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de désaccord",
+      "options": [
+        "a methodological limitation",
+        "a main argument",
+        "a piece of evidence",
+        "a point of disagreement"
+      ],
+      "answer": 3,
+      "explain": "un point de désaccord means a point of disagreement."
+    }
+  ]
+}

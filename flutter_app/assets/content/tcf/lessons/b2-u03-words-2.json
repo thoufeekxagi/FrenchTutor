@@ -1,0 +1,148 @@
+{
+  "id": "b2-u03-words-2",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un stage",
+      "en": "an internship; placement",
+      "sound": "uh(n) STAHZH",
+      "exampleFr": "Le stage permet d'appliquer les notions.",
+      "exampleEn": "The placement lets learners apply the concepts."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une reconnaissance",
+      "en": "recognition; acknowledgement",
+      "sound": "ün ruh-koh-neh-SAH(N)S",
+      "exampleFr": "La reconnaissance des acquis varie selon le contexte.",
+      "exampleEn": "Recognition of prior learning varies by context."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un dossier",
+      "en": "a file; application dossier",
+      "sound": "uh(n) doh-SYAY",
+      "exampleFr": "Le dossier comprend plusieurs documents.",
+      "exampleEn": "The application file includes several documents."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un critère",
+      "en": "a criterion",
+      "sound": "uh(n) kree-TEHR",
+      "exampleFr": "Le critère qui compte le plus est l'horaire.",
+      "exampleEn": "The criterion that matters most is the schedule."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un débouché",
+      "en": "a career prospect",
+      "sound": "uh(n) day-boo-SHAY",
+      "exampleFr": "Le programme présente différents débouchés.",
+      "exampleEn": "The program presents different career prospects."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une échéance",
+      "en": "a deadline",
+      "sound": "ün ay-shay-AH(N)S",
+      "exampleFr": "La date à laquelle le dossier doit être remis approche.",
+      "exampleEn": "The date by which the file must be submitted is approaching."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un stage",
+      "options": [
+        "a criterion",
+        "an internship; placement",
+        "recognition; acknowledgement",
+        "a file; application dossier"
+      ],
+      "answer": 1,
+      "explain": "un stage means an internship; placement."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une reconnaissance",
+      "options": [
+        "a career prospect",
+        "a file; application dossier",
+        "a criterion",
+        "recognition; acknowledgement"
+      ],
+      "answer": 3,
+      "explain": "une reconnaissance means recognition; acknowledgement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un dossier",
+      "options": [
+        "a deadline",
+        "a file; application dossier",
+        "a criterion",
+        "a career prospect"
+      ],
+      "answer": 1,
+      "explain": "un dossier means a file; application dossier."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un critère",
+      "options": [
+        "an internship; placement",
+        "a career prospect",
+        "a deadline",
+        "a criterion"
+      ],
+      "answer": 3,
+      "explain": "un critère means a criterion."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un débouché",
+      "options": [
+        "recognition; acknowledgement",
+        "a career prospect",
+        "a deadline",
+        "an internship; placement"
+      ],
+      "answer": 1,
+      "explain": "un débouché means a career prospect."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une échéance",
+      "options": [
+        "a file; application dossier",
+        "an internship; placement",
+        "recognition; acknowledgement",
+        "a deadline"
+      ],
+      "answer": 3,
+      "explain": "une échéance means a deadline."
+    }
+  ]
+}

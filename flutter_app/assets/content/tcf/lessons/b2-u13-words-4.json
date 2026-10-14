@@ -1,0 +1,148 @@
+{
+  "id": "b2-u13-words-4",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "garder le fil",
+      "en": "to keep one's train of thought",
+      "sound": "gar-DAY luh feel",
+      "exampleFr": "Une courte note l'aide à garder le fil.",
+      "exampleEn": "A short note helps her keep her train of thought."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un discours fluide",
+      "en": "a fluent speech",
+      "sound": "uh(n) dees-KOOR flü-EED",
+      "exampleFr": "Un discours fluide relie les idées sans longues pauses.",
+      "exampleEn": "A fluent speech connects ideas without long pauses."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "reformuler sans répétition",
+      "en": "to rephrase without repetition",
+      "sound": "ruh-for-mü-LAY sahn ray-pay-tee-SYOH(N)",
+      "exampleFr": "Il reformule sans répétition lorsque le mot lui échappe.",
+      "exampleEn": "He rephrases without repetition when a word escapes him."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "nuancer son propos",
+      "en": "to qualify one's statement",
+      "sound": "nü-ahn-SAY sohn proh-POH",
+      "exampleFr": "Elle nuance son propos après avoir entendu une autre expérience.",
+      "exampleEn": "She qualifies her statement after hearing another experience."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "faire une concession",
+      "en": "to make a concession",
+      "sound": "fehr ün kohn-seh-SYOH(N)",
+      "exampleFr": "Il fait une concession avant de défendre sa position.",
+      "exampleEn": "He makes a concession before defending his position."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "répliquer",
+      "en": "to respond; retort",
+      "sound": "ray-plee-KAY",
+      "exampleFr": "Le candidat réplique en s'appuyant sur un exemple.",
+      "exampleEn": "The candidate responds by drawing on an example."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "garder le fil",
+      "options": [
+        "a fluent speech",
+        "to keep one's train of thought",
+        "to rephrase without repetition",
+        "to make a concession"
+      ],
+      "answer": 1,
+      "explain": "garder le fil means to keep one's train of thought."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un discours fluide",
+      "options": [
+        "to make a concession",
+        "to rephrase without repetition",
+        "to qualify one's statement",
+        "a fluent speech"
+      ],
+      "answer": 3,
+      "explain": "un discours fluide means a fluent speech."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "reformuler sans répétition",
+      "options": [
+        "to respond; retort",
+        "to rephrase without repetition",
+        "to qualify one's statement",
+        "to make a concession"
+      ],
+      "answer": 1,
+      "explain": "reformuler sans répétition means to rephrase without repetition."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "nuancer son propos",
+      "options": [
+        "to make a concession",
+        "to respond; retort",
+        "a fluent speech",
+        "to qualify one's statement"
+      ],
+      "answer": 3,
+      "explain": "nuancer son propos means to qualify one's statement."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "faire une concession",
+      "options": [
+        "a fluent speech",
+        "to make a concession",
+        "to respond; retort",
+        "to keep one's train of thought"
+      ],
+      "answer": 1,
+      "explain": "faire une concession means to make a concession."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "répliquer",
+      "options": [
+        "to rephrase without repetition",
+        "to keep one's train of thought",
+        "a fluent speech",
+        "to respond; retort"
+      ],
+      "answer": 3,
+      "explain": "répliquer means to respond; retort."
+    }
+  ]
+}

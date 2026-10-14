@@ -1,0 +1,148 @@
+{
+  "id": "b2-u07-words-4",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un objectif mesurable",
+      "en": "a measurable objective",
+      "sound": "uh(n) ohb-zhehk-TEEF muh-zü-RAHBL",
+      "exampleFr": "L'organisme fixe un objectif mesurable pour réduire les déchets.",
+      "exampleEn": "The organization sets a measurable objective to reduce waste."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un taux de récupération",
+      "en": "a recovery rate",
+      "sound": "uh(n) toh duh ray-kü-pay-rah-SYOH(N)",
+      "exampleFr": "Le taux de récupération a progressé en deux ans.",
+      "exampleEn": "The recovery rate increased over two years."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "répercuter un coût",
+      "en": "to pass on a cost",
+      "sound": "ray-pehr-kü-TAY uh(n) koo",
+      "exampleFr": "Le fournisseur pourrait répercuter un coût sur les clients.",
+      "exampleEn": "The supplier could pass a cost on to customers."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "à l'échelle locale",
+      "en": "at the local level",
+      "sound": "ah lay-SHEHL loh-KAHL",
+      "exampleFr": "À l'échelle locale, le programme soutient le compostage.",
+      "exampleEn": "At the local level, the program supports composting."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la gestion des matières",
+      "en": "materials management",
+      "sound": "lah zhehs-TYOH(N) day mah-TYEHR",
+      "exampleFr": "La gestion des matières comprend le tri et la collecte.",
+      "exampleEn": "Materials management includes sorting and collection."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un effet rebond",
+      "en": "a rebound effect",
+      "sound": "uh(n) ay-FEH ruh-BOHN",
+      "exampleFr": "Une économie d'énergie peut parfois créer un effet rebond.",
+      "exampleEn": "An energy saving can sometimes create a rebound effect."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un objectif mesurable",
+      "options": [
+        "at the local level",
+        "a measurable objective",
+        "a recovery rate",
+        "to pass on a cost"
+      ],
+      "answer": 1,
+      "explain": "un objectif mesurable means a measurable objective."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un taux de récupération",
+      "options": [
+        "materials management",
+        "to pass on a cost",
+        "at the local level",
+        "a recovery rate"
+      ],
+      "answer": 3,
+      "explain": "un taux de récupération means a recovery rate."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "répercuter un coût",
+      "options": [
+        "a rebound effect",
+        "to pass on a cost",
+        "at the local level",
+        "materials management"
+      ],
+      "answer": 1,
+      "explain": "répercuter un coût means to pass on a cost."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "à l'échelle locale",
+      "options": [
+        "a measurable objective",
+        "materials management",
+        "a rebound effect",
+        "at the local level"
+      ],
+      "answer": 3,
+      "explain": "à l'échelle locale means at the local level."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la gestion des matières",
+      "options": [
+        "a recovery rate",
+        "materials management",
+        "a rebound effect",
+        "a measurable objective"
+      ],
+      "answer": 1,
+      "explain": "la gestion des matières means materials management."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un effet rebond",
+      "options": [
+        "to pass on a cost",
+        "a measurable objective",
+        "a recovery rate",
+        "a rebound effect"
+      ],
+      "answer": 3,
+      "explain": "un effet rebond means a rebound effect."
+    }
+  ]
+}

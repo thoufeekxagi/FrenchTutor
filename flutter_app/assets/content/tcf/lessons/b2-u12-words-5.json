@@ -1,0 +1,148 @@
+{
+  "id": "b2-u12-words-5",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "selon le premier texte",
+      "en": "according to the first text",
+      "sound": "suh-LOHN luh pruh-MYAY tehkst",
+      "exampleFr": "Selon le premier texte, la mesure reste à l'étude.",
+      "exampleEn": "According to the first text, the measure is still being considered."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "en comparaison",
+      "en": "in comparison",
+      "sound": "ahn kohn-pah-reh-ZOH(N)",
+      "exampleFr": "En comparaison, le second auteur insiste sur le coût.",
+      "exampleEn": "In comparison, the second author emphasizes cost."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un angle de vue",
+      "en": "a perspective; viewpoint",
+      "sound": "uh(n) ahngl duh VÜ",
+      "exampleFr": "Chaque article adopte un angle de vue différent.",
+      "exampleEn": "Each article adopts a different viewpoint."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une formulation biaisée",
+      "en": "a biased wording",
+      "sound": "ün for-mü-lah-SYOH(N) beh-ZAY",
+      "exampleFr": "Une formulation biaisée peut déformer l'argument.",
+      "exampleEn": "Biased wording can distort the argument."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une synthèse équilibrée",
+      "en": "a balanced synthesis",
+      "sound": "ün sah(n)-TEHZ ay-kee-lee-BRAY",
+      "exampleFr": "Une synthèse équilibrée rapporte les accords et les écarts.",
+      "exampleEn": "A balanced synthesis reports both agreements and differences."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une prise de position",
+      "en": "a stated position",
+      "sound": "ün preez duh poh-zee-SYOH(N)",
+      "exampleFr": "La prise de position s'appuie sur les deux textes.",
+      "exampleEn": "The stated position is supported by both texts."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "selon le premier texte",
+      "options": [
+        "a biased wording",
+        "according to the first text",
+        "in comparison",
+        "a perspective; viewpoint"
+      ],
+      "answer": 1,
+      "explain": "selon le premier texte means according to the first text."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "en comparaison",
+      "options": [
+        "a balanced synthesis",
+        "a perspective; viewpoint",
+        "a biased wording",
+        "in comparison"
+      ],
+      "answer": 3,
+      "explain": "en comparaison means in comparison."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un angle de vue",
+      "options": [
+        "a stated position",
+        "a perspective; viewpoint",
+        "a biased wording",
+        "a balanced synthesis"
+      ],
+      "answer": 1,
+      "explain": "un angle de vue means a perspective; viewpoint."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une formulation biaisée",
+      "options": [
+        "according to the first text",
+        "a balanced synthesis",
+        "a stated position",
+        "a biased wording"
+      ],
+      "answer": 3,
+      "explain": "une formulation biaisée means a biased wording."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une synthèse équilibrée",
+      "options": [
+        "in comparison",
+        "a balanced synthesis",
+        "a stated position",
+        "according to the first text"
+      ],
+      "answer": 1,
+      "explain": "une synthèse équilibrée means a balanced synthesis."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une prise de position",
+      "options": [
+        "a perspective; viewpoint",
+        "according to the first text",
+        "in comparison",
+        "a stated position"
+      ],
+      "answer": 3,
+      "explain": "une prise de position means a stated position."
+    }
+  ]
+}

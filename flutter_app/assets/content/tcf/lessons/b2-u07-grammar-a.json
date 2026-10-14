@@ -1,0 +1,99 @@
+{
+  "id": "b2-u07-grammar-a",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Grammar: Cause, result, purpose and condition: choose the relationship you mean",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Cause, result, purpose and condition: choose the relationship you mean",
+      "body": "These connectors are not interchangeable. Parce que / en raison de give a cause; donc / de sorte que can give a result; afin que / dans le but de express purpose; à moins que introduces an exception. Purpose clauses with a different subject usually take the subjunctive (afin que le dispositif soit accessible). With the same subject, an infinitive is often smoother (dans le but de réduire les déchets). Ask: is this the reason, the result, or the intended goal? A proposal's intended result is not automatically a measured result."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Cause, result, purpose and condition: choose the relationship you mean",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Cause",
+          "en raison de + noun",
+          "En raison du coût, le projet sera évalué.",
+          "Because of the cost, the project will be assessed."
+        ],
+        [
+          "Measured result",
+          "donc / de sorte que",
+          "Le bac était plein, donc les déchets ont été triés plus tard.",
+          "The bin was full, so the waste was sorted later."
+        ],
+        [
+          "Purpose, different subject",
+          "afin que + subjunctive",
+          "Le guide est simplifié afin que chacun puisse le comprendre.",
+          "The guide is simplified so that everyone can understand it."
+        ],
+        [
+          "Purpose, same subject",
+          "dans le but de + infinitive",
+          "L'équipe teste le système dans le but de réduire le gaspillage.",
+          "The team is testing the system in order to reduce waste."
+        ],
+        [
+          "Exception",
+          "à moins que + subjunctive",
+          "Le projet continuera, à moins que le budget ne change.",
+          "The project will continue unless the budget changes."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which phrase introduces purpose?",
+      "options": [
+        "auparavant",
+        "afin que",
+        "par conséquent",
+        "en raison de"
+      ],
+      "answer": 1,
+      "explain": "Afin que introduces a purpose clause."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which phrase gives a cause before a noun?",
+      "options": [
+        "en raison de",
+        "afin que",
+        "de sorte que",
+        "à moins que"
+      ],
+      "answer": 0,
+      "explain": "En raison de is followed by a noun and gives a cause."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should you distinguish in a proposal?",
+      "options": [
+        "A question and a greeting",
+        "A speaker and their accent",
+        "Its title and punctuation",
+        "Its intended purpose and measured outcome"
+      ],
+      "answer": 3,
+      "explain": "An intended purpose is not the same as an observed outcome."
+    }
+  ]
+}

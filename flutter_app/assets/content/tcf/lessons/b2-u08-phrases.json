@@ -1,0 +1,78 @@
+{
+  "id": "b2-u08-phrases",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Phrases",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "These chunks help you organize a real response. Choose the one that matches your meaning, say it from memory, and replace the topic details with your own."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Elle explique avoir…",
+      "en": "She explains having…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Il a ajouté que…",
+      "en": "He added that…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Elle racontait qu'à l'époque…",
+      "en": "She used to explain that at the time…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Les deux personnes s'accordent sur…",
+      "en": "Both people agree on…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "L'une souligne…, tandis que l'autre…",
+      "en": "One emphasizes…, while the other…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Selon son expérience, …",
+      "en": "In her experience, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Cela ne reflète pas nécessairement…",
+      "en": "That does not necessarily reflect…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Ce témoignage met en lumière…",
+      "en": "This account highlights…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "b1-u04-write-speak",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word message to a friend about choosing between two housing, study or work options. Describe the option you chose, give two criteria and explain one drawback. Use relative clauses only where they make the reference clearer.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "J'ai finalement choisi le programme du soir dont je t'avais parlé. Il se déroule dans un centre qui se trouve près de mon travail, alors je n'aurai pas besoin de traverser toute la ville. Le critère auquel je tenais le plus était l'horaire, parce que je veux continuer à travailler pendant la journée. Le programme que j'ai comparé en premier était moins cher, mais les cours avaient lieu le matin. L'inconvénient de mon choix est le trajet après vingt heures; le dernier autobus passe moins souvent. J'ai demandé à la conseillère si une partie du travail pouvait se faire en ligne. Elle m'a expliqué que les exercices qui demandent un échange en groupe resteront en personne. Cette formule correspond assez bien à mes besoins, même si je devrai planifier mon retour. Je préfère essayer cette option pendant un trimestre et réévaluer ensuite.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• State the choice and the criteria that support it.\n• Check that dont follows a structure with de and that references are clear.\n• Mention a real drawback rather than claiming the choice is perfect."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. You are asking a housing or training contact about an option described in a fictional notice. Prepare for two minutes; ask about location, schedule, included services, the person to contact and one detail that remains unclear. Interact for 3 minutes 30 and adapt your follow-up to the answer.\n\n• Use a relative clause when it helps the listener identify the exact option.\n• Ask a follow-up when an answer does not cover the feature you need.\n• If your reference becomes confusing, repeat the key noun."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, j'appelle au sujet de l'option décrite dans votre avis. Pourriez-vous me préciser à quelle adresse elle se trouve ? J'aimerais aussi savoir quels services sont inclus.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "À qui dois-je écrire pour organiser une visite ? Est-ce que l'horaire indiqué est flexible ? Si j'ai bien compris, le logement est près du terminus, mais la buanderie se trouve au sous-sol.",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Est-ce que l'entrée est accessible sans marches ? Merci; je vais comparer ces détails avant de confirmer.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

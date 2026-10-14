@@ -1,0 +1,200 @@
+{
+  "id": "a2-u10-words-6",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Words: shopping and cooking actions",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "peser",
+      "en": "to weigh",
+      "sound": "puh-ZAY",
+      "exampleFr": "Je peux peser les lentilles.",
+      "exampleEn": "I can weigh the lentils."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "trancher",
+      "en": "to slice",
+      "sound": "trahn-SHAY",
+      "exampleFr": "Je peux trancher le pain.",
+      "exampleEn": "I can slice the bread."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "égoutter",
+      "en": "to drain",
+      "sound": "ay-goo-TAY",
+      "exampleFr": "Je peux égoutter les lentilles.",
+      "exampleEn": "I can drain the lentils."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "congeler",
+      "en": "to freeze",
+      "sound": "kohn-zhuh-LAY",
+      "exampleFr": "Je peux congeler le plat préparé.",
+      "exampleEn": "I can freeze the prepared dish."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "réchauffer",
+      "en": "to reheat",
+      "sound": "ray-shoh-FAY",
+      "exampleFr": "Je peux réchauffer la soupe.",
+      "exampleEn": "I can reheat the soup."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "convenir à",
+      "en": "to suit; be suitable for",
+      "sound": "kohn-vuh-NEER ah",
+      "exampleFr": "Cette option convient à mon régime alimentaire.",
+      "exampleEn": "This option suits my diet."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "échanger",
+      "en": "to exchange",
+      "sound": "ay-shahn-ZHAY",
+      "exampleFr": "Je peux échanger le produit selon la politique du magasin.",
+      "exampleEn": "I can exchange the product according to the store policy."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "rembourser",
+      "en": "to refund",
+      "sound": "rah(n)-boor-SAY",
+      "exampleFr": "Le magasin peut rembourser le produit selon sa politique.",
+      "exampleEn": "The store may refund the product according to its policy."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "peser",
+      "options": [
+        "to freeze",
+        "to weigh",
+        "to exchange",
+        "to slice"
+      ],
+      "answer": 1,
+      "explain": "peser means to weigh."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "trancher",
+      "options": [
+        "to reheat",
+        "to refund",
+        "to drain",
+        "to slice"
+      ],
+      "answer": 3,
+      "explain": "trancher means to slice."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "égoutter",
+      "options": [
+        "to suit; be suitable for",
+        "to drain",
+        "to weigh",
+        "to freeze"
+      ],
+      "answer": 1,
+      "explain": "égoutter means to drain."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "congeler",
+      "options": [
+        "to exchange",
+        "to slice",
+        "to reheat",
+        "to freeze"
+      ],
+      "answer": 3,
+      "explain": "congeler means to freeze."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "réchauffer",
+      "options": [
+        "to refund",
+        "to reheat",
+        "to drain",
+        "to suit; be suitable for"
+      ],
+      "answer": 1,
+      "explain": "réchauffer means to reheat."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "convenir à",
+      "options": [
+        "to weigh",
+        "to freeze",
+        "to exchange",
+        "to suit; be suitable for"
+      ],
+      "answer": 3,
+      "explain": "convenir à means to suit; be suitable for."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "trancher",
+      "question": "Which word did you hear?",
+      "options": [
+        "congeler",
+        "trancher",
+        "convenir à",
+        "rembourser"
+      ],
+      "answer": 1,
+      "explain": "You heard trancher: to slice."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "congeler",
+      "question": "Which word did you hear?",
+      "options": [
+        "congeler",
+        "convenir à",
+        "rembourser",
+        "trancher"
+      ],
+      "answer": 0,
+      "explain": "You heard congeler: to freeze."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: shopping and cooking actions",
+      "body": "Examples use made-up products and prices. Prepackaged consumer food generally shows metric quantities; Canadian units can appear in some situations as well. Confirm the unit and amount when needed. Store return policies vary by business. Store return and refund policies vary by business. This lesson teaches language, not consumer or nutrition advice."
+    }
+  ]
+}

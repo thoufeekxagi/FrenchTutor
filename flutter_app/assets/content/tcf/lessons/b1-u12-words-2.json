@@ -1,0 +1,148 @@
+{
+  "id": "b1-u12-words-2",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un exemple",
+      "en": "an example",
+      "sound": "uh(n) ehk-ZAH(N)pl",
+      "exampleFr": "Un exemple précis rend son idée plus claire.",
+      "exampleEn": "A specific example makes her idea clearer."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une solution",
+      "en": "a solution",
+      "sound": "ün soh-lü-SYOH(N)",
+      "exampleFr": "La solution doit répondre aux besoins du groupe.",
+      "exampleEn": "The solution needs to address the group's needs."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "nuancer",
+      "en": "to qualify; nuance",
+      "sound": "nü-ahn-SAY",
+      "exampleFr": "Il faut nuancer son avis si les faits sont incomplets.",
+      "exampleEn": "You should qualify your view if the facts are incomplete."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "résumer",
+      "en": "to summarize",
+      "sound": "ray-zü-MAY",
+      "exampleFr": "Je peux résumer les deux options en une phrase.",
+      "exampleEn": "I can summarize the two options in one sentence."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "soutenir",
+      "en": "to support; defend",
+      "sound": "soo-tuh-NEER",
+      "exampleFr": "Elle soutient son avis avec un exemple vécu.",
+      "exampleEn": "She supports her view with a personal example."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "transférer",
+      "en": "to transfer; apply elsewhere",
+      "sound": "trahn-sfay-RAY",
+      "exampleFr": "Le défi consiste à transférer cette stratégie à un autre sujet.",
+      "exampleEn": "The challenge is to transfer this strategy to another topic."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un exemple",
+      "options": [
+        "to summarize",
+        "an example",
+        "a solution",
+        "to qualify; nuance"
+      ],
+      "answer": 1,
+      "explain": "un exemple means an example."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une solution",
+      "options": [
+        "to support; defend",
+        "to qualify; nuance",
+        "to summarize",
+        "a solution"
+      ],
+      "answer": 3,
+      "explain": "une solution means a solution."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "nuancer",
+      "options": [
+        "to transfer; apply elsewhere",
+        "to qualify; nuance",
+        "to summarize",
+        "to support; defend"
+      ],
+      "answer": 1,
+      "explain": "nuancer means to qualify; nuance."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "résumer",
+      "options": [
+        "an example",
+        "to support; defend",
+        "to transfer; apply elsewhere",
+        "to summarize"
+      ],
+      "answer": 3,
+      "explain": "résumer means to summarize."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "soutenir",
+      "options": [
+        "a solution",
+        "to support; defend",
+        "to transfer; apply elsewhere",
+        "an example"
+      ],
+      "answer": 1,
+      "explain": "soutenir means to support; defend."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "transférer",
+      "options": [
+        "to qualify; nuance",
+        "an example",
+        "a solution",
+        "to transfer; apply elsewhere"
+      ],
+      "answer": 3,
+      "explain": "transférer means to transfer; apply elsewhere."
+    }
+  ]
+}

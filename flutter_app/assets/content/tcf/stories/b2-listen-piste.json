@@ -1,0 +1,772 @@
+{
+  "id": "b2-listen-piste",
+  "title": "La piste cyclable à l'essai",
+  "titleEn": "The cycling lane trial",
+  "level": "B2",
+  "mode": "listening",
+  "minutes": 6,
+  "summary": "Residents debate a temporary cycling lane, compare safety and access concerns, and agree to judge the trial with published measures.",
+  "unit": "b2-u05",
+  "sentences": [
+    {
+      "fr": "La ville proposait d'aménager une piste cyclable temporaire sur une rue commerçante où les collisions avaient augmenté.",
+      "en": "The city proposed a temporary cycling lane on a commercial street where collisions had increased."
+    },
+    {
+      "fr": "Plusieurs commerçants craignaient que la suppression de places de stationnement ne réduise l'accès aux boutiques.",
+      "en": "Several shop owners feared that removing parking spaces would reduce access to businesses."
+    },
+    {
+      "fr": "Des résidents estimaient au contraire que l'absence d'un trajet protégé empêchait certains déplacements à vélo.",
+      "en": "Residents, by contrast, felt that the lack of a protected route prevented some trips by bicycle."
+    },
+    {
+      "fr": "À la consultation, une personne a demandé que les livraisons et les besoins des personnes à mobilité réduite soient examinés séparément.",
+      "en": "At the consultation, one person asked that deliveries and the needs of people with limited mobility be examined separately."
+    },
+    {
+      "fr": "L'ingénieure a reconnu que les données disponibles ne permettaient pas de prévoir tous les effets sur les commerces.",
+      "en": "The engineer acknowledged that the available data could not predict every effect on businesses."
+    },
+    {
+      "fr": "Elle a toutefois proposé un essai de trois mois, avec des indicateurs de sécurité, de fréquentation et d'accès.",
+      "en": "She nevertheless proposed a three-month trial with measures for safety, use, and access."
+    },
+    {
+      "fr": "Les critères seraient publiés avant le début, afin d'éviter de choisir après coup les résultats les plus convaincants.",
+      "en": "The criteria would be published before the start to avoid selecting the most persuasive results after the fact."
+    },
+    {
+      "fr": "Les participants n'ont pas tous changé d'avis, mais ils ont accepté de discuter à partir des mêmes données.",
+      "en": "Not all participants changed their minds, but they agreed to discuss the same data."
+    },
+    {
+      "fr": "La décision finale dépendra donc des résultats et des ajustements possibles, plutôt que d'une promesse faite à l'avance.",
+      "en": "The final decision will therefore depend on the results and possible adjustments, rather than a promise made in advance."
+    }
+  ],
+  "words": {
+    "la": {
+      "en": "the"
+    },
+    "ville": {
+      "en": "city, town",
+      "sound": "lah veel",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ville"
+    },
+    "proposait": {
+      "en": "was proposing",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Imperfect form of proposer."
+    },
+    "d'aménager": {
+      "en": "to create; to set up",
+      "pos": "expression",
+      "note": "Elided de + aménager."
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "piste": {
+      "en": "lane; track",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "piste"
+    },
+    "cyclable": {
+      "en": "for cycling; cycle",
+      "pos": "adjective",
+      "lemma": "cyclable"
+    },
+    "temporaire": {
+      "en": "temporary",
+      "pos": "adjective",
+      "lemma": "temporaire"
+    },
+    "sur": {
+      "en": "on"
+    },
+    "rue": {
+      "en": "street",
+      "pos": "noun, feminine",
+      "sound": "rü",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "rue"
+    },
+    "commerçante": {
+      "en": "shop owner",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "commerçant",
+      "note": "Feminine form of commerçant."
+    },
+    "où": {
+      "en": "where; in which",
+      "pos": "adverb / pronoun"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "collisions": {
+      "en": "collisions",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "collision",
+      "note": "Plural of collision."
+    },
+    "avaient": {
+      "en": "had",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Imperfect form of avoir."
+    },
+    "augmenté": {
+      "en": "increased",
+      "pos": "verb",
+      "lemma": "augmenter",
+      "note": "Past participle of augmenter."
+    },
+    "plusieurs": {
+      "en": "several",
+      "pos": "determiner / pronoun"
+    },
+    "commerçants": {
+      "en": "shop owners",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "commerçant",
+      "note": "Masculine plural form."
+    },
+    "craignaient": {
+      "en": "feared; were concerned",
+      "pos": "verb",
+      "lemma": "craindre",
+      "note": "Imperfect form of craindre."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "suppression": {
+      "en": "removal; elimination",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "places": {
+      "en": "square, plaza",
+      "sound": "lah plahs",
+      "lemma": "place",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "stationnement": {
+      "en": "parking",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "réduise": {
+      "en": "reduce",
+      "pos": "verb",
+      "lemma": "réduire",
+      "note": "Subjunctive form of réduire."
+    },
+    "l'accès": {
+      "en": "access",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "accès",
+      "note": "Elided le before a vowel."
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "boutiques": {
+      "en": "shops",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "boutique",
+      "note": "Plural of boutique."
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "résidents": {
+      "en": "residents",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "résident",
+      "note": "Masculine plural; mixed groups use this form."
+    },
+    "estimaient": {
+      "en": "felt; considered",
+      "pos": "verb",
+      "lemma": "estimer",
+      "note": "Imperfect form of estimer."
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "contraire": {
+      "en": "opposite; contrary",
+      "pos": "adjective",
+      "lemma": "contraire"
+    },
+    "l'absence": {
+      "en": "the absence; lack",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "absence",
+      "note": "Elided la before a vowel."
+    },
+    "d'un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "trajet": {
+      "en": "a journey; a trip",
+      "sound": "uh(n) trah-ZHAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "trajet"
+    },
+    "protégé": {
+      "en": "protected",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "protéger",
+      "note": "Masculine singular form."
+    },
+    "empêchait": {
+      "en": "prevented",
+      "pos": "verb",
+      "lemma": "empêcher",
+      "note": "Imperfect form of empêcher."
+    },
+    "certains": {
+      "en": "some; certain",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "certain",
+      "note": "Masculine plural form."
+    },
+    "déplacements": {
+      "en": "a trip; a commute",
+      "sound": "uh(n) day-plahs-MAH(N)",
+      "lemma": "déplacement",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "vélo": {
+      "en": "bicycle",
+      "sound": "luh vay-LOH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "vélo"
+    },
+    "consultation": {
+      "en": "consultation; public meeting",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "personne": {
+      "en": "person",
+      "sound": "lah pehR-SUN",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "personne"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "demandé": {
+      "en": "asked; requested",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Past participle of demander."
+    },
+    "livraisons": {
+      "en": "deliveries",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "livraison",
+      "note": "Plural of livraison."
+    },
+    "et": {
+      "en": "and"
+    },
+    "besoins": {
+      "en": "a need",
+      "sound": "uh(n) buh-ZWA(N)",
+      "lemma": "besoin",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "personnes": {
+      "en": "person",
+      "sound": "lah pehR-SUN",
+      "lemma": "personne",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "mobilité": {
+      "en": "mobility",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "réduite": {
+      "en": "reduced",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "réduit",
+      "note": "Feminine form of réduit."
+    },
+    "soient": {
+      "en": "be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Subjunctive form of être."
+    },
+    "examinés": {
+      "en": "examined",
+      "pos": "verb",
+      "lemma": "examiner",
+      "note": "Masculine plural form of the past participle examiné."
+    },
+    "séparément": {
+      "en": "separately",
+      "pos": "adverb"
+    },
+    "l'ingénieure": {
+      "en": "the engineer",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ingénieur",
+      "note": "Feminine form of ingénieur."
+    },
+    "reconnu": {
+      "en": "recognized; acknowledged",
+      "pos": "verb",
+      "lemma": "reconnaître",
+      "note": "Past participle of reconnaître."
+    },
+    "données": {
+      "en": "data",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "donnée",
+      "note": "Plural of donnée; often used as a plural noun."
+    },
+    "disponibles": {
+      "en": "available",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "disponible",
+      "note": "Plural form; same spelling for masculine and feminine."
+    },
+    "permettaient": {
+      "en": "allowed; made possible",
+      "pos": "verb",
+      "lemma": "permettre",
+      "note": "Imperfect form of permettre."
+    },
+    "pas": {
+      "en": "not"
+    },
+    "prévoir": {
+      "en": "to plan; foresee",
+      "pos": "verb",
+      "lemma": "prévoir",
+      "note": "Infinitive."
+    },
+    "tous": {
+      "en": "all; everyone",
+      "pos": "pronoun / determiner",
+      "note": "Masculine plural form; toutes is feminine plural."
+    },
+    "effets": {
+      "en": "effects",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "effet",
+      "note": "Plural of effet."
+    },
+    "commerces": {
+      "en": "a shop; business",
+      "sound": "uh(n) koh-MEHRS",
+      "lemma": "commerce",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "toutefois": {
+      "en": "however; nevertheless",
+      "pos": "adverb"
+    },
+    "proposé": {
+      "en": "proposed",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Past participle of proposer."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "essai": {
+      "en": "trial; pilot",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "essai"
+    },
+    "trois": {
+      "en": "three",
+      "pos": "number"
+    },
+    "mois": {
+      "en": "month",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "mois",
+      "note": "The written form is the same in the plural."
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "indicateurs": {
+      "en": "measures; indicators",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "indicateur",
+      "note": "Plural of indicateur."
+    },
+    "sécurité": {
+      "en": "safety",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "fréquentation": {
+      "en": "use; attendance",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "fréquentation"
+    },
+    "d'accès": {
+      "en": "of access",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "accès",
+      "note": "Elided de before a vowel; accès is masculine."
+    },
+    "critères": {
+      "en": "criteria",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "critère",
+      "note": "Plural of critère."
+    },
+    "seraient": {
+      "en": "would be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Conditional form of être."
+    },
+    "publiés": {
+      "en": "published",
+      "pos": "verb",
+      "lemma": "publier",
+      "note": "Masculine plural form of the past participle publié."
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "le": {
+      "en": "the"
+    },
+    "début": {
+      "en": "beginning, start",
+      "sound": "luh day-BÜ",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "début"
+    },
+    "afin": {
+      "en": "so as to",
+      "pos": "connector",
+      "note": "Often followed by de."
+    },
+    "d'éviter": {
+      "en": "to avoid",
+      "pos": "expression",
+      "note": "Elided de + éviter."
+    },
+    "choisir": {
+      "en": "to choose",
+      "pos": "verb",
+      "lemma": "choisir",
+      "note": "Infinitive."
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "coup": {
+      "en": "blow; instance",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "résultats": {
+      "en": "a result",
+      "sound": "uh(n) ray-zül-TAH",
+      "lemma": "résultat",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "convaincants": {
+      "en": "convincing",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "convaincant",
+      "note": "Masculine plural form."
+    },
+    "participants": {
+      "en": "a participant",
+      "sound": "uh(n) par-tee-see-PAH(N)",
+      "lemma": "participant",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "n'ont": {
+      "en": "do not have; have not",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Negative form: ne + ont."
+    },
+    "changé": {
+      "en": "changed",
+      "pos": "verb",
+      "lemma": "changer",
+      "note": "Past participle of changer."
+    },
+    "d'avis": {
+      "en": "of notice; opinion",
+      "pos": "expression",
+      "note": "Elided de before a vowel."
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "ils": {
+      "en": "they",
+      "pos": "pronoun"
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "accepté": {
+      "en": "accepted",
+      "pos": "verb",
+      "lemma": "accepter",
+      "note": "Masculine singular past participle of accepter."
+    },
+    "discuter": {
+      "en": "to discuss",
+      "pos": "verb",
+      "lemma": "discuter",
+      "note": "Infinitive."
+    },
+    "partir": {
+      "en": "to leave",
+      "pos": "verb",
+      "lemma": "partir",
+      "note": "Infinitive."
+    },
+    "mêmes": {
+      "en": "same",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "même",
+      "note": "Plural form; same spelling for masculine and feminine."
+    },
+    "décision": {
+      "en": "decision",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "finale": {
+      "en": "final",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "final",
+      "note": "Feminine form of final."
+    },
+    "dépendra": {
+      "en": "will depend",
+      "pos": "verb",
+      "lemma": "dépendre",
+      "note": "Future form of dépendre."
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "ajustements": {
+      "en": "an adjustment",
+      "sound": "uh(n) ah-zhüs-tuh-MAH(N)",
+      "lemma": "ajustement",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "possibles": {
+      "en": "possible",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "possible",
+      "note": "Plural form; same spelling for masculine and feminine."
+    },
+    "plutôt": {
+      "en": "rather; instead",
+      "pos": "adverb"
+    },
+    "d'une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "promesse": {
+      "en": "promise",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "faite": {
+      "en": "made; done",
+      "pos": "verb",
+      "lemma": "faire",
+      "note": "Feminine form of the past participle fait."
+    },
+    "l'avance": {
+      "en": "advance",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "avance",
+      "note": "In à l'avance, it means beforehand."
+    }
+  },
+  "keywords": [
+    "piste",
+    "cyclable",
+    "sécurité",
+    "résidents",
+    "stationnement"
+  ],
+  "quiz": [
+    {
+      "prompt": "What is the engineer's response to uncertain effects on businesses?",
+      "options": [
+        "A three-month trial with published measures",
+        "An immediate permanent change",
+        "A promise that no business will be affected",
+        "A decision based only on parking counts"
+      ],
+      "answer": 0,
+      "explain": "She acknowledges the uncertainty and proposes a measured trial."
+    },
+    {
+      "prompt": "Why publish the criteria before the trial?",
+      "options": [
+        "To prevent selecting results after the fact",
+        "To guarantee that everyone agrees",
+        "To remove the need for data",
+        "To ensure the lane becomes permanent"
+      ],
+      "answer": 0,
+      "explain": "Publishing criteria in advance limits after-the-fact selection."
+    },
+    {
+      "prompt": "What do participants agree to do?",
+      "options": [
+        "Discuss using the same data",
+        "Adopt the same opinion",
+        "Stop considering access",
+        "End the consultation"
+      ],
+      "answer": 0,
+      "explain": "They do not all change position, but agree to use shared data."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "a2-u12-reading",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When is the rescheduled meeting?",
+      "options": [
+        "Thursday at 6 p.m.",
+        "Tuesday at 6 p.m.",
+        "Thursday at 8 p.m.",
+        "Friday at 6 p.m."
+      ],
+      "answer": 0,
+      "explain": "The message says Thursday at 18 h.",
+      "promptFr": "HORAIRE — Réunion : jeudi à 18 h, pas mardi. Nouveau point de départ : entrée principale."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is the appointment?",
+      "options": [
+        "Thursday at 2 p.m.",
+        "Wednesday at 6 p.m.",
+        "Saturday morning",
+        "Thursday at 6 p.m."
+      ],
+      "answer": 0,
+      "explain": "The schedule gives the appointment on Thursday at 14 h.",
+      "promptFr": "HORAIRE PROVISOIRE — Cours : mercredi 18 h. Rendez-vous : jeudi 14 h. Révision : samedi matin."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why might the writer choose the second option?",
+      "options": [
+        "Its starting point is closer to the centre",
+        "It is shorter",
+        "It is at a different time",
+        "It has no route change"
+      ],
+      "answer": 0,
+      "explain": "The note says its starting point is closer, although it is longer.",
+      "promptFr": "NOTE — J'ai lu l'avis. La deuxième option est plus longue, mais le point de départ est plus près du centre."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What will the learner practise without help?",
+      "options": [
+        "Speaking for 45 seconds",
+        "Writing a 120-word letter",
+        "Reading a two-page report",
+        "Listening to a long interview"
+      ],
+      "answer": 0,
+      "explain": "The sheet gives a 45-second speaking goal without help.",
+      "promptFr": "FICHE DE RÉVISION — Objectif : parler sans aide. Point à revoir : lui / leur. Prochaine étape : un nouvel essai vendredi."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does the sender ask the reader to confirm?",
+      "options": [
+        "The new schedule and starting point",
+        "The practice score and review sheet",
+        "The route price and food order",
+        "The lesson level and study group"
+      ],
+      "answer": 0,
+      "explain": "The sender asks for both the schedule and starting point.",
+      "promptFr": "MESSAGE — Nouvel horaire : jeudi. Pourriez-vous confirmer le point de départ ? Merci."
+    }
+  ]
+}

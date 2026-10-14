@@ -1,0 +1,75 @@
+{
+  "id": "b1-u07-checkpoint",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which word introduces an indirect yes/no question?",
+      "options": [
+        "où",
+        "dont",
+        "si",
+        "que"
+      ],
+      "answer": 2,
+      "explain": "Use si to report a yes/no question."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does selon le compte rendu do?",
+      "options": [
+        "Attributes information to a source",
+        "Introduces a purpose",
+        "Confirms every rumour",
+        "Gives a future condition"
+      ],
+      "answer": 0,
+      "explain": "It tells the reader where the information comes from."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "If a proposal is not confirmed, how should you report it?",
+      "options": [
+        "As a final decision",
+        "As a guaranteed fact",
+        "As a personal experience",
+        "As a proposal or open question"
+      ],
+      "answer": 3,
+      "explain": "Preserve the information's status."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which sentence reports a question correctly?",
+      "options": [
+        "Il a demandé la salle était disponible.",
+        "Il a demandé si la salle était disponible.",
+        "Il a demandé que la salle était disponible.",
+        "Il a demandé si était la salle disponible."
+      ],
+      "answer": 1,
+      "explain": "Use demander si with normal statement word order."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is a useful reading check for a forwarded claim?",
+      "options": [
+        "Assume the sender confirmed it",
+        "Ignore its date",
+        "Find and verify its source",
+        "Share it before checking"
+      ],
+      "answer": 2,
+      "explain": "Checking the original source helps separate a claim from a verified update."
+    }
+  ]
+}

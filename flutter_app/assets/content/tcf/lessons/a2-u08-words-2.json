@@ -1,0 +1,166 @@
+{
+  "id": "a2-u08-words-2",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Words: reports, files and meeting papers",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un compte rendu",
+      "en": "a meeting report",
+      "sound": "uh(n) koh(n)t ruh(n)-DÜ",
+      "exampleFr": "Le courriel contient un compte rendu.",
+      "exampleEn": "The email contains a meeting report."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un ordre du jour",
+      "en": "an agenda",
+      "sound": "uh(n) OR-dr dü zhoor",
+      "exampleFr": "Le courriel contient un ordre du jour.",
+      "exampleEn": "The email contains an agenda."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une version finale",
+      "en": "a final version",
+      "sound": "ün vehr-SYOH(N) fee-NAHL",
+      "exampleFr": "Le courriel contient une version finale.",
+      "exampleEn": "The email contains a final version."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un brouillon partagé",
+      "en": "a shared draft",
+      "sound": "uh(n) broo-YOH(N) pahr-tah-ZHAY",
+      "exampleFr": "Le courriel contient un brouillon partagé.",
+      "exampleEn": "The email contains a shared draft."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un dossier de projet",
+      "en": "a project file",
+      "sound": "uh(n) doh-SYAY duh proh-ZHEH",
+      "exampleFr": "Le courriel contient un dossier de projet.",
+      "exampleEn": "The email contains a project file."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un fichier joint",
+      "en": "an attached file",
+      "sound": "uh(n) fee-SHYAY zhWA(N)",
+      "exampleFr": "Le courriel contient un fichier joint.",
+      "exampleEn": "The email contains an attached file."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une copie de travail",
+      "en": "a working copy",
+      "sound": "ün koh-PEE duh trah-VAI",
+      "exampleFr": "Le courriel contient une copie de travail.",
+      "exampleEn": "The email contains a working copy."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un document de référence",
+      "en": "a reference document",
+      "sound": "uh(n) doh-kü-MAH(N) duh ray-fay-RAH(N)S",
+      "exampleFr": "Le courriel contient un document de référence.",
+      "exampleEn": "The email contains a reference document."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un compte rendu",
+      "options": [
+        "a shared draft",
+        "a meeting report",
+        "a working copy",
+        "an agenda"
+      ],
+      "answer": 1,
+      "explain": "un compte rendu means a meeting report."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un ordre du jour",
+      "options": [
+        "a project file",
+        "a reference document",
+        "a final version",
+        "an agenda"
+      ],
+      "answer": 3,
+      "explain": "un ordre du jour means an agenda."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une version finale",
+      "options": [
+        "an attached file",
+        "a final version",
+        "a meeting report",
+        "a shared draft"
+      ],
+      "answer": 1,
+      "explain": "une version finale means a final version."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un brouillon partagé",
+      "options": [
+        "a working copy",
+        "an agenda",
+        "a project file",
+        "a shared draft"
+      ],
+      "answer": 3,
+      "explain": "un brouillon partagé means a shared draft."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un dossier de projet",
+      "options": [
+        "a reference document",
+        "a project file",
+        "a final version",
+        "a meeting report"
+      ],
+      "answer": 1,
+      "explain": "un dossier de projet means a project file."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un fichier joint",
+      "options": [
+        "a meeting report",
+        "a shared draft",
+        "a working copy",
+        "an attached file"
+      ],
+      "answer": 3,
+      "explain": "un fichier joint means an attached file."
+    }
+  ]
+}

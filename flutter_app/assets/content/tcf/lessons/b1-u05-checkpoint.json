@@ -1,0 +1,75 @@
+{
+  "id": "b1-u05-checkpoint",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which pattern expresses a need with a different subject?",
+      "options": [
+        "Il faut que la salle sera accessible.",
+        "Il faut que la salle soit accessible.",
+        "Il faut la salle être accessible.",
+        "Il faut la salle est accessible."
+      ],
+      "answer": 1,
+      "explain": "Il faut que introduces the subjunctive in this pattern."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is the infinitive normally used?",
+      "options": [
+        "Only in a past story",
+        "After every que",
+        "When the subject stays the same",
+        "After every expression of emotion"
+      ],
+      "answer": 2,
+      "explain": "The infinitive is normal when the same person does both actions."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does un obstacle mean?",
+      "options": [
+        "A result",
+        "A preference",
+        "A deadline",
+        "A barrier"
+      ],
+      "answer": 3,
+      "explain": "An obstacle is a barrier or difficulty."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Choose the useful request frame.",
+      "options": [
+        "Je souhaite que les consignes soient claires.",
+        "Je souhaite que les consignes seront claires.",
+        "Je souhaite les consignes claires que.",
+        "Je souhaite les consignes sont claires."
+      ],
+      "answer": 0,
+      "explain": "This wish has a different subject and uses the subjunctive."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What makes feedback actionable?",
+      "options": [
+        "An unrelated complaint",
+        "A specific need and a practical example",
+        "A copied model",
+        "A guaranteed promise"
+      ],
+      "answer": 1,
+      "explain": "Specific feedback helps the group decide what to change."
+    }
+  ]
+}

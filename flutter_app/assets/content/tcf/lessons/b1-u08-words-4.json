@@ -1,0 +1,148 @@
+{
+  "id": "b1-u08-words-4",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une demande de suivi",
+      "en": "a follow-up request",
+      "sound": "ün duh-mahnd duh sü-vee",
+      "exampleFr": "J'ai envoyé une demande de suivi lundi.",
+      "exampleEn": "I sent a follow-up request on Monday."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un renseignement complémentaire",
+      "en": "additional information",
+      "sound": "uh(n) rahn-seh-nyuh-mahn kohn-play-mahn-TEHR",
+      "exampleFr": "Le bureau demande un renseignement complémentaire.",
+      "exampleEn": "The office is asking for additional information."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une condition d'admissibilité",
+      "en": "an eligibility condition",
+      "sound": "ün kohn-dee-SYOH(N) dahd-mee-see-bee-lee-TAY",
+      "exampleFr": "La résidence est une condition d'admissibilité au programme.",
+      "exampleEn": "Residency is an eligibility condition for the program."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "fournir un document",
+      "en": "to provide a document",
+      "sound": "foor-NEER uh(n) doh-kü-mahn",
+      "exampleFr": "Vous devez fournir un document avant le rendez-vous.",
+      "exampleEn": "You need to provide a document before the appointment."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "transmettre un dossier",
+      "en": "to submit a file",
+      "sound": "trahns-mehtr uh(n) doh-syay",
+      "exampleFr": "Elle transmettra le dossier par voie électronique.",
+      "exampleEn": "She will submit the file electronically."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "recevoir une confirmation",
+      "en": "to receive confirmation",
+      "sound": "ruh-suh-vwahr ün kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Vous recevrez une confirmation après l'envoi.",
+      "exampleEn": "You will receive confirmation after sending it."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une demande de suivi",
+      "options": [
+        "to provide a document",
+        "a follow-up request",
+        "additional information",
+        "an eligibility condition"
+      ],
+      "answer": 1,
+      "explain": "une demande de suivi means a follow-up request."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un renseignement complémentaire",
+      "options": [
+        "to submit a file",
+        "an eligibility condition",
+        "to provide a document",
+        "additional information"
+      ],
+      "answer": 3,
+      "explain": "un renseignement complémentaire means additional information."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une condition d'admissibilité",
+      "options": [
+        "to receive confirmation",
+        "an eligibility condition",
+        "to provide a document",
+        "to submit a file"
+      ],
+      "answer": 1,
+      "explain": "une condition d'admissibilité means an eligibility condition."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "fournir un document",
+      "options": [
+        "a follow-up request",
+        "to submit a file",
+        "to receive confirmation",
+        "to provide a document"
+      ],
+      "answer": 3,
+      "explain": "fournir un document means to provide a document."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "transmettre un dossier",
+      "options": [
+        "additional information",
+        "to submit a file",
+        "to receive confirmation",
+        "a follow-up request"
+      ],
+      "answer": 1,
+      "explain": "transmettre un dossier means to submit a file."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "recevoir une confirmation",
+      "options": [
+        "an eligibility condition",
+        "a follow-up request",
+        "additional information",
+        "to receive confirmation"
+      ],
+      "answer": 3,
+      "explain": "recevoir une confirmation means to receive confirmation."
+    }
+  ]
+}

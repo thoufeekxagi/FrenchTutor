@@ -1,0 +1,58 @@
+{
+  "id": "b1-u04-listening",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le logement que j'ai visité hier est lumineux. Le quartier où il se trouve est calme, mais le trajet auquel je dois penser prend presque une heure.",
+      "question": "Which feature is the main concern?",
+      "options": [
+        "The commute is long",
+        "The neighbourhood is noisy",
+        "The landlord has not replied",
+        "The apartment is dark"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the commute takes almost an hour."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La conseillère m'a présenté trois cours. Celui dont les horaires me conviennent est aussi le plus près de mon travail.",
+      "question": "Which course is the speaker considering?",
+      "options": [
+        "The course with no evening classes",
+        "The course with no placement",
+        "The one with a suitable schedule and a location near work",
+        "The one the speaker has already completed"
+      ],
+      "answer": 2,
+      "explain": "The schedule and location fit the speaker."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "J'ai choisi l'option à laquelle ma sœur m'avait inscrite. Le service dont j'avais besoin, toutefois, n'était pas compris.",
+      "question": "What was missing from the chosen option?",
+      "options": [
+        "A place for the sister",
+        "A travel schedule",
+        "A registration form",
+        "A needed service"
+      ],
+      "answer": 3,
+      "explain": "The needed service was not included."
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "id": "a2-u02-words-5",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Words: describe a reaction and its cause",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "soulagé / soulagée",
+      "en": "relieved",
+      "say": "soulagé, soulagée",
+      "sound": "soo-lah-ZHAY",
+      "exampleFr": "Je suis soulagée après l'appel.",
+      "exampleEn": "I am relieved after the call."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "surpris / surprise",
+      "en": "surprised",
+      "say": "surpris, surprise",
+      "sound": "sür-PREE / sür-PREEZ",
+      "exampleFr": "Il est surpris par le résultat.",
+      "exampleEn": "He is surprised by the result."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "inquiet / inquiète",
+      "en": "worried",
+      "say": "inquiet, inquiète",
+      "sound": "ah(n)-KYEH / ah(n)-KYEHT",
+      "exampleFr": "Elle est inquiète pour le colis.",
+      "exampleEn": "She is worried about the parcel."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "déçu / déçue",
+      "en": "disappointed",
+      "say": "déçu, déçue",
+      "sound": "day-SÜ",
+      "exampleFr": "Nous sommes déçus par le retard.",
+      "exampleEn": "We are disappointed by the delay."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "heureusement",
+      "en": "fortunately",
+      "sound": "uh-ruh-ZMÄ(N)",
+      "exampleFr": "Heureusement, le bureau est encore ouvert.",
+      "exampleEn": "Fortunately, the office is still open."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "malheureusement",
+      "en": "unfortunately",
+      "sound": "mah-luh-ruh-ZMÄ(N)",
+      "exampleFr": "Malheureusement, le colis n'arrive pas aujourd'hui.",
+      "exampleEn": "Unfortunately, the parcel is not arriving today."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "grâce à",
+      "en": "thanks to",
+      "sound": "grahs ah",
+      "exampleFr": "Grâce à toi, j'ai trouvé la salle.",
+      "exampleEn": "Thanks to you, I found the room."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "à cause de",
+      "en": "because of",
+      "sound": "ah kohz duh",
+      "exampleFr": "Le cours a changé à cause du problème.",
+      "exampleEn": "The class changed because of the problem."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "soulagé / soulagée",
+      "options": [
+        "disappointed",
+        "relieved",
+        "thanks to",
+        "surprised"
+      ],
+      "answer": 1,
+      "explain": "soulagé / soulagée means relieved."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "surpris / surprise",
+      "options": [
+        "fortunately",
+        "because of",
+        "worried",
+        "surprised"
+      ],
+      "answer": 3,
+      "explain": "surpris / surprise means surprised."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "inquiet / inquiète",
+      "options": [
+        "unfortunately",
+        "worried",
+        "relieved",
+        "disappointed"
+      ],
+      "answer": 1,
+      "explain": "inquiet / inquiète means worried."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "déçu / déçue",
+      "options": [
+        "thanks to",
+        "surprised",
+        "fortunately",
+        "disappointed"
+      ],
+      "answer": 3,
+      "explain": "déçu / déçue means disappointed."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "heureusement",
+      "options": [
+        "because of",
+        "fortunately",
+        "worried",
+        "unfortunately"
+      ],
+      "answer": 1,
+      "explain": "heureusement means fortunately."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "malheureusement",
+      "options": [
+        "relieved",
+        "disappointed",
+        "thanks to",
+        "unfortunately"
+      ],
+      "answer": 3,
+      "explain": "malheureusement means unfortunately."
+    }
+  ]
+}

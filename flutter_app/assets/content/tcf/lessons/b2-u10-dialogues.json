@@ -1,0 +1,84 @@
+{
+  "id": "b2-u10-dialogues",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Three voices, three priorities",
+      "body": "A facilitator summarizes an invented community meeting.",
+      "examples": [
+        {
+          "fr": "Mina propose d'ouvrir la salle le soir.",
+          "en": "Facilitatrice: Mina proposes opening the room in the evening."
+        },
+        {
+          "fr": "Plusieurs participants travaillent pendant la journée.",
+          "en": "Mina: Several participants work during the day."
+        },
+        {
+          "fr": "Je comprends, mais le transport est moins fréquent tard le soir.",
+          "en": "Louis: I understand, but transport is less frequent late in the evening."
+        },
+        {
+          "fr": "Nous pourrions tester deux soirées par mois.",
+          "en": "Chen: We could test two evenings per month."
+        },
+        {
+          "fr": "Les trois propositions tiennent compte de l'accès, mais pas de la même manière.",
+          "en": "Facilitatrice: All three proposals consider access, but not in the same way."
+        },
+        {
+          "fr": "D'accord. Pour le transport, il faudra en parler avec l'organisme concerné.",
+          "en": "Louis: Agreed. For transportation, we will need to discuss it with the relevant organization."
+        },
+        {
+          "fr": "Et nous y reviendrons après le premier essai.",
+          "en": "Mina: And we will return to it after the first trial."
+        },
+        {
+          "fr": "Je noterai les points d'accord et les questions à suivre.",
+          "en": "Facilitatrice: I will record the points of agreement and the questions to follow up."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Replying to an objection",
+      "body": "A learner clarifies which proposal a pronoun refers to.",
+      "examples": [
+        {
+          "fr": "La proposition de Chen prévoit deux soirées.",
+          "en": "Sam: Chen's proposal includes two evenings."
+        },
+        {
+          "fr": "Et celle de Mina ?",
+          "en": "Awa: And Mina's?"
+        },
+        {
+          "fr": "Elle propose une ouverture chaque soir de semaine.",
+          "en": "Sam: She proposes opening every weekday evening."
+        },
+        {
+          "fr": "Alors, quand tu dis 'y revenir', tu parles de la proposition de Chen ?",
+          "en": "Awa: So when you say 'return to it', do you mean Chen's proposal?"
+        },
+        {
+          "fr": "Oui, pour éviter toute ambiguïté, je vais répéter son nom.",
+          "en": "Sam: Yes, to avoid any ambiguity, I will repeat its name."
+        }
+      ]
+    }
+  ]
+}

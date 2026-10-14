@@ -1,0 +1,99 @@
+{
+  "id": "b2-u03-grammar-a",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Grammar: Relative clauses: choose the form from the relationship, not from English word order",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Relative clauses: choose the form from the relationship, not from English word order",
+      "body": "A relative clause lets you specify a person, thing or idea without starting a new sentence. Choose qui when the relative pronoun is the subject, que for a direct object, dont when the missing link would use de, and où for a place or time. After many prepositions, use lequel / laquelle / lesquels / lesquelles; with à and de, forms combine (e.g. auquel, duquel). Use ce qui / ce que / ce dont when there is no specific noun before the clause. Test the verb or expression: avoir besoin de → dont; s'intéresser à → auquel."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Relative clauses: choose the form from the relationship, not from English word order",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Subject",
+          "qui",
+          "Le cours qui commence en septembre est intensif.",
+          "The course that starts in September is intensive."
+        ],
+        [
+          "Direct object",
+          "que",
+          "Le dossier que j'ai envoyé est complet.",
+          "The file that I sent is complete."
+        ],
+        [
+          "Link with de",
+          "dont",
+          "Les compétences dont elle a besoin sont précises.",
+          "The skills she needs are specific."
+        ],
+        [
+          "After à + thing",
+          "auquel / à laquelle",
+          "Le programme auquel je pense dure un an.",
+          "The program I am thinking of lasts a year."
+        ],
+        [
+          "No named antecedent",
+          "ce qui / ce que / ce dont",
+          "Ce qui compte, c'est l'horaire.",
+          "What matters is the schedule."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the correct form: les critères ___ le programme fait référence.",
+      "options": [
+        "auxquels",
+        "que",
+        "qui",
+        "où"
+      ],
+      "answer": 0,
+      "explain": "Faire référence à takes à; with plural masculine critères, use auxquels."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose: les documents ___ j'ai besoin.",
+      "options": [
+        "lesquels",
+        "qui",
+        "dont",
+        "où"
+      ],
+      "answer": 2,
+      "explain": "Avoir besoin de requires dont."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "In ce qui me manque, what is qui?",
+      "options": [
+        "A direct object",
+        "The subject of the relative clause",
+        "A place marker",
+        "A possessive"
+      ],
+      "answer": 1,
+      "explain": "Qui is the subject of me manque."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "a2-u11-reading",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which two items are requested?",
+      "options": [
+        "A double-sided copy and proof of address",
+        "A delivery receipt and tracking number",
+        "A payment option and a written reply",
+        "A repair appointment and an appliance manual"
+      ],
+      "answer": 0,
+      "explain": "The form message names a copy and proof of address.",
+      "promptFr": "FORMULAIRE — Une signature manque. Joindre une copie recto verso et un justificatif de domicile."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is the next delivery time slot?",
+      "options": [
+        "Thursday from 2 to 4 p.m.",
+        "Tuesday from 2 to 4 p.m.",
+        "Thursday morning",
+        "Friday from 4 to 6 p.m."
+      ],
+      "answer": 0,
+      "explain": "The notice says the next time slot is Thursday from 14 h to 16 h.",
+      "promptFr": "LIVRAISON — Tentative de livraison : mardi. Créneau : jeudi, de 14 h à 16 h."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What number does the message provide?",
+      "options": [
+        "The tracking number",
+        "The confirmation page",
+        "The account number",
+        "The repair number"
+      ],
+      "answer": 0,
+      "explain": "The message labels 4071 as the tracking number.",
+      "promptFr": "MESSAGE AUTOMATIQUE — Votre numéro de suivi est 4071. Confirmation de livraison après le passage."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What will the service provide?",
+      "options": [
+        "A written reply",
+        "A new delivery",
+        "A repair appointment",
+        "A replacement appliance"
+      ],
+      "answer": 0,
+      "explain": "The service notice says it will provide a written reply.",
+      "promptFr": "SERVICE — Une modification de facture est en traitement. Le service donne une réponse écrite dans deux jours."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "When is the maintenance appointment?",
+      "options": [
+        "Thursday at 10 a.m.",
+        "Tuesday at 10 a.m.",
+        "Thursday at 2 p.m.",
+        "Friday at 10 a.m."
+      ],
+      "answer": 0,
+      "explain": "The notice gives Thursday at 10 h.",
+      "promptFr": "ENTRETIEN — Détecteur de fumée : rendez-vous jeudi à 10 h. Contact principal : Nadia."
+    }
+  ]
+}

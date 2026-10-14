@@ -1,0 +1,194 @@
+{
+  "id": "a2-u06-words-5",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Words: space, comfort and condition",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "spacieux",
+      "en": "spacious",
+      "sound": "spah-SYUH",
+      "exampleFr": "Le logement est spacieux.",
+      "exampleEn": "The home is spacious."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "étroit",
+      "en": "narrow; cramped",
+      "sound": "ay-TRWAH",
+      "exampleFr": "Le couloir est étroit.",
+      "exampleEn": "The hallway is narrow."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "lumineux",
+      "en": "bright",
+      "sound": "lü-mee-NUH",
+      "exampleFr": "Le logement est lumineux le matin.",
+      "exampleEn": "The home is bright in the morning."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "sombre",
+      "en": "dark",
+      "sound": "SOH(N)br",
+      "exampleFr": "La pièce est sombre le soir.",
+      "exampleEn": "The room is dark in the evening."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "abordable",
+      "en": "affordable",
+      "sound": "ah-bohr-DAHBL",
+      "exampleFr": "Le loyer reste abordable.",
+      "exampleEn": "The rent remains affordable."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "bien isolé",
+      "en": "well insulated",
+      "sound": "byah(n) ee-zoh-LAY",
+      "exampleFr": "Le logement est bien isolé.",
+      "exampleEn": "The home is well insulated."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "insonorisé",
+      "en": "soundproofed",
+      "sound": "a(n)-soh-noh-ree-ZAY",
+      "exampleFr": "Le mur est insonorisé.",
+      "exampleEn": "The wall is soundproofed."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "bien situé",
+      "en": "well located",
+      "sound": "byah(n) see-tü-AY",
+      "exampleFr": "Le logement est bien situé près de la gare.",
+      "exampleEn": "The home is well located near the station."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "spacieux",
+      "options": [
+        "dark",
+        "spacious",
+        "soundproofed",
+        "narrow; cramped"
+      ],
+      "answer": 1,
+      "explain": "spacieux means spacious."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "étroit",
+      "options": [
+        "affordable",
+        "well located",
+        "bright",
+        "narrow; cramped"
+      ],
+      "answer": 3,
+      "explain": "étroit means narrow; cramped."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "lumineux",
+      "options": [
+        "well insulated",
+        "bright",
+        "spacious",
+        "dark"
+      ],
+      "answer": 1,
+      "explain": "lumineux means bright."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "sombre",
+      "options": [
+        "soundproofed",
+        "narrow; cramped",
+        "affordable",
+        "dark"
+      ],
+      "answer": 3,
+      "explain": "sombre means dark."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "abordable",
+      "options": [
+        "well located",
+        "affordable",
+        "bright",
+        "well insulated"
+      ],
+      "answer": 1,
+      "explain": "abordable means affordable."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "bien isolé",
+      "options": [
+        "spacious",
+        "dark",
+        "soundproofed",
+        "well insulated"
+      ],
+      "answer": 3,
+      "explain": "bien isolé means well insulated."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "étroit",
+      "question": "Which word did you hear?",
+      "options": [
+        "sombre",
+        "étroit",
+        "bien isolé",
+        "bien situé"
+      ],
+      "answer": 1,
+      "explain": "You heard étroit: narrow; cramped."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "sombre",
+      "question": "Which word did you hear?",
+      "options": [
+        "sombre",
+        "bien isolé",
+        "bien situé",
+        "étroit"
+      ],
+      "answer": 0,
+      "explain": "You heard sombre: dark."
+    }
+  ]
+}

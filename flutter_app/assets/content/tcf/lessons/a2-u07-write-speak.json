@@ -1,0 +1,42 @@
+{
+  "id": "a2-u07-write-speak",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Contact a clinic with useful details",
+      "body": "Write 60–90 French words to a fictional clinic. Give a neutral description, when it began, one timing detail and one clear question. Use one sentence with qui, que or où. Do not diagnose yourself or suggest a treatment; this is language practice, not a medical message template for urgent care.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour, J'ai un symptôme nouveau depuis deux jours. La gêne commence après le repas et dure pendant une heure. Je voudrais une consultation avec un professionnel qui peut répondre à mes questions. Est-ce que je dois apporter le formulaire que la clinique m'a envoyé ? Quel est le délai d'attente pour un rendez-vous en personne ? Merci, Awa\n\nCheck:\n• State the concern neutrally; do not write a diagnosis.\n• Give the duration and one specific time or frequency detail.\n• Ask one clear question about a document or next step.\n• Check whether qui, que or où matches the job in the second clause.\n• Count 60–90 words and close your notes before rewriting a different message."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Prepare for a clinic call",
+      "body": "Tell Marie what information you would give a clinic receptionist: when the concern began, when it happens and what appointment you are requesting. Marie asks which document or next step you need to clarify. Use one relative clause, then repeat the explanation with a different timeline.\n\n• Give timing and observable details, not a diagnosis.\n• Say what appointment or information you need; a receptionist may route the request.\n• Use qui for the person or service doing the action, que for the thing receiving it, and où for a place or time.\n• On the retry, change the concern and timeline and answer Marie's follow-up without notes."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Depuis hier, j'ai un symptôme nouveau. Il commence après le repas. Je cherche une consultation téléphonique avec un professionnel qui va parler avec moi.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je vais noter les questions que je veux poser et demander où se trouve la clinique.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

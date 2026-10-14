@@ -1,0 +1,58 @@
+{
+  "id": "b1-u07-listening",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La responsable a expliqué que la salle serait disponible dès dix-sept heures. Elle a aussi demandé si les bénévoles pouvaient arriver plus tôt pour installer les chaises.",
+      "question": "What did the coordinator ask the volunteers?",
+      "options": [
+        "Whether they could arrive early",
+        "Whether they could move the date",
+        "Whether they could cancel the event",
+        "Whether they had reserved a different room"
+      ],
+      "answer": 0,
+      "explain": "She asked whether they could arrive earlier to set up chairs."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Selon le compte rendu, le comité a retenu l'idée d'un essai. La durée exacte n'a pas été confirmée; elle sera discutée après la vérification du budget.",
+      "question": "What is not confirmed yet?",
+      "options": [
+        "Whether a budget exists",
+        "Whether the idea was discussed",
+        "The length of the trial",
+        "The meeting location"
+      ],
+      "answer": 2,
+      "explain": "The trial duration is still to be discussed."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Un message affirme que l'activité est annulée. Toutefois, l'organisateur dit qu'il n'a pas envoyé cette annonce et qu'il vérifiera le compte officiel.",
+      "question": "What is the speaker's main point?",
+      "options": [
+        "The organizer cancelled the activity",
+        "The account is closed",
+        "The activity moved to another room",
+        "The cancellation message is not verified"
+      ],
+      "answer": 3,
+      "explain": "The organizer says the announcement did not come from them and needs checking."
+    }
+  ]
+}

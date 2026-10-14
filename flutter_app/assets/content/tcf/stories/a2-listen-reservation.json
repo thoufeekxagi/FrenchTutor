@@ -1,0 +1,386 @@
+{
+  "id": "a2-listen-reservation",
+  "title": "Une réservation à confirmer",
+  "titleEn": "A reservation to confirm",
+  "level": "A2",
+  "mode": "listening",
+  "minutes": 4,
+  "summary": "A group dinner reservation is missing one detail, so the organizer calls back and checks the practical arrangements.",
+  "unit": "a2-u08",
+  "sentences": [
+    {
+      "fr": "Samira organise un dîner pour six collègues vendredi soir.",
+      "en": "Samira is organizing dinner for six colleagues on Friday evening."
+    },
+    {
+      "fr": "Elle réserve une table près de la fenêtre.",
+      "en": "She reserves a table near the window."
+    },
+    {
+      "fr": "Le restaurant rappelle, car il manque un numéro de téléphone.",
+      "en": "The restaurant calls back because a phone number is missing."
+    },
+    {
+      "fr": "Samira donne son numéro et confirme l'heure de sept heures.",
+      "en": "Samira gives her number and confirms the seven o'clock time."
+    },
+    {
+      "fr": "Elle mentionne aussi une allergie aux noix dans le groupe.",
+      "en": "She also mentions a nut allergy in the group."
+    },
+    {
+      "fr": "L'employé note la demande et précise que le menu sera vérifié.",
+      "en": "The employee notes the request and says the menu will be checked."
+    },
+    {
+      "fr": "Samira envoie l'adresse du restaurant aux collègues.",
+      "en": "Samira sends the restaurant address to her colleagues."
+    },
+    {
+      "fr": "Le jour venu, tout le groupe arrive à l'heure.",
+      "en": "On the day, the whole group arrives on time."
+    }
+  ],
+  "words": {
+    "samira": {
+      "en": "Samira (a woman's name)",
+      "pos": "proper name"
+    },
+    "organise": {
+      "en": "organizes (organiser)",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "dîner": {
+      "en": "lunch in Québec and much of French-speaking Canada; dinner in France",
+      "sound": "luh dee-NAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "dîner"
+    },
+    "pour": {
+      "en": "for"
+    },
+    "six": {
+      "en": "six",
+      "pos": "number"
+    },
+    "collègues": {
+      "en": "colleagues",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "plural",
+      "lemma": "collègue",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "vendredi": {
+      "en": "Friday",
+      "pos": "day"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine",
+      "sound": "swahr",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "soir"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "réserve": {
+      "en": "reserve; backup",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "table": {
+      "en": "table",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "table"
+    },
+    "près": {
+      "en": "near; close to",
+      "pos": "preposition / adverb"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "la": {
+      "en": "the"
+    },
+    "fenêtre": {
+      "en": "window",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "le": {
+      "en": "the"
+    },
+    "restaurant": {
+      "en": "restaurant",
+      "sound": "rehs-toh-RAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "restaurant"
+    },
+    "rappelle": {
+      "en": "remembers; calls back",
+      "pos": "verb",
+      "lemma": "se rappeler / rappeler",
+      "note": "Present form; context determines whether it means remember or call."
+    },
+    "car": {
+      "en": "because; for",
+      "pos": "connector",
+      "note": "Introduces a reason or explanation."
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "manque": {
+      "en": "missing detail; lack",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "numéro": {
+      "en": "number",
+      "sound": "luh nü-may-ROH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "numéro"
+    },
+    "téléphone": {
+      "en": "telephone",
+      "sound": "luh tay-lay-FOHN",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "téléphone"
+    },
+    "donne": {
+      "en": "gives (donner)",
+      "pos": "verb",
+      "sound": "dohn"
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "et": {
+      "en": "and"
+    },
+    "confirme": {
+      "en": "confirms (confirmer)",
+      "pos": "verb",
+      "sound": "koh(n)-FEERM"
+    },
+    "l'heure": {
+      "en": "time; hour",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "heure",
+      "note": "Elided la before a vowel."
+    },
+    "sept": {
+      "en": "seven",
+      "pos": "number"
+    },
+    "heures": {
+      "en": "hours, o'clock",
+      "pos": "noun, feminine plural"
+    },
+    "mentionne": {
+      "en": "mentions",
+      "pos": "verb",
+      "lemma": "mentionner",
+      "note": "Present form of mentionner."
+    },
+    "aussi": {
+      "en": "also; too",
+      "pos": "adverb"
+    },
+    "allergie": {
+      "en": "allergy",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "allergie"
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "noix": {
+      "en": "nuts",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "noix",
+      "note": "The form noix is the same in the singular and plural."
+    },
+    "dans": {
+      "en": "in"
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "l'employé": {
+      "en": "employee",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "employé",
+      "note": "Elided le before a vowel."
+    },
+    "note": {
+      "en": "writes down; notes",
+      "pos": "verb",
+      "lemma": "noter",
+      "note": "Present form of noter."
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "demande"
+    },
+    "précise": {
+      "en": "explains; specifies",
+      "pos": "verb",
+      "lemma": "préciser",
+      "note": "Present form of préciser."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "menu": {
+      "en": "set meal; menu",
+      "sound": "luh muh-NÜ",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "menu"
+    },
+    "sera": {
+      "en": "will be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Future form of être."
+    },
+    "vérifié": {
+      "en": "checked; verified",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Past participle of vérifier."
+    },
+    "envoie": {
+      "en": "sends",
+      "pos": "verb",
+      "lemma": "envoyer",
+      "note": "Present form of envoyer."
+    },
+    "l'adresse": {
+      "en": "the address",
+      "pos": "noun, feminine",
+      "sound": "lah-DREHS",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "l'adresse"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "jour": {
+      "en": "day",
+      "pos": "noun, masculine",
+      "sound": "zhoor"
+    },
+    "venu": {
+      "en": "came",
+      "pos": "verb",
+      "lemma": "venir",
+      "note": "Past participle of venir."
+    },
+    "tout": {
+      "en": "everyone; all",
+      "pos": "determiner / pronoun"
+    },
+    "arrive": {
+      "en": "arrives (arriver)",
+      "pos": "verb",
+      "sound": "ah-REEV"
+    },
+    "à": {
+      "en": "in, at"
+    }
+  },
+  "keywords": [
+    "restaurant",
+    "groupe",
+    "confirme",
+    "allergie",
+    "numéro"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why does the restaurant call back?",
+      "options": [
+        "A phone number is missing.",
+        "The table is not near a window.",
+        "The menu has changed.",
+        "The dinner is on the wrong day."
+      ],
+      "answer": 0,
+      "explain": "The restaurant says it is missing a phone number."
+    },
+    {
+      "prompt": "What food concern does Samira mention?",
+      "options": [
+        "A nut allergy",
+        "A vegetarian meal",
+        "A dairy allergy",
+        "A dislike of fish"
+      ],
+      "answer": 0,
+      "explain": "She mentions an allergy to nuts in the group."
+    },
+    {
+      "prompt": "What does Samira send to her colleagues?",
+      "options": [
+        "The restaurant address",
+        "The menu price",
+        "A parking ticket",
+        "The restaurant's phone bill"
+      ],
+      "answer": 0,
+      "explain": "She sends them the restaurant address."
+    }
+  ]
+}

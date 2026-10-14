@@ -1,0 +1,58 @@
+{
+  "id": "b1-u11-listening",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le journal du cours invite les participants à relater une expérience en 120 à 150 mots. Le texte doit inclure un commentaire personnel et une raison, mais pas une longue présentation de l'organisme.",
+      "question": "What should the text include?",
+      "options": [
+        "A list of grammar rules",
+        "A personal comment and a reason",
+        "A full history of the organization",
+        "Three unrelated stories"
+      ],
+      "answer": 1,
+      "explain": "The instructions request a personal comment and a reason."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "J'ai reçu plusieurs messages après la rencontre. La remarque qui m'a aidée était celle d'une participante; je vais l'ajouter à mon compte rendu sans reprendre tout son texte.",
+      "question": "How will the speaker use the participant's comment?",
+      "options": [
+        "Include its idea without copying the whole text",
+        "Remove all comments",
+        "Copy the entire message",
+        "Publish it as confirmed policy"
+      ],
+      "answer": 0,
+      "explain": "The speaker will use the relevant idea without copying the full message."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le brouillon compte 156 mots. La consigne autorise au maximum 150. L'auteur va supprimer une répétition, puis vérifier que les deux raisons sont encore présentes.",
+      "question": "What will the author do first?",
+      "options": [
+        "Add a new paragraph",
+        "Delete both reasons",
+        "Remove a repetition",
+        "Change the audience"
+      ],
+      "answer": 2,
+      "explain": "The author plans to remove a repetition to meet the limit."
+    }
+  ]
+}

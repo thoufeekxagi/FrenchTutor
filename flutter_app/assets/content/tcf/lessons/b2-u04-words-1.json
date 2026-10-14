@@ -1,0 +1,148 @@
+{
+  "id": "b2-u04-words-1",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un aménagement",
+      "en": "a layout; a development or improvement",
+      "sound": "uh(n) ah-may-nahzh-MAH(N)",
+      "exampleFr": "Le nouvel aménagement prévoirait une zone calme.",
+      "exampleEn": "The new layout would provide a quiet area."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la densité",
+      "en": "density",
+      "sound": "lah dahn-see-TAY",
+      "exampleFr": "La densité varie d'un quartier à l'autre.",
+      "exampleEn": "Density varies from one neighbourhood to another."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "l'accessibilité",
+      "en": "accessibility",
+      "sound": "lahk-seh-see-bee-lee-TAY",
+      "exampleFr": "L'accessibilité du lieu doit être examinée.",
+      "exampleEn": "The site's accessibility must be examined."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un déplacement",
+      "en": "a trip; a commute",
+      "sound": "uh(n) day-plahs-MAH(N)",
+      "exampleFr": "Un déplacement plus court libérerait du temps.",
+      "exampleEn": "A shorter commute would free up time."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un voisinage",
+      "en": "a neighbourhood; neighbours",
+      "sound": "uh(n) vwah-zee-NAHZH",
+      "exampleFr": "Le voisinage demande des horaires prévisibles.",
+      "exampleEn": "The neighbours ask for predictable hours."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une contrainte",
+      "en": "a constraint",
+      "sound": "ün kohn-TREHNT",
+      "exampleFr": "Le budget constitue une contrainte réelle.",
+      "exampleEn": "The budget is a real constraint."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un aménagement",
+      "options": [
+        "a trip; a commute",
+        "a layout; a development or improvement",
+        "density",
+        "accessibility"
+      ],
+      "answer": 1,
+      "explain": "un aménagement means a layout; a development or improvement."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la densité",
+      "options": [
+        "a neighbourhood; neighbours",
+        "accessibility",
+        "a trip; a commute",
+        "density"
+      ],
+      "answer": 3,
+      "explain": "la densité means density."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "l'accessibilité",
+      "options": [
+        "a constraint",
+        "accessibility",
+        "a trip; a commute",
+        "a neighbourhood; neighbours"
+      ],
+      "answer": 1,
+      "explain": "l'accessibilité means accessibility."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un déplacement",
+      "options": [
+        "a layout; a development or improvement",
+        "a neighbourhood; neighbours",
+        "a constraint",
+        "a trip; a commute"
+      ],
+      "answer": 3,
+      "explain": "un déplacement means a trip; a commute."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un voisinage",
+      "options": [
+        "density",
+        "a neighbourhood; neighbours",
+        "a constraint",
+        "a layout; a development or improvement"
+      ],
+      "answer": 1,
+      "explain": "un voisinage means a neighbourhood; neighbours."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une contrainte",
+      "options": [
+        "accessibility",
+        "a layout; a development or improvement",
+        "density",
+        "a constraint"
+      ],
+      "answer": 3,
+      "explain": "une contrainte means a constraint."
+    }
+  ]
+}

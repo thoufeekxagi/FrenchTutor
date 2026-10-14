@@ -1,0 +1,134 @@
+{
+  "id": "a2-u07-phrases",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Notice what each relative pronoun does. In your notes, join two short sentences about a place, document or professional; close the notes and say the combined sentence from memory."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "C'est le service qui répond aux appels.",
+      "en": "It is the service that answers calls.",
+      "tip": "Say it: seh luh sehr-VEES kee ray-POHN oh zah-PEHL"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Voici le formulaire que la clinique demande.",
+      "en": "Here is the form that the clinic asks for.",
+      "tip": "Say it: vwah-SEE luh for-mü-LEHR kuh lah klee-NEEK duh-MAH(N)d"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "C'est la clinique où j'ai mon rendez-vous.",
+      "en": "It is the clinic where I have my appointment.",
+      "tip": "Say it: seh lah klee-NEEK oo zhay mohn rah(n)-day-VOO"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je parle au professionnel qui suit mon dossier.",
+      "en": "I speak to the professional who follows my file.",
+      "tip": "Say it: zhuh parl oh proh-feh-syoh-NEHL kee swee mohn doh-SYAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je garde le message que le service a envoyé.",
+      "en": "I keep the message that the service sent.",
+      "tip": "Say it: zhuh gard luh meh-SAHZH kuh luh sehr-VEES ah ah(n)-vwah-YAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Le matin est le moment où je note les changements.",
+      "en": "Morning is the time when I write down changes.",
+      "tip": "Say it: luh mah-TA(N) eh luh moh-MAH(N) oo zhuh noht lay shahnzh-MAH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je cherche une consultation qui convient à mon horaire.",
+      "en": "I am looking for a consultation that fits my schedule.",
+      "tip": "Say it: zhuh shehrsh ün kohn-sül-tah-SYOH(N) kee kohn-VYAH(N) ah mohn oh-REHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "C'est une question que je veux poser au professionnel.",
+      "en": "It is a question that I want to ask the professional.",
+      "tip": "Say it: seh-tün keh-STYOH(N) kuh zhuh vuh poh-ZAY oh proh-feh-syoh-NEHL"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "C'est le service qui répond aux appels.",
+      "options": [
+        "I speak to the professional who follows my file.",
+        "It is the service that answers calls.",
+        "I am looking for a consultation that fits my schedule.",
+        "Here is the form that the clinic asks for."
+      ],
+      "answer": 1,
+      "explain": "C'est le service qui répond aux appels. means It is the service that answers calls.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "C'est la clinique où j'ai mon rendez-vous.",
+      "options": [
+        "Morning is the time when I write down changes.",
+        "It is the clinic where I have my appointment.",
+        "It is the service that answers calls.",
+        "I speak to the professional who follows my file."
+      ],
+      "answer": 1,
+      "explain": "C'est la clinique où j'ai mon rendez-vous. means It is the clinic where I have my appointment.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je garde le message que le service a envoyé.",
+      "options": [
+        "It is a question that I want to ask the professional.",
+        "I keep the message that the service sent.",
+        "It is the clinic where I have my appointment.",
+        "Morning is the time when I write down changes."
+      ],
+      "answer": 1,
+      "explain": "Je garde le message que le service a envoyé. means I keep the message that the service sent.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je cherche une consultation qui convient à mon horaire.",
+      "options": [
+        "Here is the form that the clinic asks for.",
+        "I am looking for a consultation that fits my schedule.",
+        "I keep the message that the service sent.",
+        "It is a question that I want to ask the professional."
+      ],
+      "answer": 1,
+      "explain": "Je cherche une consultation qui convient à mon horaire. means I am looking for a consultation that fits my schedule.."
+    }
+  ]
+}

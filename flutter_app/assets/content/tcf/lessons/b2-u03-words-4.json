@@ -1,0 +1,148 @@
+{
+  "id": "b2-u03-words-4",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une reconnaissance professionnelle",
+      "en": "professional recognition",
+      "sound": "ün ruh-koh-neh-sahns proh-feh-syoh-NEHL",
+      "exampleFr": "La reconnaissance professionnelle valorise les compétences acquises.",
+      "exampleEn": "Professional recognition values the skills acquired."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un parcours atypique",
+      "en": "a non-traditional career path",
+      "sound": "uh(n) par-koor ah-tee-PEEK",
+      "exampleFr": "Son parcours atypique combine deux domaines.",
+      "exampleEn": "Her non-traditional career path combines two fields."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un plafond salarial",
+      "en": "a salary ceiling",
+      "sound": "uh(n) plah-fohn sah-lah-RYAL",
+      "exampleFr": "Le poste comporte un plafond salarial précis.",
+      "exampleEn": "The position has a specific salary ceiling."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "négocier un contrat",
+      "en": "to negotiate a contract",
+      "sound": "nay-goh-SYAY uh(n) kohn-TRAH",
+      "exampleFr": "Le candidat souhaite négocier un contrat à durée déterminée.",
+      "exampleEn": "The candidate wants to negotiate a fixed-term contract."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "être admissible à",
+      "en": "to be eligible for",
+      "sound": "ehtr ahd-mee-SEE-bl ah",
+      "exampleFr": "Elle vérifie si son expérience la rend admissible à la formation.",
+      "exampleEn": "She checks whether her experience makes her eligible for the training."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "renoncer à",
+      "en": "to give up; withdraw from",
+      "sound": "ruh-nohn-SAY ah",
+      "exampleFr": "Il préfère ne pas renoncer à ses études pour ce poste.",
+      "exampleEn": "He prefers not to give up his studies for this position."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une reconnaissance professionnelle",
+      "options": [
+        "to negotiate a contract",
+        "professional recognition",
+        "a non-traditional career path",
+        "a salary ceiling"
+      ],
+      "answer": 1,
+      "explain": "une reconnaissance professionnelle means professional recognition."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un parcours atypique",
+      "options": [
+        "to be eligible for",
+        "a salary ceiling",
+        "to negotiate a contract",
+        "a non-traditional career path"
+      ],
+      "answer": 3,
+      "explain": "un parcours atypique means a non-traditional career path."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un plafond salarial",
+      "options": [
+        "to give up; withdraw from",
+        "a salary ceiling",
+        "to negotiate a contract",
+        "to be eligible for"
+      ],
+      "answer": 1,
+      "explain": "un plafond salarial means a salary ceiling."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "négocier un contrat",
+      "options": [
+        "professional recognition",
+        "to be eligible for",
+        "to give up; withdraw from",
+        "to negotiate a contract"
+      ],
+      "answer": 3,
+      "explain": "négocier un contrat means to negotiate a contract."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "être admissible à",
+      "options": [
+        "a non-traditional career path",
+        "to be eligible for",
+        "to give up; withdraw from",
+        "professional recognition"
+      ],
+      "answer": 1,
+      "explain": "être admissible à means to be eligible for."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "renoncer à",
+      "options": [
+        "a salary ceiling",
+        "professional recognition",
+        "a non-traditional career path",
+        "to give up; withdraw from"
+      ],
+      "answer": 3,
+      "explain": "renoncer à means to give up; withdraw from."
+    }
+  ]
+}

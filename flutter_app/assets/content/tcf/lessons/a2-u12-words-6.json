@@ -1,0 +1,191 @@
+{
+  "id": "a2-u12-words-6",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Words: connect and respond",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "résumer",
+      "en": "to summarize",
+      "sound": "ray-zü-MAY",
+      "exampleFr": "Je peux résumer le message en deux phrases.",
+      "exampleEn": "I can summarize the message in two sentences."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "justifier",
+      "en": "to justify",
+      "sound": "zhüs-tee-fee-YAY",
+      "exampleFr": "Je peux justifier mon choix avec un détail.",
+      "exampleEn": "I can justify my choice with one detail."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "s'autoévaluer",
+      "en": "to assess oneself",
+      "sound": "soh-toh-ay-vah-lü-AY",
+      "exampleFr": "Je peux m'autoévaluer après l'essai.",
+      "exampleEn": "I can assess myself after the attempt."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "reformuler",
+      "en": "to rephrase",
+      "sound": "ruh-for-mü-LAY",
+      "exampleFr": "Je peux reformuler ma question.",
+      "exampleEn": "I can rephrase my question."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "prévenir",
+      "en": "to let someone know",
+      "sound": "pray-vuh-NEER",
+      "exampleFr": "Je peux prévenir le groupe d'un changement.",
+      "exampleEn": "I can let the group know about a change."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "interpréter",
+      "en": "to interpret",
+      "sound": "a(n)-tehr-pray-TAY",
+      "exampleFr": "Je peux interpréter la consigne avec le contexte.",
+      "exampleEn": "I can interpret the instruction using the context."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "s'adapter",
+      "en": "to adapt",
+      "sound": "sah-dahp-TAY",
+      "exampleFr": "Je peux m'adapter à un nouvel horaire.",
+      "exampleEn": "I can adapt to a new schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "résumer",
+      "options": [
+        "to rephrase",
+        "to summarize",
+        "to adapt",
+        "to assess oneself"
+      ],
+      "answer": 1,
+      "explain": "résumer means to summarize."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "justifier",
+      "options": [
+        "to let someone know",
+        "to summarize",
+        "to rephrase",
+        "to justify"
+      ],
+      "answer": 3,
+      "explain": "justifier means to justify."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "s'autoévaluer",
+      "options": [
+        "to interpret",
+        "to assess oneself",
+        "to justify",
+        "to let someone know"
+      ],
+      "answer": 1,
+      "explain": "s'autoévaluer means to assess oneself."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "reformuler",
+      "options": [
+        "to adapt",
+        "to assess oneself",
+        "to interpret",
+        "to rephrase"
+      ],
+      "answer": 3,
+      "explain": "reformuler means to rephrase."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "prévenir",
+      "options": [
+        "to summarize",
+        "to let someone know",
+        "to rephrase",
+        "to adapt"
+      ],
+      "answer": 1,
+      "explain": "prévenir means to let someone know."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "interpréter",
+      "options": [
+        "to justify",
+        "to let someone know",
+        "to summarize",
+        "to interpret"
+      ],
+      "answer": 3,
+      "explain": "interpréter means to interpret."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "justifier",
+      "question": "Which word did you hear?",
+      "options": [
+        "reformuler",
+        "justifier",
+        "interpréter",
+        "résumer"
+      ],
+      "answer": 1,
+      "explain": "You heard justifier: to justify."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "reformuler",
+      "question": "Which word did you hear?",
+      "options": [
+        "reformuler",
+        "interpréter",
+        "résumer",
+        "s'autoévaluer"
+      ],
+      "answer": 0,
+      "explain": "You heard reformuler: to rephrase."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: connect and respond",
+      "body": "This capstone uses fictional schedules, services and prices. It checks language across everyday Canadian-life contexts; it does not certify a TCF score or replace a current official practice paper."
+    }
+  ]
+}

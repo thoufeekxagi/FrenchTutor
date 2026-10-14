@@ -1,0 +1,176 @@
+{
+  "id": "b1-u04-words-1",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un critère",
+      "en": "a criterion",
+      "sound": "uh(n) kree-TEHR",
+      "exampleFr": "Le critère qui compte le plus est la distance.",
+      "exampleEn": "The criterion that matters most is distance."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un quartier",
+      "en": "a neighbourhood",
+      "sound": "uh(n) kahr-TYAY",
+      "exampleFr": "Le quartier où elle habite est bien desservi.",
+      "exampleEn": "The neighbourhood where she lives has good service."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un logement",
+      "en": "a home; accommodation",
+      "sound": "uh(n) lozh-MAH(N)",
+      "exampleFr": "Le logement dont il parle est près du métro.",
+      "exampleEn": "The home he is talking about is near the metro."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un propriétaire",
+      "en": "a landlord; owner",
+      "sound": "uh(n) proh-pryay-TEHR",
+      "exampleFr": "Le propriétaire à qui j'ai écrit a répondu hier.",
+      "exampleEn": "The landlord I wrote to replied yesterday."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un service inclus",
+      "en": "an included service",
+      "sound": "uh(n) sehr-VEES an-klü",
+      "exampleFr": "Le service inclus auquel je tiens est l'accès à Internet.",
+      "exampleEn": "The included service I value is Internet access."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un trajet",
+      "en": "a commute; a trip",
+      "sound": "uh(n) trah-ZHEH",
+      "exampleFr": "Le trajet que je fais chaque jour dure trente minutes.",
+      "exampleEn": "The commute I make every day takes thirty minutes."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un critère",
+      "options": [
+        "a landlord; owner",
+        "a criterion",
+        "a neighbourhood",
+        "a home; accommodation"
+      ],
+      "answer": 1,
+      "explain": "un critère means a criterion."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un quartier",
+      "options": [
+        "an included service",
+        "a home; accommodation",
+        "a landlord; owner",
+        "a neighbourhood"
+      ],
+      "answer": 3,
+      "explain": "un quartier means a neighbourhood."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un logement",
+      "options": [
+        "a commute; a trip",
+        "a home; accommodation",
+        "a landlord; owner",
+        "an included service"
+      ],
+      "answer": 1,
+      "explain": "un logement means a home; accommodation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un propriétaire",
+      "options": [
+        "a criterion",
+        "an included service",
+        "a commute; a trip",
+        "a landlord; owner"
+      ],
+      "answer": 3,
+      "explain": "un propriétaire means a landlord; owner."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un service inclus",
+      "options": [
+        "a neighbourhood",
+        "an included service",
+        "a commute; a trip",
+        "a criterion"
+      ],
+      "answer": 1,
+      "explain": "un service inclus means an included service."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un trajet",
+      "options": [
+        "a home; accommodation",
+        "a criterion",
+        "a neighbourhood",
+        "a commute; a trip"
+      ],
+      "answer": 3,
+      "explain": "un trajet means a commute; a trip."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un quartier",
+      "question": "Which word did you hear?",
+      "options": [
+        "un propriétaire",
+        "un quartier",
+        "un critère",
+        "un logement"
+      ],
+      "answer": 1,
+      "explain": "You heard un quartier: a neighbourhood."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un logement",
+      "question": "Which word did you hear?",
+      "options": [
+        "un trajet",
+        "un quartier",
+        "un propriétaire",
+        "un logement"
+      ],
+      "answer": 3,
+      "explain": "You heard un logement: a home; accommodation."
+    }
+  ]
+}

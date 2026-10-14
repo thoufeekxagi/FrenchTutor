@@ -1,0 +1,75 @@
+{
+  "id": "b2-u08-checkpoint",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does un témoignage mean?",
+      "options": [
+        "An account or testimony",
+        "A deadline",
+        "A budget",
+        "A device"
+      ],
+      "answer": 0,
+      "explain": "Un témoignage is an account or testimony."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What must a fair summary preserve?",
+      "options": [
+        "Only the writer's opinion",
+        "A different claim",
+        "Who said what and with what limits",
+        "One person's story as universal"
+      ],
+      "answer": 2,
+      "explain": "Fair reporting preserves attribution and qualification."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "A past speaker says 'I am learning'. Which form may appear in indirect speech?",
+      "options": [
+        "Elle a dit qu'elle apprends",
+        "Elle a dit qu'elle apprenne",
+        "Elle a dit qu'elle apprendra hier",
+        "Elle a dit qu'elle apprenait"
+      ],
+      "answer": 3,
+      "explain": "A present form may shift to the imperfect after a past reporting verb."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does un point commun mean?",
+      "options": [
+        "A deadline",
+        "A shared point",
+        "A resource",
+        "A disagreement"
+      ],
+      "answer": 1,
+      "explain": "Un point commun is something shared."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Does one account prove that a method suits everyone?",
+      "options": [
+        "No, it illustrates one experience",
+        "Only if it is a quote",
+        "Only if it is recent",
+        "Yes, automatically"
+      ],
+      "answer": 0,
+      "explain": "A personal account alone does not establish a universal result."
+    }
+  ]
+}

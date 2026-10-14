@@ -1,0 +1,166 @@
+{
+  "id": "a2-u07-words-5",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Words: questions and next steps",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une question précise",
+      "en": "a specific question",
+      "sound": "ün keh-STYOH(N) pray-SEEZ",
+      "exampleFr": "Je pose une question précise au service.",
+      "exampleEn": "I ask the service a specific question."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une consigne écrite",
+      "en": "a written instruction",
+      "sound": "ün kohn-SEEN-yuh ay-KREET",
+      "exampleFr": "Je demande une consigne écrite à la clinique.",
+      "exampleEn": "I ask the clinic for written instructions."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un appel de suivi",
+      "en": "a follow-up call",
+      "sound": "uh(n) ah-PEHL duh swee-VEE",
+      "exampleFr": "La clinique prévoit un appel de suivi.",
+      "exampleEn": "The clinic schedules a follow-up call."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un service d'accueil",
+      "en": "a reception service",
+      "sound": "uh(n) sehr-VEES dah-KUHY",
+      "exampleFr": "Le service d'accueil confirme l'heure de mon rendez-vous.",
+      "exampleEn": "The reception service confirms my appointment time."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un professionnel disponible",
+      "en": "an available health professional",
+      "sound": "uh(n) proh-feh-syoh-NEHL dee-spoh-NEEBL",
+      "exampleFr": "Je cherche un professionnel disponible pour un rendez-vous.",
+      "exampleEn": "I am looking for an available health professional for an appointment."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un rendez-vous prioritaire",
+      "en": "a priority appointment",
+      "sound": "uh(n) rah(n)-day-VOO pree-oh-ree-TEHR",
+      "exampleFr": "Je demande si un rendez-vous prioritaire est possible.",
+      "exampleEn": "I ask whether a priority appointment is possible."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un document à apporter",
+      "en": "a document to bring",
+      "sound": "uh(n) doh-kü-MAH(N) ah ah-por-TAY",
+      "exampleFr": "Je demande quel document je dois apporter.",
+      "exampleEn": "I ask which document I should bring."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "la prochaine étape",
+      "en": "the next step",
+      "sound": "lah proh-SHEN ay-TAHP",
+      "exampleFr": "La clinique m'explique la prochaine étape.",
+      "exampleEn": "The clinic explains the next step to me."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une question précise",
+      "options": [
+        "a reception service",
+        "a specific question",
+        "a document to bring",
+        "a written instruction"
+      ],
+      "answer": 1,
+      "explain": "une question précise means a specific question."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une consigne écrite",
+      "options": [
+        "an available health professional",
+        "the next step",
+        "a follow-up call",
+        "a written instruction"
+      ],
+      "answer": 3,
+      "explain": "une consigne écrite means a written instruction."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un appel de suivi",
+      "options": [
+        "a priority appointment",
+        "a follow-up call",
+        "a specific question",
+        "a reception service"
+      ],
+      "answer": 1,
+      "explain": "un appel de suivi means a follow-up call."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un service d'accueil",
+      "options": [
+        "a document to bring",
+        "a written instruction",
+        "an available health professional",
+        "a reception service"
+      ],
+      "answer": 3,
+      "explain": "un service d'accueil means a reception service."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un professionnel disponible",
+      "options": [
+        "the next step",
+        "an available health professional",
+        "a follow-up call",
+        "a priority appointment"
+      ],
+      "answer": 1,
+      "explain": "un professionnel disponible means an available health professional."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un rendez-vous prioritaire",
+      "options": [
+        "a specific question",
+        "a reception service",
+        "a document to bring",
+        "a priority appointment"
+      ],
+      "answer": 3,
+      "explain": "un rendez-vous prioritaire means a priority appointment."
+    }
+  ]
+}

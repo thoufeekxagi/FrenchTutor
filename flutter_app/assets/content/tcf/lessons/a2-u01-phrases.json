@@ -1,0 +1,148 @@
+{
+  "id": "a2-u01-phrases",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Try each phrase before reading its meaning. Choose one that is true for you, then change the day, time or activity so it describes your own week."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "D'habitude, je commence tôt, mais je termine tard.",
+      "en": "I usually start early, but I finish late.",
+      "tip": "Say it: dah-bee-TÜD zhuh koh-MAH(N)S TOH meh zhuh tehr-MEEN TAHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Chaque matin, je vérifie mon horaire.",
+      "en": "Every morning, I check my schedule.",
+      "tip": "Say it: shahk mah-TA(N) zhuh vay-ree-FEE moh(n) oh-REHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "En général, je révise après le travail.",
+      "en": "Generally, I review after work.",
+      "tip": "Say it: ah(n) zhay-nay-RAHL zhuh ray-VEEZ ah-preh luh trah-VAHY"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "J'ai une journée chargée parce que j'ai un atelier.",
+      "en": "I have a busy day because I have a workshop.",
+      "tip": "Say it: zhay ün zhoor-NAY shar-ZHAY parsk zh-ay uh(n) ah-tuh-LYAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je suis fatigué, donc je prends une pause.",
+      "en": "I am tired, so I take a break.",
+      "tip": "Say it: zhuh swee fah-tee-GAY dohnk zhuh prah(n) ün pohz"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "D'abord, je termine ma tâche; ensuite, je me repose.",
+      "en": "First, I finish my task; then I rest.",
+      "tip": "Say it: dah-BOR zhuh tehr-MEEN mah tahsh; ah(n)-SWHEET zhuh muh ruh-POHZ"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Si j'ai bien compris, la séance est jeudi.",
+      "en": "If I understood correctly, the session is Thursday.",
+      "tip": "Say it: see zhay byah(n) kohn-PREE lah say-AH(N)S eh zhuh-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Tu peux préciser l'heure, s'il te plaît ?",
+      "en": "Can you clarify the time, please?",
+      "tip": "Say it: tü puh pray-see-ZAY luhr seel tuh pleh"
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Je veux dire mardi, pas mercredi.",
+      "en": "I mean Tuesday, not Wednesday.",
+      "tip": "Say it: zhuh vuh DEER mahr-DEE pah mehr-kruh-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Ça dépend de mon horaire; je te confirme ce soir.",
+      "en": "It depends on my schedule; I'll confirm tonight.",
+      "tip": "Say it: sah day-pah(n) duh moh(n) oh-REHR zhuh tuh kohn-FEERM suh swahr"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "D'habitude, je commence tôt, mais je termine tard.",
+      "options": [
+        "I have a busy day because I have a workshop.",
+        "I usually start early, but I finish late.",
+        "If I understood correctly, the session is Thursday.",
+        "It depends on my schedule; I'll confirm tonight."
+      ],
+      "answer": 1,
+      "explain": "D'habitude, je commence tôt, mais je termine tard. means I usually start early, but I finish late.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "En général, je révise après le travail.",
+      "options": [
+        "First, I finish my task; then I rest.",
+        "Generally, I review after work.",
+        "I mean Tuesday, not Wednesday.",
+        "Every morning, I check my schedule."
+      ],
+      "answer": 1,
+      "explain": "En général, je révise après le travail. means Generally, I review after work.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Je suis fatigué, donc je prends une pause.",
+      "options": [
+        "Can you clarify the time, please?",
+        "I am tired, so I take a break.",
+        "I usually start early, but I finish late.",
+        "I have a busy day because I have a workshop."
+      ],
+      "answer": 1,
+      "explain": "Je suis fatigué, donc je prends une pause. means I am tired, so I take a break.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Si j'ai bien compris, la séance est jeudi.",
+      "options": [
+        "It depends on my schedule; I'll confirm tonight.",
+        "If I understood correctly, the session is Thursday.",
+        "Generally, I review after work.",
+        "First, I finish my task; then I rest."
+      ],
+      "answer": 1,
+      "explain": "Si j'ai bien compris, la séance est jeudi. means If I understood correctly, the session is Thursday.."
+    }
+  ]
+}

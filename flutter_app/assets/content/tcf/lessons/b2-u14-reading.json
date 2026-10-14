@@ -1,0 +1,66 @@
+{
+  "id": "b2-u14-reading",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why include a new transfer task?",
+      "options": [
+        "To replace every skill result with one score",
+        "To guarantee an exam level",
+        "To remove the need for feedback",
+        "To check whether learning applies beyond a repeated exercise"
+      ],
+      "answer": 3,
+      "explain": "A new task checks whether the skill transfers to unfamiliar content.",
+      "promptFr": "Un bilan d'apprentissage utile présente séparément la compréhension orale, la compréhension écrite, la production orale et la production écrite. Il inclut aussi une tâche de transfert avec un sujet nouveau. La répétition d'un même exercice peut montrer une amélioration sur cet exercice, mais elle ne suffit pas à démontrer une compétence générale. Le bilan doit indiquer les conditions de passation et les limites de l'évaluation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the advice?",
+      "options": [
+        "Avoid checking agreement",
+        "Keep precise vocabulary but use structures the learner controls",
+        "Remove the main argument",
+        "Make every sentence longer"
+      ],
+      "answer": 1,
+      "explain": "The learner should prefer clear, controlled structures over unnecessary complexity.",
+      "promptFr": "Lors d'une révision, le candidat a remplacé plusieurs mots simples par des expressions plus complexes. Certaines nouvelles phrases contenaient des erreurs d'accord et rendaient le lien logique moins clair. Le correcteur lui a conseillé de garder les mots précis, mais de rétablir des structures qu'il maîtrise. La complexité n'est utile que si le sens reste clair."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should the app not claim?",
+      "options": [
+        "An official equivalence based only on course performance",
+        "A learner's areas for improvement",
+        "A task's word range",
+        "Separate skill results"
+      ],
+      "answer": 0,
+      "explain": "Only the test authority provides official score equivalencies.",
+      "promptFr": "Le relevé présente quatre résultats distincts. Il ne les additionne pas en une seule note de cours, car la performance peut varier selon la compétence. Les équivalences officielles doivent être établies par l'organisme responsable du test, et non par l'application."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What do both documents value?",
+      "options": [
+        "A single online platform",
+        "The same schedule for everyone",
+        "Participation",
+        "Shorter meetings"
+      ],
+      "answer": 2,
+      "explain": "Both documents value participation, despite preferring different formats.",
+      "promptFr": "Document A — Une rencontre de quartier devrait rester en personne, car les échanges spontanés permettent de poser des questions et de mieux comprendre les besoins locaux. Document B — Une rencontre hybride peut faciliter la participation des personnes qui travaillent le soir ou habitent loin. Les organisateurs doivent toutefois prévoir un moyen équitable de prendre la parole. Les deux textes valorisent la participation, mais proposent des formats différents."
+    }
+  ]
+}

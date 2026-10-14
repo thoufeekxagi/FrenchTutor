@@ -1,0 +1,80 @@
+{
+  "id": "b2-u01-dialogues",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A proposal at work",
+      "body": "Two colleagues discuss a pilot schedule. All figures and policy details are fictional.",
+      "examples": [
+        {
+          "fr": "Le projet propose deux jours à distance par semaine.",
+          "en": "Nadia: The proposal suggests two remote days per week."
+        },
+        {
+          "fr": "Cela réduirait les déplacements de plusieurs collègues.",
+          "en": "Marc: That would reduce several colleagues' commutes."
+        },
+        {
+          "fr": "Certes, mais certaines tâches demandent une présence sur place.",
+          "en": "Nadia: Certainly, but some tasks require being on site."
+        },
+        {
+          "fr": "C'est vrai. En revanche, les réunions de suivi pourraient rester en ligne.",
+          "en": "Marc: That's true. On the other hand, follow-up meetings could remain online."
+        },
+        {
+          "fr": "À condition que l'équipe définisse des heures communes.",
+          "en": "Nadia: Provided the team sets shared hours."
+        },
+        {
+          "fr": "Je partage cette réserve. On pourrait essayer le modèle pendant un mois.",
+          "en": "Marc: I share that reservation. We could try the model for a month."
+        },
+        {
+          "fr": "Puis comparer les résultats, sans conclure trop vite.",
+          "en": "Nadia: Then compare the results without drawing conclusions too quickly."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A listener challenges the evidence",
+      "body": "A speaker distinguishes a personal example from general evidence.",
+      "examples": [
+        {
+          "fr": "Mon trajet a diminué depuis que je travaille à distance.",
+          "en": "Sam: My commute has decreased since I started working remotely."
+        },
+        {
+          "fr": "C'est un exemple utile, mais peut-on le généraliser ?",
+          "en": "Awa: That's a useful example, but can it be generalized?"
+        },
+        {
+          "fr": "Pas à lui seul. Il faudrait aussi examiner les données de l'équipe.",
+          "en": "Sam: Not by itself. We would also need to examine the team's data."
+        },
+        {
+          "fr": "Donc, tu soutiens un essai, pas une règle permanente ?",
+          "en": "Awa: So you support a trial, not a permanent rule?"
+        },
+        {
+          "fr": "Exactement. Je suis favorable à un essai avec des critères clairs.",
+          "en": "Sam: Exactly. I support a trial with clear criteria."
+        }
+      ]
+    }
+  ]
+}

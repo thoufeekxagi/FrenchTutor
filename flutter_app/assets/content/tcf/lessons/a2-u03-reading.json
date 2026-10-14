@@ -1,0 +1,80 @@
+{
+  "id": "a2-u03-reading",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where is the welcome desk?",
+      "options": [
+        "Near the entrance",
+        "On platform two",
+        "At the service window",
+        "Beside the bus stop"
+      ],
+      "answer": 0,
+      "explain": "The notice says accueil près de l'entrée.",
+      "promptFr": "SÉANCE DE FRANÇAIS · Bibliothèque municipale · Jeudi, 18 h · Accueil près de l'entrée"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Where is the centre's address?",
+      "options": [
+        "At the end of the message",
+        "On a ticket",
+        "At the train station",
+        "In a voice message"
+      ],
+      "answer": 0,
+      "explain": "Sam says the address is at the end of the message.",
+      "promptFr": "Salut Awa, · J'ai lu ton article sur le centre. Son adresse est à la fin du message. · Sam"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where does the line change take place?",
+      "options": [
+        "At Central Station",
+        "At the public library",
+        "At the city centre desk",
+        "At the workshop"
+      ],
+      "answer": 0,
+      "explain": "The notice names the central station for the line change.",
+      "promptFr": "TITRE DE TRANSPORT · Quai : 2 · Changement de ligne : station centrale · Fin du trajet : Ottawa"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What number should the reader note?",
+      "options": [
+        "4816",
+        "4186",
+        "4861",
+        "4618"
+      ],
+      "answer": 0,
+      "explain": "The notice gives file number 4816.",
+      "promptFr": "DEMANDE 4816 · Numéro de dossier : 4816 · Réponse prévue : vendredi"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Where is the person at noon?",
+      "options": [
+        "At the library",
+        "At the workshop",
+        "At home",
+        "On the train"
+      ],
+      "answer": 0,
+      "explain": "The noon entry says bibliothèque.",
+      "promptFr": "MON JOUR · 8 h : bus pour le centre · 9 h : atelier · 12 h : bibliothèque · 14 h : retour à la maison"
+    }
+  ]
+}

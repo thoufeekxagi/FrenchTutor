@@ -1,0 +1,87 @@
+{
+  "id": "b2-u01-grammar-a",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Grammar: Concession and contrast: agree with a point without giving up your position",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Concession and contrast: agree with a point without giving up your position",
+      "body": "A strong argument can recognize a valid point and then show its limit. Use certes… mais… or bien que… for a concession, tandis que / alors que to contrast two situations, and en revanche to introduce a different side. Put the concession where it belongs: do not use a contrast word if the ideas do not actually contrast. At this stage, learn the subjunctive after bien que as a fixed pattern; Unit 5 explains the choice more fully."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Concession and contrast: agree with a point without giving up your position",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Although / even though",
+          "bien que + subjunctive",
+          "Bien que le télétravail réduise certains trajets, il ne convient pas à tous les postes.",
+          "Although remote work reduces some commutes, it does not suit every role."
+        ],
+        [
+          "Certainly…, but…",
+          "certes… mais…",
+          "Certes, les réunions en ligne sont pratiques, mais elles ne remplacent pas chaque échange.",
+          "Certainly, online meetings are convenient, but they do not replace every interaction."
+        ],
+        [
+          "By contrast",
+          "en revanche",
+          "Le premier horaire offre de la souplesse; en revanche, le second facilite la coordination.",
+          "The first schedule offers flexibility; by contrast, the second makes coordination easier."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which connector introduces a concession?",
+      "options": [
+        "en outre",
+        "bien que",
+        "en premier lieu",
+        "par conséquent"
+      ],
+      "answer": 1,
+      "explain": "Bien que introduces a concession."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does en revanche signal here?",
+      "options": [
+        "A time sequence",
+        "A quotation",
+        "A contrasting point",
+        "A cause"
+      ],
+      "answer": 2,
+      "explain": "En revanche introduces a contrasting point."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which is the best response to an overgeneralized claim?",
+      "options": [
+        "Remove the supporting example",
+        "Repeat the claim more loudly",
+        "Change every verb to the future",
+        "Add a relevant condition or limit"
+      ],
+      "answer": 3,
+      "explain": "A qualified argument names the conditions under which a claim applies."
+    }
+  ]
+}

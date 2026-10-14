@@ -1,0 +1,176 @@
+{
+  "id": "b2-u06-words-1",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une donnée personnelle",
+      "en": "personal data",
+      "sound": "ün doh-NAY pehr-soh-NEHL",
+      "exampleFr": "Le formulaire demande une donnée personnelle.",
+      "exampleEn": "The form asks for personal data."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un consentement",
+      "en": "consent",
+      "sound": "uh(n) kohn-sahn-tuh-MAH(N)",
+      "exampleFr": "Le consentement doit être expliqué clairement.",
+      "exampleEn": "Consent must be explained clearly."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un paramètre",
+      "en": "a setting; parameter",
+      "sound": "uh(n) pah-rah-MEHTR",
+      "exampleFr": "L'utilisateur peut modifier un paramètre.",
+      "exampleEn": "The user can change a setting."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une fonctionnalité",
+      "en": "a feature",
+      "sound": "ün fohnk-syoh-nah-lee-TAY",
+      "exampleFr": "La fonctionnalité simplifie une tâche précise.",
+      "exampleEn": "The feature simplifies a specific task."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un accès",
+      "en": "access",
+      "sound": "uh(n) ak-SEH",
+      "exampleFr": "Un accès sans appareil récent serait utile.",
+      "exampleEn": "Access without a recent device would be useful."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une limite",
+      "en": "a limitation",
+      "sound": "ün lee-MEET",
+      "exampleFr": "Cette limite doit être présentée aux utilisateurs.",
+      "exampleEn": "This limitation must be presented to users."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une donnée personnelle",
+      "options": [
+        "a feature",
+        "personal data",
+        "consent",
+        "a setting; parameter"
+      ],
+      "answer": 1,
+      "explain": "une donnée personnelle means personal data."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un consentement",
+      "options": [
+        "access",
+        "a setting; parameter",
+        "a feature",
+        "consent"
+      ],
+      "answer": 3,
+      "explain": "un consentement means consent."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un paramètre",
+      "options": [
+        "a limitation",
+        "a setting; parameter",
+        "a feature",
+        "access"
+      ],
+      "answer": 1,
+      "explain": "un paramètre means a setting; parameter."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une fonctionnalité",
+      "options": [
+        "personal data",
+        "access",
+        "a limitation",
+        "a feature"
+      ],
+      "answer": 3,
+      "explain": "une fonctionnalité means a feature."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès",
+      "options": [
+        "consent",
+        "access",
+        "a limitation",
+        "personal data"
+      ],
+      "answer": 1,
+      "explain": "un accès means access."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une limite",
+      "options": [
+        "a setting; parameter",
+        "personal data",
+        "consent",
+        "a limitation"
+      ],
+      "answer": 3,
+      "explain": "une limite means a limitation."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un paramètre",
+      "question": "Which word did you hear?",
+      "options": [
+        "un accès",
+        "un paramètre",
+        "un consentement",
+        "une fonctionnalité"
+      ],
+      "answer": 1,
+      "explain": "You heard un paramètre: a setting; parameter."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une fonctionnalité",
+      "question": "Which word did you hear?",
+      "options": [
+        "une limite",
+        "un paramètre",
+        "un accès",
+        "une fonctionnalité"
+      ],
+      "answer": 3,
+      "explain": "You heard une fonctionnalité: a feature."
+    }
+  ]
+}

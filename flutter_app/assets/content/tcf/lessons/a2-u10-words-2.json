@@ -1,0 +1,166 @@
+{
+  "id": "a2-u10-words-2",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Words: ingredients and prepared foods",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "des lentilles sèches",
+      "en": "dried lentils",
+      "sound": "day lah(n)-TEE-yuh sehsh",
+      "exampleFr": "Les lentilles sèches sont dans le placard.",
+      "exampleEn": "The dried lentils are in the cupboard."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "du lait végétal",
+      "en": "plant-based milk",
+      "sound": "dü leh vay-zhay-TAHL",
+      "exampleFr": "Je prends du lait végétal pour le café.",
+      "exampleEn": "I take plant-based milk for the coffee."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une boisson sans sucre",
+      "en": "a sugar-free drink",
+      "sound": "ün bwah-SOH(N) sah(n) sükr",
+      "exampleFr": "J'apporte une boisson sans sucre pour le repas.",
+      "exampleEn": "I bring a sugar-free drink for the meal."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une sauce maison",
+      "en": "homemade sauce",
+      "sound": "ün sohs meh-ZOH(N)",
+      "exampleFr": "Je prépare une sauce maison pour les légumes.",
+      "exampleEn": "I make homemade sauce for the vegetables."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un ingrédient principal",
+      "en": "a main ingredient",
+      "sound": "uh(n) a(n)-gray-DYAH(N) pree(n)-see-PAHL",
+      "exampleFr": "Les lentilles sont l'ingrédient principal de la soupe.",
+      "exampleEn": "Lentils are the main ingredient in the soup."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un repas sans gluten",
+      "en": "a gluten-free meal",
+      "sound": "uh(n) ruh-PAH sah(n) glü-TEHN",
+      "exampleFr": "Je choisis un repas sans gluten pour ma collègue.",
+      "exampleEn": "I choose a gluten-free meal for my colleague."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un produit congelé",
+      "en": "a frozen product",
+      "sound": "uh(n) proh-DÜEE kohn-zhuh-LAY",
+      "exampleFr": "Je garde le produit congelé au congélateur.",
+      "exampleEn": "I keep the frozen product in the freezer."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un plat préparé",
+      "en": "a prepared dish",
+      "sound": "uh(n) plah pray-pah-RAY",
+      "exampleFr": "Je réchauffe un plat préparé pour le dîner.",
+      "exampleEn": "I reheat a prepared dish for dinner."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "des lentilles sèches",
+      "options": [
+        "homemade sauce",
+        "dried lentils",
+        "a frozen product",
+        "plant-based milk"
+      ],
+      "answer": 1,
+      "explain": "des lentilles sèches means dried lentils."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "du lait végétal",
+      "options": [
+        "a main ingredient",
+        "a prepared dish",
+        "a sugar-free drink",
+        "plant-based milk"
+      ],
+      "answer": 3,
+      "explain": "du lait végétal means plant-based milk."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une boisson sans sucre",
+      "options": [
+        "dried lentils",
+        "a sugar-free drink",
+        "homemade sauce",
+        "a frozen product"
+      ],
+      "answer": 1,
+      "explain": "une boisson sans sucre means a sugar-free drink."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une sauce maison",
+      "options": [
+        "a frozen product",
+        "plant-based milk",
+        "a main ingredient",
+        "homemade sauce"
+      ],
+      "answer": 3,
+      "explain": "une sauce maison means homemade sauce."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un ingrédient principal",
+      "options": [
+        "a prepared dish",
+        "a main ingredient",
+        "a sugar-free drink",
+        "a gluten-free meal"
+      ],
+      "answer": 1,
+      "explain": "un ingrédient principal means a main ingredient."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un repas sans gluten",
+      "options": [
+        "dried lentils",
+        "homemade sauce",
+        "a frozen product",
+        "a gluten-free meal"
+      ],
+      "answer": 3,
+      "explain": "un repas sans gluten means a gluten-free meal."
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "id": "b1-u12-write-speak",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word account for a fictional community newsletter about an experience involving a change or a shared decision. Recount what happened, report one person's view accurately, give your brief opinion with a reason and suggest a proportionate next step.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Le mois dernier, j'ai participé à une rencontre sur les activités du centre communautaire. La première salle avait été réservée, mais l'organisatrice a découvert qu'elle n'était pas accessible. Le groupe a été déplacé dans un autre local et la séance a commencé avec un peu de retard. Une participante a expliqué qu'une option en ligne l'aiderait à venir plus souvent, car elle habite loin. Un autre membre a toutefois rappelé que sa connexion à la maison n'était pas stable. À mon avis, le centre devrait essayer un format hybride pendant quelques semaines, puis demander des commentaires. Les deux personnes ont décrit leur expérience; leurs réponses ne représentent pas nécessairement tout le quartier. Il faudrait donc vérifier combien de membres pourraient utiliser chaque formule avant de prendre une décision permanente. Cette rencontre m'a appris qu'une solution pratique doit aussi tenir compte des besoins différents.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Recount the event and report another person's view accurately.\n• Make your position brief and support it with a reason.\n• Keep the proposed next step proportionate to the evidence."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Writing: TCF Task 1 practice",
+      "body": "Write a 60–120-word message to the fictional committee asking where to find the next update and when members can send comments. Target 70–90 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Model answer",
+      "body": "Bonjour, J'ai lu la note sur les options à l'étude pour les activités du centre. Pourriez-vous me dire où la prochaine mise à jour sera publiée ? J'aimerais aussi savoir si les membres peuvent encore transmettre leurs commentaires après le 20 juin. Si le comité organise une courte rencontre de consultation, pourriez-vous m'indiquer comment y participer ? Merci de me confirmer les prochaines étapes. Cordialement, Awa\n\nCheck:\n• Official Task 1 range: 60–120 words.\n• Ask for the information that is still missing.\n• Use an appropriate greeting and closing."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 capstone. A fictional notice says a community centre is reviewing its evening activities. Prepare for two minutes; ask what options are being considered, how members can comment, when a decision will be made and where updates will appear. Interact for 3 minutes 30. Marie should give a partial answer, then ask you to confirm what you understood.\n\n• Complete the interaction without notes after the preparation period.\n• Ask questions based on information that is actually missing from the notice.\n• Do not report a proposal as a decision."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de la consultation. Pourriez-vous me dire quelles options sont actuellement à l'étude ? Comment les membres peuvent-ils envoyer leurs commentaires ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'aimerais aussi savoir quand le comité prendra une décision. Si j'ai bien compris, aucune formule n'a encore été choisie. Où pourrai-je consulter la prochaine mise à jour ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Merci de confirmer : les commentaires sont acceptés jusqu'au 20 juin, c'est bien cela ?",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "explain",
+      "id": "e6",
+      "title": "Speaking: TCF oral Task 3: a brief unprepared viewpoint",
+      "body": "Without preparation, respond for 60–90 seconds to: Les activités communautaires devraient-elles toujours être proposées en ligne ? State your view, give two brief reasons or one reason and example, recognize one limitation and answer Marie's follow-up. This is B1-length practice; the official oral Task 3 lasts 4 minutes 30.\n\n• This oral Task 3 asks for your own spontaneous viewpoint; it is not a comparison of written sources.\n• Start with one clear answer, then support it with a reason and a concrete example.\n• Acknowledge one limit and finish with a simple conclusion.\n• The 60–90 second practice is shorter than the official 4 minute 30 task; B2 extends sustained argument."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je ne pense pas que toutes les activités doivent toujours être en ligne. Cette formule aide les personnes qui habitent loin ou qui ont un horaire chargé.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Par exemple, je peux participer à une réunion après mon travail sans prendre l'autobus.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Toutefois, certaines activités demandent du matériel ou un échange en personne, et la connexion n'est pas toujours fiable.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "À mon avis, le centre devrait proposer plusieurs formats quand c'est possible et demander aux membres ce qui leur convient. Une période d'essai permettrait de vérifier les besoins.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Donc, l'option en ligne est utile, mais elle ne devrait pas être la seule solution.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

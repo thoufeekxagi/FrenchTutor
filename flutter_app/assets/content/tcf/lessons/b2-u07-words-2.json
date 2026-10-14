@@ -1,0 +1,176 @@
+{
+  "id": "b2-u07-words-2",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un dispositif",
+      "en": "a measure; a system",
+      "sound": "uh(n) dees-poh-zee-TEEF",
+      "exampleFr": "Le dispositif doit être simple à comprendre.",
+      "exampleEn": "The measure should be easy to understand."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un bilan",
+      "en": "an assessment; a review",
+      "sound": "uh(n) bee-LAH(N)",
+      "exampleFr": "Un bilan sera réalisé après l'essai.",
+      "exampleEn": "An assessment will be carried out after the trial."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une incidence",
+      "en": "an impact; an incidence",
+      "sound": "ün an-see-DAH(N)S",
+      "exampleFr": "L'incidence sur les petits fournisseurs est inconnue.",
+      "exampleEn": "The impact on small suppliers is unknown."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une réduction",
+      "en": "a reduction",
+      "sound": "ün ray-dük-SYOH(N)",
+      "exampleFr": "La réduction annoncée doit être mesurée.",
+      "exampleEn": "The announced reduction must be measured."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un objectif",
+      "en": "an objective",
+      "sound": "uh(n) ob-zhek-TEEF",
+      "exampleFr": "L'objectif est de limiter le gaspillage.",
+      "exampleEn": "The objective is to limit waste."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une mise en œuvre",
+      "en": "implementation",
+      "sound": "ün mees ah(n) övr",
+      "exampleFr": "La mise en œuvre dépendra des ressources disponibles.",
+      "exampleEn": "Implementation will depend on available resources."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un dispositif",
+      "options": [
+        "a reduction",
+        "a measure; a system",
+        "an assessment; a review",
+        "an impact; an incidence"
+      ],
+      "answer": 1,
+      "explain": "un dispositif means a measure; a system."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un bilan",
+      "options": [
+        "an objective",
+        "an impact; an incidence",
+        "a reduction",
+        "an assessment; a review"
+      ],
+      "answer": 3,
+      "explain": "un bilan means an assessment; a review."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une incidence",
+      "options": [
+        "implementation",
+        "an impact; an incidence",
+        "a reduction",
+        "an objective"
+      ],
+      "answer": 1,
+      "explain": "une incidence means an impact; an incidence."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une réduction",
+      "options": [
+        "a measure; a system",
+        "an objective",
+        "implementation",
+        "a reduction"
+      ],
+      "answer": 3,
+      "explain": "une réduction means a reduction."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un objectif",
+      "options": [
+        "an assessment; a review",
+        "an objective",
+        "implementation",
+        "a measure; a system"
+      ],
+      "answer": 1,
+      "explain": "un objectif means an objective."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une mise en œuvre",
+      "options": [
+        "an impact; an incidence",
+        "a measure; a system",
+        "an assessment; a review",
+        "implementation"
+      ],
+      "answer": 3,
+      "explain": "une mise en œuvre means implementation."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un bilan",
+      "question": "Which word did you hear?",
+      "options": [
+        "une réduction",
+        "un bilan",
+        "un dispositif",
+        "une incidence"
+      ],
+      "answer": 1,
+      "explain": "You heard un bilan: an assessment; a review."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une incidence",
+      "question": "Which word did you hear?",
+      "options": [
+        "un objectif",
+        "un bilan",
+        "une réduction",
+        "une incidence"
+      ],
+      "answer": 3,
+      "explain": "You heard une incidence: an impact; an incidence."
+    }
+  ]
+}

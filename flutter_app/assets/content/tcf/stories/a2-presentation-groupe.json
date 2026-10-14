@@ -1,0 +1,304 @@
+{
+  "id": "a2-presentation-groupe",
+  "title": "La présentation de groupe",
+  "titleEn": "The group presentation",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "A project team prepares, corrects and shares documents for a presentation.",
+  "unit": "a2-u08",
+  "sentences": [
+    {
+      "fr": "L'équipe prépare une présentation de groupe pour vendredi.",
+      "en": "The team is preparing a group presentation for Friday."
+    },
+    {
+      "fr": "La formatrice demande le plan de présentation et un compte rendu.",
+      "en": "The instructor asks for the presentation outline and a meeting report."
+    },
+    {
+      "fr": "Nadia prépare le plan; elle le relit avec le tuteur.",
+      "en": "Nadia prepares the outline; she rereads it with the supervisor."
+    },
+    {
+      "fr": "Sam termine le compte rendu. Il est dans le dossier de projet.",
+      "en": "Sam finishes the report. It is in the project file."
+    },
+    {
+      "fr": "La liste de corrections est prête; Nadia la joint au dossier.",
+      "en": "The list of corrections is ready; Nadia attaches it to the file."
+    },
+    {
+      "fr": "Les documents sont à jour. Sam les classe par date.",
+      "en": "The documents are up to date, so Sam files them by date."
+    },
+    {
+      "fr": "Le brouillon est encore à corriger; l'équipe va le relire ce soir.",
+      "en": "The draft still needs correction; the team is going to proofread it this evening."
+    },
+    {
+      "fr": "La formatrice reçoit la version finale dans le dossier de projet.",
+      "en": "The instructor receives the final version in the project file."
+    }
+  ],
+  "words": {
+    "l'équipe": {
+      "en": "the team",
+      "pos": "noun, feminine"
+    },
+    "prépare": {
+      "en": "is preparing",
+      "pos": "verb"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "présentation": {
+      "en": "presentation",
+      "pos": "noun, feminine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun, masculine"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "vendredi": {
+      "en": "Friday",
+      "pos": "day"
+    },
+    "la": {
+      "en": "the; it (feminine)",
+      "pos": "article/pronoun"
+    },
+    "formatrice": {
+      "en": "instructor",
+      "pos": "noun, feminine"
+    },
+    "demande": {
+      "en": "asks for",
+      "pos": "verb"
+    },
+    "le": {
+      "en": "the; it (masculine)",
+      "pos": "article/pronoun"
+    },
+    "plan": {
+      "en": "outline; plan",
+      "pos": "noun, masculine"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "compte": {
+      "en": "account",
+      "pos": "noun, masculine"
+    },
+    "rendu": {
+      "en": "report",
+      "pos": "noun, masculine"
+    },
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "name"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "relit": {
+      "en": "rereads",
+      "pos": "verb"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "tuteur": {
+      "en": "supervisor",
+      "pos": "noun, masculine"
+    },
+    "sam": {
+      "en": "Sam (a man's name)",
+      "pos": "name"
+    },
+    "termine": {
+      "en": "finishes",
+      "pos": "verb"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "est": {
+      "en": "is; has (être)",
+      "pos": "verb"
+    },
+    "dans": {
+      "en": "in",
+      "sound": "dah(n)"
+    },
+    "dossier": {
+      "en": "file",
+      "pos": "noun, masculine"
+    },
+    "projet": {
+      "en": "a project"
+    },
+    "liste": {
+      "en": "list",
+      "pos": "noun, feminine"
+    },
+    "corrections": {
+      "en": "corrections",
+      "pos": "noun, feminine plural"
+    },
+    "prête": {
+      "en": "ready",
+      "pos": "adjective"
+    },
+    "joint": {
+      "en": "attaches",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "to the",
+      "pos": "contraction"
+    },
+    "les": {
+      "en": "the; them (plural)",
+      "pos": "article/pronoun"
+    },
+    "documents": {
+      "en": "documents",
+      "pos": "noun, masculine plural"
+    },
+    "sont": {
+      "en": "are (être)",
+      "pos": "verb"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "jour": {
+      "en": "day",
+      "pos": "noun, masculine"
+    },
+    "classe": {
+      "en": "class; classroom",
+      "pos": "noun, feminine"
+    },
+    "par": {
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    "date": {
+      "en": "date"
+    },
+    "brouillon": {
+      "en": "draft",
+      "pos": "noun, masculine"
+    },
+    "encore": {
+      "en": "still",
+      "pos": "adverb"
+    },
+    "corriger": {
+      "en": "to correct",
+      "pos": "verb"
+    },
+    "va": {
+      "en": "is going to",
+      "pos": "verb"
+    },
+    "relire": {
+      "en": "to reread; review",
+      "sound": "ruh-LEER"
+    },
+    "ce": {
+      "en": "this; that (masculine)",
+      "pos": "determiner"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine"
+    },
+    "reçoit": {
+      "en": "receives",
+      "pos": "verb"
+    },
+    "version": {
+      "en": "version",
+      "pos": "noun, feminine"
+    },
+    "finale": {
+      "en": "final",
+      "pos": "adjective"
+    }
+  },
+  "keywords": [
+    "présentation",
+    "compte",
+    "corrections",
+    "dossier",
+    "version"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does the instructor ask the team to prepare?",
+      "options": [
+        "An outline and a meeting report",
+        "A rent notice and a lease",
+        "A medical form and a result",
+        "A transit map and a ticket"
+      ],
+      "answer": 0,
+      "explain": "The second sentence names both documents."
+    },
+    {
+      "prompt": "What does Nadia reread with the supervisor?",
+      "options": [
+        "The presentation outline",
+        "The correction list",
+        "The final version",
+        "The reminder message"
+      ],
+      "answer": 0,
+      "explain": "Le refers to the masculine noun le plan."
+    },
+    {
+      "prompt": "What does Sam do with the documents?",
+      "options": [
+        "Files them by date",
+        "Deletes them",
+        "Prints them for the landlord",
+        "Sends them to the clinic"
+      ],
+      "answer": 0,
+      "explain": "The sixth sentence says he files them by date."
+    },
+    {
+      "prompt": "What does the instructor present to the student committee?",
+      "options": [
+        "The final version",
+        "The draft",
+        "The project deadline",
+        "The attendance sheet"
+      ],
+      "answer": 0,
+      "explain": "La refers to la version finale."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "b1-u10-write-speak",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 1 practice",
+      "body": "Write a 60–120-word message to a fictional event organizer. Refer to one detail from the notice, ask two relevant questions and politely confirm how you can get an update. Target 80–100 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour, Je vous écris au sujet de la rencontre de samedi. J'ai lu que l'entrée se ferait par la porte nord, mais je voudrais vérifier si cette entrée est accessible par ascenseur. Pourriez-vous aussi me dire à qui m'adresser si j'arrive après le début ? J'aimerais savoir si l'inscription est obligatoire ou si je peux me présenter directement. Si l'horaire change, pourriez-vous m'indiquer où la mise à jour sera publiée ? Merci de me confirmer ces renseignements. Cordialement, Amina\n\nCheck:\n• Official Task 1 range: 60–120 words.\n• State the purpose and refer to the notice accurately.\n• Ask specific questions and use an appropriate register.\n• Close with a clear request for confirmation or an update."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF Canada oral Task 2 simulation. You are asking a fictional event organizer for information based on a short notice. You have two minutes to prepare and 3 minutes 30 seconds to interact. Ask about the location, accessibility, registration, materials and what to do if you arrive late. Marie should give answers in stages, then change one detail. Use a follow-up and confirm the new detail.\n\n• Official Task 2 is an interaction: two minutes to prepare, then 3 minutes 30 of dialogue.\n• Use the notice to make a short question plan; do not script every sentence.\n• React to the changed detail and ask a follow-up that depends on the answer."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de la rencontre. Pourriez-vous me dire où se trouve l'entrée nord ? Est-ce qu'il y a un ascenseur jusqu'à la salle ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'aimerais aussi savoir si l'inscription est obligatoire. Faut-il apporter du matériel ? Si j'arrive en retard, à qui dois-je m'adresser ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Merci, je vais reformuler : l'heure est maintenant dix heures trente, et l'entrée reste au nord. Est-ce exact ?",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "id": "a2-journee-remplie",
+  "title": "Une journée bien remplie",
+  "titleEn": "A busy day",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Awa completes classwork, books a tour and follows up on a delayed parcel.",
+  "unit": "a2-u02",
+  "sentences": [
+    {
+      "fr": "Mardi, Awa a commencé sa journée tôt.",
+      "en": "On Tuesday, Awa started her day early."
+    },
+    {
+      "fr": "Elle a terminé un devoir avant son cours.",
+      "en": "She finished an assignment before her class."
+    },
+    {
+      "fr": "Après le cours, elle a réservé une visite guidée.",
+      "en": "After class, she booked a guided tour."
+    },
+    {
+      "fr": "Ensuite, elle a emprunté un livre à la bibliothèque.",
+      "en": "Then she borrowed a book from the library."
+    },
+    {
+      "fr": "Plus tard, elle a trouvé un avis de passage.",
+      "en": "Later, she found a delivery notice."
+    },
+    {
+      "fr": "Elle a appelé le service au sujet du retard, puis elle a réclamé un remboursement.",
+      "en": "She called the service to report the delay, then requested a refund."
+    },
+    {
+      "fr": "Heureusement, le service a confirmé la livraison pour mercredi.",
+      "en": "Fortunately, the service confirmed the delivery for Wednesday."
+    },
+    {
+      "fr": "Le soir, Awa a préparé ses notes et a téléphoné à une amie.",
+      "en": "In the evening, Awa prepared her notes and called a friend."
+    }
+  ],
+  "words": {
+    "mardi": {
+      "en": "Tuesday",
+      "sound": "mahr-DEE"
+    },
+    "awa": {
+      "en": "Awa (a woman's name)",
+      "pos": "name"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "commencé": {
+      "en": "started (commencer)",
+      "pos": "verb"
+    },
+    "sa": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "journée": {
+      "en": "day (as a whole)",
+      "pos": "noun, feminine"
+    },
+    "tôt": {
+      "en": "early",
+      "sound": "toh"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "terminé": {
+      "en": "finished (terminer)",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "devoir": {
+      "en": "assignment; homework",
+      "pos": "noun, masculine"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "son": {
+      "en": "her; his (masculine noun)",
+      "pos": "possessive"
+    },
+    "cours": {
+      "en": "a course, class"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "le": {
+      "en": "the (masculine)",
+      "pos": "article"
+    },
+    "réservé": {
+      "en": "booked (réserver)",
+      "pos": "verb"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "visite": {
+      "en": "visit",
+      "pos": "noun, feminine"
+    },
+    "guidée": {
+      "en": "guided (feminine)",
+      "pos": "adjective"
+    },
+    "ensuite": {
+      "en": "then, next",
+      "sound": "ah(n)-SWEET"
+    },
+    "emprunté": {
+      "en": "borrowed (emprunter)",
+      "pos": "verb"
+    },
+    "livre": {
+      "en": "book",
+      "pos": "noun, masculine"
+    },
+    "à": {
+      "en": "to; at",
+      "pos": "preposition"
+    },
+    "la": {
+      "en": "the (feminine)",
+      "pos": "article"
+    },
+    "bibliothèque": {
+      "en": "library",
+      "pos": "noun, feminine"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "tard": {
+      "en": "late",
+      "sound": "tahr"
+    },
+    "trouvé": {
+      "en": "found (trouver)",
+      "pos": "verb"
+    },
+    "avis": {
+      "en": "notice",
+      "pos": "noun, masculine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "passage": {
+      "en": "delivery attempt",
+      "pos": "noun, masculine"
+    },
+    "appelé": {
+      "en": "called (appeler)",
+      "pos": "verb"
+    },
+    "service": {
+      "en": "service",
+      "pos": "noun, masculine"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "sujet": {
+      "en": "subject; topic",
+      "pos": "noun, masculine"
+    },
+    "du": {
+      "en": "of the; from the",
+      "pos": "contraction"
+    },
+    "retard": {
+      "en": "delay",
+      "pos": "noun, masculine"
+    },
+    "puis": {
+      "en": "then",
+      "sound": "pwee"
+    },
+    "réclamé": {
+      "en": "requested (réclamer)",
+      "pos": "verb"
+    },
+    "remboursement": {
+      "en": "refund",
+      "pos": "noun, masculine"
+    },
+    "heureusement": {
+      "en": "fortunately",
+      "sound": "uh-ruh-ZMÄ(N)"
+    },
+    "confirmé": {
+      "en": "confirmed (confirmer)",
+      "pos": "verb"
+    },
+    "livraison": {
+      "en": "delivery",
+      "pos": "noun, feminine"
+    },
+    "pour": {
+      "en": "for",
+      "pos": "preposition"
+    },
+    "mercredi": {
+      "en": "Wednesday",
+      "sound": "mehr-kruh-DEE"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "préparé": {
+      "en": "prepared (préparer)",
+      "pos": "verb"
+    },
+    "ses": {
+      "en": "her; his (plural noun)",
+      "pos": "possessive"
+    },
+    "notes": {
+      "en": "notes",
+      "pos": "noun, feminine plural"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "téléphoné": {
+      "en": "called by phone (téléphoner)",
+      "pos": "verb"
+    },
+    "amie": {
+      "en": "friend"
+    }
+  },
+  "keywords": [
+    "devoir",
+    "livraison",
+    "passage",
+    "avis",
+    "remboursement"
+  ],
+  "quiz": [
+    {
+      "prompt": "What did Awa finish before class?",
+      "options": [
+        "An assignment",
+        "A delivery",
+        "A phone call",
+        "A guided tour"
+      ],
+      "answer": 0,
+      "explain": "The second sentence says she finished an assignment before class."
+    },
+    {
+      "prompt": "What did she borrow after the tour booking?",
+      "options": [
+        "A book",
+        "A bicycle",
+        "A parcel",
+        "A form"
+      ],
+      "answer": 0,
+      "explain": "She borrowed a book from the library."
+    },
+    {
+      "prompt": "Why did Awa call the service?",
+      "options": [
+        "To report the delay",
+        "To reserve a class",
+        "To return a book",
+        "To cancel the tour"
+      ],
+      "answer": 0,
+      "explain": "The story says she called the service to report the delivery delay."
+    },
+    {
+      "prompt": "When was the delivery confirmed?",
+      "options": [
+        "Wednesday",
+        "Monday",
+        "Friday",
+        "Saturday"
+      ],
+      "answer": 0,
+      "explain": "The service confirmed the delivery for Wednesday."
+    }
+  ]
+}

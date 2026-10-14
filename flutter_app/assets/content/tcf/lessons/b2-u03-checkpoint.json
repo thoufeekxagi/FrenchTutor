@@ -1,0 +1,75 @@
+{
+  "id": "b2-u03-checkpoint",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does un préalable mean?",
+      "options": [
+        "A prerequisite",
+        "A commute",
+        "A conclusion",
+        "A stipend"
+      ],
+      "answer": 0,
+      "explain": "Un préalable is a prerequisite."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which form links to a verb or phrase with de?",
+      "options": [
+        "qui",
+        "où",
+        "dont",
+        "que"
+      ],
+      "answer": 2,
+      "explain": "Dont represents a link with de."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does ce qui usually introduce?",
+      "options": [
+        "A quoted source",
+        "A relative clause with no named antecedent, as its subject",
+        "A future condition",
+        "A direct address"
+      ],
+      "answer": 1,
+      "explain": "Ce qui means 'what/that which' and is the clause subject."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which phrase means 'the position I am interested in'?",
+      "options": [
+        "le poste qui je m'intéresse",
+        "le poste où je m'intéresse",
+        "le poste dont je m'intéresse",
+        "le poste auquel je m'intéresse"
+      ],
+      "answer": 3,
+      "explain": "S'intéresser à calls for auquel when referring to a thing."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What should a recommendation include?",
+      "options": [
+        "A reason and any important condition",
+        "Only a program title",
+        "An unsupported guarantee",
+        "A claim that fits everyone"
+      ],
+      "answer": 0,
+      "explain": "A reason and relevant condition make advice precise."
+    }
+  ]
+}

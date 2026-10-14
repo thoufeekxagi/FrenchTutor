@@ -1,0 +1,148 @@
+{
+  "id": "b2-u14-words-2",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un bilan",
+      "en": "an assessment; review",
+      "sound": "uh(n) bee-LAH(N)",
+      "exampleFr": "Le bilan distingue les quatre compétences.",
+      "exampleEn": "The assessment distinguishes the four skills."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une stratégie",
+      "en": "a strategy",
+      "sound": "ün strah-tay-ZHEE",
+      "exampleFr": "La stratégie doit aider à comprendre, pas distraire.",
+      "exampleEn": "The strategy should help comprehension, not distract."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un point fort",
+      "en": "a strength",
+      "sound": "uh(n) pwa FOR",
+      "exampleFr": "L'écoute est un point fort de l'apprenant.",
+      "exampleEn": "Listening is a learner's strength."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un axe de progrès",
+      "en": "an area for improvement",
+      "sound": "uh(n) aks duh proh-GREH",
+      "exampleFr": "La précision des accords reste un axe de progrès.",
+      "exampleEn": "Agreement precision remains an area for improvement."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une réponse hors sujet",
+      "en": "an off-topic response",
+      "sound": "ün ray-POHNS or sü-ZHEH",
+      "exampleFr": "Une réponse hors sujet peut être bien formulée.",
+      "exampleEn": "An off-topic response can be well phrased."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une autocorrection",
+      "en": "self-correction",
+      "sound": "ün oh-toh-koh-rehk-SYOH(N)",
+      "exampleFr": "Une autocorrection brève clarifie le propos.",
+      "exampleEn": "A brief self-correction clarifies the point."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un bilan",
+      "options": [
+        "an area for improvement",
+        "an assessment; review",
+        "a strategy",
+        "a strength"
+      ],
+      "answer": 1,
+      "explain": "un bilan means an assessment; review."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une stratégie",
+      "options": [
+        "an off-topic response",
+        "a strength",
+        "an area for improvement",
+        "a strategy"
+      ],
+      "answer": 3,
+      "explain": "une stratégie means a strategy."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un point fort",
+      "options": [
+        "self-correction",
+        "a strength",
+        "an area for improvement",
+        "an off-topic response"
+      ],
+      "answer": 1,
+      "explain": "un point fort means a strength."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un axe de progrès",
+      "options": [
+        "an assessment; review",
+        "an off-topic response",
+        "self-correction",
+        "an area for improvement"
+      ],
+      "answer": 3,
+      "explain": "un axe de progrès means an area for improvement."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une réponse hors sujet",
+      "options": [
+        "a strategy",
+        "an off-topic response",
+        "self-correction",
+        "an assessment; review"
+      ],
+      "answer": 1,
+      "explain": "une réponse hors sujet means an off-topic response."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une autocorrection",
+      "options": [
+        "a strength",
+        "an assessment; review",
+        "a strategy",
+        "self-correction"
+      ],
+      "answer": 3,
+      "explain": "une autocorrection means self-correction."
+    }
+  ]
+}

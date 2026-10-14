@@ -1,0 +1,58 @@
+{
+  "id": "b2-u13-listening",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "À mon avis, les cours enregistrés offrent plus de souplesse. Cela dit, ils ne remplacent pas toujours les échanges immédiats avec un enseignant.",
+      "question": "How does the speaker qualify the position?",
+      "options": [
+        "Recorded courses should be removed",
+        "Recorded courses are flexible but do not always replace interaction",
+        "Flexibility has no value",
+        "Teachers are never available"
+      ],
+      "answer": 1,
+      "explain": "The speaker supports flexibility but names a limitation."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "D'abord, un espace public peut donner accès à des ressources. Ensuite, il peut créer des occasions de rencontre. En somme, son rôle ne se limite pas au prêt de documents.",
+      "question": "What is the speaker's main conclusion?",
+      "options": [
+        "The space can serve more than one purpose",
+        "Only meetings matter",
+        "Resources are unnecessary",
+        "The space should stop lending books"
+      ],
+      "answer": 0,
+      "explain": "The conclusion broadens the role beyond lending documents."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je pensais que la solution conviendrait à tous. Après votre question, je dirais plutôt qu'elle peut convenir lorsque l'accès et le soutien sont prévus.",
+      "question": "What does the speaker do?",
+      "options": [
+        "Rejects the question",
+        "Repeats the same claim without change",
+        "Revises an overgeneralized claim",
+        "Changes to a past narrative"
+      ],
+      "answer": 2,
+      "explain": "The speaker narrows the claim after a follow-up."
+    }
+  ]
+}

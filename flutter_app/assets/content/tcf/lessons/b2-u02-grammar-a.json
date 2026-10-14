@@ -1,0 +1,93 @@
+{
+  "id": "b2-u02-grammar-a",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Grammar: Passive and impersonal reporting: keep the source and certainty visible",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Passive and impersonal reporting: keep the source and certainty visible",
+      "body": "Use the active voice when the source matters: La porte-parole annonce… Use the passive when the affected result is the focus and the agent is known or irrelevant: Le rapport a été publié… An impersonal form such as il semble que softens a conclusion; it does not make weak evidence strong. For a claim you have not confirmed, the conditional can signal reported uncertainty (Le projet coûterait…). Attribute statements with selon / d'après and keep fact, estimate and interpretation separate."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Passive and impersonal reporting: keep the source and certainty visible",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Active with source",
+          "source + verb + que",
+          "La porte-parole indique que la mesure sera évaluée.",
+          "The spokesperson says the measure will be evaluated."
+        ],
+        [
+          "Passive, result in focus",
+          "être + past participle",
+          "Le rapport a été publié lundi.",
+          "The report was published Monday."
+        ],
+        [
+          "Unconfirmed report",
+          "conditional",
+          "Le projet coûterait moins cher, selon le média.",
+          "The project would reportedly cost less, according to the outlet."
+        ],
+        [
+          "Impersonal caution",
+          "il semble que + subjunctive",
+          "Il semble que les données soient incomplètes.",
+          "It appears that the data is incomplete."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which sentence keeps an unconfirmed report cautious?",
+      "options": [
+        "Le projet coûte davantage, c'est certain.",
+        "Le projet coûte davantage parce que demain.",
+        "Le projet coûterait davantage, selon le média.",
+        "Le projet a été payé par tous."
+      ],
+      "answer": 2,
+      "explain": "The conditional and source attribution mark this as unconfirmed reporting."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When is passive voice useful?",
+      "options": [
+        "When the result is the focus and the agent is less important",
+        "Whenever you want to hide every source",
+        "To make a weak claim certain",
+        "Only in spoken questions"
+      ],
+      "answer": 0,
+      "explain": "Passive voice shifts focus; it does not replace proper attribution."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does selon le communiqué do?",
+      "options": [
+        "Confirms the claim independently",
+        "Names the source of a claim",
+        "Gives a future condition",
+        "Introduces a personal example"
+      ],
+      "answer": 1,
+      "explain": "Selon attributes the information to a source."
+    }
+  ]
+}

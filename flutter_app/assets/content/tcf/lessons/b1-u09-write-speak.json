@@ -1,0 +1,49 @@
+{
+  "id": "b1-u09-write-speak",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word account for a class blog about a community, study or work activity you attended. Describe how it was organized, what you did and one result or lesson. Use passive or impersonal language only where it makes the actor less important.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Samedi dernier, j'ai participé à un atelier de cuisine organisé par le centre de mon quartier. Les participants ont été accueillis à l'entrée, puis on leur a remis un tablier et une fiche avec les étapes. En préparant les ingrédients avec deux bénévoles, j'ai appris de nouveaux mots et j'ai parlé avec des voisins que je ne connaissais pas. Le matériel avait été installé avant le début, alors nous avons pu commencer à l'heure. À la fin, les recettes ont été distribuées et les commentaires ont été recueillis dans une boîte. J'ai apprécié que chacun puisse participer, même sans expérience. Une amélioration serait d'envoyer la liste des ingrédients la veille, afin que les personnes puissent vérifier si elles ont besoin d'apporter quelque chose. Cette activité m'a montré qu'un petit groupe facilite les échanges. Je m'inscrirais volontiers à une prochaine rencontre si l'horaire me convient.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Keep the event sequence clear and include your own role.\n• Use the gerund only when its subject matches the main subject.\n• Prefer active language if it makes responsibility clearer."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. Contact a fictional community centre to ask how an event is organized. Prepare for two minutes; ask about registration, materials, accessibility, arrival time and how feedback is collected. Interact for 3 minutes 30. Summarize the steps you heard and confirm one detail.\n\n• Use passive voice only when the actor does not matter.\n• Use on for a common process; name the person when responsibility matters.\n• When summarizing, keep the steps in the order the organizer gave them."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je voudrais obtenir des renseignements sur l'atelier. Comment peut-on s'inscrire ? Est-ce que le matériel est fourni ? Je voudrais aussi savoir si la salle est accessible.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "À quelle heure faut-il arriver ? Comment les commentaires sont-ils recueillis après l'activité ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si j'ai bien compris, les places sont confirmées par courriel et le matériel est fourni sur place. Est-ce exact ? Merci; je vais suivre les étapes indiquées.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

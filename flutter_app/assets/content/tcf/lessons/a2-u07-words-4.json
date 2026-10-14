@@ -1,0 +1,166 @@
+{
+  "id": "a2-u07-words-4",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Words: give timing and frequency details",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "depuis deux jours",
+      "en": "for two days",
+      "sound": "duh-PWEE duh zhoor",
+      "exampleFr": "Le symptôme dure depuis deux jours.",
+      "exampleEn": "The symptom has lasted for two days."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "depuis hier soir",
+      "en": "since last night",
+      "sound": "duh-PWEE yehr swahr",
+      "exampleFr": "Je ressens cette gêne depuis hier soir.",
+      "exampleEn": "I have felt this discomfort since last night."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une fois par jour",
+      "en": "once a day",
+      "sound": "ün fwah par zhoor",
+      "exampleFr": "Je note la fréquence : une fois par jour.",
+      "exampleEn": "I note the frequency: once a day."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "plusieurs fois par semaine",
+      "en": "several times a week",
+      "sound": "plü-ZYUHR fwah par suh-MEN",
+      "exampleFr": "La gêne apparaît plusieurs fois par semaine.",
+      "exampleEn": "The discomfort appears several times a week."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "au réveil",
+      "en": "on waking",
+      "sound": "oh ray-VAY",
+      "exampleFr": "Je note la gêne au réveil.",
+      "exampleEn": "I note the discomfort on waking."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "pendant la nuit",
+      "en": "during the night",
+      "sound": "pah(n)-DAH(N) lah nwee",
+      "exampleFr": "La gêne apparaît parfois pendant la nuit.",
+      "exampleEn": "The discomfort sometimes appears during the night."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "après le repas",
+      "en": "after a meal",
+      "sound": "ah-preh luh ruh-PAH",
+      "exampleFr": "La sensation de brûlure commence après le repas.",
+      "exampleEn": "The burning sensation starts after a meal."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "avant le rendez-vous",
+      "en": "before the appointment",
+      "sound": "ah-vah(n) luh rah(n)-day-VOO",
+      "exampleFr": "Je note mes questions avant le rendez-vous.",
+      "exampleEn": "I write down my questions before the appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "depuis deux jours",
+      "options": [
+        "several times a week",
+        "for two days",
+        "after a meal",
+        "since last night"
+      ],
+      "answer": 1,
+      "explain": "depuis deux jours means for two days."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "depuis hier soir",
+      "options": [
+        "on waking",
+        "before the appointment",
+        "once a day",
+        "since last night"
+      ],
+      "answer": 3,
+      "explain": "depuis hier soir means since last night."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une fois par jour",
+      "options": [
+        "during the night",
+        "once a day",
+        "for two days",
+        "several times a week"
+      ],
+      "answer": 1,
+      "explain": "une fois par jour means once a day."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "plusieurs fois par semaine",
+      "options": [
+        "after a meal",
+        "since last night",
+        "on waking",
+        "several times a week"
+      ],
+      "answer": 3,
+      "explain": "plusieurs fois par semaine means several times a week."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "au réveil",
+      "options": [
+        "before the appointment",
+        "on waking",
+        "once a day",
+        "during the night"
+      ],
+      "answer": 1,
+      "explain": "au réveil means on waking."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "pendant la nuit",
+      "options": [
+        "for two days",
+        "several times a week",
+        "after a meal",
+        "during the night"
+      ],
+      "answer": 3,
+      "explain": "pendant la nuit means during the night."
+    }
+  ]
+}

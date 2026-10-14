@@ -1,0 +1,148 @@
+{
+  "id": "b2-u06-words-4",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une autorisation préalable",
+      "en": "prior authorization",
+      "sound": "ün oh-toh-ree-zah-SYOH(N) pray-ah-LAHBL",
+      "exampleFr": "Le partage exige une autorisation préalable.",
+      "exampleEn": "Sharing requires prior authorization."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un paramètre par défaut",
+      "en": "a default setting",
+      "sound": "uh(n) pah-rah-mehtr par duh-FOH",
+      "exampleFr": "Le paramètre par défaut rend le profil visible.",
+      "exampleEn": "The default setting makes the profile visible."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un accès restreint",
+      "en": "restricted access",
+      "sound": "uh(n) ahk-SEH rehs-TREH(N)",
+      "exampleFr": "Les documents exigent un accès restreint.",
+      "exampleEn": "The documents require restricted access."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "stocker de façon sécurisée",
+      "en": "to store securely",
+      "sound": "stoh-KAY duh foh-SOH(N) say-kü-ree-ZAY",
+      "exampleFr": "L'organisme doit stocker les fichiers de façon sécurisée.",
+      "exampleEn": "The organization must store the files securely."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "retirer son consentement",
+      "en": "to withdraw one's consent",
+      "sound": "ruh-tee-RAY sohn kohn-sahnt-mahn",
+      "exampleFr": "L'utilisateur peut retirer son consentement à tout moment.",
+      "exampleEn": "The user can withdraw consent at any time."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un partage involontaire",
+      "en": "unintended sharing",
+      "sound": "uh(n) par-TAHZH ehn-voh-lohn-TEHR",
+      "exampleFr": "Un partage involontaire peut révéler un renseignement privé.",
+      "exampleEn": "Unintended sharing can reveal private information."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une autorisation préalable",
+      "options": [
+        "to store securely",
+        "prior authorization",
+        "a default setting",
+        "restricted access"
+      ],
+      "answer": 1,
+      "explain": "une autorisation préalable means prior authorization."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un paramètre par défaut",
+      "options": [
+        "to withdraw one's consent",
+        "restricted access",
+        "to store securely",
+        "a default setting"
+      ],
+      "answer": 3,
+      "explain": "un paramètre par défaut means a default setting."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès restreint",
+      "options": [
+        "unintended sharing",
+        "restricted access",
+        "to store securely",
+        "to withdraw one's consent"
+      ],
+      "answer": 1,
+      "explain": "un accès restreint means restricted access."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "stocker de façon sécurisée",
+      "options": [
+        "prior authorization",
+        "to withdraw one's consent",
+        "unintended sharing",
+        "to store securely"
+      ],
+      "answer": 3,
+      "explain": "stocker de façon sécurisée means to store securely."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "retirer son consentement",
+      "options": [
+        "a default setting",
+        "to withdraw one's consent",
+        "unintended sharing",
+        "prior authorization"
+      ],
+      "answer": 1,
+      "explain": "retirer son consentement means to withdraw one's consent."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un partage involontaire",
+      "options": [
+        "restricted access",
+        "prior authorization",
+        "a default setting",
+        "unintended sharing"
+      ],
+      "answer": 3,
+      "explain": "un partage involontaire means unintended sharing."
+    }
+  ]
+}

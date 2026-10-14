@@ -1,0 +1,148 @@
+{
+  "id": "a2-u03-dialogues",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the situation first. Then notice the exact action and the follow-up question; the second speaker checks a detail instead of changing the topic."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A new bus connection",
+      "body": "Lina asks Sam how he got to a new French workshop in Ottawa.",
+      "examples": [
+        {
+          "fr": "Tu as pris le bus jusqu'au centre ?",
+          "en": "Lina: Did you take the bus downtown?"
+        },
+        {
+          "fr": "Oui, puis j'ai pris une correspondance près de la gare.",
+          "en": "Sam: Yes, then I took a connection near the train station."
+        },
+        {
+          "fr": "Tu as vu le numéro de la ligne sur le billet ?",
+          "en": "Lina: Did you see the route number on the ticket?"
+        },
+        {
+          "fr": "Oui, je l'ai vu à l'accueil.",
+          "en": "Sam: Yes, I saw it at the welcome desk."
+        },
+        {
+          "fr": "Et tu as trouvé la salle sans problème ?",
+          "en": "Lina: And did you find the room without a problem?"
+        },
+        {
+          "fr": "Oui. J'ai lu le plan de la ville et j'ai vu le nom de la salle.",
+          "en": "Sam: Yes. I read the city map and saw the room's name."
+        },
+        {
+          "fr": "Tu as eu le temps de lire la consigne ?",
+          "en": "Lina: Did you have time to read the instruction?"
+        },
+        {
+          "fr": "Oui, et j'ai eu le temps de lire la consigne.",
+          "en": "Sam: Yes, and I had time to read the instruction."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "After the library visit",
+      "body": "Nadia asks Awa about her first visit to a public library.",
+      "examples": [
+        {
+          "fr": "Tu as lu un article pendant ta première visite à la bibliothèque municipale ?",
+          "en": "Nadia: Did you read an article during your first visit to the public library?"
+        },
+        {
+          "fr": "Oui. J'ai lu un article et j'ai trouvé une séance de français.",
+          "en": "Awa: Yes. I read an article and found a French session."
+        },
+        {
+          "fr": "Tu as pris un livre aussi ?",
+          "en": "Nadia: Did you take a book too?"
+        },
+        {
+          "fr": "Oui, j'ai pris un chapitre facile pour commencer.",
+          "en": "Awa: Yes, I took an easy chapter to start."
+        },
+        {
+          "fr": "Et tu as eu une carte ?",
+          "en": "Nadia: And did you get a card?"
+        },
+        {
+          "fr": "Pas encore. J'ai fait une demande et j'ai pris le reçu.",
+          "en": "Awa: Not yet. I made an application and took the receipt."
+        },
+        {
+          "fr": "Tu as eu une réponse ?",
+          "en": "Nadia: Did you get an answer?"
+        },
+        {
+          "fr": "Oui, j'ai eu une réponse par courriel ce matin.",
+          "en": "Awa: Yes, I got an answer by email this morning."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which connection did Sam take?",
+      "options": [
+        "One near the train station",
+        "One at the library",
+        "One beside the clinic",
+        "One at the airport"
+      ],
+      "answer": 0,
+      "explain": "Sam says the connection was near the train station."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What did Sam read to find the room?",
+      "options": [
+        "A city map",
+        "A newspaper",
+        "A receipt",
+        "A voice message"
+      ],
+      "answer": 0,
+      "explain": "He says he read the city map and saw the room's name."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What did Awa do at the public library?",
+      "options": [
+        "She read an article and saw a French session.",
+        "She bought a train ticket.",
+        "She applied for a job.",
+        "She met the instructor at a clinic."
+      ],
+      "answer": 0,
+      "explain": "Awa says she read an article and saw a French session."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What did Awa keep after her application?",
+      "options": [
+        "The receipt",
+        "The city map",
+        "The newspaper",
+        "The ticket"
+      ],
+      "answer": 0,
+      "explain": "Awa says she kept the receipt."
+    }
+  ]
+}

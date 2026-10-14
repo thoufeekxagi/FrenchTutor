@@ -1,0 +1,175 @@
+{
+  "id": "a2-u03-words-6",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Words: reactions and outcomes",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "satisfait / satisfaite",
+      "en": "satisfied",
+      "say": "satisfait, satisfaite",
+      "sound": "sah-tee-FEH / sah-tee-FEHT",
+      "exampleFr": "Je suis satisfaite du résultat.",
+      "exampleEn": "I am satisfied with the result."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "fier / fière",
+      "en": "proud",
+      "say": "fier, fière",
+      "sound": "FYAYR / FYAYR",
+      "exampleFr": "Il est fier de son progrès.",
+      "exampleEn": "He is proud of his progress."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "étonné / étonnée",
+      "en": "surprised; astonished",
+      "say": "étonné, étonnée",
+      "sound": "ay-toh-NAY",
+      "exampleFr": "Elle est étonnée par la réponse.",
+      "exampleEn": "She is surprised by the answer."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une étape",
+      "en": "a step; a stage",
+      "sound": "ün ay-TAHP",
+      "exampleFr": "Cette étape est importante.",
+      "exampleEn": "This step is important."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "à la fin",
+      "en": "at the end",
+      "sound": "ah lah fa(n)",
+      "exampleFr": "À la fin, nous faisons une courte révision.",
+      "exampleEn": "At the end, we do a short review."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "tout à coup",
+      "en": "suddenly",
+      "sound": "too-tah-KOO",
+      "exampleFr": "Tout à coup, le numéro change.",
+      "exampleEn": "Suddenly, the number changes."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un détail",
+      "en": "a detail",
+      "sound": "uh(n) day-TAHY",
+      "exampleFr": "Un détail manque dans le message.",
+      "exampleEn": "A detail is missing from the message."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une bonne nouvelle",
+      "en": "good news",
+      "sound": "ün bun noo-VEL",
+      "exampleFr": "J'ai une bonne nouvelle pour toi.",
+      "exampleEn": "I have good news for you."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "satisfait / satisfaite",
+      "options": [
+        "a step; a stage",
+        "satisfied",
+        "a detail",
+        "proud"
+      ],
+      "answer": 1,
+      "explain": "satisfait / satisfaite means satisfied."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "fier / fière",
+      "options": [
+        "at the end",
+        "good news",
+        "surprised; astonished",
+        "proud"
+      ],
+      "answer": 3,
+      "explain": "fier / fière means proud."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "étonné / étonnée",
+      "options": [
+        "suddenly",
+        "surprised; astonished",
+        "satisfied",
+        "a step; a stage"
+      ],
+      "answer": 1,
+      "explain": "étonné / étonnée means surprised; astonished."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une étape",
+      "options": [
+        "a detail",
+        "proud",
+        "at the end",
+        "a step; a stage"
+      ],
+      "answer": 3,
+      "explain": "une étape means a step; a stage."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "à la fin",
+      "options": [
+        "good news",
+        "at the end",
+        "surprised; astonished",
+        "suddenly"
+      ],
+      "answer": 1,
+      "explain": "à la fin means at the end."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "tout à coup",
+      "options": [
+        "satisfied",
+        "a step; a stage",
+        "a detail",
+        "suddenly"
+      ],
+      "answer": 3,
+      "explain": "tout à coup means suddenly."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: reactions and outcomes",
+      "body": "The transport and service scenes are invented for practice; station names, routes and opening hours are not current travel information. Standard French is used, with familiar Canadian places only as context."
+    }
+  ]
+}

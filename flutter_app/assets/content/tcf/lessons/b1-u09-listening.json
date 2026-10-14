@@ -1,0 +1,58 @@
+{
+  "id": "b1-u09-listening",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Les participants ont été accueillis à l'entrée. On leur a remis un badge et le matériel a été distribué dans la salle. En suivant les panneaux, ils ont trouvé leur groupe.",
+      "question": "What did participants receive at the entrance?",
+      "options": [
+        "A certificate",
+        "A new schedule",
+        "A bus ticket",
+        "A badge"
+      ],
+      "answer": 3,
+      "explain": "They received a badge at the entrance."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "On peut s'inscrire au comptoir. Les places sont confirmées par courriel, et les personnes qui annulent doivent prévenir le centre avant mardi.",
+      "question": "How are places confirmed?",
+      "options": [
+        "By phone only",
+        "By email",
+        "By a paper notice",
+        "At the bus stop"
+      ],
+      "answer": 1,
+      "explain": "The notice says confirmation is sent by email."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "En aidant à installer les chaises, plusieurs bénévoles ont rencontré les participants. La responsable a ensuite expliqué que le matériel serait rangé après la dernière activité.",
+      "question": "When will the equipment be put away?",
+      "options": [
+        "During registration",
+        "The next month",
+        "After the last activity",
+        "Before volunteers arrive"
+      ],
+      "answer": 2,
+      "explain": "The coordinator says it will be put away after the final activity."
+    }
+  ]
+}

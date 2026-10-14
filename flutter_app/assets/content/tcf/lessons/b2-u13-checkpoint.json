@@ -1,0 +1,75 @@
+{
+  "id": "b2-u13-checkpoint",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is une thèse?",
+      "options": [
+        "A reservation",
+        "A schedule",
+        "A public statement",
+        "A central position"
+      ],
+      "answer": 3,
+      "explain": "Une thèse is the main position or claim."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How long is oral Task 3?",
+      "options": [
+        "3 minutes 30 seconds after 2 minutes prep",
+        "4 minutes 30 seconds, with no preparation",
+        "2 minutes total",
+        "12 minutes of preparation"
+      ],
+      "answer": 1,
+      "explain": "Task 3 is a 4 minute 30 second spontaneous viewpoint task."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does a relevant example do?",
+      "options": [
+        "Removes the need for a position",
+        "Replaces the conclusion",
+        "Supports an idea",
+        "Proves every person agrees"
+      ],
+      "answer": 2,
+      "explain": "An example supports a reason but does not prove a universal claim."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What should you do after a follow-up changes a condition?",
+      "options": [
+        "Adapt your answer to the new condition",
+        "Restart the entire test",
+        "Ignore the question",
+        "Repeat the memorized model"
+      ],
+      "answer": 0,
+      "explain": "Responsive interaction requires adapting the answer."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is a useful repair?",
+      "options": [
+        "A repeated filler phrase",
+        "A claim with no verb",
+        "An unrelated new argument",
+        "A concise reformulation that clarifies meaning"
+      ],
+      "answer": 3,
+      "explain": "A brief reformulation helps the listener follow the intended meaning."
+    }
+  ]
+}

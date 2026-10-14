@@ -1,0 +1,166 @@
+{
+  "id": "a2-u08-words-5",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Words: project outputs and communication",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un résumé de réunion",
+      "en": "a meeting summary",
+      "sound": "uh(n) ray-zü-MAY duh ray-ü-NYOH(N)",
+      "exampleFr": "Nous partageons le résumé de réunion avec le groupe.",
+      "exampleEn": "We share the meeting summary with the group."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un fichier PDF",
+      "en": "a PDF file",
+      "sound": "uh(n) fee-SHYAY pay-day-EHF",
+      "exampleFr": "Le fichier PDF est en pièce jointe.",
+      "exampleEn": "The PDF file is attached."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une présentation de groupe",
+      "en": "a group presentation",
+      "sound": "ün pray-zah(n)-tah-SYOH(N) duh groop",
+      "exampleFr": "Le groupe présente son travail vendredi.",
+      "exampleEn": "The group presents its work on Friday."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un enregistrement audio",
+      "en": "an audio recording",
+      "sound": "uh(n) ah(n)-ruh-zhees-truh-MAH(N) oh-DYOH",
+      "exampleFr": "J'écoute l'enregistrement audio avant la réunion.",
+      "exampleEn": "I listen to the audio recording before the meeting."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un rapport de projet",
+      "en": "a project report",
+      "sound": "uh(n) rah-POHR duh proh-ZHEH",
+      "exampleFr": "Nous corrigeons le rapport de projet ensemble.",
+      "exampleEn": "We correct the project report together."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une note de lecture",
+      "en": "a reading note",
+      "sound": "ün noht duh lehk-TÜHR",
+      "exampleFr": "J'écris une note de lecture pour le cours.",
+      "exampleEn": "I write a reading note for the course."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un message de rappel",
+      "en": "a reminder message",
+      "sound": "uh(n) meh-SAHZH duh rah-PEHL",
+      "exampleFr": "J'envoie un message de rappel aux membres du groupe.",
+      "exampleEn": "I send a reminder message to the group members."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une feuille de présence",
+      "en": "an attendance sheet",
+      "sound": "ün fuhy duh pray-ZAH(N)S",
+      "exampleFr": "Je signe la feuille de présence au début du cours.",
+      "exampleEn": "I sign the attendance sheet at the start of class."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un résumé de réunion",
+      "options": [
+        "an audio recording",
+        "a meeting summary",
+        "a reminder message",
+        "a PDF file"
+      ],
+      "answer": 1,
+      "explain": "un résumé de réunion means a meeting summary."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un fichier PDF",
+      "options": [
+        "a project report",
+        "an attendance sheet",
+        "a group presentation",
+        "a PDF file"
+      ],
+      "answer": 3,
+      "explain": "un fichier PDF means a PDF file."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une présentation de groupe",
+      "options": [
+        "a reading note",
+        "a group presentation",
+        "a meeting summary",
+        "an audio recording"
+      ],
+      "answer": 1,
+      "explain": "une présentation de groupe means a group presentation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un enregistrement audio",
+      "options": [
+        "a reminder message",
+        "a PDF file",
+        "a project report",
+        "an audio recording"
+      ],
+      "answer": 3,
+      "explain": "un enregistrement audio means an audio recording."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un rapport de projet",
+      "options": [
+        "an attendance sheet",
+        "a project report",
+        "a group presentation",
+        "a reading note"
+      ],
+      "answer": 1,
+      "explain": "un rapport de projet means a project report."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une note de lecture",
+      "options": [
+        "a meeting summary",
+        "an audio recording",
+        "a reminder message",
+        "a reading note"
+      ],
+      "answer": 3,
+      "explain": "une note de lecture means a reading note."
+    }
+  ]
+}

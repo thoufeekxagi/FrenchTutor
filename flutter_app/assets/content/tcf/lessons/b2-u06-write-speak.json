@@ -1,0 +1,63 @@
+{
+  "id": "b2-u06-write-speak",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two fictional viewpoints discuss whether a public-facing service should use a digital-only process. One emphasizes speed and easier updates; the other emphasizes access, privacy and alternatives. Compare them and give a qualified position in 130–160 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux textes reconnaissent que les outils numériques peuvent simplifier certaines démarches. Le premier met l'accent sur la rapidité et sur la mise à jour des renseignements. Le second rappelle toutefois que l'accès à Internet, la protection des données et la facilité d'utilisation ne sont pas identiques pour tout le monde. À mon avis, le service numérique devrait être proposé, mais il ne devrait pas être la seule solution. Si une personne ne pouvait pas utiliser l'application, une autre méthode devrait rester disponible. Il faudrait également expliquer quelles données sont recueillies et permettre aux utilisateurs de modifier leur choix. Ainsi, le service pourrait être pratique sans exclure les personnes qui ont des contraintes différentes. Son efficacité devrait être évaluée avant de généraliser le modèle.\n\nCheck:\n• Task 3 range: 120–180 words.\n• Compare both sources and separate your position from theirs.\n• Use a conditional hypothesis accurately; never write conditional after si.\n• Name at least one uncertainty the sources do not resolve."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Task 3: Les services publics devraient-ils être offerts uniquement en ligne ? State a position, explain access and convenience, test your view with one hypothetical and answer Marie's changed scenario. Do not claim the hypothetical proves a real result.\n\n• Choose a realistic, unreal-present or unreal-past si pattern intentionally.\n• Use a conditional to discuss possibility, not to present a proven fact.\n• Marie changes the access constraint; adapt the recommendation."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je ne pense pas que les services devraient être offerts uniquement en ligne.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Une application peut rendre une démarche plus rapide pour les personnes qui disposent d'un appareil et d'une connexion fiable. Cependant, ces conditions ne sont pas universelles.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si une personne ne pouvait pas accéder au service en ligne, elle devrait pouvoir utiliser une autre méthode.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Les options numériques peuvent aussi faciliter les mises à jour, à condition que les règles et la collecte des données soient expliquées.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "À mon avis, il faut garder plusieurs voies d'accès et évaluer les difficultés rencontrées. La technologie est utile si elle élargit l'accès au lieu de le réduire.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

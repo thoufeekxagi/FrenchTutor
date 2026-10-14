@@ -1,0 +1,52 @@
+{
+  "id": "b1-u02-reading",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When will the date be confirmed?",
+      "options": [
+        "August 1",
+        "August 15",
+        "September 9",
+        "The next term"
+      ],
+      "answer": 1,
+      "explain": "The notice says confirmation will be emailed August 15.",
+      "promptFr": "PROGRAMME DU SOIR — Début prévu : 9 septembre. La date sera confirmée par courriel le 15 août. Si le groupe compte assez de participants, les cours auront lieu les mardis et jeudis. Les candidatures reçues après le 1er août seront examinées pour le trimestre suivant."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What will the writer do if the leave is not confirmed?",
+      "options": [
+        "Move the course to August",
+        "Cancel all future courses",
+        "Apply for a different job",
+        "Ask whether remote participation is possible"
+      ],
+      "answer": 3,
+      "explain": "The writer will ask about a remote option.",
+      "promptFr": "Message — Si mon employeur confirme mes congés, je suivrai la formation en personne. Sinon, je demanderai si une option à distance est possible. Quand j'aurai une réponse, je vous écrirai."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is confirmed, and what remains unknown?",
+      "options": [
+        "The program starts in September; the placement date is unknown",
+        "The placement is cancelled",
+        "Both dates are confirmed",
+        "The program begins after the placement"
+      ],
+      "answer": 0,
+      "explain": "The text distinguishes the confirmed program start from the unknown placement date.",
+      "promptFr": "Le conseiller explique que le stage dépend des places disponibles. Le programme d'études commencera en septembre, mais le centre ne peut pas encore préciser la date du placement."
+    }
+  ]
+}

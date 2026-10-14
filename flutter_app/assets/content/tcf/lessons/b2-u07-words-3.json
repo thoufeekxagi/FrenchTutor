@@ -1,0 +1,148 @@
+{
+  "id": "b2-u07-words-3",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une émission",
+      "en": "an emission; broadcast",
+      "sound": "ün ay-mee-SYOH(N)",
+      "exampleFr": "L'émission de gaz varie selon le mode de transport.",
+      "exampleEn": "Emissions vary depending on the mode of transport."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un gaz à effet de serre",
+      "en": "a greenhouse gas",
+      "sound": "uh(n) gah ah ay-FEH duh sehr",
+      "exampleFr": "Le rapport décrit les gaz à effet de serre du secteur.",
+      "exampleEn": "The report describes the sector's greenhouse gases."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un seuil réglementaire",
+      "en": "a regulatory threshold",
+      "sound": "uh(n) suhy ray-gleh-mahn-TEHR",
+      "exampleFr": "Le document compare les résultats au seuil réglementaire.",
+      "exampleEn": "The document compares the results with the regulatory threshold."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une économie circulaire",
+      "en": "a circular economy",
+      "sound": "ün ay-koh-noh-MEE sehr-kü-LEHR",
+      "exampleFr": "L'économie circulaire privilégie la réparation et le réemploi.",
+      "exampleEn": "A circular economy prioritizes repair and reuse."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une énergie renouvelable",
+      "en": "renewable energy",
+      "sound": "ün ay-nehr-ZHEE ruh-noo-vuh-LAHBL",
+      "exampleFr": "Le projet utilise une énergie renouvelable pour le bâtiment.",
+      "exampleEn": "The project uses renewable energy for the building."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une mesure incitative",
+      "en": "an incentive measure",
+      "sound": "ün muh-ZÜR ehn-see-tah-TEEV",
+      "exampleFr": "Une mesure incitative encourage la rénovation énergétique.",
+      "exampleEn": "An incentive measure encourages energy retrofits."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une émission",
+      "options": [
+        "a circular economy",
+        "an emission; broadcast",
+        "a greenhouse gas",
+        "a regulatory threshold"
+      ],
+      "answer": 1,
+      "explain": "une émission means an emission; broadcast."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un gaz à effet de serre",
+      "options": [
+        "renewable energy",
+        "a regulatory threshold",
+        "a circular economy",
+        "a greenhouse gas"
+      ],
+      "answer": 3,
+      "explain": "un gaz à effet de serre means a greenhouse gas."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un seuil réglementaire",
+      "options": [
+        "an incentive measure",
+        "a regulatory threshold",
+        "a circular economy",
+        "renewable energy"
+      ],
+      "answer": 1,
+      "explain": "un seuil réglementaire means a regulatory threshold."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une économie circulaire",
+      "options": [
+        "an emission; broadcast",
+        "renewable energy",
+        "an incentive measure",
+        "a circular economy"
+      ],
+      "answer": 3,
+      "explain": "une économie circulaire means a circular economy."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une énergie renouvelable",
+      "options": [
+        "a greenhouse gas",
+        "renewable energy",
+        "an incentive measure",
+        "an emission; broadcast"
+      ],
+      "answer": 1,
+      "explain": "une énergie renouvelable means renewable energy."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une mesure incitative",
+      "options": [
+        "a regulatory threshold",
+        "an emission; broadcast",
+        "a greenhouse gas",
+        "an incentive measure"
+      ],
+      "answer": 3,
+      "explain": "une mesure incitative means an incentive measure."
+    }
+  ]
+}

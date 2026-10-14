@@ -1,0 +1,144 @@
+{
+  "id": "a2-u08-dialogues",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Track which person owns each task and which document the pronouns replace. If you lose the reference, ask a short clarification question before continuing."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Prepare the meeting report",
+      "body": "Sam and Lina coordinate a project meeting at a training centre.",
+      "examples": [
+        {
+          "fr": "Le compte rendu, tu le relis avant midi ?",
+          "en": "Lina: The meeting report, can you proofread it before noon?"
+        },
+        {
+          "fr": "Oui, je le relis après le cours.",
+          "en": "Sam: Yes, I will proofread it after class."
+        },
+        {
+          "fr": "Et la version finale ?",
+          "en": "Lina: And the final version?"
+        },
+        {
+          "fr": "Je la corrige avec le tuteur de stage.",
+          "en": "Sam: I am correcting it with the internship supervisor."
+        },
+        {
+          "fr": "Les fichiers du projet sont dans le dossier partagé.",
+          "en": "Lina: The project files are in the shared folder."
+        },
+        {
+          "fr": "Je vais les classer par date et enregistrer la version finale.",
+          "en": "Sam: I am going to file them by date and save the final version."
+        },
+        {
+          "fr": "Tu peux envoyer le compte rendu au groupe ?",
+          "en": "Lina: Can you send the report to the group?"
+        },
+        {
+          "fr": "Oui, je vais l'envoyer avant la réunion.",
+          "en": "Sam: Yes, I am going to send it before the meeting."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Clarify the assignment",
+      "body": "Nadia asks a classmate which item the instructor needs first.",
+      "examples": [
+        {
+          "fr": "La formatrice demande le plan de présentation et la liste de corrections.",
+          "en": "Nadia: The instructor asks for the presentation outline and list of corrections."
+        },
+        {
+          "fr": "Tu vas les préparer aujourd'hui ?",
+          "en": "Karim: Are you going to prepare them today?"
+        },
+        {
+          "fr": "Je vais préparer le plan, mais la liste est prête.",
+          "en": "Nadia: I am going to prepare the outline, but the list is ready."
+        },
+        {
+          "fr": "Tu la remets avec le brouillon ?",
+          "en": "Karim: Are you handing it in with the draft?"
+        },
+        {
+          "fr": "Oui, je la joins au dossier de projet.",
+          "en": "Nadia: Yes, I am attaching it to the project file."
+        },
+        {
+          "fr": "Et le brouillon, tu l'envoies aussi ?",
+          "en": "Karim: And the draft, are you sending it too?"
+        },
+        {
+          "fr": "Oui. Je vais l'envoyer après avoir relu les corrections.",
+          "en": "Nadia: Yes. I am going to send it after rereading the corrections."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When will Sam proofread the report?",
+      "options": [
+        "After class",
+        "Before the course starts",
+        "Next month",
+        "At the weekend"
+      ],
+      "answer": 0,
+      "explain": "Sam says he will reread it after class."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What will Sam do with the project files?",
+      "options": [
+        "File them by date",
+        "Delete them",
+        "Print every copy",
+        "Send them to a clinic"
+      ],
+      "answer": 0,
+      "explain": "He says he will classify them by date."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which items does the instructor request?",
+      "options": [
+        "The outline and correction list",
+        "The audio file and rent notice",
+        "The lease and reference document",
+        "The class schedule and transcript"
+      ],
+      "answer": 0,
+      "explain": "Nadia names the outline and list of corrections."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Nadia attach to the project file?",
+      "options": [
+        "The correction list",
+        "The final report",
+        "The class schedule",
+        "The audio recording"
+      ],
+      "answer": 0,
+      "explain": "She says she attaches the list to the project file."
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "b1-u01-reading",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What had the teacher done before sending the notice?",
+      "options": [
+        "Changed the course topic",
+        "Reserved another room",
+        "Cancelled the next session",
+        "Sent everyone home"
+      ],
+      "answer": 1,
+      "explain": "The notice says she had reserved room 204 before sending the update.",
+      "promptFr": "Message — Le cours devait commencer à 18 h. La salle étant encore occupée, l'enseignante avait réservé la salle 204. Elle a envoyé un avis à 16 h 30. Le cours a finalement commencé à 18 h 20. Les personnes déjà parties ont reçu un lien pour la séance suivante."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why were the participants waiting outside?",
+      "options": [
+        "The centre had moved to another city",
+        "The event had ended",
+        "The main entrance was closed",
+        "They had lost the room number"
+      ],
+      "answer": 2,
+      "explain": "The account states the main entrance was closed.",
+      "promptFr": "Compte rendu — Nous attendions dehors parce que la porte principale était fermée. Une participante avait appelé le centre plus tôt, mais la réponse n'était pas arrivée. Un employé nous a finalement indiqué l'entrée latérale."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is the reason the first notice did not reach Karim?",
+      "options": [
+        "It was sent to an old email address",
+        "He changed the meeting room",
+        "The meeting was not announced",
+        "He had not registered"
+      ],
+      "answer": 0,
+      "explain": "The first notice went to an old email address.",
+      "promptFr": "À la fin de la rencontre, Karim a expliqué qu'il n'avait pas reçu le premier avis. Il avait vérifié son adresse courriel le matin, mais le message avait été envoyé à une ancienne adresse."
+    }
+  ]
+}

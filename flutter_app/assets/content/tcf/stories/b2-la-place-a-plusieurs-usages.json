@@ -1,0 +1,387 @@
+{
+  "id": "b2-la-place-a-plusieurs-usages",
+  "title": "La place à plusieurs usages",
+  "titleEn": "A square with several uses",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "Residents debate a redesign that could improve access while changing the quiet character of a shared neighbourhood space.",
+  "unit": "b2-u04",
+  "sentences": [
+    {
+      "fr": "La municipalité souhaitait réaménager une petite place où les résidents se rencontraient depuis plusieurs années.",
+      "en": "The municipality wanted to redesign a small square where residents had met for several years."
+    },
+    {
+      "fr": "Le premier plan ajoutait une terrasse et un passage accessible, mais réduisait l'espace calme près des logements.",
+      "en": "The first plan added a patio and an accessible path, but reduced the quiet space near the homes."
+    },
+    {
+      "fr": "Pendant la consultation, une commerçante a soutenu le passage, tandis qu'un voisin craignait le bruit du soir.",
+      "en": "During the consultation, a shopkeeper supported the path, while a neighbour worried about evening noise."
+    },
+    {
+      "fr": "Une personne qui utilisait un fauteuil a expliqué que l'entrée actuelle était difficile après la pluie.",
+      "en": "A person who used a wheelchair explained that the current entrance was difficult after rain."
+    },
+    {
+      "fr": "Le comité a reconnu que chaque option entraînait une répercussion différente selon l'heure et l'usager.",
+      "en": "The committee recognized that each option had a different effect depending on the time and the user."
+    },
+    {
+      "fr": "Il a proposé d'essayer le nouvel accès et des heures limitées pour la terrasse avant de construire l'installation permanente.",
+      "en": "It proposed testing the new access and limited patio hours before building the permanent installation."
+    },
+    {
+      "fr": "Les commentaires recueillis pendant l'essai aideraient à ajuster le plan sans prétendre qu'un compromis satisferait tout le monde.",
+      "en": "Comments gathered during the trial would help adjust the plan without pretending one compromise would satisfy everyone.",
+      "note": "A consultation is most useful when a proposal identifies who may benefit, who may face a cost and how feedback can change the plan."
+    }
+  ],
+  "words": {
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "municipalité": {
+      "en": "municipality"
+    },
+    "souhaitait": {
+      "en": "wanted; hoped"
+    },
+    "réaménager": {
+      "en": "to redesign"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "petite": {
+      "en": "small, short",
+      "sound": "puh-TEET"
+    },
+    "place": {
+      "en": "square, plaza"
+    },
+    "où": {
+      "en": "where",
+      "sound": "oo"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "résidents": {
+      "en": "residents"
+    },
+    "se": {
+      "en": "oneself",
+      "pos": "pronoun"
+    },
+    "rencontraient": {
+      "en": "met; were meeting"
+    },
+    "depuis": {
+      "en": "since, for",
+      "sound": "duh-PWEE"
+    },
+    "plusieurs": {
+      "en": "several"
+    },
+    "années": {
+      "en": "years"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "premier": {
+      "en": "the first"
+    },
+    "plan": {
+      "en": "plan"
+    },
+    "ajoutait": {
+      "en": "was adding; added"
+    },
+    "terrasse": {
+      "en": "patio; terrace"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "passage": {
+      "en": "path; passage"
+    },
+    "accessible": {
+      "en": "accessible"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "réduisait": {
+      "en": "reduced; was reducing"
+    },
+    "l'espace": {
+      "en": "the space"
+    },
+    "calme": {
+      "en": "quiet; calm"
+    },
+    "près": {
+      "en": "near",
+      "pos": "preposition"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "logements": {
+      "en": "homes; accommodations",
+      "pos": "noun, masculine plural"
+    },
+    "pendant": {
+      "en": "during; while"
+    },
+    "consultation": {
+      "en": "consultation"
+    },
+    "commerçante": {
+      "en": "shopkeeper"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "soutenu": {
+      "en": "supported"
+    },
+    "tandis": {
+      "en": "whereas; while"
+    },
+    "qu'un": {
+      "en": "that a; than a"
+    },
+    "voisin": {
+      "en": "neighbour"
+    },
+    "craignait": {
+      "en": "feared"
+    },
+    "bruit": {
+      "en": "noise"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "personne": {
+      "en": "person"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "utilisait": {
+      "en": "used"
+    },
+    "fauteuil": {
+      "en": "armchair; wheelchair (in fauteuil roulant)"
+    },
+    "expliqué": {
+      "en": "explained"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "l'entrée": {
+      "en": "entrance, entryway",
+      "sound": "lah(n)-TRAY"
+    },
+    "actuelle": {
+      "en": "current"
+    },
+    "était": {
+      "en": "was"
+    },
+    "difficile": {
+      "en": "difficult"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "pluie": {
+      "en": "rain"
+    },
+    "comité": {
+      "en": "committee"
+    },
+    "reconnu": {
+      "en": "recognized"
+    },
+    "chaque": {
+      "en": "each; every"
+    },
+    "option": {
+      "en": "option"
+    },
+    "entraînait": {
+      "en": "caused; led to"
+    },
+    "répercussion": {
+      "en": "effect; consequence"
+    },
+    "différente": {
+      "en": "different"
+    },
+    "selon": {
+      "en": "according to",
+      "sound": "suh-LOH(N)"
+    },
+    "l'heure": {
+      "en": "hour; time on a clock",
+      "sound": "luhR"
+    },
+    "l'usager": {
+      "en": "the user"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "proposé": {
+      "en": "proposed"
+    },
+    "d'essayer": {
+      "en": "to try",
+      "sound": "eh-seh-YAY"
+    },
+    "nouvel": {
+      "en": "new (masculine before a vowel)",
+      "pos": "adjective"
+    },
+    "accès": {
+      "en": "access"
+    },
+    "heures": {
+      "en": "hours; clock times",
+      "pos": "noun, feminine plural"
+    },
+    "limitées": {
+      "en": "limited"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "construire": {
+      "en": "to build"
+    },
+    "l'installation": {
+      "en": "the installation"
+    },
+    "permanente": {
+      "en": "permanent"
+    },
+    "commentaires": {
+      "en": "comments"
+    },
+    "recueillis": {
+      "en": "collected"
+    },
+    "l'essai": {
+      "en": "a trial"
+    },
+    "aideraient": {
+      "en": "would help"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "ajuster": {
+      "en": "to adjust"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "prétendre": {
+      "en": "to claim"
+    },
+    "compromis": {
+      "en": "a compromise"
+    },
+    "satisferait": {
+      "en": "would satisfy"
+    },
+    "tout": {
+      "en": "all; whole"
+    },
+    "monde": {
+      "en": "people; crowd"
+    }
+  },
+  "keywords": [
+    "place",
+    "plan",
+    "terrasse",
+    "passage",
+    "consultation",
+    "accès",
+    "compromis"
+  ],
+  "quiz": [
+    {
+      "prompt": "What did the first plan add?",
+      "options": [
+        "A permanent evening concert stage",
+        "A new apartment building",
+        "A patio and an accessible path",
+        "A larger quiet area near the homes"
+      ],
+      "answer": 2,
+      "explain": "The second sentence names both additions."
+    },
+    {
+      "prompt": "Why did the committee propose a trial?",
+      "options": [
+        "The consultation had no participants",
+        "Different options affected users in different ways",
+        "The square was no longer used",
+        "Everyone had already agreed on one plan"
+      ],
+      "answer": 1,
+      "explain": "The committee recognized that effects varied by time and user."
+    },
+    {
+      "prompt": "What would the trial help the committee do?",
+      "options": [
+        "Avoid collecting feedback",
+        "Prove that every resident liked it",
+        "Remove access from the design",
+        "Adjust the plan using comments"
+      ],
+      "answer": 3,
+      "explain": "The last sentence says the feedback would help adjust the plan."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "b1-u06-tcf",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le chantier a fermé l'entrée principale. Par conséquent, les visiteurs doivent utiliser la porte latérale. Le détour est plus long, toutefois une rampe d'accès est disponible à cette entrée.",
+      "question": "What is one result of the entrance closure?",
+      "options": [
+        "The construction has ended",
+        "The ramp has been removed",
+        "Visitors must use the side door",
+        "The centre is permanently closed"
+      ],
+      "answer": 2,
+      "explain": "The notice says visitors must use the side door."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La nouvelle ligne a été ajoutée afin de desservir le quartier. Elle ne passe pas toutes les dix minutes, alors certains résidents devront attendre plus longtemps.",
+      "question": "What limitation does the speaker mention?",
+      "options": [
+        "The service is less frequent",
+        "The line does not serve the neighbourhood",
+        "The bus stops at every home",
+        "The route is free"
+      ],
+      "answer": 0,
+      "explain": "The new service is not as frequent, so the wait may be longer."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why was the temporary ramp installed?",
+      "options": [
+        "So the station can move",
+        "To shorten the construction period",
+        "To close the north entrance",
+        "So people with reduced mobility can reach the platform"
+      ],
+      "answer": 3,
+      "explain": "The notice states the ramp allows access to the platform.",
+      "promptFr": "AVIS DE TRAVAUX — La passerelle sera fermée du 4 au 18 juin. Afin de rejoindre la station, suivez les panneaux vers l'entrée nord. Ce trajet prend environ six minutes de plus. Une rampe temporaire est installée pour que les personnes à mobilité réduite puissent accéder au quai."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What has not yet been calculated?",
+      "options": [
+        "The current closing time",
+        "Number of workers",
+        "Staffing cost",
+        "The centre's address"
+      ],
+      "answer": 2,
+      "explain": "The report says staffing cost has not been calculated.",
+      "promptFr": "Le comité souhaite prolonger les heures d'ouverture parce que des travailleurs terminent tard. Toutefois, le rapport précise que le coût du personnel n'a pas encore été calculé. Une période d'essai permettrait de mesurer la fréquentation avant de prendre une décision permanente."
+    }
+  ]
+}

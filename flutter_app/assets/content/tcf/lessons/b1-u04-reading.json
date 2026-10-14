@@ -1,0 +1,52 @@
+{
+  "id": "b1-u04-reading",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which option is closer to work?",
+      "options": [
+        "Option A",
+        "Both are equally close",
+        "The notice does not say",
+        "Option B"
+      ],
+      "answer": 0,
+      "explain": "Option A is described as near the transit terminal, while B is forty minutes from work.",
+      "promptFr": "OPTION A — Studio près du terminus; chauffage compris; buanderie à laquelle les locataires ont accès au sous-sol. OPTION B — Appartement plus grand, dont le loyer est inférieur, mais situé à quarante minutes du travail. Les visites ont lieu sur rendez-vous."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why did the writer choose the evening group?",
+      "options": [
+        "It is closer to the writer's home",
+        "It fits around work",
+        "It is the only course offered",
+        "It has no placement"
+      ],
+      "answer": 1,
+      "explain": "The evening group fits the writer's work schedule.",
+      "promptFr": "La formation dont le conseiller m'avait parlé comprend un stage. J'ai préféré le groupe du soir, auquel je peux participer après mon travail. Le cours du samedi, que j'avais aussi considéré, se remplit rapidement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which two requirements does the committee mention?",
+      "options": [
+        "A place near a hospital",
+        "Parking and a larger stage",
+        "Bus access and step-free access",
+        "A lower rent and evening meals"
+      ],
+      "answer": 2,
+      "explain": "The text names transit access and accessible entry.",
+      "promptFr": "Le comité recherche une salle qui est accessible en autobus. Il veut aussi choisir un lieu auquel les personnes en fauteuil peuvent accéder sans aide. Le budget dont il dispose reste limité."
+    }
+  ]
+}

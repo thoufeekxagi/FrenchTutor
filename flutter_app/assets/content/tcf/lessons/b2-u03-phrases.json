@@ -1,0 +1,134 @@
+{
+  "id": "b2-u03-phrases",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Phrases",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "These chunks help you organize a real response. Choose the one that matches your meaning, say it from memory, and replace the topic details with your own."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "un programme qui mène à…",
+      "en": "a program that leads to…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "les compétences dont j'ai besoin",
+      "en": "the skills I need",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "le poste auquel je m'intéresse",
+      "en": "the position I am interested in",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "ce qui me convient le mieux",
+      "en": "what suits me best",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "ce dont il faut tenir compte",
+      "en": "what must be taken into account",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "un parcours au cours duquel…",
+      "en": "a pathway during which…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "un critère que je peux vérifier",
+      "en": "a criterion that I can verify",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "la personne à qui je poserai la question",
+      "en": "the person I will ask the question to",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "les compétences dont j'ai besoin",
+      "options": [
+        "what must be taken into account",
+        "the skills I need",
+        "the position I am interested in",
+        "what suits me best"
+      ],
+      "answer": 1,
+      "explain": "les compétences dont j'ai besoin means the skills I need."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le poste auquel je m'intéresse",
+      "options": [
+        "a criterion that I can verify",
+        "what suits me best",
+        "what must be taken into account",
+        "the position I am interested in"
+      ],
+      "answer": 3,
+      "explain": "le poste auquel je m'intéresse means the position I am interested in."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "ce qui me convient le mieux",
+      "options": [
+        "the person I will ask the question to",
+        "what suits me best",
+        "a criterion that I can verify",
+        "the skills I need"
+      ],
+      "answer": 1,
+      "explain": "ce qui me convient le mieux means what suits me best."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "ce dont il faut tenir compte",
+      "options": [
+        "the skills I need",
+        "a criterion that I can verify",
+        "the person I will ask the question to",
+        "what must be taken into account"
+      ],
+      "answer": 3,
+      "explain": "ce dont il faut tenir compte means what must be taken into account."
+    }
+  ]
+}

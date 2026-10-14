@@ -1,0 +1,176 @@
+{
+  "id": "b1-u01-words-2",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une réaction",
+      "en": "a reaction",
+      "sound": "ün ray-ahk-SYOH(N)",
+      "exampleFr": "Sa réaction a calmé le groupe.",
+      "exampleEn": "Her reaction calmed the group."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un résultat",
+      "en": "an outcome; a result",
+      "sound": "uh(n) ray-zül-TAH",
+      "exampleFr": "Le résultat était différent de ce que nous attendions.",
+      "exampleEn": "The outcome was different from what we expected."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "prévenir",
+      "en": "to let someone know",
+      "sound": "pray-vuh-NEER",
+      "exampleFr": "L'organisatrice nous a prévenus avant le départ.",
+      "exampleEn": "The organizer let us know before we left."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "déplacer",
+      "en": "to move; reschedule",
+      "sound": "day-plah-SAY",
+      "exampleFr": "Nous avons déplacé la rencontre au lendemain.",
+      "exampleEn": "We rescheduled the meeting for the next day."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "se rendre compte",
+      "en": "to realize",
+      "sound": "suh rah(n)dr kohn(t)",
+      "exampleFr": "Je me suis rendu compte que l'heure avait changé.",
+      "exampleEn": "I realized that the time had changed."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "finalement",
+      "en": "finally; in the end",
+      "sound": "fee-nahl-MAH(N)",
+      "exampleFr": "Finalement, nous avons trouvé une autre salle.",
+      "exampleEn": "In the end, we found another room."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une réaction",
+      "options": [
+        "to move; reschedule",
+        "a reaction",
+        "an outcome; a result",
+        "to let someone know"
+      ],
+      "answer": 1,
+      "explain": "une réaction means a reaction."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un résultat",
+      "options": [
+        "to realize",
+        "to let someone know",
+        "to move; reschedule",
+        "an outcome; a result"
+      ],
+      "answer": 3,
+      "explain": "un résultat means an outcome; a result."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "prévenir",
+      "options": [
+        "finally; in the end",
+        "to let someone know",
+        "to move; reschedule",
+        "to realize"
+      ],
+      "answer": 1,
+      "explain": "prévenir means to let someone know."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "déplacer",
+      "options": [
+        "a reaction",
+        "to realize",
+        "finally; in the end",
+        "to move; reschedule"
+      ],
+      "answer": 3,
+      "explain": "déplacer means to move; reschedule."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "se rendre compte",
+      "options": [
+        "an outcome; a result",
+        "to realize",
+        "finally; in the end",
+        "a reaction"
+      ],
+      "answer": 1,
+      "explain": "se rendre compte means to realize."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "finalement",
+      "options": [
+        "to let someone know",
+        "a reaction",
+        "an outcome; a result",
+        "finally; in the end"
+      ],
+      "answer": 3,
+      "explain": "finalement means finally; in the end."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un résultat",
+      "question": "Which word did you hear?",
+      "options": [
+        "déplacer",
+        "un résultat",
+        "une réaction",
+        "prévenir"
+      ],
+      "answer": 1,
+      "explain": "You heard un résultat: an outcome; a result."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "prévenir",
+      "question": "Which word did you hear?",
+      "options": [
+        "finalement",
+        "un résultat",
+        "déplacer",
+        "prévenir"
+      ],
+      "answer": 3,
+      "explain": "You heard prévenir: to let someone know."
+    }
+  ]
+}

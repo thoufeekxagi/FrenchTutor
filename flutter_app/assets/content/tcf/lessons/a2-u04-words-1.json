@@ -1,0 +1,194 @@
+{
+  "id": "a2-u04-words-1",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Words: describe a neighbourhood",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "animé",
+      "en": "lively",
+      "sound": "ah-nee-MAY",
+      "exampleFr": "Le quartier était animé.",
+      "exampleEn": "The neighbourhood used to be lively."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "silencieux",
+      "en": "quiet",
+      "sound": "see-lah(n)-SYUH",
+      "exampleFr": "Le quartier était silencieux.",
+      "exampleEn": "The neighbourhood used to be quiet."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "bruyant",
+      "en": "noisy",
+      "sound": "brwee-YAH(N)",
+      "exampleFr": "Le quartier était bruyant.",
+      "exampleEn": "The neighbourhood used to be noisy."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "paisible",
+      "en": "peaceful",
+      "sound": "peh-zee-bl",
+      "exampleFr": "Le quartier était paisible.",
+      "exampleEn": "The neighbourhood used to be peaceful."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "central",
+      "en": "central",
+      "sound": "sah(n)-TRAHL",
+      "exampleFr": "Le quartier était central.",
+      "exampleEn": "The neighbourhood used to be central."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "éloigné",
+      "en": "far away",
+      "sound": "ay-lwah-NYAY",
+      "exampleFr": "Le quartier était éloigné.",
+      "exampleEn": "The neighbourhood used to be far away."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "accueillant",
+      "en": "welcoming",
+      "sound": "ah-kuh-YAH(N)",
+      "exampleFr": "Le quartier était accueillant.",
+      "exampleEn": "The neighbourhood used to be welcoming."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "familier",
+      "en": "familiar",
+      "sound": "fah-mee-LYAY",
+      "exampleFr": "Le quartier était familier.",
+      "exampleEn": "The neighbourhood used to be familiar."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "animé",
+      "options": [
+        "peaceful",
+        "lively",
+        "welcoming",
+        "quiet"
+      ],
+      "answer": 1,
+      "explain": "animé means lively."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "silencieux",
+      "options": [
+        "central",
+        "familiar",
+        "noisy",
+        "quiet"
+      ],
+      "answer": 3,
+      "explain": "silencieux means quiet."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "bruyant",
+      "options": [
+        "far away",
+        "noisy",
+        "lively",
+        "peaceful"
+      ],
+      "answer": 1,
+      "explain": "bruyant means noisy."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "paisible",
+      "options": [
+        "welcoming",
+        "quiet",
+        "central",
+        "peaceful"
+      ],
+      "answer": 3,
+      "explain": "paisible means peaceful."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "central",
+      "options": [
+        "familiar",
+        "central",
+        "noisy",
+        "far away"
+      ],
+      "answer": 1,
+      "explain": "central means central."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "éloigné",
+      "options": [
+        "lively",
+        "peaceful",
+        "welcoming",
+        "far away"
+      ],
+      "answer": 3,
+      "explain": "éloigné means far away."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "silencieux",
+      "question": "Which word did you hear?",
+      "options": [
+        "paisible",
+        "silencieux",
+        "éloigné",
+        "familier"
+      ],
+      "answer": 1,
+      "explain": "You heard silencieux: quiet."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "paisible",
+      "question": "Which word did you hear?",
+      "options": [
+        "paisible",
+        "éloigné",
+        "familier",
+        "silencieux"
+      ],
+      "answer": 0,
+      "explain": "You heard paisible: peaceful."
+    }
+  ]
+}

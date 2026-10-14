@@ -1,0 +1,148 @@
+{
+  "id": "b1-u05-words-5",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "surmonter un obstacle",
+      "en": "to overcome an obstacle",
+      "sound": "sür-mohn-tay uh(n) ohb-stahkl",
+      "exampleFr": "Elle a surmonté un obstacle grâce à un plan simple.",
+      "exampleEn": "She overcame an obstacle with a simple plan."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "s'attendre à",
+      "en": "to expect",
+      "sound": "sah-tahn-dr ah",
+      "exampleFr": "Il faut s'attendre à un délai de quelques jours.",
+      "exampleEn": "A delay of a few days should be expected."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "formuler une recommandation",
+      "en": "to make a recommendation",
+      "sound": "for-mü-lay ün ruh-koh-mahn-dah-SYOH(N)",
+      "exampleFr": "La conseillère peut formuler une recommandation adaptée.",
+      "exampleEn": "The advisor can make an appropriate recommendation."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "préférable",
+      "en": "preferable",
+      "sound": "pray-fay-RAH-bl",
+      "exampleFr": "Il est préférable de confirmer le rendez-vous la veille.",
+      "exampleEn": "It is preferable to confirm the appointment the day before."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "à long terme",
+      "en": "in the long term",
+      "sound": "ah lohn tehrm",
+      "exampleFr": "À long terme, un suivi régulier peut renforcer l'autonomie.",
+      "exampleEn": "In the long term, regular follow-up can strengthen independence."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "demander de l'aide",
+      "en": "to ask for help",
+      "sound": "duh-mah(n)-day duh leh",
+      "exampleFr": "Demander de l'aide peut éviter un retard important.",
+      "exampleEn": "Asking for help can prevent a significant delay."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "surmonter un obstacle",
+      "options": [
+        "preferable",
+        "to overcome an obstacle",
+        "to expect",
+        "to make a recommendation"
+      ],
+      "answer": 1,
+      "explain": "surmonter un obstacle means to overcome an obstacle."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "s'attendre à",
+      "options": [
+        "in the long term",
+        "to make a recommendation",
+        "preferable",
+        "to expect"
+      ],
+      "answer": 3,
+      "explain": "s'attendre à means to expect."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "formuler une recommandation",
+      "options": [
+        "to ask for help",
+        "to make a recommendation",
+        "preferable",
+        "in the long term"
+      ],
+      "answer": 1,
+      "explain": "formuler une recommandation means to make a recommendation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "préférable",
+      "options": [
+        "to overcome an obstacle",
+        "in the long term",
+        "to ask for help",
+        "preferable"
+      ],
+      "answer": 3,
+      "explain": "préférable means preferable."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "à long terme",
+      "options": [
+        "to expect",
+        "in the long term",
+        "to ask for help",
+        "to overcome an obstacle"
+      ],
+      "answer": 1,
+      "explain": "à long terme means in the long term."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "demander de l'aide",
+      "options": [
+        "to make a recommendation",
+        "to overcome an obstacle",
+        "to expect",
+        "to ask for help"
+      ],
+      "answer": 3,
+      "explain": "demander de l'aide means to ask for help."
+    }
+  ]
+}

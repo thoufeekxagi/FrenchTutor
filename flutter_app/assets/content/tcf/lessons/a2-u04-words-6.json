@@ -1,0 +1,172 @@
+{
+  "id": "a2-u04-words-6",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Words: past feelings and descriptions",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un sentiment de calme",
+      "en": "a sense of calm",
+      "sound": "uh(n) sah(n)-tee-MAH(N) duh kahlm",
+      "exampleFr": "Dans cette pièce, je ressentais un sentiment de calme.",
+      "exampleEn": "In that room, I felt a sense of calm."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une impression étrange",
+      "en": "a strange impression",
+      "sound": "ün ah(n)-pre-SYOH(N) ay-TRAH(N)ZH",
+      "exampleFr": "Cette pièce me donnait une impression étrange.",
+      "exampleEn": "That room gave me a strange impression."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un souvenir précis",
+      "en": "a clear memory",
+      "sound": "uh(n) soo-vuh-NEER pray-SEE",
+      "exampleFr": "Cette pièce me rappelait un souvenir précis.",
+      "exampleEn": "That room reminded me of a clear memory."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une ambiance chaleureuse",
+      "en": "a warm atmosphere",
+      "sound": "ün ah(n)-bee-AH(N)S shah-luh-RUHZ",
+      "exampleFr": "La pièce avait une ambiance chaleureuse.",
+      "exampleEn": "The room had a warm atmosphere."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un bruit de fond",
+      "en": "background noise",
+      "sound": "uh(n) brwee duh foh(n)",
+      "exampleFr": "J'entendais un bruit de fond dans la pièce.",
+      "exampleEn": "I could hear background noise in the room."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une odeur de café",
+      "en": "a smell of coffee",
+      "sound": "ün oh-DUHR duh kah-FAY",
+      "exampleFr": "Il y avait une odeur de café dans la pièce.",
+      "exampleEn": "There was a smell of coffee in the room."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un coin familier",
+      "en": "a familiar corner",
+      "sound": "uh(n) kwa(n) fah-mee-LYAY",
+      "exampleFr": "Dans la maison, je retrouvais un coin familier.",
+      "exampleEn": "In the house, I found a familiar corner again."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une lumière douce",
+      "en": "soft light",
+      "sound": "ün lü-MYEHR doos",
+      "exampleFr": "Une lumière douce entrait par la fenêtre.",
+      "exampleEn": "Soft light came through the window."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un sentiment de calme",
+      "options": [
+        "a warm atmosphere",
+        "a sense of calm",
+        "a familiar corner",
+        "a strange impression"
+      ],
+      "answer": 1,
+      "explain": "un sentiment de calme means a sense of calm."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une impression étrange",
+      "options": [
+        "background noise",
+        "soft light",
+        "a clear memory",
+        "a strange impression"
+      ],
+      "answer": 3,
+      "explain": "une impression étrange means a strange impression."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un souvenir précis",
+      "options": [
+        "a smell of coffee",
+        "a clear memory",
+        "a sense of calm",
+        "a warm atmosphere"
+      ],
+      "answer": 1,
+      "explain": "un souvenir précis means a clear memory."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une ambiance chaleureuse",
+      "options": [
+        "a familiar corner",
+        "a strange impression",
+        "background noise",
+        "a warm atmosphere"
+      ],
+      "answer": 3,
+      "explain": "une ambiance chaleureuse means a warm atmosphere."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un bruit de fond",
+      "options": [
+        "soft light",
+        "background noise",
+        "a clear memory",
+        "a smell of coffee"
+      ],
+      "answer": 1,
+      "explain": "un bruit de fond means background noise."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une odeur de café",
+      "options": [
+        "a sense of calm",
+        "a warm atmosphere",
+        "a familiar corner",
+        "a smell of coffee"
+      ],
+      "answer": 3,
+      "explain": "une odeur de café means a smell of coffee."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: past feelings and descriptions",
+      "body": "The past routines are personal examples, not claims about all Canadian cities. Housing terms such as sous-sol and cour intérieure depend on the property; confirm details in a real rental listing."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b2-u11-words-2",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une condition",
+      "en": "a condition",
+      "sound": "ün kohn-dee-SYOH(N)",
+      "exampleFr": "Je demande quelles conditions s'appliquent.",
+      "exampleEn": "I am asking which conditions apply."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un renseignement",
+      "en": "information",
+      "sound": "uh(n) rah(n)-sayn-MAH(N)",
+      "exampleFr": "Le renseignement manque dans la brochure.",
+      "exampleEn": "The information is missing from the brochure."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un horaire",
+      "en": "a schedule",
+      "sound": "uh(n) oh-REHR",
+      "exampleFr": "L'horaire varie selon la saison.",
+      "exampleEn": "The schedule varies by season."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une personne-ressource",
+      "en": "a contact person",
+      "sound": "ün pehr-sohn ruh-SOORS",
+      "exampleFr": "À quelle personne-ressource dois-je écrire ?",
+      "exampleEn": "Which contact person should I write to?"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une confirmation",
+      "en": "a confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Je demande une confirmation de la date.",
+      "exampleEn": "I am asking for confirmation of the date."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un suivi",
+      "en": "a follow-up",
+      "sound": "uh(n) süi-VEE",
+      "exampleFr": "Un suivi par courriel est proposé.",
+      "exampleEn": "An email follow-up is offered."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une condition",
+      "options": [
+        "a contact person",
+        "a condition",
+        "information",
+        "a schedule"
+      ],
+      "answer": 1,
+      "explain": "une condition means a condition."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un renseignement",
+      "options": [
+        "a confirmation",
+        "a schedule",
+        "a contact person",
+        "information"
+      ],
+      "answer": 3,
+      "explain": "un renseignement means information."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un horaire",
+      "options": [
+        "a follow-up",
+        "a schedule",
+        "a contact person",
+        "a confirmation"
+      ],
+      "answer": 1,
+      "explain": "un horaire means a schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une personne-ressource",
+      "options": [
+        "a condition",
+        "a confirmation",
+        "a follow-up",
+        "a contact person"
+      ],
+      "answer": 3,
+      "explain": "une personne-ressource means a contact person."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation",
+      "options": [
+        "information",
+        "a confirmation",
+        "a follow-up",
+        "a condition"
+      ],
+      "answer": 1,
+      "explain": "une confirmation means a confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un suivi",
+      "options": [
+        "a schedule",
+        "a condition",
+        "information",
+        "a follow-up"
+      ],
+      "answer": 3,
+      "explain": "un suivi means a follow-up."
+    }
+  ]
+}

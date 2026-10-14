@@ -1,0 +1,63 @@
+{
+  "id": "b2-u10-write-speak",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two fictional community representatives describe proposals for an evening learning space. One prioritizes access for shift workers; the other emphasizes safe, reliable transportation. Compare the views and propose a fair next step in 130–160 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux représentants souhaitent améliorer l'accès à l'espace d'apprentissage, mais ils mettent en avant des contraintes différentes. Le premier propose des heures en soirée pour les personnes qui travaillent le jour. Le second rappelle que les trajets tardifs peuvent être plus difficiles. À mon avis, il faudrait tester plusieurs horaires avant de choisir une règle permanente. Le groupe pourrait recueillir les commentaires des usagers et discuter avec les partenaires de transport. Il devrait aussi publier les résultats du premier essai. Cette démarche ne garantit pas que chaque besoin sera satisfait, mais elle rendrait la décision plus transparente. Il faut enfin préciser à quelle proposition le compte rendu fait référence; sinon, les lecteurs risquent de confondre les options. Un compromis devrait être évalué selon ses effets réels.\n\nCheck:\n• Task 3 range: 120–180 words.\n• Keep both speakers' positions distinct.\n• Use en or y only when its reference is unmistakable.\n• Propose a next step and state its limitation."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Task 3: Quand des groupes ne sont pas d'accord, faut-il chercher un compromis ou prendre une décision rapidement ? Give a clear position, distinguish common ground from disagreement and explain a practical next step. Marie should ask which proposal your pronoun refers to if it becomes unclear.\n\n• Summarize positions before evaluating them.\n• Repeat a key noun when en or y could have two references.\n• Respond to Marie's clarification question directly."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je pense qu'il faut chercher un compromis lorsque le désaccord concerne des besoins légitimes. Cela ne signifie pas que chaque option sera retenue.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Le groupe doit d'abord préciser les points d'accord, puis vérifier les contraintes qui restent.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Un essai limité peut aider si les critères sont publiés et si les personnes concernées peuvent donner leur avis.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Toutefois, lorsqu'une décision urgente est nécessaire, il faut expliquer pourquoi elle est prise et prévoir un suivi. À mon avis, la transparence compte autant que la rapidité.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je répéterais le nom d'une proposition si un pronom risque de rendre ma réponse ambiguë.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

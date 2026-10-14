@@ -1,0 +1,148 @@
+{
+  "id": "b1-u05-words-3",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une personne-ressource",
+      "en": "a support contact; resource person",
+      "sound": "ün pehr-sohn ruh-SOORS",
+      "exampleFr": "Une personne-ressource peut expliquer les prochaines étapes.",
+      "exampleEn": "A support contact can explain the next steps."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un rendez-vous de suivi",
+      "en": "a follow-up appointment",
+      "sound": "uh(n) rah(n)-day-voo duh sü-vee",
+      "exampleFr": "Un rendez-vous de suivi est prévu après l'inscription.",
+      "exampleEn": "A follow-up appointment is planned after registration."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une demande d'aide",
+      "en": "a request for help",
+      "sound": "ün duh-mahnd dehd",
+      "exampleFr": "La demande d'aide sera traitée cette semaine.",
+      "exampleEn": "The request for help will be handled this week."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un service d'accompagnement",
+      "en": "a guidance service",
+      "sound": "uh(n) sehr-vees dah-kohn-pah-nyuh-mahn",
+      "exampleFr": "Le service d'accompagnement aide les nouveaux participants.",
+      "exampleEn": "The guidance service helps new participants."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une ressource locale",
+      "en": "a local resource",
+      "sound": "ün ruh-soors loh-KAHL",
+      "exampleFr": "La bibliothèque est une ressource locale gratuite.",
+      "exampleEn": "The library is a free local resource."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une situation urgente",
+      "en": "an urgent situation",
+      "sound": "ün see-tü-ah-SYOH(N) ür-ZHAHNT",
+      "exampleFr": "La clinique peut répondre à une situation urgente.",
+      "exampleEn": "The clinic can respond to an urgent situation."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une personne-ressource",
+      "options": [
+        "a guidance service",
+        "a support contact; resource person",
+        "a follow-up appointment",
+        "a request for help"
+      ],
+      "answer": 1,
+      "explain": "une personne-ressource means a support contact; resource person."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un rendez-vous de suivi",
+      "options": [
+        "a local resource",
+        "a request for help",
+        "a guidance service",
+        "a follow-up appointment"
+      ],
+      "answer": 3,
+      "explain": "un rendez-vous de suivi means a follow-up appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une demande d'aide",
+      "options": [
+        "an urgent situation",
+        "a request for help",
+        "a guidance service",
+        "a local resource"
+      ],
+      "answer": 1,
+      "explain": "une demande d'aide means a request for help."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un service d'accompagnement",
+      "options": [
+        "a support contact; resource person",
+        "a local resource",
+        "an urgent situation",
+        "a guidance service"
+      ],
+      "answer": 3,
+      "explain": "un service d'accompagnement means a guidance service."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une ressource locale",
+      "options": [
+        "a follow-up appointment",
+        "a local resource",
+        "an urgent situation",
+        "a request for help"
+      ],
+      "answer": 1,
+      "explain": "une ressource locale means a local resource."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une situation urgente",
+      "options": [
+        "a request for help",
+        "a support contact; resource person",
+        "a follow-up appointment",
+        "an urgent situation"
+      ],
+      "answer": 3,
+      "explain": "une situation urgente means an urgent situation."
+    }
+  ]
+}

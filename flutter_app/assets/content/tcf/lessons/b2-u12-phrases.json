@@ -1,0 +1,78 @@
+{
+  "id": "b2-u12-phrases",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Phrases",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "These chunks help you organize a real response. Choose the one that matches your meaning, say it from memory, and replace the topic details with your own."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Le premier document met l'accent sur…",
+      "en": "The first document emphasizes…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Le second fait valoir que…",
+      "en": "The second argues that…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Les deux textes s'accordent sur…",
+      "en": "Both texts agree on…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Ils divergent toutefois quant à…",
+      "en": "They differ, however, on…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Autrement dit, …",
+      "en": "In other words, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Cette idée est nuancée par…",
+      "en": "This idea is qualified by…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "À mon sens, …",
+      "en": "In my view, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Il serait préférable de…, pourvu que…",
+      "en": "It would be preferable to…, provided that…",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

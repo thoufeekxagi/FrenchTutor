@@ -1,0 +1,148 @@
+{
+  "id": "b1-u01-words-3",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une panne",
+      "en": "a breakdown; an outage",
+      "sound": "ün pahn",
+      "exampleFr": "Une panne a interrompu le cours pendant vingt minutes.",
+      "exampleEn": "A breakdown interrupted class for twenty minutes."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un changement de dernière minute",
+      "en": "a last-minute change",
+      "sound": "uh(n) shahnzh-mahn duh dehr-nee-ehr meen-üt",
+      "exampleFr": "Un changement de dernière minute a surpris le groupe.",
+      "exampleEn": "A last-minute change surprised the group."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une consigne provisoire",
+      "en": "a temporary instruction",
+      "sound": "ün kohn-seeny proh-vee-ZWAHR",
+      "exampleFr": "La consigne provisoire reste valable jusqu'à demain.",
+      "exampleEn": "The temporary instruction remains in effect until tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une salle de remplacement",
+      "en": "a replacement room",
+      "sound": "ün sal duh rah(n)-plahs-mahn",
+      "exampleFr": "Une salle de remplacement est indiquée à l'entrée.",
+      "exampleEn": "A replacement room is listed at the entrance."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un avis préalable",
+      "en": "advance notice",
+      "sound": "uh(n) ah-vee pray-ah-LAHBL",
+      "exampleFr": "L'organisme enverra un avis préalable par courriel.",
+      "exampleEn": "The organization will send advance notice by email."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une confirmation écrite",
+      "en": "written confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N) ay-kreet",
+      "exampleFr": "Je demanderai une confirmation écrite de la nouvelle heure.",
+      "exampleEn": "I will ask for written confirmation of the new time."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une panne",
+      "options": [
+        "a replacement room",
+        "a breakdown; an outage",
+        "a last-minute change",
+        "a temporary instruction"
+      ],
+      "answer": 1,
+      "explain": "une panne means a breakdown; an outage."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un changement de dernière minute",
+      "options": [
+        "advance notice",
+        "a temporary instruction",
+        "a replacement room",
+        "a last-minute change"
+      ],
+      "answer": 3,
+      "explain": "un changement de dernière minute means a last-minute change."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une consigne provisoire",
+      "options": [
+        "written confirmation",
+        "a temporary instruction",
+        "a replacement room",
+        "advance notice"
+      ],
+      "answer": 1,
+      "explain": "une consigne provisoire means a temporary instruction."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une salle de remplacement",
+      "options": [
+        "a breakdown; an outage",
+        "advance notice",
+        "written confirmation",
+        "a replacement room"
+      ],
+      "answer": 3,
+      "explain": "une salle de remplacement means a replacement room."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un avis préalable",
+      "options": [
+        "a last-minute change",
+        "advance notice",
+        "written confirmation",
+        "a breakdown; an outage"
+      ],
+      "answer": 1,
+      "explain": "un avis préalable means advance notice."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation écrite",
+      "options": [
+        "a temporary instruction",
+        "a breakdown; an outage",
+        "a last-minute change",
+        "written confirmation"
+      ],
+      "answer": 3,
+      "explain": "une confirmation écrite means written confirmation."
+    }
+  ]
+}

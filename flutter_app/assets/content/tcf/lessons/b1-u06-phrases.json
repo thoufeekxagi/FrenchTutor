@@ -1,0 +1,78 @@
+{
+  "id": "b1-u06-phrases",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Phrases",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Choose a phrase because it matches your meaning. Note one phrase, adapt its details to your own life, close your notes and say it in a different scene."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Cela s'explique par …",
+      "en": "This is explained by …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Par conséquent, …",
+      "en": "As a result, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Afin de …",
+      "en": "In order to …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Pour que …",
+      "en": "So that …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Alors que …",
+      "en": "Whereas …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Toutefois, …",
+      "en": "However, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Cela peut entraîner …",
+      "en": "This can lead to …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Il faut aussi tenir compte de …",
+      "en": "We also need to take … into account.",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

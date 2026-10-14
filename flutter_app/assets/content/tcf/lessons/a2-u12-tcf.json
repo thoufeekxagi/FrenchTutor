@@ -1,0 +1,100 @@
+{
+  "id": "a2-u12-tcf",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le rendez-vous est jeudi à 14 h. Je vais confirmer le nouvel horaire ce soir.",
+      "question": "When is the new appointment?",
+      "options": [
+        "Thursday at 2 p.m.",
+        "Tuesday at 2 p.m.",
+        "Thursday at 4 p.m.",
+        "Friday at 2 p.m."
+      ],
+      "answer": 0,
+      "explain": "The appointment is moved to Thursday at 14 h."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il pleuvait quand le bus est arrivé. La deuxième option est plus longue, mais plus simple.",
+      "question": "What is true about the second option?",
+      "options": [
+        "It is longer but simpler",
+        "It is shorter but less clear",
+        "It is cancelled",
+        "It starts earlier"
+      ],
+      "answer": 0,
+      "explain": "The recording directly compares the two qualities."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Pourriez-vous répéter le point de départ ? Je voudrais le noter.",
+      "question": "What does the speaker want repeated?",
+      "options": [
+        "The starting point",
+        "The meeting time",
+        "The reason for the delay",
+        "The review target"
+      ],
+      "answer": 0,
+      "explain": "The speaker asks to hear the starting point again."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where is the meeting point?",
+      "options": [
+        "At the main entrance",
+        "In the classroom",
+        "At the station platform",
+        "Near the bus stop"
+      ],
+      "answer": 0,
+      "explain": "The schedule names the main entrance as the starting point.",
+      "promptFr": "HORAIRE — Cours : 18 h. Réunion déplacée : jeudi à 19 h. Point de départ : entrée principale."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why did the writer choose this option?",
+      "options": [
+        "It is simpler and near the centre",
+        "It is shorter and free",
+        "It has a different meeting time",
+        "It avoids all travel"
+      ],
+      "answer": 0,
+      "explain": "The note says it is the simplest option and the place is near the centre.",
+      "promptFr": "NOTE PERSONNELLE — Je choisis l'option la plus simple. Elle est plus longue, mais le lieu est près du centre."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should the learner do after the practice test?",
+      "options": [
+        "Note an error and choose a point to review",
+        "Write a long opinion article",
+        "Cancel the next class",
+        "Repeat the same test immediately"
+      ],
+      "answer": 0,
+      "explain": "The reminder asks for one error and one review point after the test.",
+      "promptFr": "RAPPEL — Après le test blanc, une erreur fréquente est dans vos notes. Choisissez un point à revoir demain."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "b2-u01-listening",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je suis favorable à l'essai, à condition qu'on publie les critères avant le début. Sinon, les résultats seront difficiles à comparer.",
+      "question": "What condition does the speaker set?",
+      "options": [
+        "Compare only personal stories",
+        "End the trial after one day",
+        "Let each team choose new criteria later",
+        "Publish the criteria before the trial"
+      ],
+      "answer": 3,
+      "explain": "The speaker says the criteria should be published before the trial."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Certes, le bureau facilite les échanges rapides. Cela dit, le temps de transport représente une contrainte réelle pour une partie de l'équipe.",
+      "question": "What is the speaker doing?",
+      "options": [
+        "Changing the subject to travel",
+        "Acknowledging an advantage and adding a limitation",
+        "Reporting a final survey result",
+        "Rejecting all in-person meetings"
+      ],
+      "answer": 1,
+      "explain": "Certes acknowledges an advantage; cela dit introduces the limitation."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le sondage montre une préférence chez les répondants, mais l'échantillon est petit. On ne peut donc pas en déduire l'avis de toute l'organisation.",
+      "question": "What limit does the speaker identify?",
+      "options": [
+        "The sample is small",
+        "The organization has no offices",
+        "The question was about commuting",
+        "No one answered the survey"
+      ],
+      "answer": 0,
+      "explain": "The speaker explicitly warns that the sample is small."
+    }
+  ]
+}

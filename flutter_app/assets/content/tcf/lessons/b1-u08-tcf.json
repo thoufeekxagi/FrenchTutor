@@ -1,0 +1,72 @@
+{
+  "id": "b1-u08-tcf",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Pourriez-vous me dire si le formulaire peut être envoyé en ligne ? Oui, mais la preuve d'adresse doit être lisible. Le délai de réponse est de cinq jours ouvrables.",
+      "question": "What must be readable?",
+      "options": [
+        "The appointment calendar",
+        "The course schedule",
+        "Proof of address",
+        "The email subject"
+      ],
+      "answer": 2,
+      "explain": "The proof of address must be readable."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je voudrais savoir où déposer le document original. On m'a dit que je pouvais l'apporter à l'accueil, du lundi au jeudi.",
+      "question": "Where can the original document be left?",
+      "options": [
+        "At a bus terminal",
+        "At reception",
+        "By phone",
+        "At the library"
+      ],
+      "answer": 1,
+      "explain": "The speaker was told to bring it to reception."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When should applicants follow up?",
+      "options": [
+        "On August 15 at 16 h",
+        "After five business days",
+        "Before getting proof of address",
+        "Before sending the form"
+      ],
+      "answer": 1,
+      "explain": "The notice recommends following up after five business days.",
+      "promptFr": "INSCRIPTION — Envoyez le formulaire et une preuve d'adresse avant le 15 août. Pour confirmer que votre dossier est complet, communiquez avec le bureau après cinq jours ouvrables. Les documents originaux ne doivent pas être envoyés par la poste."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What information does the writer need?",
+      "options": [
+        "How to replace the document",
+        "Who will translate the form",
+        "Whether an appointment is required and where to see availability",
+        "Whether the office is moving"
+      ],
+      "answer": 2,
+      "explain": "The writer asks whether an appointment is required and where to check openings.",
+      "promptFr": "Message — Bonjour, je voudrais savoir si je dois prendre rendez-vous pour remettre le document. Si oui, pourriez-vous me dire où je peux consulter les disponibilités ? Merci."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "b2-u06-dialogues",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Reviewing a prototype",
+      "body": "A product team tests an invented service before deciding whether to launch it.",
+      "examples": [
+        {
+          "fr": "Le prototype enregistre les préférences pour accélérer la recherche.",
+          "en": "Awa: The prototype records preferences to speed up searching."
+        },
+        {
+          "fr": "Les utilisateurs peuvent-ils désactiver cette fonction ?",
+          "en": "Marc: Can users turn off this feature?"
+        },
+        {
+          "fr": "Oui, à condition qu'ils trouvent le paramètre.",
+          "en": "Awa: Yes, provided they can find the setting."
+        },
+        {
+          "fr": "Si l'option était plus visible, le choix serait plus clair.",
+          "en": "Marc: If the option were more visible, the choice would be clearer."
+        },
+        {
+          "fr": "C'est possible. Il faudrait aussi expliquer quelles données sont conservées.",
+          "en": "Awa: That's possible. We should also explain which data is retained."
+        },
+        {
+          "fr": "Si nous avions testé le formulaire plus tôt, nous aurions remarqué cette ambiguïté.",
+          "en": "Marc: If we had tested the form earlier, we would have noticed this ambiguity."
+        },
+        {
+          "fr": "Ajoutons une solution de rechange avant de refaire l'essai.",
+          "en": "Awa: Let's add an alternative before testing again."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Choosing an alternative",
+      "body": "Two friends compare two ways to complete a fictional online task.",
+      "examples": [
+        {
+          "fr": "Le service en ligne est rapide, mais il demande une autorisation.",
+          "en": "Sam: The online service is quick, but it asks for permission."
+        },
+        {
+          "fr": "Si je ne voulais pas partager cette donnée, pourrais-je utiliser une autre méthode ?",
+          "en": "Nadia: If I did not want to share this data, could I use another method?"
+        },
+        {
+          "fr": "Le document propose une solution de rechange par téléphone.",
+          "en": "Sam: The document offers a phone alternative."
+        },
+        {
+          "fr": "C'est important. Rien ne garantit que tout le monde a un appareil récent.",
+          "en": "Nadia: That's important. Nothing guarantees that everyone has a recent device."
+        },
+        {
+          "fr": "Alors, l'accès devrait rester possible de plusieurs façons.",
+          "en": "Sam: Then access should remain possible in several ways."
+        }
+      ]
+    }
+  ]
+}

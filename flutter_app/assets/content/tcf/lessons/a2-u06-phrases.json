@@ -1,0 +1,134 @@
+{
+  "id": "a2-u06-phrases",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "In your notes, draw two columns for two homes. Compare price, location and one feature; then close the notes and recommend one option for a person with a specific need."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Le studio est moins cher que l'appartement d'une chambre.",
+      "en": "The studio is less expensive than the one-bedroom apartment.",
+      "tip": "Say it: luh stü-DYOH eh mwan shehr kuh lah-pahr-tuh-MAH(N) dü-n shah(n)-br"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Le logement B est plus près de l'arrêt d'autobus.",
+      "en": "Home B is closer to the bus stop.",
+      "tip": "Say it: luh lohzh-MAH(N) bay eh plü preh duh lah-REH doh-toh-BÜS"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Les deux logements sont aussi lumineux l'un que l'autre.",
+      "en": "The two homes are just as bright as each other.",
+      "tip": "Say it: lay duh lohzh-MAH(N) sohn oh-SEE lü-mee-NUH lu(n) kuh lohtr"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Le quartier A est le plus paisible.",
+      "en": "Neighbourhood A is the most peaceful.",
+      "tip": "Say it: luh kahr-TYAY ah eh luh plü peh-zee-bl"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Le logement B a plus d'espace de rangement que le studio.",
+      "en": "Home B has more storage space than the studio.",
+      "tip": "Say it: luh lohzh-MAH(N) bay ah plü deh-SPAHS duh rah(n)-zhuh-MAH(N) kuh luh stü-DYOH"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Le loyer est moins élevé, mais le trajet est plus long.",
+      "en": "The rent is lower, but the trip is longer.",
+      "tip": "Say it: luh lwah-YAY eh mwan ay-luh-VAY meh luh trah-ZHAY eh plü lohn"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Cet appartement offre le meilleur accès au train.",
+      "en": "This apartment offers the best access to the train.",
+      "tip": "Say it: seht ah-pahr-tuh-MAH(N) ofr luh meh-YUHR ahk-SEH oh tra(n)"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Pour moi, le coût mensuel est le critère le plus important.",
+      "en": "For me, the monthly cost is the most important factor.",
+      "tip": "Say it: poor mwah luh koo mah(n)-sü-EHL eh luh kree-TEHR luh plü a(n)-por-TAH(N)"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Le studio est moins cher que l'appartement d'une chambre.",
+      "options": [
+        "Neighbourhood A is the most peaceful.",
+        "The studio is less expensive than the one-bedroom apartment.",
+        "Home B is closer to the bus stop.",
+        "For me, the monthly cost is the most important factor."
+      ],
+      "answer": 1,
+      "explain": "Le studio est moins cher que l'appartement d'une chambre. means The studio is less expensive than the one-bedroom apartment.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Les deux logements sont aussi lumineux l'un que l'autre.",
+      "options": [
+        "The rent is lower, but the trip is longer.",
+        "The two homes are just as bright as each other.",
+        "The studio is less expensive than the one-bedroom apartment.",
+        "Neighbourhood A is the most peaceful."
+      ],
+      "answer": 1,
+      "explain": "Les deux logements sont aussi lumineux l'un que l'autre. means The two homes are just as bright as each other.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Le logement B a plus d'espace de rangement que le studio.",
+      "options": [
+        "For me, the monthly cost is the most important factor.",
+        "Home B has more storage space than the studio.",
+        "The two homes are just as bright as each other.",
+        "The rent is lower, but the trip is longer."
+      ],
+      "answer": 1,
+      "explain": "Le logement B a plus d'espace de rangement que le studio. means Home B has more storage space than the studio.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Cet appartement offre le meilleur accès au train.",
+      "options": [
+        "Home B is closer to the bus stop.",
+        "This apartment offers the best access to the train.",
+        "Home B has more storage space than the studio.",
+        "For me, the monthly cost is the most important factor."
+      ],
+      "answer": 1,
+      "explain": "Cet appartement offre le meilleur accès au train. means This apartment offers the best access to the train.."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b1-u08-words-3",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un justificatif",
+      "en": "a supporting document; proof",
+      "sound": "uh(n) zhüs-tee-fee-KAH-teef",
+      "exampleFr": "Un justificatif de domicile est demandé.",
+      "exampleEn": "Proof of address is required."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une facture",
+      "en": "an invoice; bill",
+      "sound": "ün fahk-TÜR",
+      "exampleFr": "La facture indique le montant et la date du paiement.",
+      "exampleEn": "The bill shows the amount and payment date."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un numéro de dossier",
+      "en": "a file number",
+      "sound": "uh(n) nü-may-roh duh doh-syay",
+      "exampleFr": "Veuillez noter le numéro de dossier avant d'appeler.",
+      "exampleEn": "Please note the file number before calling."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une pièce manquante",
+      "en": "a missing document",
+      "sound": "ün pyehs mahn-KAHNT",
+      "exampleFr": "Le service a signalé une pièce manquante.",
+      "exampleEn": "The service reported a missing document."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la date limite",
+      "en": "the deadline",
+      "sound": "lah dat lee-MEET",
+      "exampleFr": "La date limite figure en haut du formulaire.",
+      "exampleEn": "The deadline appears at the top of the form."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "l'état d'avancement",
+      "en": "the status; progress",
+      "sound": "lay-tah dah-vahn-suh-MAH(N)",
+      "exampleFr": "Vous pouvez vérifier l'état d'avancement en ligne.",
+      "exampleEn": "You can check the status online."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un justificatif",
+      "options": [
+        "an invoice; bill",
+        "a supporting document; proof",
+        "a file number",
+        "the deadline"
+      ],
+      "answer": 1,
+      "explain": "un justificatif means a supporting document; proof."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une facture",
+      "options": [
+        "the deadline",
+        "a file number",
+        "a missing document",
+        "an invoice; bill"
+      ],
+      "answer": 3,
+      "explain": "une facture means an invoice; bill."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un numéro de dossier",
+      "options": [
+        "the status; progress",
+        "a file number",
+        "a missing document",
+        "the deadline"
+      ],
+      "answer": 1,
+      "explain": "un numéro de dossier means a file number."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une pièce manquante",
+      "options": [
+        "the deadline",
+        "the status; progress",
+        "an invoice; bill",
+        "a missing document"
+      ],
+      "answer": 3,
+      "explain": "une pièce manquante means a missing document."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la date limite",
+      "options": [
+        "an invoice; bill",
+        "the deadline",
+        "the status; progress",
+        "a supporting document; proof"
+      ],
+      "answer": 1,
+      "explain": "la date limite means the deadline."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "l'état d'avancement",
+      "options": [
+        "a file number",
+        "a supporting document; proof",
+        "an invoice; bill",
+        "the status; progress"
+      ],
+      "answer": 3,
+      "explain": "l'état d'avancement means the status; progress."
+    }
+  ]
+}

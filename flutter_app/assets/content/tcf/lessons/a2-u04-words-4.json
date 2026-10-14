@@ -1,0 +1,166 @@
+{
+  "id": "a2-u04-words-4",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Words: the weekly rhythm",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un rituel",
+      "en": "a routine",
+      "sound": "uh(n) ree-tü-EL",
+      "exampleFr": "À l'époque, j'avais un rituel après le travail.",
+      "exampleEn": "At that time, I had a routine after work."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un horaire régulier",
+      "en": "a regular schedule",
+      "sound": "uh(n) oh-REHR ray-gü-LYAY",
+      "exampleFr": "J'avais un horaire régulier du lundi au vendredi.",
+      "exampleEn": "I had a regular schedule from Monday to Friday."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une pause du midi",
+      "en": "a lunch break",
+      "sound": "ün pohz dü mee-DEE",
+      "exampleFr": "Je prenais une pause du midi avec mes collègues.",
+      "exampleEn": "I used to take a lunch break with my colleagues."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un jour de congé",
+      "en": "a day off",
+      "sound": "uh(n) zhoor duh kohn-ZHAY",
+      "exampleFr": "Je prenais mon jour de congé le vendredi.",
+      "exampleEn": "I used to take my day off on Friday."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une routine du soir",
+      "en": "an evening routine",
+      "sound": "ün roo-TEEN dü swahr",
+      "exampleFr": "Ma routine du soir commençait après le dîner.",
+      "exampleEn": "My evening routine started after dinner."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un trajet quotidien",
+      "en": "a daily commute",
+      "sound": "uh(n) trah-ZHAY koh-tee-DYAH(N)",
+      "exampleFr": "Mon trajet quotidien durait vingt minutes.",
+      "exampleEn": "My daily commute lasted twenty minutes."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une réunion hebdomadaire",
+      "en": "a weekly meeting",
+      "sound": "ün ray-ü-NYOH(N) ehb-doh-mah-DEHR",
+      "exampleFr": "La réunion hebdomadaire avait lieu le lundi.",
+      "exampleEn": "The weekly meeting took place on Mondays."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un commerce",
+      "en": "a shop; business",
+      "sound": "uh(n) koh-MEHRS",
+      "exampleFr": "Le commerce du quartier fermait à dix-huit heures.",
+      "exampleEn": "The shop in the neighbourhood used to close at six p.m."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un rituel",
+      "options": [
+        "a day off",
+        "a routine",
+        "a weekly meeting",
+        "a regular schedule"
+      ],
+      "answer": 1,
+      "explain": "un rituel means a routine."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un horaire régulier",
+      "options": [
+        "an evening routine",
+        "a shop; business",
+        "a lunch break",
+        "a regular schedule"
+      ],
+      "answer": 3,
+      "explain": "un horaire régulier means a regular schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une pause du midi",
+      "options": [
+        "a daily commute",
+        "a lunch break",
+        "a routine",
+        "a day off"
+      ],
+      "answer": 1,
+      "explain": "une pause du midi means a lunch break."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un jour de congé",
+      "options": [
+        "a weekly meeting",
+        "a regular schedule",
+        "an evening routine",
+        "a day off"
+      ],
+      "answer": 3,
+      "explain": "un jour de congé means a day off."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une routine du soir",
+      "options": [
+        "a shop; business",
+        "an evening routine",
+        "a lunch break",
+        "a daily commute"
+      ],
+      "answer": 1,
+      "explain": "une routine du soir means an evening routine."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un trajet quotidien",
+      "options": [
+        "a routine",
+        "a day off",
+        "a weekly meeting",
+        "a daily commute"
+      ],
+      "answer": 3,
+      "explain": "un trajet quotidien means a daily commute."
+    }
+  ]
+}

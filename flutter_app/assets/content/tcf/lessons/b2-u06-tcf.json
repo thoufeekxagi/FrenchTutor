@@ -1,0 +1,72 @@
+{
+  "id": "b2-u06-tcf",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Si l'équipe publie les paramètres avant le lancement, les utilisateurs pourront choisir. Le résultat dépendra toutefois de la clarté des explications.",
+      "question": "What is the stated condition?",
+      "options": [
+        "Collect more personal data",
+        "Require a recent device",
+        "Publish the settings before launch",
+        "Remove every alternative"
+      ],
+      "answer": 2,
+      "explain": "The settings must be published before the launch."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Si nous avions demandé l'avis des utilisateurs, nous aurions probablement repéré ce problème plus tôt.",
+      "question": "What does the speaker imply?",
+      "options": [
+        "The team did not ask early enough and may have missed the problem",
+        "The team has already resolved every issue",
+        "The problem is unrelated to the test",
+        "Users refused to give feedback"
+      ],
+      "answer": 0,
+      "explain": "The unreal past suggests earlier feedback did not happen."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What has not yet been measured?",
+      "options": [
+        "The wording of the notice",
+        "Whether the prototype exists",
+        "The user's ability to view choices",
+        "The time saved by the feature"
+      ],
+      "answer": 3,
+      "explain": "The text says the time saving has not been measured.",
+      "promptFr": "Le prototype fictif propose d'enregistrer certaines préférences. L'équipe affirme que cette fonction pourrait accélérer une recherche, mais elle n'a pas encore mesuré le gain. Si les données étaient conservées, les utilisateurs devraient pouvoir consulter et modifier leurs choix. Le document propose aussi un mode sans enregistrement. La décision de lancer la fonction dépendra donc d'un essai et d'explications compréhensibles."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the report recommend?",
+      "options": [
+        "Remove the consent choice",
+        "Keep the link difficult to find",
+        "Test with several user profiles",
+        "Assume one test represents everyone"
+      ],
+      "answer": 2,
+      "explain": "The report calls for tests with multiple profiles.",
+      "promptFr": "Deux personnes ont testé le même formulaire. La première a compris le choix de consentement; la seconde n'a pas vu le lien vers les paramètres. Le rapport recommande de tester l'interface avec plusieurs profils, sans supposer qu'une seule expérience représente tous les utilisateurs."
+    }
+  ]
+}

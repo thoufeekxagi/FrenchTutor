@@ -1,0 +1,148 @@
+{
+  "id": "b2-u09-words-3",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le pouvoir d'achat",
+      "en": "purchasing power",
+      "sound": "luh poo-vwahr dah-SHAH",
+      "exampleFr": "La hausse des prix réduit le pouvoir d'achat.",
+      "exampleEn": "Rising prices reduce purchasing power."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'inflation",
+      "en": "inflation",
+      "sound": "lehn-flah-SYOH(N)",
+      "exampleFr": "L'inflation modifie le coût des dépenses courantes.",
+      "exampleEn": "Inflation changes the cost of everyday expenses."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une hausse annualisée",
+      "en": "an annualized increase",
+      "sound": "ün ohs ah-nü-ah-lee-ZAY",
+      "exampleFr": "Le graphique montre une hausse annualisée de trois pour cent.",
+      "exampleEn": "The chart shows an annualized increase of three percent."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un taux d'intérêt",
+      "en": "an interest rate",
+      "sound": "uh(n) toh dehn-tay-REH",
+      "exampleFr": "Le taux d'intérêt influence le coût total du prêt.",
+      "exampleEn": "The interest rate affects the total cost of the loan."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une dépense récurrente",
+      "en": "a recurring expense",
+      "sound": "ün day-pahns ray-kü-RAHNT",
+      "exampleFr": "L'abonnement constitue une dépense récurrente.",
+      "exampleEn": "The subscription is a recurring expense."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une somme forfaitaire",
+      "en": "a flat-rate sum",
+      "sound": "ün sohm for-feh-TEHR",
+      "exampleFr": "Le contrat prévoit une somme forfaitaire pour le déplacement.",
+      "exampleEn": "The contract provides a flat-rate amount for travel."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le pouvoir d'achat",
+      "options": [
+        "an interest rate",
+        "purchasing power",
+        "inflation",
+        "an annualized increase"
+      ],
+      "answer": 1,
+      "explain": "le pouvoir d'achat means purchasing power."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "l'inflation",
+      "options": [
+        "a recurring expense",
+        "an annualized increase",
+        "an interest rate",
+        "inflation"
+      ],
+      "answer": 3,
+      "explain": "l'inflation means inflation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une hausse annualisée",
+      "options": [
+        "a flat-rate sum",
+        "an annualized increase",
+        "an interest rate",
+        "a recurring expense"
+      ],
+      "answer": 1,
+      "explain": "une hausse annualisée means an annualized increase."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un taux d'intérêt",
+      "options": [
+        "purchasing power",
+        "a recurring expense",
+        "inflation",
+        "an interest rate"
+      ],
+      "answer": 3,
+      "explain": "un taux d'intérêt means an interest rate."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une dépense récurrente",
+      "options": [
+        "inflation",
+        "a recurring expense",
+        "a flat-rate sum",
+        "purchasing power"
+      ],
+      "answer": 1,
+      "explain": "une dépense récurrente means a recurring expense."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une somme forfaitaire",
+      "options": [
+        "an annualized increase",
+        "purchasing power",
+        "inflation",
+        "a flat-rate sum"
+      ],
+      "answer": 3,
+      "explain": "une somme forfaitaire means a flat-rate sum."
+    }
+  ]
+}

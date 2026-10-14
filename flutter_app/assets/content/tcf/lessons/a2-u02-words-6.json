@@ -1,0 +1,166 @@
+{
+  "id": "a2-u02-words-6",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Words: add one useful detail",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le début de la journée",
+      "en": "the start of the day",
+      "sound": "luh day-BÜ duh lah zhoor-NAY",
+      "exampleFr": "Au début de la journée, je prends le bus.",
+      "exampleEn": "At the start of the day, I take the bus."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le reste de la journée",
+      "en": "the rest of the day",
+      "sound": "luh rehst duh lah zhoor-NAY",
+      "exampleFr": "Le reste de la journée est libre.",
+      "exampleEn": "The rest of the day is free."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "pendant une heure",
+      "en": "for an hour",
+      "sound": "pah(n)-DAH(N) ün uhr",
+      "exampleFr": "Je travaille pendant une heure.",
+      "exampleEn": "I work for an hour."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une fois",
+      "en": "once; one time",
+      "sound": "ün fwah",
+      "exampleFr": "J'ai appelé une fois.",
+      "exampleEn": "I called once."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "deux fois",
+      "en": "twice; two times",
+      "sound": "duh fwah",
+      "exampleFr": "J'ai vérifié l'adresse deux fois.",
+      "exampleEn": "I checked the address twice."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "à l'heure prévue",
+      "en": "at the scheduled time",
+      "sound": "ah luhr pray-VÜ",
+      "exampleFr": "Le rendez-vous a commencé à l'heure prévue.",
+      "exampleEn": "The appointment started at the scheduled time."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "par hasard",
+      "en": "by chance",
+      "sound": "par ah-ZAHR",
+      "exampleFr": "Je rencontre ma voisine par hasard.",
+      "exampleEn": "I meet my neighbour by chance."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "au bon moment",
+      "en": "at the right time",
+      "sound": "oh boh(n) moh-MAH(N)",
+      "exampleFr": "Tu arrives au bon moment.",
+      "exampleEn": "You arrive at the right time."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le début de la journée",
+      "options": [
+        "once; one time",
+        "the start of the day",
+        "by chance",
+        "twice; two times"
+      ],
+      "answer": 1,
+      "explain": "le début de la journée means the start of the day."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le reste de la journée",
+      "options": [
+        "twice; two times",
+        "at the right time",
+        "for an hour",
+        "the rest of the day"
+      ],
+      "answer": 3,
+      "explain": "le reste de la journée means the rest of the day."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "pendant une heure",
+      "options": [
+        "at the scheduled time",
+        "for an hour",
+        "the start of the day",
+        "once; one time"
+      ],
+      "answer": 1,
+      "explain": "pendant une heure means for an hour."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une fois",
+      "options": [
+        "by chance",
+        "the rest of the day",
+        "twice; two times",
+        "once; one time"
+      ],
+      "answer": 3,
+      "explain": "une fois means once; one time."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "deux fois",
+      "options": [
+        "at the right time",
+        "twice; two times",
+        "for an hour",
+        "at the scheduled time"
+      ],
+      "answer": 1,
+      "explain": "deux fois means twice; two times."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "à l'heure prévue",
+      "options": [
+        "the start of the day",
+        "by chance",
+        "the rest of the day",
+        "at the scheduled time"
+      ],
+      "answer": 3,
+      "explain": "à l'heure prévue means at the scheduled time."
+    }
+  ]
+}

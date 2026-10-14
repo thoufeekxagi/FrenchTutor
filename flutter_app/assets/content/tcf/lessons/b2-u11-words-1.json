@@ -1,0 +1,148 @@
+{
+  "id": "b2-u11-words-1",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une disponibilité",
+      "en": "availability",
+      "sound": "ün dee-spoh-nee-bee-lee-TAY",
+      "exampleFr": "Le document ne précise pas les disponibilités.",
+      "exampleEn": "The document does not specify availability."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un tarif",
+      "en": "a rate; a price",
+      "sound": "uh(n) tah-REEF",
+      "exampleFr": "Je voudrais connaître le tarif du matériel.",
+      "exampleEn": "I would like to know the equipment fee."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une inscription",
+      "en": "registration",
+      "sound": "ün an-skreep-SYOH(N)",
+      "exampleFr": "L'inscription se fait en ligne dans cet exemple.",
+      "exampleEn": "Registration is completed online in this example."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une réservation",
+      "en": "a reservation",
+      "sound": "ün ray-zehr-vah-SYOH(N)",
+      "exampleFr": "Faut-il faire une réservation ?",
+      "exampleEn": "Is a reservation required?"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un justificatif",
+      "en": "a supporting document",
+      "sound": "uh(n) zhüs-tee-fee-kah-TEEF",
+      "exampleFr": "L'avis mentionne un justificatif sans le nommer.",
+      "exampleEn": "The notice mentions a supporting document without naming it."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une annulation",
+      "en": "a cancellation",
+      "sound": "ün ah-nü-lah-SYOH(N)",
+      "exampleFr": "La règle d'annulation doit être clarifiée.",
+      "exampleEn": "The cancellation rule needs clarification."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une disponibilité",
+      "options": [
+        "a reservation",
+        "availability",
+        "a rate; a price",
+        "registration"
+      ],
+      "answer": 1,
+      "explain": "une disponibilité means availability."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un tarif",
+      "options": [
+        "a supporting document",
+        "registration",
+        "a reservation",
+        "a rate; a price"
+      ],
+      "answer": 3,
+      "explain": "un tarif means a rate; a price."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une inscription",
+      "options": [
+        "a cancellation",
+        "registration",
+        "a reservation",
+        "a supporting document"
+      ],
+      "answer": 1,
+      "explain": "une inscription means registration."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une réservation",
+      "options": [
+        "availability",
+        "a supporting document",
+        "a cancellation",
+        "a reservation"
+      ],
+      "answer": 3,
+      "explain": "une réservation means a reservation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un justificatif",
+      "options": [
+        "a rate; a price",
+        "a supporting document",
+        "a cancellation",
+        "availability"
+      ],
+      "answer": 1,
+      "explain": "un justificatif means a supporting document."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une annulation",
+      "options": [
+        "registration",
+        "availability",
+        "a rate; a price",
+        "a cancellation"
+      ],
+      "answer": 3,
+      "explain": "une annulation means a cancellation."
+    }
+  ]
+}

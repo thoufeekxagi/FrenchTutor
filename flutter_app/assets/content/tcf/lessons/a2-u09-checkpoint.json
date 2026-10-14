@@ -1,0 +1,140 @@
+{
+  "id": "a2-u09-checkpoint",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je donne l'adresse à Karim. Je ___ donne l'adresse.",
+      "options": [
+        "lui",
+        "leur",
+        "y",
+        "la"
+      ],
+      "answer": 0,
+      "explain": "Karim is one person, so use lui."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Je donne le plan aux voyageurs. Je ___ donne le plan.",
+      "options": [
+        "leur",
+        "lui",
+        "y",
+        "les"
+      ],
+      "answer": 0,
+      "explain": "Aux voyageurs is plural, so use leur."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Nous allons à la gare. Nous ___ allons.",
+      "options": [
+        "y",
+        "lui",
+        "leur",
+        "la"
+      ],
+      "answer": 0,
+      "explain": "Y replaces the place à la gare."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where does lui go in Je demande l'heure à Nadia?",
+      "options": [
+        "Before the conjugated verb: Je lui demande l'heure",
+        "After the noun: Je demande l'heure lui",
+        "At the end: Je demande l'heure à lui",
+        "Before the subject: Lui je demande l'heure"
+      ],
+      "answer": 0,
+      "explain": "The indirect object pronoun goes before its conjugated verb."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Choose the correct near-future sentence for asking the staff member.",
+      "options": [
+        "Je vais lui demander l'heure.",
+        "Je lui vais demander l'heure.",
+        "Je vais demander lui l'heure.",
+        "Je vais lui l'heure demander."
+      ],
+      "answer": 0,
+      "explain": "With aller + infinitive, put lui before the infinitive."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Nadia is at the library. Choose the sentence meaning 'Nadia is there.'",
+      "options": [
+        "Nadia y est.",
+        "Nadia lui est.",
+        "Nadia leur est.",
+        "Nadia est les."
+      ],
+      "answer": 0,
+      "explain": "Use y to refer to the named place."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Which pronoun refers to a place in the pattern taught here?",
+      "options": [
+        "y",
+        "lui",
+        "leur",
+        "les"
+      ],
+      "answer": 0,
+      "explain": "Y replaces a previously named place in the location patterns in this unit."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Which sentence refers to one woman as the person receiving a question?",
+      "options": [
+        "Je lui demande le quai.",
+        "Je leur demande le quai.",
+        "J'y demande le quai.",
+        "Je la demande le quai."
+      ],
+      "answer": 0,
+      "explain": "Lui is used for one person, regardless of gender."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "The travellers go to the intersection and wait there. Choose the French sentence.",
+      "options": [
+        "Ils vont au carrefour et ils y attendent.",
+        "Ils vont au carrefour et ils lui attendent.",
+        "Ils vont au carrefour et leur attendent.",
+        "Ils y vont et attendent le carrefour."
+      ],
+      "answer": 0,
+      "explain": "Y refers to the named intersection as the place where they wait."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "If it is unclear who leur refers to, what is the best repair?",
+      "options": [
+        "Name the group: Tu parles des voyageurs ?",
+        "Use y without naming the place.",
+        "Repeat leur more loudly.",
+        "Remove the person from the sentence."
+      ],
+      "answer": 0,
+      "explain": "Confirm the person or group when a pronoun reference is unclear."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b1-u05-words-4",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un besoin immédiat",
+      "en": "an immediate need",
+      "sound": "uh(n) buh-zweh(n) ee-may-dyah",
+      "exampleFr": "Le centre peut répondre à un besoin immédiat.",
+      "exampleEn": "The centre can respond to an immediate need."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une mesure adaptée",
+      "en": "an appropriate measure",
+      "sound": "ün muh-ZÜR ah-dahp-TAY",
+      "exampleFr": "Une mesure adaptée faciliterait la participation.",
+      "exampleEn": "An appropriate measure would make participation easier."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un soutien ponctuel",
+      "en": "short-term support",
+      "sound": "uh(n) soo-tyeh(n) pohnk-tü-EHL",
+      "exampleFr": "Un soutien ponctuel peut aider pendant la transition.",
+      "exampleEn": "Short-term support can help during the transition."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "être rassuré",
+      "en": "to feel reassured",
+      "sound": "ehtr rah-sü-RAY",
+      "exampleFr": "Après l'appel, elle était rassurée sur la démarche.",
+      "exampleEn": "After the call, she felt reassured about the process."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "se sentir soutenu",
+      "en": "to feel supported",
+      "sound": "suh sah(n)-teer soo-tuh-NÜ",
+      "exampleFr": "Les participants se sentent soutenus par l'équipe.",
+      "exampleEn": "The participants feel supported by the team."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "éprouver une difficulté",
+      "en": "to experience a difficulty",
+      "sound": "ay-proo-vay ün dee-fee-kül-TAY",
+      "exampleFr": "Il éprouve une difficulté à suivre les consignes orales.",
+      "exampleEn": "He is having difficulty following the spoken instructions."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un besoin immédiat",
+      "options": [
+        "to feel reassured",
+        "an immediate need",
+        "an appropriate measure",
+        "short-term support"
+      ],
+      "answer": 1,
+      "explain": "un besoin immédiat means an immediate need."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une mesure adaptée",
+      "options": [
+        "to feel supported",
+        "short-term support",
+        "to feel reassured",
+        "an appropriate measure"
+      ],
+      "answer": 3,
+      "explain": "une mesure adaptée means an appropriate measure."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un soutien ponctuel",
+      "options": [
+        "to experience a difficulty",
+        "short-term support",
+        "to feel reassured",
+        "to feel supported"
+      ],
+      "answer": 1,
+      "explain": "un soutien ponctuel means short-term support."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "être rassuré",
+      "options": [
+        "an immediate need",
+        "to experience a difficulty",
+        "an appropriate measure",
+        "to feel reassured"
+      ],
+      "answer": 3,
+      "explain": "être rassuré means to feel reassured."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "se sentir soutenu",
+      "options": [
+        "an appropriate measure",
+        "to feel supported",
+        "to experience a difficulty",
+        "an immediate need"
+      ],
+      "answer": 1,
+      "explain": "se sentir soutenu means to feel supported."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "éprouver une difficulté",
+      "options": [
+        "short-term support",
+        "an immediate need",
+        "an appropriate measure",
+        "to experience a difficulty"
+      ],
+      "answer": 3,
+      "explain": "éprouver une difficulté means to experience a difficulty."
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "id": "a2-u09-phrases",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Practise the full question once, then answer with a pronoun. In your notes, draw a tiny route and write what you ask a person and where you go. Close the notes and explain it aloud."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je demande le quai à l'employée.",
+      "en": "I ask the staff member for the platform.",
+      "tip": "Say it: zhuh duh-MAH(N)D luh keh ah lah(n)-plwah-YAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je lui demande le quai.",
+      "en": "I ask him or her for the platform.",
+      "tip": "Say it: zhuh LÜ-ee duh-MAH(N)D luh keh"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je donne l'adresse aux voyageurs.",
+      "en": "I give the address to the travellers.",
+      "tip": "Say it: zhuh dohn lah-DREHS oh vwah-yah-ZHUHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je leur donne l'adresse.",
+      "en": "I give them the address.",
+      "tip": "Say it: zhuh luhr dohn lah-DREHS"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Nous allons à la gare. Nous y allons en autobus.",
+      "en": "We are going to the station. We are going there by bus.",
+      "tip": "Say it: noo zah-LOHN ah lah gahr; noo zee ah-LOHN ah(n) oh-toh-BÜS"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "La bibliothèque est près du carrefour. Elle y est.",
+      "en": "The library is near the intersection. It is there.",
+      "tip": "Say it: lah bee-blee-oh-TEHK eh preh dü kahr-FOOR; ehl ee eh"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je vais lui expliquer le changement de trajet.",
+      "en": "I am going to explain the route change to him or her.",
+      "tip": "Say it: zhuh veh LÜ-ee ehk-splee-KAY luh shah(n)zh-MAH(N) duh trah-ZHEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "On va au centre communautaire. On va y retrouver Nadia.",
+      "en": "We are going to the community centre. We will meet Nadia there.",
+      "tip": "Say it: oh(n) vah oh sah(n)tr koh-mü-noh-TEHR; oh(n) vah zee ruh-troo-VAY nah-DYAH"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Je demande le quai à l'employée.",
+      "options": [
+        "I give them the address.",
+        "I ask the staff member for the platform.",
+        "I am going to explain the route change to him or her.",
+        "We are going to the station. We are going there by bus."
+      ],
+      "answer": 1,
+      "explain": "Je demande le quai à l'employée. means I ask the staff member for the platform.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je donne l'adresse aux voyageurs.",
+      "options": [
+        "The library is near the intersection. It is there.",
+        "I give the address to the travellers.",
+        "I ask the staff member for the platform.",
+        "I am going to explain the route change to him or her."
+      ],
+      "answer": 1,
+      "explain": "Je donne l'adresse aux voyageurs. means I give the address to the travellers.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Nous allons à la gare. Nous y allons en autobus.",
+      "options": [
+        "I give the address to the travellers.",
+        "We are going to the station. We are going there by bus.",
+        "I ask the staff member for the platform.",
+        "I give them the address."
+      ],
+      "answer": 1,
+      "explain": "Nous allons à la gare. Nous y allons en autobus. means We are going to the station. We are going there by bus.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Je vais lui expliquer le changement de trajet.",
+      "options": [
+        "I give the address to the travellers.",
+        "I am going to explain the route change to him or her.",
+        "The library is near the intersection. It is there.",
+        "I ask the staff member for the platform."
+      ],
+      "answer": 1,
+      "explain": "Je vais lui expliquer le changement de trajet. means I am going to explain the route change to him or her.."
+    }
+  ]
+}

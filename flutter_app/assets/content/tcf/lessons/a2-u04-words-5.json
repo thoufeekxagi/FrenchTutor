@@ -1,0 +1,166 @@
+{
+  "id": "a2-u04-words-5",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Words: weather and light",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une averse",
+      "en": "a shower of rain",
+      "sound": "ün ah-VEHRS",
+      "exampleFr": "Le bulletin annonçait une averse.",
+      "exampleEn": "The forecast called for a shower of rain."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un ciel couvert",
+      "en": "an overcast sky",
+      "sound": "uh(n) syel koo-VEHR",
+      "exampleFr": "Le bulletin annonçait un ciel couvert.",
+      "exampleEn": "The forecast called for an overcast sky."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une éclaircie",
+      "en": "a sunny break",
+      "sound": "ün ay-KLEHR-see",
+      "exampleFr": "Le bulletin annonçait une éclaircie.",
+      "exampleEn": "The forecast called for a sunny break."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une journée grise",
+      "en": "a grey day",
+      "sound": "ün zhoor-NAY greez",
+      "exampleFr": "Le bulletin annonçait une journée grise.",
+      "exampleEn": "The forecast called for a grey day."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un matin frais",
+      "en": "a cool morning",
+      "sound": "uh(n) mah-TA(N) freh",
+      "exampleFr": "Le bulletin annonçait un matin frais.",
+      "exampleEn": "The forecast called for a cool morning."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une nuit claire",
+      "en": "a clear night",
+      "sound": "ün nwee klehr",
+      "exampleFr": "Le bulletin annonçait une nuit claire.",
+      "exampleEn": "The forecast called for a clear night."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un vent léger",
+      "en": "a light wind",
+      "sound": "uh(n) vah(n) lay-ZHAY",
+      "exampleFr": "Le bulletin annonçait un vent léger.",
+      "exampleEn": "The forecast called for a light wind."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une forte humidité",
+      "en": "high humidity",
+      "sound": "ün fort ü-mee-dee-TAY",
+      "exampleFr": "Le bulletin annonçait une forte humidité.",
+      "exampleEn": "The forecast called for high humidity."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une averse",
+      "options": [
+        "a grey day",
+        "a shower of rain",
+        "a light wind",
+        "an overcast sky"
+      ],
+      "answer": 1,
+      "explain": "une averse means a shower of rain."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un ciel couvert",
+      "options": [
+        "a cool morning",
+        "high humidity",
+        "a sunny break",
+        "an overcast sky"
+      ],
+      "answer": 3,
+      "explain": "un ciel couvert means an overcast sky."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une éclaircie",
+      "options": [
+        "a clear night",
+        "a sunny break",
+        "a shower of rain",
+        "a grey day"
+      ],
+      "answer": 1,
+      "explain": "une éclaircie means a sunny break."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une journée grise",
+      "options": [
+        "a light wind",
+        "an overcast sky",
+        "a cool morning",
+        "a grey day"
+      ],
+      "answer": 3,
+      "explain": "une journée grise means a grey day."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un matin frais",
+      "options": [
+        "high humidity",
+        "a cool morning",
+        "a sunny break",
+        "a clear night"
+      ],
+      "answer": 1,
+      "explain": "un matin frais means a cool morning."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une nuit claire",
+      "options": [
+        "a shower of rain",
+        "a grey day",
+        "a light wind",
+        "a clear night"
+      ],
+      "answer": 3,
+      "explain": "une nuit claire means a clear night."
+    }
+  ]
+}

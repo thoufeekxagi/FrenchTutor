@@ -1,0 +1,99 @@
+{
+  "id": "b2-u11-grammar-a",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Grammar: Question strategy: vary purpose, register and follow-up",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Question strategy: vary purpose, register and follow-up",
+      "body": "A useful information exchange is not a list of unrelated questions. Start broad, then ask for a detail, clarify an unfamiliar answer and confirm the next step. Use est-ce que or intonation in neutral conversation; use pourriez-vous / sauriez-vous for a polite request; use inversion selectively in formal questions (À quelle date commence le cours ?). Indirect questions use statement word order: Pourriez-vous me dire à quelle date le cours commence ? Do not keep inversion inside the indirect clause. Use pronouns only after the reference is clear."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Question strategy: vary purpose, register and follow-up",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Direct neutral question",
+          "est-ce que + statement",
+          "Est-ce que le matériel est compris ?",
+          "Is the equipment included?"
+        ],
+        [
+          "Polite request",
+          "pourriez-vous + infinitive",
+          "Pourriez-vous préciser le tarif ?",
+          "Could you clarify the price?"
+        ],
+        [
+          "Indirect question",
+          "me dire + statement word order",
+          "Pouvez-vous me dire à quelle date le cours commence ?",
+          "Can you tell me on what date the course begins?"
+        ],
+        [
+          "Follow-up",
+          "qu'entendez-vous par…?",
+          "Qu'entendez-vous par justificatif récent ?",
+          "What do you mean by a recent supporting document?"
+        ],
+        [
+          "Confirm",
+          "si j'ai bien compris…",
+          "Si j'ai bien compris, je recevrai un courriel demain.",
+          "If I understood correctly, I will receive an email tomorrow."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the correct indirect question.",
+      "options": [
+        "Pouvez-vous me dire à quelle date commence-t-il le cours ?",
+        "Pouvez-vous me dire commence le cours à quelle date ?",
+        "Pouvez-vous me dire à quelle date le cours commencerait-il ?",
+        "Pouvez-vous me dire à quelle date le cours commence ?"
+      ],
+      "answer": 3,
+      "explain": "Indirect questions use statement word order."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which phrase politely asks for clarification?",
+      "options": [
+        "Tu dois me dire…",
+        "C'est forcément…",
+        "Pourriez-vous préciser… ?",
+        "D'abord, demain…"
+      ],
+      "answer": 2,
+      "explain": "Pourriez-vous is a polite conditional request."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should follow an incomplete answer?",
+      "options": [
+        "A relevant follow-up question",
+        "An unrelated prepared question",
+        "No response",
+        "A memorized conclusion"
+      ],
+      "answer": 0,
+      "explain": "Use the answer to decide what detail to ask next."
+    }
+  ]
+}

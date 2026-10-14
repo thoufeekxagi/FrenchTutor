@@ -1,0 +1,72 @@
+{
+  "id": "b1-u04-dialogues",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Comparing two apartments",
+      "body": "Two friends discuss fictional rental options using clear references.",
+      "examples": [
+        {
+          "fr": "J'ai visité un logement qui est près du métro.",
+          "en": "Sam: I visited a home that is near the metro."
+        },
+        {
+          "fr": "C'est celui dont tu m'as parlé hier ?",
+          "en": "Lina: Is it the one you told me about yesterday?"
+        },
+        {
+          "fr": "Oui. Le propriétaire à qui j'ai écrit m'a répondu.",
+          "en": "Sam: Yes. The landlord I wrote to replied."
+        },
+        {
+          "fr": "Et quels sont les services auxquels tu tiens ?",
+          "en": "Lina: And which services do you care about?"
+        },
+        {
+          "fr": "L'accès sans marches, surtout. Le logement que j'ai vu en premier n'en avait pas.",
+          "en": "Sam: Step-free access, especially. The first home I saw did not have it."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Choosing a training option",
+      "body": "A learner identifies the course feature that matters most.",
+      "examples": [
+        {
+          "fr": "Le programme que j'ai trouvé comprend un stage.",
+          "en": "Mina: The program I found includes a placement."
+        },
+        {
+          "fr": "Est-ce le programme dont parlait la conseillère ?",
+          "en": "Omar: Is it the program the advisor mentioned?"
+        },
+        {
+          "fr": "Oui, celui auquel je peux assister le soir.",
+          "en": "Mina: Yes, the one I can attend in the evening."
+        },
+        {
+          "fr": "Le critère qui compte pour toi, c'est l'horaire ?",
+          "en": "Omar: Is the schedule the criterion that matters to you?"
+        },
+        {
+          "fr": "Oui, mais le trajet dont je dois tenir compte est assez long.",
+          "en": "Mina: Yes, but the commute I need to consider is quite long."
+        }
+      ]
+    }
+  ]
+}

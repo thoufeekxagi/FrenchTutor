@@ -1,0 +1,148 @@
+{
+  "id": "b1-u10-words-4",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une date de clôture",
+      "en": "a closing date; deadline",
+      "sound": "ün dat duh kloh-TÜR",
+      "exampleFr": "La date de clôture des inscriptions est le 15 mai.",
+      "exampleEn": "The registration deadline is May 15."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "complet",
+      "en": "full; fully booked",
+      "sound": "kohn-pleh",
+      "exampleFr": "L'atelier est complet, mais une deuxième date sera ajoutée.",
+      "exampleEn": "The workshop is full, but a second date will be added."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "annuler sa participation",
+      "en": "to cancel one's participation",
+      "sound": "ah-nü-lay sah par-tee-see-pah-SYOH(N)",
+      "exampleFr": "Veuillez annuler votre participation si vous ne pouvez plus venir.",
+      "exampleEn": "Please cancel your participation if you can no longer come."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "demander un remboursement",
+      "en": "to request a refund",
+      "sound": "duh-mah(n)-day uh(n) rah(n)-boors-MAH(N)",
+      "exampleFr": "Elle a demandé un remboursement après l'annulation.",
+      "exampleEn": "She requested a refund after the cancellation."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "les conditions d'accès",
+      "en": "access conditions",
+      "sound": "lay kohn-dee-SYOH(N) dahk-SEH",
+      "exampleFr": "Les conditions d'accès sont affichées à l'entrée.",
+      "exampleEn": "The access conditions are posted at the entrance."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une ouverture exceptionnelle",
+      "en": "a special opening",
+      "sound": "ün oo-vehr-TÜR ehk-sehp-syoh-NEHL",
+      "exampleFr": "Le musée annonce une ouverture exceptionnelle dimanche.",
+      "exampleEn": "The museum announces a special opening on Sunday."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une date de clôture",
+      "options": [
+        "to request a refund",
+        "a closing date; deadline",
+        "full; fully booked",
+        "to cancel one's participation"
+      ],
+      "answer": 1,
+      "explain": "une date de clôture means a closing date; deadline."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "complet",
+      "options": [
+        "access conditions",
+        "to cancel one's participation",
+        "to request a refund",
+        "full; fully booked"
+      ],
+      "answer": 3,
+      "explain": "complet means full; fully booked."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "annuler sa participation",
+      "options": [
+        "a special opening",
+        "to cancel one's participation",
+        "to request a refund",
+        "access conditions"
+      ],
+      "answer": 1,
+      "explain": "annuler sa participation means to cancel one's participation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "demander un remboursement",
+      "options": [
+        "a closing date; deadline",
+        "access conditions",
+        "a special opening",
+        "to request a refund"
+      ],
+      "answer": 3,
+      "explain": "demander un remboursement means to request a refund."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "les conditions d'accès",
+      "options": [
+        "full; fully booked",
+        "access conditions",
+        "a special opening",
+        "a closing date; deadline"
+      ],
+      "answer": 1,
+      "explain": "les conditions d'accès means access conditions."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une ouverture exceptionnelle",
+      "options": [
+        "to cancel one's participation",
+        "a closing date; deadline",
+        "full; fully booked",
+        "a special opening"
+      ],
+      "answer": 3,
+      "explain": "une ouverture exceptionnelle means a special opening."
+    }
+  ]
+}

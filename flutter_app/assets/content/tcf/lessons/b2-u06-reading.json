@@ -1,0 +1,52 @@
+{
+  "id": "b2-u06-reading",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What has not yet been measured?",
+      "options": [
+        "The wording of the notice",
+        "The time saved by the feature",
+        "The user's ability to view choices",
+        "Whether the prototype exists"
+      ],
+      "answer": 1,
+      "explain": "The text says the time saving has not been measured.",
+      "promptFr": "Le prototype fictif propose d'enregistrer certaines préférences. L'équipe affirme que cette fonction pourrait accélérer une recherche, mais elle n'a pas encore mesuré le gain. Si les données étaient conservées, les utilisateurs devraient pouvoir consulter et modifier leurs choix. Le document propose aussi un mode sans enregistrement. La décision de lancer la fonction dépendra donc d'un essai et d'explications compréhensibles."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the report recommend?",
+      "options": [
+        "Test with several user profiles",
+        "Keep the link difficult to find",
+        "Remove the consent choice",
+        "Assume one test represents everyone"
+      ],
+      "answer": 0,
+      "explain": "The report calls for tests with multiple profiles.",
+      "promptFr": "Deux personnes ont testé le même formulaire. La première a compris le choix de consentement; la seconde n'a pas vu le lien vers les paramètres. Le rapport recommande de tester l'interface avec plusieurs profils, sans supposer qu'une seule expérience représente tous les utilisateurs."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is uncertain?",
+      "options": [
+        "Whether a connection is needed now",
+        "Whether users need access",
+        "Whether Internet can be interrupted",
+        "Whether an offline version is technically possible"
+      ],
+      "answer": 3,
+      "explain": "The report explicitly says feasibility is not specified.",
+      "promptFr": "Si l'accès à Internet était interrompu, la version actuelle du service ne fonctionnerait pas. Une solution hors ligne serait utile pour les personnes dont la connexion est instable. Le rapport ne précise pas si cette version est techniquement possible."
+    }
+  ]
+}

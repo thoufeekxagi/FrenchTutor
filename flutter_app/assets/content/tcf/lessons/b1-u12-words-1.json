@@ -1,0 +1,176 @@
+{
+  "id": "b1-u12-words-1",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un enjeu",
+      "en": "an issue at stake",
+      "sound": "uh(n) ahn-ZHUH",
+      "exampleFr": "L'accès aux activités est un enjeu pour plusieurs résidents.",
+      "exampleEn": "Access to activities is an issue for several residents."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un point de vue",
+      "en": "a point of view",
+      "sound": "uh(n) pwa(n) duh VÜ",
+      "exampleFr": "Chaque personne peut expliquer son point de vue.",
+      "exampleEn": "Everyone can explain their point of view."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une expérience",
+      "en": "an experience",
+      "sound": "ün ehk-spay-ree-AH(N)S",
+      "exampleFr": "Son expérience l'a aidée à choisir une solution.",
+      "exampleEn": "Her experience helped her choose a solution."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une priorité",
+      "en": "a priority",
+      "sound": "ün pree-oh-ree-TAY",
+      "exampleFr": "La priorité est de garder l'activité accessible.",
+      "exampleEn": "The priority is to keep the activity accessible."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un avantage",
+      "en": "an advantage",
+      "sound": "uh(n) ah-vahn-TAHZH",
+      "exampleFr": "Un horaire souple est un avantage pour certains.",
+      "exampleEn": "A flexible schedule is an advantage for some."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une limite",
+      "en": "a limitation",
+      "sound": "ün lee-MEET",
+      "exampleFr": "Le projet a une limite qui doit être examinée.",
+      "exampleEn": "The project has a limitation that must be examined."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un enjeu",
+      "options": [
+        "a priority",
+        "an issue at stake",
+        "a point of view",
+        "an experience"
+      ],
+      "answer": 1,
+      "explain": "un enjeu means an issue at stake."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de vue",
+      "options": [
+        "an advantage",
+        "an experience",
+        "a priority",
+        "a point of view"
+      ],
+      "answer": 3,
+      "explain": "un point de vue means a point of view."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une expérience",
+      "options": [
+        "a limitation",
+        "an experience",
+        "a priority",
+        "an advantage"
+      ],
+      "answer": 1,
+      "explain": "une expérience means an experience."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une priorité",
+      "options": [
+        "an issue at stake",
+        "an advantage",
+        "a limitation",
+        "a priority"
+      ],
+      "answer": 3,
+      "explain": "une priorité means a priority."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un avantage",
+      "options": [
+        "a point of view",
+        "an advantage",
+        "a limitation",
+        "an issue at stake"
+      ],
+      "answer": 1,
+      "explain": "un avantage means an advantage."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une limite",
+      "options": [
+        "an experience",
+        "an issue at stake",
+        "a point of view",
+        "a limitation"
+      ],
+      "answer": 3,
+      "explain": "une limite means a limitation."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une expérience",
+      "question": "Which word did you hear?",
+      "options": [
+        "un avantage",
+        "une expérience",
+        "un enjeu",
+        "une priorité"
+      ],
+      "answer": 1,
+      "explain": "You heard une expérience: an experience."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une priorité",
+      "question": "Which word did you hear?",
+      "options": [
+        "une limite",
+        "une expérience",
+        "un avantage",
+        "une priorité"
+      ],
+      "answer": 3,
+      "explain": "You heard une priorité: a priority."
+    }
+  ]
+}

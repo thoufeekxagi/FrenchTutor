@@ -1,0 +1,203 @@
+{
+  "id": "a2-u01-words-1",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Words: frequency and routine",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une habitude",
+      "en": "a habit",
+      "sound": "ün ah-bee-TÜD",
+      "exampleFr": "La marche est une bonne habitude.",
+      "exampleEn": "Walking is a good habit."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le quotidien",
+      "en": "everyday life; daily routine",
+      "sound": "luh koh-tee-DYAH(N)",
+      "exampleFr": "Le quotidien est parfois chargé.",
+      "exampleEn": "Everyday life is sometimes busy."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "d'habitude",
+      "en": "usually; as usual",
+      "sound": "dah-bee-TÜD",
+      "exampleFr": "D'habitude, je prends le bus.",
+      "exampleEn": "I usually take the bus."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "chaque matin",
+      "en": "every morning",
+      "sound": "shahk mah-TA(N)",
+      "exampleFr": "Chaque matin, je prépare mon sac.",
+      "exampleEn": "Every morning, I prepare my bag."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "en général",
+      "en": "in general; generally",
+      "sound": "ah(n) zhay-nay-RAHL",
+      "exampleFr": "En général, je travaille le lundi.",
+      "exampleEn": "Generally, I work on Monday."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "régulièrement",
+      "en": "regularly",
+      "sound": "ray-gü-lyehr-MAH(N)",
+      "exampleFr": "Je révise régulièrement.",
+      "exampleEn": "I review regularly."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "rarement",
+      "en": "rarely",
+      "sound": "rahr-MAH(N)",
+      "exampleFr": "Je mange rarement au restaurant.",
+      "exampleEn": "I rarely eat at a restaurant."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "se réveiller",
+      "en": "to wake up",
+      "sound": "suh ray-vay-YAY",
+      "exampleFr": "Je me réveille à six heures.",
+      "exampleEn": "I wake up at six o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "se coucher",
+      "en": "to go to bed",
+      "sound": "suh koo-SHAY",
+      "exampleFr": "Je me couche à vingt-deux heures.",
+      "exampleEn": "I go to bed at ten p.m."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une habitude",
+      "options": [
+        "every morning",
+        "a habit",
+        "rarely",
+        "everyday life; daily routine"
+      ],
+      "answer": 1,
+      "explain": "une habitude means a habit."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le quotidien",
+      "options": [
+        "in general; generally",
+        "to wake up",
+        "usually; as usual",
+        "everyday life; daily routine"
+      ],
+      "answer": 3,
+      "explain": "le quotidien means everyday life; daily routine."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "d'habitude",
+      "options": [
+        "regularly",
+        "usually; as usual",
+        "to go to bed",
+        "every morning"
+      ],
+      "answer": 1,
+      "explain": "d'habitude means usually; as usual."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "chaque matin",
+      "options": [
+        "rarely",
+        "a habit",
+        "in general; generally",
+        "every morning"
+      ],
+      "answer": 3,
+      "explain": "chaque matin means every morning."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "en général",
+      "options": [
+        "to wake up",
+        "in general; generally",
+        "everyday life; daily routine",
+        "regularly"
+      ],
+      "answer": 1,
+      "explain": "en général means in general; generally."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "régulièrement",
+      "options": [
+        "to go to bed",
+        "usually; as usual",
+        "rarely",
+        "regularly"
+      ],
+      "answer": 3,
+      "explain": "régulièrement means regularly."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "le quotidien",
+      "question": "Which word did you hear?",
+      "options": [
+        "chaque matin",
+        "le quotidien",
+        "régulièrement",
+        "se réveiller"
+      ],
+      "answer": 1,
+      "explain": "You heard le quotidien: everyday life; daily routine."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "en général",
+      "question": "Which word did you hear?",
+      "options": [
+        "rarement",
+        "en général",
+        "se coucher",
+        "le quotidien"
+      ],
+      "answer": 1,
+      "explain": "You heard en général: in general; generally."
+    }
+  ]
+}

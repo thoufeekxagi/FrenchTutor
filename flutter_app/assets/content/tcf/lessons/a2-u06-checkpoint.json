@@ -1,0 +1,140 @@
+{
+  "id": "a2-u06-checkpoint",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the correct comparative: Le studio est ___ cher que l'appartement d'une chambre.",
+      "options": [
+        "moins",
+        "le moins",
+        "meilleur",
+        "aussi de"
+      ],
+      "answer": 0,
+      "explain": "Moins + adjective + que compares two prices."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Complete: Le logement A est aussi ___ que le logement B. (lumineux)",
+      "options": [
+        "lumineux",
+        "lumineuse",
+        "lumières",
+        "plus lumineuse que"
+      ],
+      "answer": 0,
+      "explain": "The subject logement is masculine singular, so use lumineux."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which phrase compares quantities correctly?",
+      "options": [
+        "moins de bruit",
+        "moins bruit",
+        "moins du bruit",
+        "le moins de bruit que"
+      ],
+      "answer": 0,
+      "explain": "Use moins de + noun for a smaller quantity."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Choose the superlative for la pièce (feminine).",
+      "options": [
+        "la pièce la plus grande",
+        "la pièce le plus grand",
+        "la pièce plus grande que",
+        "la plus pièce grande"
+      ],
+      "answer": 0,
+      "explain": "The article and adjective agree with feminine pièce."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does meilleur accès mean?",
+      "options": [
+        "better access",
+        "the most accessible",
+        "less access",
+        "access nearby"
+      ],
+      "answer": 0,
+      "explain": "Meilleur is the irregular comparative of bon before a noun."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Listing A is $1,300; listing B is $1,450. Which comparison is correct?",
+      "options": [
+        "Le logement A est moins cher que le logement B.",
+        "Le logement A est aussi cher de logement B.",
+        "Le logement B est le moins cher que A.",
+        "Le logement A est meilleur cher que B."
+      ],
+      "answer": 0,
+      "explain": "A costs less than B, so use moins cher que."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "A notice says electricity costs extra. What can you conclude?",
+      "options": [
+        "The monthly total will be higher than rent alone.",
+        "Electricity is included.",
+        "The rent includes indoor parking.",
+        "The apartment has no heating."
+      ],
+      "answer": 0,
+      "explain": "An extra electricity cost is added to the stated rent."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Choose the natural comparison: This neighbourhood is the quietest.",
+      "options": [
+        "C'est le quartier le plus paisible.",
+        "C'est le quartier moins paisible que.",
+        "C'est la quartier le plus paisible.",
+        "C'est le plus quartier paisible."
+      ],
+      "answer": 0,
+      "explain": "Use le with masculine quartier and place it before plus paisible."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which detail should you ask about if the listing does not say whether electricity is included?",
+      "options": [
+        "Are electricity costs included in the rent?",
+        "What is the bus route number?",
+        "When does the French course begin?",
+        "Is the library open on Sunday?"
+      ],
+      "answer": 0,
+      "explain": "Ask for the missing cost detail before comparing monthly totals."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which comparison best matches a renter who needs an inexpensive home near transit?",
+      "options": [
+        "Le logement A coûte moins cher et l'arrêt est plus près.",
+        "Le logement B a un balcon plus grand.",
+        "Le logement A a le plus grand salon.",
+        "Le logement B est plus loin et plus cher."
+      ],
+      "answer": 0,
+      "explain": "That option supports both stated needs: lower rent and a closer stop."
+    }
+  ]
+}

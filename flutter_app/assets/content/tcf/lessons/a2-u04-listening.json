@@ -1,0 +1,86 @@
+{
+  "id": "a2-u04-listening",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "À cette époque, le centre était paisible le matin et la rue était calme.",
+      "question": "How was the centre in the morning?",
+      "options": [
+        "Quiet",
+        "Crowded",
+        "Noisy",
+        "Closed"
+      ],
+      "answer": 0,
+      "explain": "The speaker describes it as paisible, quiet."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Chaque mardi, nous prenions le bus après le travail et nous rentrions à dix-huit heures.",
+      "question": "When did the speakers use to take the bus?",
+      "options": [
+        "Every Tuesday after work",
+        "Every morning before work",
+        "Only on Sundays",
+        "At midnight"
+      ],
+      "answer": 0,
+      "explain": "The recording says chaque mardi and après le travail."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Il y avait une cour intérieure avec un banc près de l'entrée.",
+      "question": "What was near the entrance?",
+      "options": [
+        "A bench",
+        "A bus stop",
+        "A café",
+        "A shop"
+      ],
+      "answer": 0,
+      "explain": "The recording mentions a bench near the entrance."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Pendant l'hiver, le ciel était souvent couvert, mais la pièce restait calme.",
+      "question": "What was often overcast?",
+      "options": [
+        "The sky",
+        "The apartment",
+        "The street",
+        "The courtyard"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the sky was often overcast."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le dimanche, ma tante préparait le repas pendant que nous parlions dans la cuisine.",
+      "question": "What did the aunt use to prepare on Sundays?",
+      "options": [
+        "The meal",
+        "A schedule",
+        "A lesson",
+        "A newspaper"
+      ],
+      "answer": 0,
+      "explain": "The recording says the aunt prepared the meal."
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "id": "b1-u02-phrases",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Phrases",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Choose a phrase because it matches your meaning. Note one phrase, adapt its details to your own life, close your notes and say it in a different scene."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "D'ici la fin du mois, …",
+      "en": "By the end of the month, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Quand j'aurai la réponse, …",
+      "en": "When I get the answer, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si la date change, …",
+      "en": "If the date changes, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je compte …",
+      "en": "I plan to …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Il est possible que …",
+      "en": "It is possible that …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Selon l'horaire, …",
+      "en": "Depending on the schedule, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Je vais d'abord …, puis …",
+      "en": "I will first …, then …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Je vous tiendrai au courant.",
+      "en": "I will keep you updated.",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

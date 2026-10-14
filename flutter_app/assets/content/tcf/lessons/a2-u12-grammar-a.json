@@ -1,0 +1,214 @@
+{
+  "id": "a2-u12-grammar-a",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Grammar: A2 grammar retrieval map",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "A2 grammar retrieval map",
+      "body": "This unit introduces no new grammar. Use the table to recall a form from Units 1–11, then notice whether you can understand it and produce it independently in a different situation."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use the cue to retrieve, not to reread. If a form is not available without the table, mark it for delayed practice and return to it after another lesson.",
+      "headers": [
+        "Target",
+        "Recall cue",
+        "Transfer example"
+      ],
+      "rows": [
+        [
+          "g23 Connect ideas",
+          "Order, contrast and reason",
+          "D'abord, je lis l'avis, mais je demande une précision parce que le lieu a changé."
+        ],
+        [
+          "g24 Passé composé: regular forms",
+          "Completed action with avoir",
+          "J'ai réservé le trajet et j'ai confirmé l'heure."
+        ],
+        [
+          "g25 Passé composé: common patterns",
+          "Irregular forms with avoir and selected verbs with être",
+          "Nadia a lu l'avis et elle est arrivée au centre à l'heure."
+        ],
+        [
+          "g26 Imparfait background",
+          "Past habit or setting",
+          "Il pleuvait quand le bus est arrivé."
+        ],
+        [
+          "g27 Choose a past form",
+          "Background versus completed event",
+          "Il pleuvait; le bus est arrivé; Nadia a changé de plan."
+        ],
+        [
+          "g28 Talk about plans",
+          "Near future and common future simple",
+          "Je vais appeler le centre; je confirmerai l'heure demain."
+        ],
+        [
+          "g29 Compare familiar choices",
+          "plus / moins / aussi … que",
+          "La deuxième option est plus courte que la première."
+        ],
+        [
+          "g30 Combine details",
+          "qui for a subject, que for an object, où for a place/time",
+          "Je choisis l'arrêt qui est près du centre et l'heure que Marie préfère."
+        ],
+        [
+          "g31 Direct object pronouns",
+          "le / la / les",
+          "Je prends le document et je le lis."
+        ],
+        [
+          "g32 Indirect object pronouns",
+          "lui / leur with a person",
+          "Je demande l'heure à Marie; je lui demande l'heure."
+        ],
+        [
+          "Past questions and requests",
+          "Passé composé with familiar verbs",
+          "Nadia a demandé le point de départ et a pris le bus."
+        ],
+        [
+          "g33 y for a place",
+          "Replace a named place",
+          "Nous allons au centre; nous y allons après le cours."
+        ],
+        [
+          "g34 en for quantity",
+          "Keep the amount",
+          "Je prends des pommes; j'en prends quatre."
+        ],
+        [
+          "g35 Imperative",
+          "Short positive or negative instruction",
+          "Confirmez l'heure; ne changez pas le rendez-vous."
+        ],
+        [
+          "g36 Polite conditional",
+          "pourriez-vous / je voudrais",
+          "Pourriez-vous confirmer le point de départ ?"
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A2 grammar retrieval map",
+      "body": "• Before studying the table, cover the right column and try to make one original sentence for each grammar target from memory.\n• Then compare your sentence with the cue. Note a useful correction without copying the entire example.\n• Report listening recognition, reading comprehension, independent speaking and independent writing separately; one strong score does not prove all four skills.\n• Repeat the capstone after a delay with new names, dates, places and a changed problem. Use the same grammar in a new situation.\n• Move on to B1 when the A2 transfer tasks are reliable, not only when every screen is completed. Use the resulting profile to choose the first B1 reviews."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Put the completed action in the passé composé: 'Nadia ___ le message.'",
+      "options": [
+        "a lu",
+        "lisait",
+        "va lire",
+        "lira"
+      ],
+      "answer": 0,
+      "explain": "A finished action uses a lu, the passé composé form of lire."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the sentence with a background and a completed event.",
+      "options": [
+        "Il pleuvait quand le bus est arrivé.",
+        "Il a plu quand le bus arrivait demain.",
+        "Il pleut quand le bus est arrivé demain.",
+        "Il pleuvra quand le bus arrivait."
+      ],
+      "answer": 0,
+      "explain": "The ongoing weather is background (pleuvait); the arrival is a completed event (est arrivé)."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the natural way to state a near plan.",
+      "options": [
+        "Je vais appeler le centre.",
+        "Je appeler vais le centre.",
+        "Je vais appelé le centre.",
+        "J'appelle aller le centre."
+      ],
+      "answer": 0,
+      "explain": "Use the present form of aller followed by the infinitive."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Replace le document in Je prends le document et je ___ lis.",
+      "options": [
+        "le",
+        "la",
+        "leur",
+        "y"
+      ],
+      "answer": 0,
+      "explain": "Document is masculine singular; use direct object pronoun le."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Replace à Marie in Je demande l'heure à Marie; je ___ demande l'heure.",
+      "options": [
+        "lui",
+        "la",
+        "y",
+        "en"
+      ],
+      "answer": 0,
+      "explain": "Lui replaces one person after demander à."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Replace au centre in Nous allons au centre; nous ___ allons.",
+      "options": [
+        "y",
+        "lui",
+        "leur",
+        "en"
+      ],
+      "answer": 0,
+      "explain": "Y replaces the named place."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Replace des pommes while keeping the amount: J'___ prends quatre.",
+      "options": [
+        "en",
+        "y",
+        "les",
+        "leur"
+      ],
+      "answer": 0,
+      "explain": "Use en and keep the quantity quatre."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Which sentence gives a polite request?",
+      "options": [
+        "Pourriez-vous confirmer l'heure ?",
+        "Confirme l'heure !",
+        "Tu confirmes l'heure.",
+        "Confirmer l'heure."
+      ],
+      "answer": 0,
+      "explain": "The conditional pourriez-vous makes this a polite request."
+    }
+  ]
+}

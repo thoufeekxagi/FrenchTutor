@@ -1,0 +1,134 @@
+{
+  "id": "a2-u04-phrases",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Say the time phrase and the background detail together. Write one true memory in your notes, close them, then describe another place or routine without reading."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Quand j'étais étudiant, je prenais le bus chaque matin.",
+      "en": "When I was a student, I used to take the bus every morning.",
+      "tip": "Say it: kah(n) zhay-TEH ay-tü-DYAH(N) zhuh pruh-NEH luh büs shahk mah-TA(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "À cette époque, nous habitions près du centre.",
+      "en": "At that time, we lived near the centre.",
+      "tip": "Say it: ah seht ay-POHK noo zah-bee-TYOH(N) preh dü sah(n)tr"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Il y avait un petit café au coin de la rue.",
+      "en": "There was a small café at the corner.",
+      "tip": "Say it: eel ee ah-VEH uh(n) puh-TEE kah-FAY oh kwa(n) duh lah rü"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "D'habitude, le quartier était calme le soir.",
+      "en": "Usually, the neighbourhood was quiet in the evening.",
+      "tip": "Say it: dah-bee-TÜD luh kahr-TYAY ay-TEH kahlm luh swahr"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Pendant l'hiver, il faisait souvent froid le matin.",
+      "en": "During winter, it was often cold in the morning.",
+      "tip": "Say it: pah(n)-DAH(N) lee-VEHR eel fuh-ZEH soo-VAH(N) frwah luh mah-TA(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "La salle avait de grandes fenêtres.",
+      "en": "The room had large windows.",
+      "tip": "Say it: lah sahl ah-VEH duh grah(n)d fuh-NEHTR"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Le dimanche, ma famille se retrouvait chez ma tante.",
+      "en": "On Sundays, my family used to meet at my aunt's home.",
+      "tip": "Say it: luh dee-MAH(N)sh mah fah-MEEY suh ruh-troo-VEH shay mah tah(n)t"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "On se promenait près de la rivière après le repas.",
+      "en": "We used to walk near the river after the meal.",
+      "tip": "Say it: ohn suh proh-muh-NEH preh duh lah ree-VYEHR ah-preh luh ruh-PAH"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Quand j'étais étudiant, je prenais le bus chaque matin.",
+      "options": [
+        "Usually, the neighbourhood was quiet in the evening.",
+        "When I was a student, I used to take the bus every morning.",
+        "At that time, we lived near the centre.",
+        "There was a small café at the corner."
+      ],
+      "answer": 1,
+      "explain": "Quand j'étais étudiant, je prenais le bus chaque matin. means When I was a student, I used to take the bus every morning.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Il y avait un petit café au coin de la rue.",
+      "options": [
+        "The room had large windows.",
+        "There was a small café at the corner.",
+        "When I was a student, I used to take the bus every morning.",
+        "Usually, the neighbourhood was quiet in the evening."
+      ],
+      "answer": 1,
+      "explain": "Il y avait un petit café au coin de la rue. means There was a small café at the corner.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Pendant l'hiver, il faisait souvent froid le matin.",
+      "options": [
+        "We used to walk near the river after the meal.",
+        "During winter, it was often cold in the morning.",
+        "There was a small café at the corner.",
+        "The room had large windows."
+      ],
+      "answer": 1,
+      "explain": "Pendant l'hiver, il faisait souvent froid le matin. means During winter, it was often cold in the morning.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Le dimanche, ma famille se retrouvait chez ma tante.",
+      "options": [
+        "At that time, we lived near the centre.",
+        "On Sundays, my family used to meet at my aunt's home.",
+        "During winter, it was often cold in the morning.",
+        "There was a small café at the corner."
+      ],
+      "answer": 1,
+      "explain": "Le dimanche, ma famille se retrouvait chez ma tante. means On Sundays, my family used to meet at my aunt's home.."
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "id": "a2-u05-words-1",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Words: work and study goals",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un objectif professionnel",
+      "en": "a career goal",
+      "sound": "uh(n) noh-bzhehk-teef proh-feh-syoh-NEHL",
+      "exampleFr": "Je définis un objectif professionnel pour cette année.",
+      "exampleEn": "I set a career goal for this year."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une formation du soir",
+      "en": "an evening course",
+      "sound": "ün for-mah-SYOH(N) dü swahr",
+      "exampleFr": "Une formation du soir commence en septembre.",
+      "exampleEn": "An evening course starts in September."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un cours intensif",
+      "en": "an intensive course",
+      "sound": "uh(n) koor a(n)-tah(n)-SEEF",
+      "exampleFr": "Je prends un cours intensif pendant deux semaines.",
+      "exampleEn": "I am taking an intensive course for two weeks."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un certificat",
+      "en": "a certificate",
+      "sound": "uh(n) sehr-tee-fee-KAH",
+      "exampleFr": "Ce certificat confirme ma réussite au cours.",
+      "exampleEn": "This certificate confirms that I passed the course."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un stage rémunéré",
+      "en": "a paid internship",
+      "sound": "uh(n) stahzh ray-mü-nay-RAY",
+      "exampleFr": "Elle cherche un stage rémunéré cet été.",
+      "exampleEn": "She is looking for a paid internship this summer."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un test de niveau",
+      "en": "a placement test",
+      "sound": "uh(n) tehst duh nee-VOH",
+      "exampleFr": "Le centre propose un test de niveau avant l'inscription.",
+      "exampleEn": "The centre offers a placement test before registration."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un portfolio",
+      "en": "a portfolio",
+      "sound": "uh(n) port-foh-LYOH",
+      "exampleFr": "J'ajoute mes meilleurs travaux à mon portfolio.",
+      "exampleEn": "I add my best work to my portfolio."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une expérience pertinente",
+      "en": "relevant experience",
+      "sound": "ün ehk-speh-ree-AH(N)S pehr-tee-NAH(N)t",
+      "exampleFr": "Je décris mon expérience pertinente dans ma candidature.",
+      "exampleEn": "I describe my relevant experience in my application."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un objectif professionnel",
+      "options": [
+        "a certificate",
+        "a career goal",
+        "a portfolio",
+        "an evening course"
+      ],
+      "answer": 1,
+      "explain": "un objectif professionnel means a career goal."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une formation du soir",
+      "options": [
+        "a paid internship",
+        "relevant experience",
+        "a placement test",
+        "an evening course"
+      ],
+      "answer": 3,
+      "explain": "une formation du soir means an evening course."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un cours intensif",
+      "options": [
+        "a placement test",
+        "an intensive course",
+        "a career goal",
+        "a certificate"
+      ],
+      "answer": 1,
+      "explain": "un cours intensif means an intensive course."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un certificat",
+      "options": [
+        "a portfolio",
+        "an evening course",
+        "a paid internship",
+        "a certificate"
+      ],
+      "answer": 3,
+      "explain": "un certificat means a certificate."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un stage rémunéré",
+      "options": [
+        "relevant experience",
+        "a paid internship",
+        "an intensive course",
+        "a placement test"
+      ],
+      "answer": 1,
+      "explain": "un stage rémunéré means a paid internship."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un test de niveau",
+      "options": [
+        "a career goal",
+        "a certificate",
+        "a portfolio",
+        "a placement test"
+      ],
+      "answer": 3,
+      "explain": "un test de niveau means a placement test."
+    }
+  ]
+}

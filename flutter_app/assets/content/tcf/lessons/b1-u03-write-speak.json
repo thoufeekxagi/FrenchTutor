@@ -1,0 +1,49 @@
+{
+  "id": "b1-u03-write-speak",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word post for a community group about a practical change that could make an activity easier to attend. Describe the current situation, propose one realistic option, acknowledge a constraint and explain what should be checked before a decision.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Notre groupe de conversation se réunit actuellement le jeudi à dix-huit heures. Plusieurs participants terminent leur travail à cette heure-là et arrivent souvent en retard. Si nous commencions à dix-huit heures trente, davantage de personnes pourraient être présentes dès le début. Une autre possibilité serait de garder l'horaire actuel et d'offrir une séance en ligne une fois par mois. Je comprends toutefois que certains membres n'ont pas une connexion stable à la maison. À mon avis, le groupe pourrait essayer les deux options pendant quatre semaines. Il faudrait d'abord vérifier la disponibilité de la salle et demander aux participants quelle formule leur convient. Après l'essai, nous pourrions comparer les présences et les commentaires. Ainsi, la décision reposerait sur les besoins observés, plutôt que sur une seule préférence. Je serais favorable à un changement si chaque personne peut encore participer d'une façon accessible.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Use imparfait after si for a hypothetical condition and conditional in the result.\n• Acknowledge one real constraint and name a check before deciding.\n• Keep the recommendation proportionate to the information given."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. You are asking a community organizer about a proposed activity change. Prepare for two minutes; ask what is changing, why, when the trial begins, how participants can give feedback and what happens if the new schedule does not work. Interact for 3 minutes 30. Marie will introduce one concern and ask your preference.\n\n• Begin with information-seeking questions, then add your view if the role requires it.\n• Respond to the organizer's answer instead of asking every question mechanically.\n• Use a hypothetical to make a suggestion; do not treat it as a confirmed policy."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet du nouvel horaire. Pourriez-vous me dire quand l'essai commencera ? Pourquoi le groupe envisage-t-il ce changement ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Est-ce qu'une option en ligne sera disponible ? Si l'horaire ne convenait pas, pourrait-on revenir à l'ancien ? J'aimerais aussi savoir comment les participants pourront donner leur avis.",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "À mon avis, un essai de quelques semaines serait utile, à condition que chacun puisse participer. Si j'ai bien compris, la décision finale sera prise après la période d'essai.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

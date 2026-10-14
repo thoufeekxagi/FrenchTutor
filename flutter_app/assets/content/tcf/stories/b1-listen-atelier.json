@@ -1,0 +1,572 @@
+{
+  "id": "b1-listen-atelier",
+  "title": "L'atelier qui déborde",
+  "titleEn": "The workshop with too many registrations",
+  "level": "B1",
+  "mode": "listening",
+  "minutes": 5,
+  "summary": "A popular workshop exceeds its room capacity, and the team creates a fair second session instead of turning people away without a plan.",
+  "unit": "b1-u05",
+  "sentences": [
+    {
+      "fr": "Le centre communautaire avait annoncé un atelier gratuit sur la préparation d'un budget.",
+      "en": "The community centre had announced a free workshop on preparing a budget."
+    },
+    {
+      "fr": "Deux jours plus tard, les inscriptions dépassaient déjà la capacité de la salle.",
+      "en": "Two days later, registrations already exceeded the room's capacity."
+    },
+    {
+      "fr": "L'équipe aurait pu fermer la liste, mais plusieurs personnes attendaient encore une réponse.",
+      "en": "The team could have closed the list, but several people were still waiting for an answer."
+    },
+    {
+      "fr": "Après avoir consulté l'animatrice, elle a proposé une deuxième séance le samedi.",
+      "en": "After consulting the facilitator, it proposed a second session on Saturday."
+    },
+    {
+      "fr": "La première séance a été réservée aux personnes qui avaient besoin d'une réponse rapide.",
+      "en": "The first session was reserved for people who needed a quick answer."
+    },
+    {
+      "fr": "Les autres ont reçu le nouveau choix avec une date limite pour confirmer.",
+      "en": "The others received the new option with a deadline to confirm."
+    },
+    {
+      "fr": "Cette règle a évité de favoriser seulement les personnes qui connaissaient déjà le personnel.",
+      "en": "This rule avoided favouring only people who already knew the staff."
+    },
+    {
+      "fr": "Les deux séances ont finalement affiché complet, sans dépasser le nombre de places.",
+      "en": "Both sessions eventually filled up without exceeding the number of seats."
+    },
+    {
+      "fr": "L'équipe a décidé de demander les inscriptions plus tôt pour le prochain atelier.",
+      "en": "The team decided to open registration earlier for the next workshop."
+    }
+  ],
+  "words": {
+    "le": {
+      "en": "the"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "communautaire": {
+      "en": "community",
+      "pos": "adjective"
+    },
+    "avait": {
+      "en": "had",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Imperfect form of avoir."
+    },
+    "annoncé": {
+      "en": "announced",
+      "pos": "verb",
+      "lemma": "annoncer",
+      "note": "Past participle of annoncer."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "atelier": {
+      "en": "a workshop",
+      "sound": "uh(n) ah-tuh-LYAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "atelier"
+    },
+    "gratuit": {
+      "en": "free of charge",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "gratuit",
+      "note": "Masculine singular form."
+    },
+    "sur": {
+      "en": "on"
+    },
+    "la": {
+      "en": "the"
+    },
+    "préparation": {
+      "en": "preparation",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "d'un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "budget": {
+      "en": "a budget",
+      "sound": "uh(n) bü-JEH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "budget"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "jours": {
+      "en": "days",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "jour",
+      "note": "Plural of jour."
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "tard": {
+      "en": "late",
+      "pos": "adverb"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "inscriptions": {
+      "en": "registrations",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "inscription",
+      "note": "Plural of inscription."
+    },
+    "dépassaient": {
+      "en": "exceeded",
+      "pos": "verb",
+      "lemma": "dépasser",
+      "note": "Imperfect form of dépasser."
+    },
+    "déjà": {
+      "en": "already",
+      "pos": "adverb"
+    },
+    "capacité": {
+      "en": "capacity",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "capacité"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "salle": {
+      "en": "room",
+      "pos": "noun, feminine",
+      "sound": "sal"
+    },
+    "l'équipe": {
+      "en": "team",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "équipe",
+      "note": "Elided la before a vowel."
+    },
+    "aurait": {
+      "en": "would have; could have",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Conditional form of avoir."
+    },
+    "pu": {
+      "en": "could; was able to",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Past participle used with avoir."
+    },
+    "fermer": {
+      "en": "to close",
+      "pos": "verb",
+      "lemma": "fermer",
+      "note": "Infinitive."
+    },
+    "liste": {
+      "en": "list",
+      "pos": "noun, feminine",
+      "sound": "LEEST",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "liste"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "plusieurs": {
+      "en": "several",
+      "pos": "determiner / pronoun"
+    },
+    "personnes": {
+      "en": "person",
+      "sound": "lah pehR-SUN",
+      "lemma": "personne",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "attendaient": {
+      "en": "were waiting",
+      "pos": "verb",
+      "lemma": "attendre",
+      "note": "Imperfect form of attendre."
+    },
+    "encore": {
+      "en": "still; again",
+      "pos": "adverb"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "réponse": {
+      "en": "answer; response",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "réponse"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "avoir": {
+      "en": "to have",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Infinitive."
+    },
+    "consulté": {
+      "en": "consulted",
+      "pos": "verb",
+      "lemma": "consulter",
+      "note": "Past participle of consulter."
+    },
+    "l'animatrice": {
+      "en": "the facilitator",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "animateur",
+      "note": "Elided la; feminine form of animateur."
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "proposé": {
+      "en": "proposed",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Past participle of proposer."
+    },
+    "deuxième": {
+      "en": "second; next",
+      "pos": "adjective",
+      "number": "singular",
+      "lemma": "deuxième",
+      "note": "Same form for masculine and feminine."
+    },
+    "séance": {
+      "en": "session",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "séance"
+    },
+    "samedi": {
+      "en": "Saturday",
+      "pos": "day"
+    },
+    "première": {
+      "en": "first",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "premier",
+      "note": "Feminine form of premier."
+    },
+    "été": {
+      "en": "been",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Past participle of être; this form does not agree."
+    },
+    "réservée": {
+      "en": "reserved",
+      "pos": "verb",
+      "lemma": "réserver",
+      "note": "Feminine form of the past participle réservé."
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "avaient": {
+      "en": "had",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Imperfect form of avoir."
+    },
+    "besoin": {
+      "en": "a need",
+      "sound": "uh(n) buh-ZWA(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "besoin"
+    },
+    "d'une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "rapide": {
+      "en": "quick",
+      "pos": "adjective",
+      "lemma": "rapide"
+    },
+    "autres": {
+      "en": "other; different",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "autre",
+      "note": "Plural form; same spelling for masculine and feminine."
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "reçu": {
+      "en": "receipt",
+      "sound": "luh ruh-SÜ",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "reçu"
+    },
+    "nouveau": {
+      "en": "new",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "nouveau",
+      "note": "Masculine singular form; feminine is nouvelle."
+    },
+    "choix": {
+      "en": "choice",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "date": {
+      "en": "date",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "date"
+    },
+    "limite": {
+      "en": "limit; deadline",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "limite"
+    },
+    "pour": {
+      "en": "for"
+    },
+    "confirmer": {
+      "en": "to confirm",
+      "pos": "verb",
+      "lemma": "confirmer",
+      "note": "Infinitive."
+    },
+    "cette": {
+      "en": "this",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ce",
+      "note": "Feminine singular demonstrative."
+    },
+    "règle": {
+      "en": "rule",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "évité": {
+      "en": "avoided",
+      "pos": "verb",
+      "lemma": "éviter",
+      "note": "Past participle of éviter."
+    },
+    "favoriser": {
+      "en": "to favour",
+      "pos": "verb",
+      "lemma": "favoriser",
+      "note": "Infinitive."
+    },
+    "seulement": {
+      "en": "only",
+      "pos": "adverb"
+    },
+    "connaissaient": {
+      "en": "knew",
+      "pos": "verb",
+      "lemma": "connaître",
+      "note": "Imperfect form of connaître."
+    },
+    "personnel": {
+      "en": "staff",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "personnel",
+      "note": "Collective noun for the staff."
+    },
+    "séances": {
+      "en": "sessions",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "séance",
+      "note": "Plural of séance."
+    },
+    "finalement": {
+      "en": "finally; in the end",
+      "pos": "adverb"
+    },
+    "affiché": {
+      "en": "filled up; displayed",
+      "pos": "verb",
+      "lemma": "afficher",
+      "note": "Past participle of afficher."
+    },
+    "complet": {
+      "en": "full; complete",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "complet",
+      "note": "Masculine singular form."
+    },
+    "sans": {
+      "en": "without",
+      "pos": "preposition"
+    },
+    "dépasser": {
+      "en": "to exceed",
+      "pos": "verb",
+      "lemma": "dépasser",
+      "note": "Infinitive."
+    },
+    "nombre": {
+      "en": "number, quantity",
+      "sound": "luh NOH(N)br",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "nombre"
+    },
+    "places": {
+      "en": "square, plaza",
+      "sound": "lah plahs",
+      "lemma": "place",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "décidé": {
+      "en": "decided",
+      "pos": "verb",
+      "lemma": "décider",
+      "note": "Past participle of décider."
+    },
+    "demander": {
+      "en": "to ask",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Infinitive."
+    },
+    "tôt": {
+      "en": "early",
+      "pos": "adverb"
+    },
+    "prochain": {
+      "en": "next",
+      "pos": "adjective"
+    }
+  },
+  "keywords": [
+    "inscriptions",
+    "capacité",
+    "séance",
+    "liste",
+    "complet"
+  ],
+  "quiz": [
+    {
+      "prompt": "What problem did the team face?",
+      "options": [
+        "Registrations exceeded room capacity.",
+        "The facilitator cancelled the workshop.",
+        "No one wanted to attend.",
+        "The centre lost its budget."
+      ],
+      "answer": 0,
+      "explain": "The number of registrations passed the room's capacity."
+    },
+    {
+      "prompt": "How did the team make the decision fairer?",
+      "options": [
+        "It set a stated priority and offered another session.",
+        "It invited only people known to staff.",
+        "It removed the registration list.",
+        "It charged a higher fee."
+      ],
+      "answer": 0,
+      "explain": "The team used a clear priority and offered a second session."
+    },
+    {
+      "prompt": "What will change next time?",
+      "options": [
+        "Registration will open earlier.",
+        "The room will have fewer seats.",
+        "The workshop will be cancelled.",
+        "Only one session will be offered."
+      ],
+      "answer": 0,
+      "explain": "The team chose to open registration earlier."
+    }
+  ]
+}

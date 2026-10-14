@@ -1,0 +1,72 @@
+{
+  "id": "b1-u01-dialogues",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "The class moved",
+      "body": "Two classmates explain a last-minute room change.",
+      "examples": [
+        {
+          "fr": "Quand je suis arrivée, le groupe attendait dans le couloir.",
+          "en": "Lina: When I arrived, the group was waiting in the hallway."
+        },
+        {
+          "fr": "La professeure avait déjà envoyé un message.",
+          "en": "Marc: The teacher had already sent a message."
+        },
+        {
+          "fr": "Je ne l'avais pas vu; mon téléphone était dans mon sac.",
+          "en": "Lina: I had not seen it; my phone was in my bag."
+        },
+        {
+          "fr": "La nouvelle salle était au deuxième étage.",
+          "en": "Marc: The new room was on the second floor."
+        },
+        {
+          "fr": "Finalement, nous avons commencé avec dix minutes de retard.",
+          "en": "Lina: In the end, we started ten minutes late."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A missed connection",
+      "body": "A learner recounts why a meeting began late.",
+      "examples": [
+        {
+          "fr": "Le bus est arrivé après l'heure prévue.",
+          "en": "Awa: The bus arrived later than planned."
+        },
+        {
+          "fr": "Tu avais vérifié l'horaire avant de partir ?",
+          "en": "Sam: Had you checked the schedule before leaving?"
+        },
+        {
+          "fr": "Oui, mais le service avait été modifié le matin même.",
+          "en": "Awa: Yes, but the service had been changed that morning."
+        },
+        {
+          "fr": "Tu as prévenu le groupe ?",
+          "en": "Sam: Did you let the group know?"
+        },
+        {
+          "fr": "Oui. Ils ont commencé sans moi et j'ai rejoint la réunion en ligne.",
+          "en": "Awa: Yes. They started without me, and I joined the meeting online."
+        }
+      ]
+    }
+  ]
+}

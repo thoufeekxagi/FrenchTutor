@@ -1,0 +1,75 @@
+{
+  "id": "b2-u04-checkpoint",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does une contrainte mean?",
+      "options": [
+        "A compromise",
+        "A constraint",
+        "A result",
+        "A survey"
+      ],
+      "answer": 1,
+      "explain": "Une contrainte is a constraint."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which tense advances a completed past event?",
+      "options": [
+        "present subjunctive",
+        "imparfait",
+        "future conditional",
+        "passé composé"
+      ],
+      "answer": 3,
+      "explain": "The passé composé often advances a narrative with a completed event."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which information had happened first?",
+      "options": [
+        "The residents had reported the issue before the closure",
+        "The closure will happen next year",
+        "The issue is still unnamed",
+        "The residents report it tomorrow"
+      ],
+      "answer": 0,
+      "explain": "The earlier report belongs before the later closure."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What should a comparison consider?",
+      "options": [
+        "Only the cheapest option",
+        "A single universal preference",
+        "Different groups' needs and trade-offs",
+        "An invented guarantee"
+      ],
+      "answer": 2,
+      "explain": "A strong comparison considers affected groups and trade-offs."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does au détriment de introduce?",
+      "options": [
+        "A time marker",
+        "A cost or negative effect on something",
+        "A source attribution",
+        "A polite greeting"
+      ],
+      "answer": 1,
+      "explain": "Au détriment de means at the expense of something."
+    }
+  ]
+}

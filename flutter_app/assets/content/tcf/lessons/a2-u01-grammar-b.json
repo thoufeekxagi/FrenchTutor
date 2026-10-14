@@ -1,0 +1,92 @@
+{
+  "id": "a2-u01-grammar-b",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Grammar: put events in an easy order",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "A small sequence makes a longer answer easier to follow",
+      "headers": [
+        "Order",
+        "Example"
+      ],
+      "rows": [
+        [
+          "first",
+          "D'abord, je vérifie mon horaire."
+        ],
+        [
+          "next",
+          "Ensuite, je planifie mes tâches."
+        ],
+        [
+          "last",
+          "Enfin, je prépare mon sac."
+        ]
+      ],
+      "hear": 1
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "put events in an easy order",
+      "body": "Notebook move: write one true sentence about your week. Close your notes and say it again with a different connector. Tomorrow, retrieve the idea first, then rebuild the French without looking."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je travaille le matin ___ j'étudie le soir. (addition)",
+      "options": [
+        "parce que",
+        "et",
+        "donc",
+        "mais"
+      ],
+      "answer": 1,
+      "explain": "Et adds the second activity."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Je suis occupée lundi, ___ je suis libre mardi. (contrast)",
+      "options": [
+        "mais",
+        "donc",
+        "parce que",
+        "d'abord"
+      ],
+      "answer": 0,
+      "explain": "Mais shows the contrast between busy Monday and free Tuesday."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Je reporte le cours ___ je travaille. (reason)",
+      "options": [
+        "ensuite",
+        "mais",
+        "parce que",
+        "donc"
+      ],
+      "answer": 2,
+      "explain": "Parce que introduces the reason: je travaille."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Le bus est en retard, ___ j'arrive plus tard. (result)",
+      "options": [
+        "d'abord",
+        "parce que",
+        "mais",
+        "donc"
+      ],
+      "answer": 3,
+      "explain": "Donc introduces the result."
+    }
+  ]
+}

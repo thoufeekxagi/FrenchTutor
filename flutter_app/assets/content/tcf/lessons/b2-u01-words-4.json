@@ -1,0 +1,148 @@
+{
+  "id": "b2-u01-words-4",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "mettre en balance",
+      "en": "to weigh against each other",
+      "sound": "mehtr ahn bah-LAHNS",
+      "exampleFr": "Il faut mettre les coûts et les avantages en balance.",
+      "exampleEn": "The costs and benefits need to be weighed against each other."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un lien de causalité",
+      "en": "a causal link",
+      "sound": "uh(n) lyeh(n) duh koh-zah-lee-TAY",
+      "exampleFr": "Une corrélation ne prouve pas un lien de causalité.",
+      "exampleEn": "A correlation does not prove a causal link."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une justification",
+      "en": "a justification",
+      "sound": "ün zhüs-tee-fee-kah-SYOH(N)",
+      "exampleFr": "La justification doit répondre à la question posée.",
+      "exampleEn": "The justification must answer the question asked."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une implication",
+      "en": "an implication",
+      "sound": "ün ehn-plee-kah-SYOH(N)",
+      "exampleFr": "Cette décision a une implication pour les horaires d'équipe.",
+      "exampleEn": "This decision has an implication for team schedules."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un fondement",
+      "en": "a basis; foundation",
+      "sound": "uh(n) fohn-duh-MAH(N)",
+      "exampleFr": "Le fondement de sa position est une expérience récente.",
+      "exampleEn": "The basis of her position is a recent experience."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une objection recevable",
+      "en": "a valid objection",
+      "sound": "ün ohb-zhehk-SYOH(N) ruh-suh-VAHBL",
+      "exampleFr": "Il reconnaît une objection recevable avant de répondre.",
+      "exampleEn": "He acknowledges a valid objection before responding."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "mettre en balance",
+      "options": [
+        "an implication",
+        "to weigh against each other",
+        "a causal link",
+        "a justification"
+      ],
+      "answer": 1,
+      "explain": "mettre en balance means to weigh against each other."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un lien de causalité",
+      "options": [
+        "a basis; foundation",
+        "a justification",
+        "an implication",
+        "a causal link"
+      ],
+      "answer": 3,
+      "explain": "un lien de causalité means a causal link."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une justification",
+      "options": [
+        "a valid objection",
+        "a justification",
+        "an implication",
+        "a basis; foundation"
+      ],
+      "answer": 1,
+      "explain": "une justification means a justification."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une implication",
+      "options": [
+        "to weigh against each other",
+        "a basis; foundation",
+        "a valid objection",
+        "an implication"
+      ],
+      "answer": 3,
+      "explain": "une implication means an implication."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un fondement",
+      "options": [
+        "a causal link",
+        "a basis; foundation",
+        "a valid objection",
+        "to weigh against each other"
+      ],
+      "answer": 1,
+      "explain": "un fondement means a basis; foundation."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une objection recevable",
+      "options": [
+        "a justification",
+        "to weigh against each other",
+        "a causal link",
+        "a valid objection"
+      ],
+      "answer": 3,
+      "explain": "une objection recevable means a valid objection."
+    }
+  ]
+}

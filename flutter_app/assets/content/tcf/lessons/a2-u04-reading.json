@@ -1,0 +1,80 @@
+{
+  "id": "a2-u04-reading",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When did the shop use to close?",
+      "options": [
+        "At 6 p.m. each evening",
+        "At 8 a.m. each morning",
+        "At noon on Sundays",
+        "At 9 p.m. each Friday"
+      ],
+      "answer": 0,
+      "explain": "The notice says the shop closed at 18 h each evening.",
+      "promptFr": "MON ANCIEN QUARTIER · Le matin, la rue était calme. Chaque soir, le commerce fermait à 18 h."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How many windows were there?",
+      "options": [
+        "Two",
+        "One",
+        "Three",
+        "Four"
+      ],
+      "answer": 0,
+      "explain": "The note says deux fenêtres.",
+      "promptFr": "Souvenir de l'école · La salle de lecture était au deuxième étage. Il y avait deux fenêtres côté cour."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What was the trip like?",
+      "options": [
+        "Short",
+        "Long",
+        "Noisy",
+        "Expensive"
+      ],
+      "answer": 0,
+      "explain": "The sentence describes the trip as court, short.",
+      "promptFr": "À cette époque, je prenais le bus 12. Le trajet était court et le quartier était paisible."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where was the Sunday meal?",
+      "options": [
+        "At the aunt's home",
+        "At the park",
+        "At the school",
+        "At the café"
+      ],
+      "answer": 0,
+      "explain": "The agenda says the meal was at the aunt's home.",
+      "promptFr": "Calendrier de la famille · Dimanche : repas chez ma tante · Chaque mois : visite au parc · En hiver : marche près de la rivière si le ciel était couvert"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What was bright?",
+      "options": [
+        "The inner courtyard",
+        "The basement",
+        "The stairwell",
+        "The college"
+      ],
+      "answer": 0,
+      "explain": "The notice says the inner courtyard was clear and bright.",
+      "promptFr": "Logement de l'époque · L'immeuble était ancien, mais la cour intérieure était claire."
+    }
+  ]
+}

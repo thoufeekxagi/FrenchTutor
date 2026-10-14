@@ -1,0 +1,86 @@
+{
+  "id": "a2-u02-listening",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Hier soir, j'ai terminé mon devoir et j'ai préparé mon exposé.",
+      "question": "What did the speaker prepare?",
+      "options": [
+        "A presentation",
+        "A delivery",
+        "A refund",
+        "A guided tour"
+      ],
+      "answer": 0,
+      "explain": "The speaker says j'ai préparé mon exposé."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La semaine dernière, nous avons réservé une visite guidée pour samedi.",
+      "question": "When did they book the tour?",
+      "options": [
+        "Last week",
+        "Yesterday morning",
+        "This afternoon",
+        "Next month"
+      ],
+      "answer": 0,
+      "explain": "The first words are la semaine dernière."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "J'ai préparé le devoir pendant une heure parce que le cours a commencé plus tard.",
+      "question": "Why did the person work on the assignment for an hour?",
+      "options": [
+        "The class started later.",
+        "The service cancelled a delivery.",
+        "The bus arrived early.",
+        "The tour finished."
+      ],
+      "answer": 0,
+      "explain": "The speaker says the class started later."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Avant-hier, j'ai emprunté un dictionnaire. Hier matin, j'ai terminé le devoir.",
+      "question": "What did the speaker finish yesterday morning?",
+      "options": [
+        "The assignment",
+        "The dictionary",
+        "The delivery",
+        "The guided tour"
+      ],
+      "answer": 0,
+      "explain": "The second sentence says the speaker finished the assignment yesterday morning."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Heureusement, nous avons trouvé le bon bureau au bon moment.",
+      "question": "How did the speakers feel about finding the office?",
+      "options": [
+        "Relieved",
+        "Angry",
+        "Sleepy",
+        "Disappointed"
+      ],
+      "answer": 0,
+      "explain": "Heureusement signals that finding the office was fortunate."
+    }
+  ]
+}

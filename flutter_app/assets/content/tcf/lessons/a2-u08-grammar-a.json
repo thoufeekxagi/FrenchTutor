@@ -1,0 +1,162 @@
+{
+  "id": "a2-u08-grammar-a",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Grammar: Choose the pronoun, then place it before its verb",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Choose the pronoun, then place it before its verb",
+      "body": "A direct object answers 'what?' or 'whom?' after the verb. If the noun is already clear, French can replace it with le, la or les. The pronoun normally sits before the verb it belongs to."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Notice the verb forms in project messages. The object pronoun then replaces the repeated document: Nadia le relit; le comité la reçoit.",
+      "headers": [
+        "Useful form",
+        "Meaning in this scene"
+      ],
+      "rows": [
+        [
+          "La formatrice demande le plan.",
+          "The instructor asks for the outline."
+        ],
+        [
+          "Tu remets le fichier jeudi ?",
+          "Are you handing in the file Thursday?"
+        ],
+        [
+          "Je joins la liste au dossier.",
+          "I attach the list to the file."
+        ],
+        [
+          "Tu envoies le compte rendu ?",
+          "Are you sending the report?"
+        ],
+        [
+          "Nadia relit le compte rendu.",
+          "Nadia rereads the report."
+        ],
+        [
+          "Sam partage la version.",
+          "Sam shares the version."
+        ],
+        [
+          "Le comité reçoit la version finale.",
+          "The committee receives the final version."
+        ],
+        [
+          "Nadia a relu le document.",
+          "Nadia reread the document."
+        ],
+        [
+          "Les documents sont prêts.",
+          "The documents are ready."
+        ],
+        [
+          "Le plan doit être prêt vendredi.",
+          "The outline must be ready Friday."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "The pronoun matches the noun replaced, not the speaker. Before a vowel sound, le and la shorten to l'.",
+      "headers": [
+        "Original noun",
+        "Pronoun",
+        "With a conjugated verb",
+        "With aller + infinitive"
+      ],
+      "rows": [
+        [
+          "le compte rendu",
+          "le",
+          "Je le relis.",
+          "Je vais le relire."
+        ],
+        [
+          "la version",
+          "la",
+          "Je la corrige.",
+          "Je vais la corriger."
+        ],
+        [
+          "les documents",
+          "les",
+          "Nous les classons.",
+          "Nous allons les classer."
+        ],
+        [
+          "l'ordre du jour",
+          "le → l'",
+          "Je l'organise.",
+          "Je vais l'organiser."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Choose the pronoun, then place it before its verb",
+      "body": "• Use le for one masculine direct object, la for one feminine direct object, and les for plural objects of any gender.\n• Place the pronoun before a conjugated verb: je le relis; elle la corrige; nous les classons.\n• With aller + infinitive, place it before the infinitive: je vais le relire; nous allons les classer.\n• Before a vowel sound, le and la become l': la note → je l'envoie. The noun's gender is still the way you choose the pronoun.\n• With a simple negative, ne and pas go around the conjugated verb: je ne le trouve pas. In your notes, replace the same noun in three sentences; then retrieve them without looking."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Le compte rendu ? Je ___ relis.",
+      "options": [
+        "le",
+        "la",
+        "les",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Compte rendu is masculine singular, so replace it with le."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "La version ? Nous ___ corrigeons aujourd'hui.",
+      "options": [
+        "la",
+        "le",
+        "les",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Version is feminine singular, so use la."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Les fichiers ? Sam va ___ classer par date.",
+      "options": [
+        "les",
+        "le",
+        "la",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Fichiers is plural, and the pronoun goes before the infinitive classer."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Le plan ? Je vais ___ organiser demain.",
+      "options": [
+        "l'",
+        "la",
+        "les",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Plan is masculine singular, so use le; it shortens to l' before organiser."
+    }
+  ]
+}

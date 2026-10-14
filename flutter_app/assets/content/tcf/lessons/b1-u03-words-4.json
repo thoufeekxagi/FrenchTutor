@@ -1,0 +1,148 @@
+{
+  "id": "b1-u03-words-4",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une solution équitable",
+      "en": "a fair solution",
+      "sound": "ün soh-lü-SYOH(N) ay-kee-TAH-bl",
+      "exampleFr": "Le groupe cherche une solution équitable pour tous.",
+      "exampleEn": "The group is looking for a fair solution for everyone."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "prendre en compte",
+      "en": "to take into account",
+      "sound": "prahn-dr ahn koh(n)t",
+      "exampleFr": "Il faut prendre en compte les besoins des personnes absentes.",
+      "exampleEn": "The needs of absent people must be taken into account."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "être en faveur de",
+      "en": "to be in favour of",
+      "sound": "ehtr ahn fah-VUHR duh",
+      "exampleFr": "Plusieurs parents sont en faveur d'un essai limité.",
+      "exampleEn": "Several parents are in favour of a limited trial."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "s'opposer à",
+      "en": "to oppose",
+      "sound": "soh-poh-ZAY ah",
+      "exampleFr": "Certains membres s'opposent à une décision immédiate.",
+      "exampleEn": "Some members oppose an immediate decision."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une mesure temporaire",
+      "en": "a temporary measure",
+      "sound": "ün muh-ZÜR tah(n)-poh-REHR",
+      "exampleFr": "Une mesure temporaire permettrait d'évaluer les résultats.",
+      "exampleEn": "A temporary measure would make it possible to evaluate the results."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un ajustement",
+      "en": "an adjustment",
+      "sound": "uh(n) ah-zhüs-tuh-MAH(N)",
+      "exampleFr": "Un petit ajustement pourrait répondre aux deux besoins.",
+      "exampleEn": "A small adjustment could address both needs."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une solution équitable",
+      "options": [
+        "to oppose",
+        "a fair solution",
+        "to take into account",
+        "to be in favour of"
+      ],
+      "answer": 1,
+      "explain": "une solution équitable means a fair solution."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "prendre en compte",
+      "options": [
+        "a temporary measure",
+        "to be in favour of",
+        "to oppose",
+        "to take into account"
+      ],
+      "answer": 3,
+      "explain": "prendre en compte means to take into account."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "être en faveur de",
+      "options": [
+        "an adjustment",
+        "to be in favour of",
+        "to oppose",
+        "a temporary measure"
+      ],
+      "answer": 1,
+      "explain": "être en faveur de means to be in favour of."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "s'opposer à",
+      "options": [
+        "a fair solution",
+        "a temporary measure",
+        "an adjustment",
+        "to oppose"
+      ],
+      "answer": 3,
+      "explain": "s'opposer à means to oppose."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une mesure temporaire",
+      "options": [
+        "to take into account",
+        "a temporary measure",
+        "an adjustment",
+        "a fair solution"
+      ],
+      "answer": 1,
+      "explain": "une mesure temporaire means a temporary measure."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un ajustement",
+      "options": [
+        "to be in favour of",
+        "a fair solution",
+        "to take into account",
+        "an adjustment"
+      ],
+      "answer": 3,
+      "explain": "un ajustement means an adjustment."
+    }
+  ]
+}

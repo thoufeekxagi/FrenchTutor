@@ -1,0 +1,75 @@
+{
+  "id": "b2-u14-checkpoint",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does un transfert mean in learning?",
+      "options": [
+        "Changing the app setting",
+        "Using a skill in a new situation",
+        "Repeating the same sentence",
+        "Translating every word"
+      ],
+      "answer": 1,
+      "explain": "Transfer means applying learning in a new context."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How should course skill evidence be reported?",
+      "options": [
+        "By the number of notes written",
+        "Only by lesson completion",
+        "As a guaranteed single exam score",
+        "Listening, reading, speaking and writing separately"
+      ],
+      "answer": 3,
+      "explain": "The four skills can develop differently and should be tracked separately."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should be corrected before polishing style?",
+      "options": [
+        "A fictional statistic",
+        "The reader's viewpoint",
+        "Task completion and meaning-changing errors",
+        "Every simple word"
+      ],
+      "answer": 2,
+      "explain": "Check whether the response answers the task and preserves meaning."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What is a useful transfer prompt?",
+      "options": [
+        "A new topic with changed details or constraints",
+        "A repeated vocabulary quiz only",
+        "A copied model paragraph",
+        "The same script with the same answers"
+      ],
+      "answer": 0,
+      "explain": "Changed content tests independent use."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Does course completion certify TCF or NCLC level?",
+      "options": [
+        "Only after a mock test",
+        "No; official results come from the test provider",
+        "Yes, automatically",
+        "Only for writing"
+      ],
+      "answer": 1,
+      "explain": "Course progress is not an official test result."
+    }
+  ]
+}

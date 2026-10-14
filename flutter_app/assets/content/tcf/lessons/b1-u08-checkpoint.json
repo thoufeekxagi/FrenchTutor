@@ -1,0 +1,75 @@
+{
+  "id": "b1-u08-checkpoint",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which word introduces an embedded yes/no question?",
+      "options": [
+        "si",
+        "dont",
+        "que",
+        "où"
+      ],
+      "answer": 0,
+      "explain": "Use si for an embedded yes/no question."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What word order is used in an embedded question?",
+      "options": [
+        "Inversion in every clause",
+        "Infinitive only",
+        "Statement order",
+        "Verb before subject in every clause"
+      ],
+      "answer": 2,
+      "explain": "Keep statement order after the polite frame."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does un délai mean?",
+      "options": [
+        "A preference",
+        "A neighbourhood",
+        "A proof document",
+        "A time limit or waiting period"
+      ],
+      "answer": 3,
+      "explain": "A délai is a limit or period of time."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does y replace in J'y retournerai?",
+      "options": [
+        "A time period",
+        "A previously named place",
+        "A whole question",
+        "A person"
+      ],
+      "answer": 1,
+      "explain": "Here y refers to the previously named place."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "When should the writer follow up according to a notice?",
+      "options": [
+        "At the stated time after all materials are submitted",
+        "Whenever a rumour appears",
+        "Only after cancelling",
+        "Before reading the instructions"
+      ],
+      "answer": 0,
+      "explain": "Use the published process and time details in the notice."
+    }
+  ]
+}

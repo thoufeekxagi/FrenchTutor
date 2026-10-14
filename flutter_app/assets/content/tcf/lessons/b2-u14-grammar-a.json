@@ -1,0 +1,99 @@
+{
+  "id": "b2-u14-grammar-a",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Grammar: Final editing: check meaning, agreement, verb links, register and task completion",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Final editing: check meaning, agreement, verb links, register and task completion",
+      "body": "Editing is not only correcting accents. First check the task: did you answer every part, use the right register and stay within the official word range? Then check sentence meaning and reference; subject–verb and adjective agreement; verb government (avoir besoin de, s'intéresser à); relative forms; tense and mood triggers; and connectors. Read aloud to catch missing words and unclear rhythm. Correct errors that change meaning first, then refine vocabulary. Do not replace every simple phrase with a complicated one. A clear, accurate sentence is stronger than an elaborate sentence you cannot control."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Final editing: check meaning, agreement, verb links, register and task completion",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Task completion",
+          "answer each requested part",
+          "La réponse compare les deux avis et formule une position.",
+          "The response compares both views and states a position."
+        ],
+        [
+          "Agreement",
+          "subject + verb / noun + adjective",
+          "Les données récentes semblent utiles.",
+          "The recent data seem useful."
+        ],
+        [
+          "Verb government",
+          "memorize the full pattern",
+          "Elle s'intéresse au programme dont nous avons parlé.",
+          "She is interested in the program we discussed."
+        ],
+        [
+          "Mood trigger",
+          "certainty / doubt / concession",
+          "Bien que le résultat soit utile, il reste limité.",
+          "Although the result is useful, it remains limited."
+        ],
+        [
+          "Cohesion",
+          "clear pronoun reference",
+          "Cette mesure est coûteuse; son effet reste à évaluer.",
+          "This measure is costly; its effect remains to be assessed."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should you check first in a timed writing task?",
+      "options": [
+        "Whether the conclusion introduces a new topic",
+        "Whether the title is long",
+        "Whether every sentence uses a rare word",
+        "Whether every part of the prompt is answered"
+      ],
+      "answer": 3,
+      "explain": "Task completion comes before stylistic refinement."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should you do when a pronoun's reference is unclear?",
+      "options": [
+        "Repeat the key noun",
+        "Remove the source",
+        "Keep the ambiguity",
+        "Add a new claim"
+      ],
+      "answer": 0,
+      "explain": "Repeating a noun can restore a clear reference."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does a new transfer task measure?",
+      "options": [
+        "The number of lessons completed",
+        "Use of learning in an unfamiliar situation",
+        "Memory for a repeated script only",
+        "An official score automatically"
+      ],
+      "answer": 1,
+      "explain": "Transfer checks performance beyond rehearsed content."
+    }
+  ]
+}

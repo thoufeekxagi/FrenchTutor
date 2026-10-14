@@ -1,0 +1,72 @@
+{
+  "id": "b1-u12-dialogues",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "An unfamiliar service change",
+      "body": "A resident asks a representative about a fictional change and summarizes the answer.",
+      "examples": [
+        {
+          "fr": "J'ai lu que le centre modifierait ses heures.",
+          "en": "Awa: I read that the centre might change its hours."
+        },
+        {
+          "fr": "Un essai est envisagé, mais aucune date n'a été confirmée.",
+          "en": "Agent: A trial is being considered, but no date has been confirmed."
+        },
+        {
+          "fr": "Si j'ai bien compris, le projet est encore à l'étude.",
+          "en": "Awa: If I understood correctly, the plan is still under review."
+        },
+        {
+          "fr": "Exactement. Nous publierons une mise à jour après la consultation.",
+          "en": "Agent: Exactly. We will publish an update after the consultation."
+        },
+        {
+          "fr": "Merci. Pourriez-vous me dire où cette mise à jour sera affichée ?",
+          "en": "Awa: Thank you. Could you tell me where that update will be posted?"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A short opinion with a limit",
+      "body": "Two classmates discuss access to a fictional evening activity.",
+      "examples": [
+        {
+          "fr": "À mon avis, une option en ligne aiderait les personnes qui habitent loin.",
+          "en": "Sam: In my view, an online option would help people who live far away."
+        },
+        {
+          "fr": "C'est possible, mais la connexion n'est pas stable pour tout le monde.",
+          "en": "Lina: That's possible, but the connection is not stable for everyone."
+        },
+        {
+          "fr": "Tu as raison. Il faudrait garder une autre façon de participer.",
+          "en": "Sam: You're right. Another way to participate should remain available."
+        },
+        {
+          "fr": "Un essai permettrait de voir quelles options sont utilisées.",
+          "en": "Lina: A trial would show which options are used."
+        },
+        {
+          "fr": "Oui, puis le groupe pourrait demander des commentaires.",
+          "en": "Sam: Yes, then the group could ask for feedback."
+        }
+      ]
+    }
+  ]
+}

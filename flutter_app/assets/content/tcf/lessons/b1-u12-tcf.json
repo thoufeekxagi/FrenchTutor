@@ -1,0 +1,72 @@
+{
+  "id": "b1-u12-tcf",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le comité étudie une séance en ligne pour les personnes qui habitent loin. La responsable précise qu'il ne s'agit pas encore d'une décision. Elle demande aux participants d'envoyer leurs commentaires avant vendredi.",
+      "question": "What is confirmed?",
+      "options": [
+        "The centre is closing",
+        "The committee is studying an online session, but no decision has been made",
+        "The online session starts Friday",
+        "All members voted for the change"
+      ],
+      "answer": 1,
+      "explain": "The idea is under study; the deadline is for feedback."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "J'avais déjà réservé la salle quand j'ai appris qu'elle serait fermée. J'ai appelé l'organisateur, qui m'a indiqué qu'une autre salle avait été prévue.",
+      "question": "What had already been arranged?",
+      "options": [
+        "The event had been cancelled",
+        "The participants had gone home",
+        "Another room had been planned",
+        "The organizer had left"
+      ],
+      "answer": 2,
+      "explain": "The organizer says a different room had already been planned."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should members do before June 20?",
+      "options": [
+        "Cancel their membership",
+        "Register for a confirmed Saturday session",
+        "Pay for the new schedule",
+        "Share a preference and explain a constraint"
+      ],
+      "answer": 3,
+      "explain": "The note invites members to share a preference and constraint.",
+      "promptFr": "NOTE DU COMITÉ — Plusieurs options sont à l'étude : une séance le samedi, une activité en ligne ou un horaire partagé. Aucune décision n'a été prise. Les membres peuvent transmettre une préférence et expliquer une contrainte avant le 20 juin."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why was another room chosen?",
+      "options": [
+        "The group had cancelled",
+        "The first room was too large",
+        "The first room was inaccessible",
+        "The activity was online"
+      ],
+      "answer": 2,
+      "explain": "The first room was inaccessible.",
+      "promptFr": "Compte rendu — La première salle avait été réservée avant que l'organisatrice apprenne qu'elle était inaccessible. Une autre salle a été choisie. Le groupe a commencé avec quinze minutes de retard, mais chaque participant a pu prendre part à l'activité."
+    }
+  ]
+}

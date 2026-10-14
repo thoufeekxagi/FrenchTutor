@@ -1,0 +1,140 @@
+{
+  "id": "a2-u10-checkpoint",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Tu achètes des fraises ? Oui, j'___ achète.",
+      "options": [
+        "en",
+        "y",
+        "lui",
+        "les"
+      ],
+      "answer": 0,
+      "explain": "En replaces des fraises."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Je prends une barquette de fraises. Je ___ prends une barquette.",
+      "options": [
+        "en",
+        "y",
+        "la",
+        "leur"
+      ],
+      "answer": 0,
+      "explain": "En replaces the phrase de fraises, while the package amount remains."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the sentence meaning 'I will buy one litre of plant-based milk.'",
+      "options": [
+        "Je vais en acheter un litre.",
+        "Je vais acheter en un litre.",
+        "J'en vais acheter un litre.",
+        "Je vais un litre en acheter."
+      ],
+      "answer": 0,
+      "explain": "Put en before the infinitive and keep the amount after it."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Choose the correct negative sentence for 'I am not taking any lentils.'",
+      "options": [
+        "Je n'en prends pas.",
+        "Je ne prends en pas.",
+        "Je en ne prends pas.",
+        "Je n'en pas prends."
+      ],
+      "answer": 0,
+      "explain": "In this pattern, ne comes before en and pas follows the verb."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What stays in J'en prends deux?",
+      "options": [
+        "The number two",
+        "The noun fraises",
+        "The word magasin",
+        "The price per kilogram"
+      ],
+      "answer": 0,
+      "explain": "The number remains after the verb and tells the amount."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does en replace in J'en veux after someone says des lentilles?",
+      "options": [
+        "The lentils",
+        "The shop",
+        "The person",
+        "The quantity two"
+      ],
+      "answer": 0,
+      "explain": "En avoids repeating the food phrase already named."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Choose the correct short answer to Tu veux du lait végétal ?",
+      "options": [
+        "Oui, j'en veux.",
+        "Oui, j'y veux.",
+        "Oui, je lui veux.",
+        "Oui, je les veux du."
+      ],
+      "answer": 0,
+      "explain": "Use en to replace du lait végétal."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Which sentence keeps the package amount?",
+      "options": [
+        "J'en prends une barquette.",
+        "J'en prends dans magasin.",
+        "J'en une barquette prends.",
+        "Je prends en fraises."
+      ],
+      "answer": 0,
+      "explain": "The package amount une barquette follows the verb."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which sentence places en correctly with aller + infinitive?",
+      "options": [
+        "Je vais en acheter un kilo.",
+        "Je en vais acheter un kilo.",
+        "Je vais acheter en un kilo.",
+        "J'en vais un kilo acheter."
+      ],
+      "answer": 0,
+      "explain": "Put en before the infinitive acheter."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "A friend asks Tu en prends combien ? What is the clearest reply?",
+      "options": [
+        "J'en prends deux barquettes.",
+        "J'y prends au magasin.",
+        "Je leur prends les fraises.",
+        "J'en deux prends."
+      ],
+      "answer": 0,
+      "explain": "Keep the quantity after the verb and name the package if useful."
+    }
+  ]
+}

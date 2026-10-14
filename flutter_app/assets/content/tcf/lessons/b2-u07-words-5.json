@@ -1,0 +1,148 @@
+{
+  "id": "b2-u07-words-5",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la biodiversité",
+      "en": "biodiversity",
+      "sound": "lah bee-oh-dee-vehr-see-TAY",
+      "exampleFr": "La biodiversité dépend aussi de la continuité des habitats.",
+      "exampleEn": "Biodiversity also depends on habitat continuity."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la durabilité",
+      "en": "sustainability; durability",
+      "sound": "lah dü-rah-bee-lee-TAY",
+      "exampleFr": "La durabilité du projet dépend de son financement.",
+      "exampleEn": "The project's sustainability depends on its funding."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "atténuer les émissions",
+      "en": "to mitigate emissions",
+      "sound": "ah-tay-nü-AY lay-zay-mee-SYOH(N)",
+      "exampleFr": "Le plan vise à atténuer les émissions du bâtiment.",
+      "exampleEn": "The plan aims to mitigate the building's emissions."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la mise en place",
+      "en": "implementation; setup",
+      "sound": "lah meez ahn plahs",
+      "exampleFr": "La mise en place du tri se fera par étapes.",
+      "exampleEn": "The sorting system will be implemented in stages."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une transition énergétique",
+      "en": "an energy transition",
+      "sound": "ün trahn-zee-SYOH(N) ay-nehr-zhay-TEEK",
+      "exampleFr": "La transition énergétique exige des décisions coordonnées.",
+      "exampleEn": "The energy transition requires coordinated decisions."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "financer un projet",
+      "en": "to fund a project",
+      "sound": "fee-nahn-SAY uh(n) proh-ZHEH",
+      "exampleFr": "La ville cherche à financer un projet de rénovation.",
+      "exampleEn": "The city is seeking to fund a retrofit project."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la biodiversité",
+      "options": [
+        "implementation; setup",
+        "biodiversity",
+        "sustainability; durability",
+        "to mitigate emissions"
+      ],
+      "answer": 1,
+      "explain": "la biodiversité means biodiversity."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la durabilité",
+      "options": [
+        "an energy transition",
+        "to mitigate emissions",
+        "implementation; setup",
+        "sustainability; durability"
+      ],
+      "answer": 3,
+      "explain": "la durabilité means sustainability; durability."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "atténuer les émissions",
+      "options": [
+        "to fund a project",
+        "to mitigate emissions",
+        "implementation; setup",
+        "an energy transition"
+      ],
+      "answer": 1,
+      "explain": "atténuer les émissions means to mitigate emissions."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la mise en place",
+      "options": [
+        "biodiversity",
+        "an energy transition",
+        "to fund a project",
+        "implementation; setup"
+      ],
+      "answer": 3,
+      "explain": "la mise en place means implementation; setup."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une transition énergétique",
+      "options": [
+        "sustainability; durability",
+        "an energy transition",
+        "to fund a project",
+        "biodiversity"
+      ],
+      "answer": 1,
+      "explain": "une transition énergétique means an energy transition."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "financer un projet",
+      "options": [
+        "to mitigate emissions",
+        "biodiversity",
+        "sustainability; durability",
+        "to fund a project"
+      ],
+      "answer": 3,
+      "explain": "financer un projet means to fund a project."
+    }
+  ]
+}

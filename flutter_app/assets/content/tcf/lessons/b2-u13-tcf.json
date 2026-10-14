@@ -1,0 +1,72 @@
+{
+  "id": "b2-u13-tcf",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "À mon avis, les cours enregistrés offrent plus de souplesse. Cela dit, ils ne remplacent pas toujours les échanges immédiats avec un enseignant.",
+      "question": "How does the speaker qualify the position?",
+      "options": [
+        "Recorded courses are flexible but do not always replace interaction",
+        "Recorded courses should be removed",
+        "Teachers are never available",
+        "Flexibility has no value"
+      ],
+      "answer": 0,
+      "explain": "The speaker supports flexibility but names a limitation."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "D'abord, un espace public peut donner accès à des ressources. Ensuite, il peut créer des occasions de rencontre. En somme, son rôle ne se limite pas au prêt de documents.",
+      "question": "What is the speaker's main conclusion?",
+      "options": [
+        "Resources are unnecessary",
+        "The space should stop lending books",
+        "The space can serve more than one purpose",
+        "Only meetings matter"
+      ],
+      "answer": 2,
+      "explain": "The conclusion broadens the role beyond lending documents."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is a useful self-correction?",
+      "options": [
+        "Adding a connector without meaning",
+        "Repeating an overgeneralization",
+        "Restarting every sentence",
+        "A short reformulation that makes the idea more accurate"
+      ],
+      "answer": 3,
+      "explain": "A brief reformulation can clarify and correct a broad statement.",
+      "promptFr": "Une réponse orale claire n'a pas besoin d'annoncer chaque partie comme un plan écrit. Elle doit toutefois rendre les relations compréhensibles. Un connecteur peut introduire un contraste, un exemple ou une conclusion. Une formule utilisée sans rapport logique ajoute du bruit. Si un candidat se rend compte qu'une affirmation est trop générale, une courte reformulation peut montrer qu'il ajuste son idée au lieu de défendre une erreur."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why should the candidate avoid reciting a memorized speech?",
+      "options": [
+        "It may not answer the prompt",
+        "It cannot include a conclusion",
+        "It uses too many sources",
+        "It always has too few words"
+      ],
+      "answer": 0,
+      "explain": "A memorized speech may not fit the actual prompt.",
+      "promptFr": "Pour une réponse spontanée, le candidat peut garder en tête quatre mots : position, raisons, exemple, limite. Cette structure sert de repère, pas de texte à réciter. Le candidat doit écouter la question et adapter ses exemples; un discours préparé qui ne répond pas au sujet peut sembler fluide tout en étant hors tâche."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "a2-u06-reading",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is included in the listing?",
+      "options": [
+        "A furnished studio and building laundry room",
+        "A private washer and indoor parking",
+        "A balcony and central heating",
+        "A one-year lease and electricity"
+      ],
+      "answer": 0,
+      "explain": "The notice lists a furnished studio and a laundry room in the building.",
+      "promptFr": "LOGEMENT A — Studio meublé. Loyer : 1 350 $ par mois. Buanderie dans l'immeuble. Arrêt d'autobus à six minutes à pied."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which cost is not included?",
+      "options": [
+        "Electricity",
+        "Monthly rent",
+        "The private balcony",
+        "The washer"
+      ],
+      "answer": 0,
+      "explain": "The notice says electricity costs are extra.",
+      "promptFr": "LOGEMENT B — Appartement d'une chambre. Loyer : 1 450 $ par mois. Laveuse dans le logement. Balcon privé. Frais d'électricité en plus."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which service is closest?",
+      "options": [
+        "The grocery store",
+        "The train",
+        "The library",
+        "The community centre"
+      ],
+      "answer": 0,
+      "explain": "The grocery store is three minutes away, closer than the library or train.",
+      "promptFr": "QUARTIER — Bibliothèque à 4 minutes à pied. Épicerie à 3 minutes. Train à 12 minutes. Piste cyclable devant l'immeuble."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "How much extra is indoor parking per month?",
+      "options": [
+        "$75",
+        "$35",
+        "$100",
+        "It is included"
+      ],
+      "answer": 0,
+      "explain": "The message gives a monthly parking cost of $75.",
+      "promptFr": "Bonjour, le chauffage central est compris dans le loyer. Le stationnement intérieur coûte 75 $ par mois. Le bail est d'un an."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "When can someone visit?",
+      "options": [
+        "Saturday morning",
+        "Friday afternoon",
+        "Sunday evening",
+        "Monday at noon"
+      ],
+      "answer": 0,
+      "explain": "The notice gives Saturday from 10 a.m. to noon.",
+      "promptFr": "À LOUER — Colocation paisible près du centre communautaire. Chaque personne a un espace de rangement. Visite : samedi de 10 h à midi."
+    }
+  ]
+}

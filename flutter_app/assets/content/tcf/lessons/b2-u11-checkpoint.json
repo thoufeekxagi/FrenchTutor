@@ -1,0 +1,75 @@
+{
+  "id": "b2-u11-checkpoint",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is un justificatif?",
+      "options": [
+        "An alternative date",
+        "A supporting document",
+        "A schedule",
+        "A reservation"
+      ],
+      "answer": 1,
+      "explain": "Un justificatif is a supporting document."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which task is TCF oral Task 2?",
+      "options": [
+        "A spontaneous four-minute opinion",
+        "A personal essay",
+        "A written comparison",
+        "An information-seeking interaction"
+      ],
+      "answer": 3,
+      "explain": "Task 2 is an interaction where the candidate asks for information."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How long is the Task 2 interaction after preparation?",
+      "options": [
+        "3 minutes 30 seconds",
+        "12 minutes",
+        "4 minutes 30 seconds",
+        "2 minutes total"
+      ],
+      "answer": 0,
+      "explain": "The interaction lasts 3 minutes 30 seconds after 2 minutes of preparation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What is a useful indirect-question order?",
+      "options": [
+        "verb before all subjects",
+        "infinitive after every question word",
+        "statement word order after the question phrase",
+        "inversion in every clause"
+      ],
+      "answer": 2,
+      "explain": "Indirect questions use statement word order."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Why confirm the answer at the end?",
+      "options": [
+        "To avoid listening",
+        "To check the key detail and next step",
+        "To replace every question",
+        "To make the answer official"
+      ],
+      "answer": 1,
+      "explain": "A concise confirmation checks understanding before closing."
+    }
+  ]
+}

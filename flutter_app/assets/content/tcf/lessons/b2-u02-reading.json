@@ -1,0 +1,52 @@
+{
+  "id": "b2-u02-reading",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which detail is not final?",
+      "options": [
+        "The length of the first phase",
+        "The budget",
+        "The pilot start",
+        "The plan to examine results"
+      ],
+      "answer": 1,
+      "explain": "The notice says there is no final budget yet.",
+      "promptFr": "Un communiqué fictif annonce le lancement d'un projet pilote. Il précise que la première phase durera quatre mois et que les résultats seront rendus publics après examen. Le document ne donne pas encore de budget final. Un média rapporte qu'un coût plus élevé est possible, mais cette estimation n'a pas été confirmée par l'organisme responsable. Le lecteur doit donc distinguer l'annonce officielle de l'estimation rapportée."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why is the conclusion limited?",
+      "options": [
+        "No one answered",
+        "The survey had no question",
+        "The results were not published",
+        "Participants volunteered themselves"
+      ],
+      "answer": 3,
+      "explain": "Self-selection limits how broadly the findings can be generalized.",
+      "promptFr": "Une enquête menée auprès de 180 volontaires révèle que plusieurs répondants souhaitent des horaires plus prévisibles. Les auteurs indiquent cependant que les participants se sont inscrits eux-mêmes. Le résultat renseigne sur ces répondants; il ne permet pas, à lui seul, de décrire toutes les personnes concernées."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What difference does the text point out?",
+      "options": [
+        "The cautious interview is stronger than the definitive headline",
+        "The researcher refused an interview",
+        "The study has already ended",
+        "The comparison was completed"
+      ],
+      "answer": 0,
+      "explain": "The headline sounds final, while the researcher describes ongoing, preliminary work.",
+      "promptFr": "Dans une entrevue, la chercheuse dit que les premières observations semblent prometteuses. Elle ajoute que l'étude se poursuit et qu'une comparaison avec un autre groupe sera nécessaire. Le titre publié en ligne résume pourtant le résultat par une formule définitive."
+    }
+  ]
+}

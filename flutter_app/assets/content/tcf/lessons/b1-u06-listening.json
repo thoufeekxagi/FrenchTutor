@@ -1,0 +1,58 @@
+{
+  "id": "b1-u06-listening",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le chantier a fermé l'entrée principale. Par conséquent, les visiteurs doivent utiliser la porte latérale. Le détour est plus long, toutefois une rampe d'accès est disponible à cette entrée.",
+      "question": "What is one result of the entrance closure?",
+      "options": [
+        "The centre is permanently closed",
+        "Visitors must use the side door",
+        "The ramp has been removed",
+        "The construction has ended"
+      ],
+      "answer": 1,
+      "explain": "The notice says visitors must use the side door."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La nouvelle ligne a été ajoutée afin de desservir le quartier. Elle ne passe pas toutes les dix minutes, alors certains résidents devront attendre plus longtemps.",
+      "question": "What limitation does the speaker mention?",
+      "options": [
+        "The line does not serve the neighbourhood",
+        "The bus stops at every home",
+        "The route is free",
+        "The service is less frequent"
+      ],
+      "answer": 3,
+      "explain": "The new service is not as frequent, so the wait may be longer."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le sondage montre que plusieurs personnes préfèrent le format hybride. Toutefois, les réponses viennent surtout des participants qui se connectent déjà en ligne.",
+      "question": "Why should the survey result be interpreted carefully?",
+      "options": [
+        "The respondents may not represent everyone",
+        "The online format was not offered",
+        "The activity has already ended",
+        "No one completed the survey"
+      ],
+      "answer": 0,
+      "explain": "The responses mostly came from people already online, which may bias the result."
+    }
+  ]
+}

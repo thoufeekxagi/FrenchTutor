@@ -1,0 +1,148 @@
+{
+  "id": "b1-u01-words-4",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "remettre à plus tard",
+      "en": "to postpone",
+      "sound": "ruh-mehtr ah plü tar",
+      "exampleFr": "Nous avons remis la visite à plus tard.",
+      "exampleEn": "We postponed the visit."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "rattraper une séance",
+      "en": "to make up a session",
+      "sound": "rah-trah-pay ün say-ahns",
+      "exampleFr": "Le groupe pourra rattraper la séance la semaine prochaine.",
+      "exampleEn": "The group can make up the session next week."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "réorganiser",
+      "en": "to reorganize",
+      "sound": "ray-or-gah-nee-ZAY",
+      "exampleFr": "L'équipe doit réorganiser les rendez-vous.",
+      "exampleEn": "The team needs to reorganize the appointments."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "avertir",
+      "en": "to notify; warn",
+      "sound": "ah-vehr-TEER",
+      "exampleFr": "Merci de nous avertir si l'horaire change.",
+      "exampleEn": "Please notify us if the schedule changes."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la veille",
+      "en": "the day before; the eve",
+      "sound": "lah vehy",
+      "exampleFr": "La veille, le centre a envoyé un rappel.",
+      "exampleEn": "The day before, the centre sent a reminder."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "sans préavis",
+      "en": "without notice",
+      "sound": "sahn pray-ah-VEE",
+      "exampleFr": "La salle a fermé sans préavis.",
+      "exampleEn": "The room closed without notice."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "remettre à plus tard",
+      "options": [
+        "to notify; warn",
+        "to postpone",
+        "to make up a session",
+        "to reorganize"
+      ],
+      "answer": 1,
+      "explain": "remettre à plus tard means to postpone."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "rattraper une séance",
+      "options": [
+        "the day before; the eve",
+        "to reorganize",
+        "to notify; warn",
+        "to make up a session"
+      ],
+      "answer": 3,
+      "explain": "rattraper une séance means to make up a session."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "réorganiser",
+      "options": [
+        "without notice",
+        "to reorganize",
+        "to notify; warn",
+        "the day before; the eve"
+      ],
+      "answer": 1,
+      "explain": "réorganiser means to reorganize."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "avertir",
+      "options": [
+        "to postpone",
+        "the day before; the eve",
+        "without notice",
+        "to notify; warn"
+      ],
+      "answer": 3,
+      "explain": "avertir means to notify; warn."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "la veille",
+      "options": [
+        "to make up a session",
+        "the day before; the eve",
+        "without notice",
+        "to postpone"
+      ],
+      "answer": 1,
+      "explain": "la veille means the day before; the eve."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "sans préavis",
+      "options": [
+        "to reorganize",
+        "to postpone",
+        "to make up a session",
+        "without notice"
+      ],
+      "answer": 3,
+      "explain": "sans préavis means without notice."
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "id": "b1-u10-phrases",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Phrases",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Choose a phrase because it matches your meaning. Note one phrase, adapt its details to your own life, close your notes and say it in a different scene."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je vous appelle au sujet de …",
+      "en": "I am calling about …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Pourriez-vous me dire … ?",
+      "en": "Could you tell me …?",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "J'aimerais aussi savoir …",
+      "en": "I would also like to know …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Pourriez-vous préciser … ?",
+      "en": "Could you clarify …?",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Si j'ai bien compris, …",
+      "en": "If I understood correctly, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Est-ce que cela signifie que … ?",
+      "en": "Does that mean that …?",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Au cas où …, que dois-je faire ?",
+      "en": "In case …, what should I do?",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Merci, je vais noter …",
+      "en": "Thank you, I will note …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

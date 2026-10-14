@@ -1,0 +1,93 @@
+{
+  "id": "b2-u06-grammar-a",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Grammar: Hypotheses: match the condition to the time and degree of reality",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Hypotheses: match the condition to the time and degree of reality",
+      "body": "For a realistic or open condition, use si + present, then present or future (si l'équipe publie les règles, les utilisateurs pourront choisir). For an unreal present, use si + imparfait, then the conditional (si le service recueillait moins de données, il serait plus simple). For an unreal past, use si + plus-que-parfait, then the conditional past (si l'équipe avait testé l'option, elle aurait repéré le problème). Never put the conditional directly after si. These forms describe possibilities; evidence is still needed to claim an outcome."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Hypotheses: match the condition to the time and degree of reality",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Open condition",
+          "si + present → present / future",
+          "Si l'application explique le choix, les utilisateurs décideront.",
+          "If the app explains the choice, users will decide."
+        ],
+        [
+          "Unreal present",
+          "si + imparfait → conditionnel",
+          "Si le service recueillait moins de données, il serait plus simple.",
+          "If the service collected less data, it would be simpler."
+        ],
+        [
+          "Unreal past",
+          "si + plus-que-parfait → conditionnel passé",
+          "Si l'équipe avait testé l'option, elle aurait vu le problème.",
+          "If the team had tested the option, it would have seen the problem."
+        ],
+        [
+          "Condition with subjunctive",
+          "à condition que + subjunctive",
+          "Le service peut fonctionner, à condition que les règles soient claires.",
+          "The service can work, provided the rules are clear."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the correct open condition.",
+      "options": [
+        "Si l'équipe a publié les règles, les utilisateurs choisiraient demain.",
+        "Si l'équipe publierait les règles, les utilisateurs choisiront.",
+        "Si l'équipe publie les règles, les utilisateurs pourront choisir.",
+        "Si l'équipe publiait les règles, les utilisateurs choisiront hier."
+      ],
+      "answer": 2,
+      "explain": "An open condition uses present after si and can use the future in the result."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the unreal-present pattern.",
+      "options": [
+        "Si le formulaire serait plus clair, les utilisateurs font moins d'erreurs.",
+        "Si le formulaire soit clair, les utilisateurs feraient moins d'erreurs.",
+        "Si le formulaire a été clair, les utilisateurs feront moins d'erreurs hier.",
+        "Si le formulaire était plus clair, les utilisateurs feraient moins d'erreurs."
+      ],
+      "answer": 3,
+      "explain": "Use imparfait after si, then the conditional for an unreal present."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is wrong with si + conditional?",
+      "options": [
+        "The conditional normally does not follow si in these hypotheses",
+        "It is only used for questions",
+        "It always marks a confirmed fact",
+        "It cannot appear in French"
+      ],
+      "answer": 0,
+      "explain": "The standard conditional hypothesis puts the appropriate tense after si, not the conditional itself."
+    }
+  ]
+}

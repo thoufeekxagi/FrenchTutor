@@ -1,0 +1,100 @@
+{
+  "id": "a2-u02-tcf",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Hier, j'ai réservé une salle pour la réunion de vendredi.",
+      "question": "What did the speaker reserve?",
+      "options": [
+        "A room",
+        "A parcel",
+        "A book",
+        "A guided tour"
+      ],
+      "answer": 0,
+      "explain": "The speaker says j'ai réservé une salle."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Nous avons marché vingt minutes, puis nous avons commencé le cours.",
+      "question": "What happened after they walked?",
+      "options": [
+        "They started class.",
+        "They cancelled a delivery.",
+        "They returned a book.",
+        "They booked a tour."
+      ],
+      "answer": 0,
+      "explain": "The script says they started class after walking."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le rendez-vous a changé d'heure, donc j'ai téléphoné pour réserver une nouvelle date.",
+      "question": "Why did the speaker call?",
+      "options": [
+        "To book another appointment",
+        "To cancel a delivery",
+        "To return a book",
+        "To ask for a refund"
+      ],
+      "answer": 0,
+      "explain": "The speaker called to reserve a new date."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When is the presentation?",
+      "options": [
+        "Thursday at 10 a.m.",
+        "Tuesday at 10 a.m.",
+        "Friday at 10 a.m.",
+        "Monday at noon"
+      ],
+      "answer": 0,
+      "explain": "The notice places the presentation on Thursday at 10 h.",
+      "promptFr": "COURS DE FRANÇAIS · Mardi : le devoir · Jeudi : exposé à 10 h · Vendredi : résultat par courriel"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What has the service confirmed?",
+      "options": [
+        "The complaint",
+        "A new appointment",
+        "A school outing",
+        "A delivery delay"
+      ],
+      "answer": 0,
+      "explain": "The message says the service confirmed the complaint.",
+      "promptFr": "Bonjour, · Le service confirme votre réclamation. Le remboursement arrive sur votre carte. · Awa"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When did Sam finish the assignment?",
+      "options": [
+        "Thursday",
+        "Tuesday",
+        "Wednesday",
+        "Friday"
+      ],
+      "answer": 0,
+      "explain": "Sam says he finished the assignment Thursday.",
+      "promptFr": "Salut Awa, · J'ai emprunté le livre mardi. J'ai terminé le devoir jeudi. · Sam"
+    }
+  ]
+}

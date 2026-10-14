@@ -1,0 +1,268 @@
+{
+  "id": "a2-rendez-vous-suivi",
+  "title": "Le rendez-vous de suivi",
+  "titleEn": "The follow-up appointment",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Awa organizes information for a follow-up appointment and distinguishes it from a diagnosis.",
+  "unit": "a2-u07",
+  "sentences": [
+    {
+      "fr": "Awa a un rendez-vous de suivi à la clinique communautaire.",
+      "en": "Awa has a follow-up appointment at the community clinic."
+    },
+    {
+      "fr": "Elle prépare le formulaire que le service a envoyé.",
+      "en": "She is preparing the form that the service sent."
+    },
+    {
+      "fr": "Le formulaire demande le début et la durée du symptôme.",
+      "en": "The form asks for the start and duration of the symptom."
+    },
+    {
+      "fr": "Awa note le changement après le repas.",
+      "en": "Awa writes down the change after the meal."
+    },
+    {
+      "fr": "Awa note aussi l'heure de la gêne.",
+      "en": "Awa also writes down the time of the discomfort."
+    },
+    {
+      "fr": "Le professionnel qui lit le dossier va parler avec Awa.",
+      "en": "The professional who reads the file is going to speak with Awa."
+    },
+    {
+      "fr": "La réceptionniste confirme l'endroit où Awa va rencontrer le professionnel.",
+      "en": "The receptionist confirms where Awa will meet the professional."
+    },
+    {
+      "fr": "Awa garde la note de la clinique.",
+      "en": "Awa keeps the clinic's note."
+    }
+  ],
+  "words": {
+    "awa": {
+      "en": "Awa (a woman's name)",
+      "pos": "name"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "rendez-vous": {
+      "en": "appointment",
+      "pos": "noun, masculine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "suivi": {
+      "en": "follow-up",
+      "pos": "noun/adjective"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "la": {
+      "en": "the (feminine)",
+      "pos": "article"
+    },
+    "clinique": {
+      "en": "clinic",
+      "pos": "noun, feminine"
+    },
+    "communautaire": {
+      "en": "community",
+      "pos": "adjective"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "prépare": {
+      "en": "is preparing",
+      "pos": "verb"
+    },
+    "le": {
+      "en": "the (masculine)",
+      "pos": "article"
+    },
+    "formulaire": {
+      "en": "form",
+      "pos": "noun, masculine"
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "relative pronoun"
+    },
+    "service": {
+      "en": "service",
+      "pos": "noun, masculine"
+    },
+    "envoyé": {
+      "en": "sent",
+      "pos": "verb"
+    },
+    "demande": {
+      "en": "asks",
+      "pos": "verb"
+    },
+    "début": {
+      "en": "beginning, start"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "durée": {
+      "en": "duration",
+      "pos": "noun, feminine"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "symptôme": {
+      "en": "symptom",
+      "pos": "noun, masculine"
+    },
+    "note": {
+      "en": "note",
+      "pos": "noun, feminine"
+    },
+    "changement": {
+      "en": "change",
+      "pos": "noun, masculine"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "repas": {
+      "en": "meal",
+      "pos": "noun, masculine"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "l'heure": {
+      "en": "hour; time on a clock",
+      "sound": "luhR"
+    },
+    "gêne": {
+      "en": "discomfort",
+      "pos": "noun, feminine"
+    },
+    "professionnel": {
+      "en": "health professional",
+      "pos": "noun, masculine"
+    },
+    "qui": {
+      "en": "who; that",
+      "pos": "relative pronoun"
+    },
+    "lit": {
+      "en": "bed"
+    },
+    "dossier": {
+      "en": "file",
+      "pos": "noun, masculine"
+    },
+    "va": {
+      "en": "is going to",
+      "pos": "verb"
+    },
+    "parler": {
+      "en": "to speak",
+      "pos": "verb"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "réceptionniste": {
+      "en": "receptionist",
+      "pos": "noun"
+    },
+    "confirme": {
+      "en": "confirms",
+      "pos": "verb"
+    },
+    "l'endroit": {
+      "en": "the place",
+      "pos": "noun, masculine"
+    },
+    "où": {
+      "en": "where; when",
+      "pos": "relative pronoun"
+    },
+    "rencontrer": {
+      "en": "to meet",
+      "sound": "rah(n)-kohn-TRAY"
+    },
+    "garde": {
+      "en": "keeps",
+      "pos": "verb"
+    }
+  },
+  "keywords": [
+    "clinique",
+    "formulaire",
+    "symptôme",
+    "rendez-vous",
+    "suivi"
+  ],
+  "quiz": [
+    {
+      "prompt": "What is Awa preparing?",
+      "options": [
+        "The form sent by the service",
+        "A rental application",
+        "A work schedule",
+        "A course certificate"
+      ],
+      "answer": 0,
+      "explain": "The second sentence says she is preparing the form the service sent."
+    },
+    {
+      "prompt": "What does Awa write down?",
+      "options": [
+        "When the change happens",
+        "The clinic's rent",
+        "A bus route",
+        "The course deadline"
+      ],
+      "answer": 0,
+      "explain": "She notes the change that happens after the meal."
+    },
+    {
+      "prompt": "Who will read Awa's answers?",
+      "options": [
+        "The health professional",
+        "The landlord",
+        "Her classmate",
+        "The bus driver"
+      ],
+      "answer": 0,
+      "explain": "The sixth sentence says the professional will read them."
+    },
+    {
+      "prompt": "Where is the consultation location confirmed?",
+      "options": [
+        "In the receptionist's confirmation",
+        "On the intake form only",
+        "In the lab result",
+        "In the class schedule"
+      ],
+      "answer": 0,
+      "explain": "The seventh sentence says the receptionist confirms the location."
+    }
+  ]
+}

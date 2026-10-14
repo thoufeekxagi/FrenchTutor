@@ -1,0 +1,80 @@
+{
+  "id": "a2-u10-reading",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How many strawberry punnets are on the list?",
+      "options": [
+        "Two",
+        "One",
+        "Three",
+        "Four"
+      ],
+      "answer": 0,
+      "explain": "The list gives two punnets of strawberries.",
+      "promptFr": "LISTE — lentilles sèches : 1 sachet; fraises : 2 barquettes; lait végétal : 1 litre."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What date appears on the label?",
+      "options": [
+        "18 November",
+        "18 October",
+        "8 November",
+        "28 November"
+      ],
+      "answer": 0,
+      "explain": "The label gives 18 November.",
+      "promptFr": "ÉTIQUETTE — Sauce maison. Ingrédients : tomates et eau. Date de péremption : 18 novembre."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which item has a price per kilogram?",
+      "options": [
+        "Lentils",
+        "The yogurt multipack",
+        "The strawberries",
+        "The glass jar"
+      ],
+      "answer": 0,
+      "explain": "The heading prix au kilo is followed by the lentil price.",
+      "promptFr": "PRIX AU KILO — Lentilles : 4,80 $. Promotion sur le lot de yaourts : 5,20 $."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does the store notice mention for a product exchange?",
+      "options": [
+        "The receipt",
+        "The ingredient list",
+        "The price label",
+        "The package amount"
+      ],
+      "answer": 0,
+      "explain": "The notice mentions an itemized receipt for a product exchange.",
+      "promptFr": "AVIS DU MAGASIN — Politique de retour : pour échanger un produit, un reçu détaillé."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which option is listed?",
+      "options": [
+        "A vegan lentil dish without nuts",
+        "A frozen dish with cheese",
+        "A sugar-free drink",
+        "A prepared meat dish"
+      ],
+      "answer": 0,
+      "explain": "The menu lists a vegan lentil option and says it is without nuts.",
+      "promptFr": "MENU DU GROUPE — Option végétalienne : lentilles et sauce maison. Portion individuelle. Sans noix."
+    }
+  ]
+}

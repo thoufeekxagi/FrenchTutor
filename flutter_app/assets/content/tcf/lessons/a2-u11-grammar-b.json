@@ -1,0 +1,87 @@
+{
+  "id": "a2-u11-grammar-b",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Grammar: Ask politely with pouvoir and vouloir in the conditional",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "For pouvoir, vous pourriez means 'could you'; for vouloir, je voudrais means 'I would like'. Keep the infinitive after pourriez or voudriez.",
+      "headers": [
+        "Direct instruction",
+        "Polite request",
+        "Purpose"
+      ],
+      "rows": [
+        [
+          "Vérifiez le numéro.",
+          "Pourriez-vous vérifier le numéro ?",
+          "Ask someone to check."
+        ],
+        [
+          "Donnez-moi le délai.",
+          "Pourriez-vous me donner le délai ?",
+          "Ask for one clear piece of information."
+        ],
+        [
+          "Je veux une réponse écrite.",
+          "Je voudrais une réponse écrite.",
+          "State what you would like."
+        ],
+        [
+          "Confirmez le rendez-vous.",
+          "Voudriez-vous confirmer le rendez-vous ?",
+          "Make a courteous request."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Ask politely with pouvoir and vouloir in the conditional",
+      "body": "• Use pourriez-vous + infinitive to request an action: Pourriez-vous vérifier le numéro ? The pronoun vous follows the verb in this question form.\n• Use je voudrais + noun to state a request politely: Je voudrais une réponse écrite.\n• A polite request still needs a specific action or item. Add a short reason or context if the other person needs it.\n• The present form can sound direct in a service exchange; the conditional is a useful courteous choice. Tone and register also matter."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the polite request for someone to check a tracking number.",
+      "options": [
+        "Pourriez-vous vérifier le numéro de suivi ?",
+        "Pouvez-vous vérifié le numéro de suivi ?",
+        "Pourriez vérifier-vous le numéro de suivi ?",
+        "Pourriez-vous vérifiez le numéro de suivi ?"
+      ],
+      "answer": 0,
+      "explain": "Use conditional pourriez-vous followed by the infinitive vérifier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the polite way to ask for a written reply.",
+      "options": [
+        "Je voudrais une réponse écrite.",
+        "Je veux une réponse écrite maintenant !",
+        "Je voudrais une répondre écrite.",
+        "Je voudrais à une réponse écrite."
+      ],
+      "answer": 0,
+      "explain": "Use je voudrais followed by the noun phrase."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which phrase asks someone to explain the next step politely?",
+      "options": [
+        "Pourriez-vous m'expliquer la prochaine étape ?",
+        "Explique-moi la prochaine étape !",
+        "Tu expliques la prochaine étape.",
+        "Vous expliquer la prochaine étape."
+      ],
+      "answer": 0,
+      "explain": "Pourriez-vous + infinitive is a courteous request in this scenario."
+    }
+  ]
+}

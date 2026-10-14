@@ -1,0 +1,295 @@
+{
+  "id": "a1-listen-bus",
+  "title": "L'autobus en retard",
+  "titleEn": "The late bus",
+  "level": "A1",
+  "mode": "listening",
+  "minutes": 3,
+  "summary": "A delayed bus threatens a first appointment, so Sam asks for help and chooses another route.",
+  "unit": "a1-u09",
+  "sentences": [
+    {
+      "fr": "Sam attend l'autobus à Montréal.",
+      "en": "Sam is waiting for the bus in Montréal."
+    },
+    {
+      "fr": "Il va à son premier rendez-vous au centre-ville.",
+      "en": "He is going to his first appointment downtown."
+    },
+    {
+      "fr": "L'autobus a dix minutes de retard.",
+      "en": "The bus is ten minutes late."
+    },
+    {
+      "fr": "Sam regarde l'horaire sur son téléphone.",
+      "en": "Sam checks the schedule on his phone."
+    },
+    {
+      "fr": "Une dame attend aussi à l'arrêt.",
+      "en": "A woman is also waiting at the stop."
+    },
+    {
+      "fr": "Elle lui montre un autre autobus.",
+      "en": "She shows him another bus."
+    },
+    {
+      "fr": "Sam prend cette ligne.",
+      "en": "Sam takes that route."
+    },
+    {
+      "fr": "Il arrive à l'heure et remercie la dame.",
+      "en": "He arrives on time and thanks the woman."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a person's name)",
+      "pos": "proper name"
+    },
+    "attend": {
+      "en": "waits for (attendre)",
+      "pos": "verb",
+      "sound": "ah-tah(n)"
+    },
+    "l'autobus": {
+      "en": "bus",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "montréal": {
+      "en": "Montréal (a city in Canada)",
+      "pos": "proper name"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "va": {
+      "en": "is going (aller)",
+      "pos": "verb"
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "premier": {
+      "en": "the first",
+      "sound": "luh pruh-MYAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "premier"
+    },
+    "rendez-vous": {
+      "en": "appointment",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "rendez-vous"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "centre-ville": {
+      "en": "downtown",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "centre-ville"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "dix": {
+      "en": "ten",
+      "pos": "number"
+    },
+    "minutes": {
+      "en": "minutes",
+      "pos": "noun, feminine",
+      "lemma": "minute",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "retard": {
+      "en": "delay",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "retard"
+    },
+    "regarde": {
+      "en": "looks at (regarder)",
+      "pos": "verb",
+      "sound": "Ruh-GAHRD"
+    },
+    "l'horaire": {
+      "en": "schedule",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "horaire",
+      "note": "Elided le before a vowel."
+    },
+    "sur": {
+      "en": "on"
+    },
+    "téléphone": {
+      "en": "telephone",
+      "sound": "luh tay-lay-FOHN",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "téléphone"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "dame": {
+      "en": "lady",
+      "pos": "noun, feminine",
+      "sound": "dahm",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "dame"
+    },
+    "aussi": {
+      "en": "also; too",
+      "pos": "adverb"
+    },
+    "l'arrêt": {
+      "en": "the stop",
+      "pos": "noun, masculine",
+      "sound": "lah-reh"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "montre": {
+      "en": "shows (montrer)",
+      "pos": "verb",
+      "sound": "mohnt"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "autre": {
+      "en": "other; another",
+      "pos": "adjective",
+      "lemma": "autre"
+    },
+    "autobus": {
+      "en": "bus",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "prend": {
+      "en": "takes (prendre)",
+      "pos": "verb",
+      "sound": "pra(n)"
+    },
+    "cette": {
+      "en": "this",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ce",
+      "note": "Feminine singular demonstrative."
+    },
+    "ligne": {
+      "en": "route; line",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ligne"
+    },
+    "arrive": {
+      "en": "arrives (arriver)",
+      "pos": "verb",
+      "sound": "ah-REEV"
+    },
+    "l'heure": {
+      "en": "time; hour",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "heure",
+      "note": "Elided la before a vowel."
+    },
+    "et": {
+      "en": "and"
+    },
+    "remercie": {
+      "en": "thanks",
+      "pos": "verb",
+      "lemma": "remercier",
+      "note": "Present form of remercier."
+    },
+    "la": {
+      "en": "the"
+    }
+  },
+  "keywords": [
+    "autobus",
+    "l'arrêt",
+    "retard",
+    "centre-ville",
+    "l'horaire"
+  ],
+  "quiz": [
+    {
+      "prompt": "Where is Sam going?",
+      "options": [
+        "Downtown",
+        "To the airport",
+        "To a library",
+        "To a friend's house"
+      ],
+      "answer": 0,
+      "explain": "He has an appointment downtown."
+    },
+    {
+      "prompt": "How late is the bus?",
+      "options": [
+        "Ten minutes",
+        "Five minutes",
+        "Twenty minutes",
+        "One hour"
+      ],
+      "answer": 0,
+      "explain": "The story says the bus is ten minutes late."
+    },
+    {
+      "prompt": "How does Sam arrive on time?",
+      "options": [
+        "He takes another bus.",
+        "He takes a taxi.",
+        "He walks all the way.",
+        "He moves the appointment."
+      ],
+      "answer": 0,
+      "explain": "A woman shows him another bus, and he takes that route."
+    }
+  ]
+}

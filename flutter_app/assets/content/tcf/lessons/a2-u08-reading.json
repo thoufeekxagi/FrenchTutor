@@ -1,0 +1,80 @@
+{
+  "id": "a2-u08-reading",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should Sam reread?",
+      "options": [
+        "The final version",
+        "The report",
+        "The agenda",
+        "The shared folder"
+      ],
+      "answer": 0,
+      "explain": "La refers to la version finale.",
+      "promptFr": "Bonjour Sam, la version finale est prête. Peux-tu la relire avant 15 h ? Le compte rendu, je vais le classer dans le dossier partagé."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is ready to hand in?",
+      "options": [
+        "The project report",
+        "The working copy",
+        "A rent notice",
+        "A clinic form"
+      ],
+      "answer": 0,
+      "explain": "The notice says the report is ready to hand in Friday.",
+      "promptFr": "ÉQUIPE DE PROJET — Le rapport est prêt à remettre vendredi. La copie de travail reste au groupe."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What will Nadia save?",
+      "options": [
+        "The attached file",
+        "The course outline",
+        "The attendance sheet",
+        "The final presentation"
+      ],
+      "answer": 0,
+      "explain": "L' refers to le fichier joint.",
+      "promptFr": "Bonjour, voici le fichier joint. Je vais l'enregistrer dans le dossier de projet après le cours. — Nadia"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "When will Nadia hand in the correction list?",
+      "options": [
+        "Thursday",
+        "Friday",
+        "Before noon today",
+        "Next month"
+      ],
+      "answer": 0,
+      "explain": "The message says she will hand it in Thursday.",
+      "promptFr": "RAPPEL — La liste de corrections est prête. Nadia va la remettre avec le brouillon jeudi."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What will the instructor reread?",
+      "options": [
+        "The draft",
+        "The final version",
+        "The committee list",
+        "The course schedule"
+      ],
+      "answer": 0,
+      "explain": "Le refers to le brouillon.",
+      "promptFr": "FORMATrice — Le brouillon est encore à corriger. Je vais le relire demain et envoyer la version finale au comité."
+    }
+  ]
+}

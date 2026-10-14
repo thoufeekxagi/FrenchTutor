@@ -1,0 +1,42 @@
+{
+  "id": "a2-u03-write-speak",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a message about a first experience",
+      "body": "Write 60–90 French words to a classmate about a first experience in Canada. Say where you went, what you did, one thing you saw or read, and how you felt. Use at least two time-order words. The official TCF Canada writing Task 1 range is 60–120 words. Draft from key ideas before opening the model.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Salut Nadia, La semaine dernière, j'ai pris le train pour la première fois. J'ai lu l'itinéraire sur le téléphone et j'ai vu le numéro du quai. Ensuite, j'ai pris une correspondance près du centre-ville. À la bibliothèque municipale, j'ai fait une demande et j'ai pris un livre en français. J'ai eu une réponse claire à ma question. J'ai eu une bonne expérience. À bientôt, Sam\n\nCheck:\n• Check that the message answers where, what and how you felt.\n• Use at least two time-order phrases and keep actions in a clear order.\n• Check each irregular pair: faire/fait, prendre/pris, voir/vu, lire/lu, avoir/eu.\n• Count 60–90 words for this practice, within the official Task 1 range of 60–120.\n• Close your notes tomorrow and recount a different first experience."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Tell Marie about a first experience",
+      "body": "Speak for 35–50 seconds about a first experience: a new route, class, appointment or activity. Say what you did, what you saw or read and how it ended. Ask Marie one related follow-up question. After her one focused correction, retell the account with a different place or activity.\n\n• Use a few short connected sentences instead of translating every thought.\n• If you forget a form, describe the action another way and keep communicating.\n• Ask one genuine question, listen to Marie's response, and answer the follow-up in your own words.\n• Use a changed prompt for your second attempt so you retrieve the language instead of reciting."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "La semaine dernière, j'ai pris un nouveau bus pour aller au cours. J'ai lu le numéro sur l'avis et j'ai vu le bon arrêt. Ensuite, j'ai fait une demande à l'accueil pour trouver la salle.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'ai eu une réponse claire et j'ai trouvé la salle à temps. C'est ma première fois dans ce centre et je suis content de cette expérience.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "a2-u01-write-speak",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write to a classmate",
+      "body": "TCF Canada writing Task 1 asks for a short message in the 60–120 word range. Write 60–80 French words to a classmate: describe two parts of your usual week, explain one change this week, give a reason, and suggest a time to meet. Use a greeting and a clear closing. Draft before reading the model.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Salut Julie, D'habitude, je travaille du lundi au jeudi et j'étudie le français le soir. Chaque dimanche, j'organise ma semaine et je prépare une liste de tâches. Cette semaine, j'ai une présentation vendredi, donc je suis un peu débordé. Je reporte ma séance de français à mercredi parce que je suis libre après dix-huit heures. Est-ce que tu peux étudier avec moi jeudi ? Nous pouvons réviser le français et prendre une pause. À bientôt, Sam\n\nCheck:\n• Write 60–80 words for this practice; the official Task 1 range is 60–120 words.\n• Include the usual routine, the change and its reason.\n• Use at least two connectors accurately.\n• Check that each sentence has a subject and a verb.\n• Close your notes and rewrite the message tomorrow from the key ideas only."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Answer follow-up questions",
+      "body": "First answer without notes for 30–45 seconds: what does a usual week look like, what is one priority, and when do you study or rest? Add one reason or contrast. Then ask Marie for one follow-up question. If needed, request one hint, try again, and ask Marie to change one day or responsibility so you must adapt the answer.\n\n• Answer the question asked; do not recite the model.\n• Use one connector to explain a reason and one to show a contrast or result.\n• If you do not understand, ask for repetition or clarification in French.\n• After one correction, repeat the answer with a changed day or activity."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "En général, je travaille quatre jours par semaine et j'étudie le français le soir. D'habitude, je révise après le souper, mais le mercredi je suis souvent fatigué.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je prends une pause parce que je veux être en forme. Mon objectif est de parler un peu chaque jour. Cette semaine, j'ai une journée chargée, donc je vais étudier jeudi.",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Le dimanche, j'organise ma semaine et je prépare mes notes.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

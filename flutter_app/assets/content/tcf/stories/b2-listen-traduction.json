@@ -1,0 +1,728 @@
+{
+  "id": "b2-listen-traduction",
+  "title": "L'essai de traduction",
+  "titleEn": "The translation pilot",
+  "level": "B2",
+  "mode": "listening",
+  "minutes": 6,
+  "summary": "A public-facing team considers machine translation for routine notices and sets safeguards after identifying errors that could mislead newcomers.",
+  "unit": "b2-u03",
+  "sentences": [
+    {
+      "fr": "Le service envisageait d'utiliser un outil de traduction automatique pour publier plus rapidement les avis courants.",
+      "en": "The service was considering machine translation to publish routine notices more quickly."
+    },
+    {
+      "fr": "Lors d'un essai, l'outil a correctement reformulé les horaires, mais a confondu une condition d'admissibilité avec une simple recommandation.",
+      "en": "During a pilot, the tool rendered the schedules correctly but confused an eligibility condition with a mere recommendation."
+    },
+    {
+      "fr": "Cette nuance pouvait conduire une personne à renoncer à un service auquel elle avait pourtant droit.",
+      "en": "That nuance could lead someone to give up a service they were actually entitled to."
+    },
+    {
+      "fr": "L'équipe a donc distingué les contenus à faible conséquence des textes qui influencent une décision importante.",
+      "en": "The team therefore distinguished low-consequence content from texts that influence an important decision."
+    },
+    {
+      "fr": "Pour les premiers, une vérification par échantillon semblait suffisante; pour les seconds, une révision humaine resterait obligatoire.",
+      "en": "For the former, a sample check seemed sufficient; for the latter, human review would remain mandatory."
+    },
+    {
+      "fr": "La responsable a également demandé que la version de référence et la date de révision soient conservées.",
+      "en": "The manager also asked that the reference version and review date be kept."
+    },
+    {
+      "fr": "Un collègue a fait remarquer qu'un avertissement général ne corrigerait pas une phrase erronée.",
+      "en": "A colleague pointed out that a general disclaimer would not correct an inaccurate sentence."
+    },
+    {
+      "fr": "Le groupe a accepté un projet limité, à condition de publier un moyen simple de signaler un problème.",
+      "en": "The group approved a limited pilot, provided that a simple way to report a problem was published."
+    },
+    {
+      "fr": "Il réévaluera les résultats après six semaines, à partir des corrections reçues et non du seul nombre de textes produits.",
+      "en": "It will review the results after six weeks using received corrections, not just the number of texts produced."
+    }
+  ],
+  "words": {
+    "le": {
+      "en": "the"
+    },
+    "service": {
+      "en": "service",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "envisageait": {
+      "en": "was considering",
+      "pos": "verb",
+      "lemma": "envisager",
+      "note": "Imperfect form of envisager."
+    },
+    "d'utiliser": {
+      "en": "to use",
+      "pos": "expression",
+      "note": "Elided de + utiliser."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "outil": {
+      "en": "tool",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "outil"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "traduction": {
+      "en": "translation",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "automatique": {
+      "en": "automatic",
+      "pos": "adjective",
+      "lemma": "automatique",
+      "note": "Same singular spelling for masculine and feminine."
+    },
+    "pour": {
+      "en": "for"
+    },
+    "publier": {
+      "en": "to publish",
+      "pos": "verb",
+      "lemma": "publier",
+      "note": "Infinitive."
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "rapidement": {
+      "en": "quickly",
+      "pos": "adverb"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "avis": {
+      "en": "notice",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "avis"
+    },
+    "courants": {
+      "en": "routine; common",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "courant",
+      "note": "Masculine plural form."
+    },
+    "lors": {
+      "en": "during; at the time of",
+      "pos": "preposition"
+    },
+    "d'un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "essai": {
+      "en": "trial; pilot",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "essai"
+    },
+    "l'outil": {
+      "en": "tool",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "outil",
+      "note": "Elided le before a vowel."
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "correctement": {
+      "en": "correctly",
+      "pos": "adverb"
+    },
+    "reformulé": {
+      "en": "rephrased",
+      "pos": "verb",
+      "lemma": "reformuler",
+      "note": "Past participle of reformuler."
+    },
+    "horaires": {
+      "en": "schedules",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "horaire",
+      "note": "Plural of horaire."
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "confondu": {
+      "en": "confused; mistaken for",
+      "pos": "verb",
+      "lemma": "confondre",
+      "note": "Past participle of confondre."
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "condition": {
+      "en": "condition; requirement",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "d'admissibilité": {
+      "en": "of eligibility",
+      "pos": "expression",
+      "note": "Elided de before a vowel."
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "simple": {
+      "en": "simple",
+      "pos": "adjective",
+      "lemma": "simple"
+    },
+    "recommandation": {
+      "en": "recommendation",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "cette": {
+      "en": "this",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ce",
+      "note": "Feminine singular demonstrative."
+    },
+    "nuance": {
+      "en": "nuance; subtle difference",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "pouvait": {
+      "en": "could; was able to",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Imperfect form of pouvoir."
+    },
+    "conduire": {
+      "en": "to lead; to cause",
+      "pos": "verb",
+      "lemma": "conduire",
+      "note": "Infinitive."
+    },
+    "personne": {
+      "en": "person",
+      "sound": "lah pehR-SUN",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "personne"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "renoncer": {
+      "en": "to give up; to forgo",
+      "pos": "verb",
+      "lemma": "renoncer",
+      "note": "Infinitive."
+    },
+    "auquel": {
+      "en": "to which",
+      "pos": "relative pronoun",
+      "note": "Contracts à + lequel; masculine singular."
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "avait": {
+      "en": "had",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Imperfect form of avoir."
+    },
+    "pourtant": {
+      "en": "however; yet",
+      "pos": "adverb"
+    },
+    "droit": {
+      "en": "right; entitlement",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "l'équipe": {
+      "en": "team",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "équipe",
+      "note": "Elided la before a vowel."
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "distingué": {
+      "en": "distinguished",
+      "pos": "verb",
+      "lemma": "distinguer",
+      "note": "Past participle of distinguer."
+    },
+    "contenus": {
+      "en": "contents; materials",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "contenu",
+      "note": "Plural of contenu."
+    },
+    "faible": {
+      "en": "low; weak",
+      "pos": "adjective",
+      "lemma": "faible"
+    },
+    "conséquence": {
+      "en": "consequence",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "textes": {
+      "en": "texts",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "texte",
+      "note": "Plural of texte."
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "influencent": {
+      "en": "influence",
+      "pos": "verb",
+      "lemma": "influencer",
+      "note": "Present form of influencer."
+    },
+    "décision": {
+      "en": "decision",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "importante": {
+      "en": "important",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "important",
+      "note": "Feminine form of important."
+    },
+    "premiers": {
+      "en": "the first",
+      "sound": "luh pruh-MYAY",
+      "lemma": "premier",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "vérification": {
+      "en": "check; verification",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "par": {
+      "en": "by"
+    },
+    "échantillon": {
+      "en": "sample",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "semblait": {
+      "en": "seemed",
+      "pos": "verb",
+      "lemma": "sembler",
+      "note": "Imperfect form of sembler."
+    },
+    "suffisante": {
+      "en": "sufficient",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "suffisant",
+      "note": "Feminine form of suffisant."
+    },
+    "seconds": {
+      "en": "second",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "second",
+      "note": "Masculine plural form."
+    },
+    "révision": {
+      "en": "review; revision",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "révision"
+    },
+    "humaine": {
+      "en": "human",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "humain",
+      "note": "Feminine form of humain."
+    },
+    "resterait": {
+      "en": "would remain",
+      "pos": "verb",
+      "lemma": "rester",
+      "note": "Conditional form of rester."
+    },
+    "obligatoire": {
+      "en": "required; mandatory",
+      "pos": "adjective",
+      "lemma": "obligatoire"
+    },
+    "la": {
+      "en": "the"
+    },
+    "responsable": {
+      "en": "manager; person in charge",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "responsable",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "également": {
+      "en": "also",
+      "pos": "adverb"
+    },
+    "demandé": {
+      "en": "asked; requested",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Past participle of demander."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "version": {
+      "en": "version",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "référence": {
+      "en": "reference; reference number",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "et": {
+      "en": "and"
+    },
+    "date": {
+      "en": "date",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "date"
+    },
+    "soient": {
+      "en": "be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Subjunctive form of être."
+    },
+    "conservées": {
+      "en": "kept; retained",
+      "pos": "verb",
+      "lemma": "conserver",
+      "note": "Feminine plural form of the past participle conservé."
+    },
+    "collègue": {
+      "en": "colleague",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "collègue",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "fait": {
+      "en": "is (faire, in a weather phrase)",
+      "pos": "verb",
+      "sound": "feh"
+    },
+    "remarquer": {
+      "en": "to notice",
+      "pos": "verb",
+      "lemma": "remarquer",
+      "note": "Infinitive."
+    },
+    "qu'un": {
+      "en": "that a; than one",
+      "pos": "contraction",
+      "note": "Elided que + un."
+    },
+    "avertissement": {
+      "en": "warning; disclaimer",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "avertissement"
+    },
+    "général": {
+      "en": "general",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "général",
+      "note": "Masculine singular form."
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "corrigerait": {
+      "en": "would correct",
+      "pos": "verb",
+      "lemma": "corriger",
+      "note": "Conditional form of corriger."
+    },
+    "pas": {
+      "en": "not"
+    },
+    "phrase": {
+      "en": "sentence",
+      "sound": "lah frahz",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "phrase"
+    },
+    "erronée": {
+      "en": "incorrect",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "erroné",
+      "note": "Feminine form of erroné."
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "accepté": {
+      "en": "accepted",
+      "pos": "verb",
+      "lemma": "accepter",
+      "note": "Masculine singular past participle of accepter."
+    },
+    "projet": {
+      "en": "a project",
+      "sound": "uh(n) proh-ZHEH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "projet"
+    },
+    "limité": {
+      "en": "limited",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "limité",
+      "note": "Masculine singular form."
+    },
+    "moyen": {
+      "en": "way; method",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "signaler": {
+      "en": "to report; point out",
+      "pos": "verb",
+      "lemma": "signaler",
+      "note": "Infinitive."
+    },
+    "problème": {
+      "en": "problem",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "réévaluera": {
+      "en": "will reassess",
+      "pos": "verb",
+      "lemma": "réévaluer",
+      "note": "Future form of réévaluer."
+    },
+    "résultats": {
+      "en": "a result",
+      "sound": "uh(n) ray-zül-TAH",
+      "lemma": "résultat",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "six": {
+      "en": "six",
+      "pos": "number"
+    },
+    "semaines": {
+      "en": "week, weekday period",
+      "sound": "lah suh-MEHN",
+      "lemma": "semaine",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "partir": {
+      "en": "to leave",
+      "pos": "verb",
+      "lemma": "partir",
+      "note": "Infinitive."
+    },
+    "corrections": {
+      "en": "corrections",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "correction",
+      "note": "Plural of correction."
+    },
+    "reçues": {
+      "en": "received",
+      "pos": "verb",
+      "lemma": "recevoir",
+      "note": "Feminine plural form of the past participle reçu."
+    },
+    "non": {
+      "en": "no; not",
+      "pos": "adverb"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "seul": {
+      "en": "only; alone",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "seul",
+      "note": "Masculine singular form."
+    },
+    "nombre": {
+      "en": "number, quantity",
+      "sound": "luh NOH(N)br",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "nombre"
+    },
+    "produits": {
+      "en": "products; items",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "produit",
+      "note": "Plural of produit."
+    }
+  },
+  "keywords": [
+    "essai",
+    "traduction",
+    "vérification",
+    "condition",
+    "nuance"
+  ],
+  "quiz": [
+    {
+      "prompt": "What type of error did the tool make?",
+      "options": [
+        "It changed an eligibility condition into a recommendation.",
+        "It omitted every schedule.",
+        "It translated a name as an address.",
+        "It published an outdated date."
+      ],
+      "answer": 0,
+      "explain": "The pilot confused an eligibility condition with a recommendation."
+    },
+    {
+      "prompt": "Which texts still require human review?",
+      "options": [
+        "Texts that affect an important decision",
+        "All routine schedules only",
+        "Only short social messages",
+        "Texts with no dates"
+      ],
+      "answer": 0,
+      "explain": "The team keeps human review for higher-consequence texts."
+    },
+    {
+      "prompt": "How will the group evaluate the pilot?",
+      "options": [
+        "By reviewing corrections received as well as output",
+        "By counting only published texts",
+        "By removing the reference version",
+        "By asking the tool to grade itself"
+      ],
+      "answer": 0,
+      "explain": "It will consider corrections, not just volume."
+    }
+  ]
+}

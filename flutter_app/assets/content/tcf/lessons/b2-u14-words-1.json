@@ -1,0 +1,148 @@
+{
+  "id": "b2-u14-words-1",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une maîtrise",
+      "en": "control; command",
+      "sound": "ün meh-TREEZ",
+      "exampleFr": "La maîtrise se vérifie dans une situation nouvelle.",
+      "exampleEn": "Control is checked in a new situation."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un transfert",
+      "en": "transfer",
+      "sound": "uh(n) trahn-SFEHR",
+      "exampleFr": "Le transfert montre si la compétence dépasse l'exercice appris.",
+      "exampleEn": "Transfer shows whether a skill goes beyond the practiced exercise."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une précision",
+      "en": "precision",
+      "sound": "ün pray-see-ZYOH(N)",
+      "exampleFr": "Une précision améliore la compréhension du message.",
+      "exampleEn": "Precision improves understanding of the message."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une cohérence",
+      "en": "coherence",
+      "sound": "ün koh-ay-RAH(N)S",
+      "exampleFr": "La cohérence relie les idées de façon logique.",
+      "exampleEn": "Coherence connects ideas logically."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une consigne",
+      "en": "an instruction; prompt",
+      "sound": "ün kohn-SEENY",
+      "exampleFr": "Il faut répondre à chaque partie de la consigne.",
+      "exampleEn": "Each part of the prompt must be answered."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une révision",
+      "en": "a revision; review",
+      "sound": "ün ray-vee-ZYOH(N)",
+      "exampleFr": "La révision repère les erreurs qui changent le sens.",
+      "exampleEn": "Revision catches errors that change the meaning."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une maîtrise",
+      "options": [
+        "coherence",
+        "control; command",
+        "transfer",
+        "precision"
+      ],
+      "answer": 1,
+      "explain": "une maîtrise means control; command."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un transfert",
+      "options": [
+        "an instruction; prompt",
+        "precision",
+        "coherence",
+        "transfer"
+      ],
+      "answer": 3,
+      "explain": "un transfert means transfer."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une précision",
+      "options": [
+        "a revision; review",
+        "precision",
+        "coherence",
+        "an instruction; prompt"
+      ],
+      "answer": 1,
+      "explain": "une précision means precision."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une cohérence",
+      "options": [
+        "control; command",
+        "an instruction; prompt",
+        "a revision; review",
+        "coherence"
+      ],
+      "answer": 3,
+      "explain": "une cohérence means coherence."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une consigne",
+      "options": [
+        "transfer",
+        "an instruction; prompt",
+        "a revision; review",
+        "control; command"
+      ],
+      "answer": 1,
+      "explain": "une consigne means an instruction; prompt."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une révision",
+      "options": [
+        "precision",
+        "control; command",
+        "transfer",
+        "a revision; review"
+      ],
+      "answer": 3,
+      "explain": "une révision means a revision; review."
+    }
+  ]
+}

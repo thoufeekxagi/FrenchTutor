@@ -1,0 +1,63 @@
+{
+  "id": "b2-u08-write-speak",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word account for a class blog about a learning experience that changed how you approach a subject. Attribute one comment from another person, describe what happened and explain what you learned. Keep your experience distinct from a universal claim.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Lors d'un atelier de conversation, j'ai rencontré des apprenants qui avaient des parcours très différents. Une participante a expliqué qu'elle avait repris le français après plusieurs années, tandis qu'un autre avait commencé à l'utiliser au travail. Leurs expériences m'ont fait comprendre que la régularité compte, mais qu'il n'existe pas une seule façon d'apprendre. Pour ma part, les échanges en petit groupe m'ont aidé à poser des questions que je n'aurais pas formulées seul. J'ai aussi réalisé que la lecture me permet de préparer des idées avant de parler. Depuis, j'essaie de combiner les deux pratiques. Cette expérience ne prouve pas que cette méthode convient à tout le monde, mais elle m'a donné une démarche que je peux adapter à mes objectifs.\n\nCheck:\n• Task 2 range: 120–150 words.\n• Attribute the other person's idea accurately.\n• Use past-time references consistently.\n• Make clear which point is personal experience and which is your conclusion."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Task 3: Les activités culturelles devraient-elles toujours refléter les intérêts de la majorité ? State a position, consider access and representation, give one example, and acknowledge a limit. Marie should present a different personal perspective; respond to it without claiming that one story represents everyone.\n\n• In a summary, keep the speakers' positions separate.\n• Use tense shifts only when the reporting time calls for them.\n• Respond to Marie's example as one experience, not as proof about everyone."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je ne pense pas que les activités devraient toujours refléter uniquement les intérêts de la majorité.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Il est utile de proposer des thèmes qui attirent beaucoup de personnes, mais d'autres perspectives peuvent enrichir la discussion.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Par exemple, un atelier pourrait offrir plusieurs sujets et laisser les participants en suggérer de nouveaux. Cela dit, il faut aussi tenir compte du temps et des ressources disponibles.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "À mon avis, l'objectif devrait être de varier les occasions plutôt que de chercher un thème qui représente tout le monde.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Les réactions individuelles ne permettent pas de décrire un groupe entier. Il est donc important de demander directement aux participants ce qui les intéresse.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

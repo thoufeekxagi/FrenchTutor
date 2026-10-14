@@ -1,0 +1,58 @@
+{
+  "id": "b2-u09-listening",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La moyenne des dépenses a baissé légèrement. Toutefois, les répondants ne forment pas un échantillon aléatoire; les résultats ne décrivent donc pas nécessairement chaque ménage.",
+      "question": "What limits the conclusion?",
+      "options": [
+        "The average increased sharply",
+        "The report includes every household",
+        "No expenses were recorded",
+        "The sample is not random"
+      ],
+      "answer": 3,
+      "explain": "The speaker says the sample was not random."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Cette hausse pourrait être liée au coût des déplacements, mais le tableau ne donne pas assez de détails pour le confirmer.",
+      "question": "What is the status of the explanation?",
+      "options": [
+        "It is the final confirmed cause",
+        "It is a possibility that the data cannot confirm",
+        "It applies to every household",
+        "It is unrelated to the figures"
+      ],
+      "answer": 1,
+      "explain": "The speaker presents a possible explanation, not a confirmed cause."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Il serait prudent de garder une marge pour les dépenses imprévues, surtout lorsque les frais varient d'un mois à l'autre.",
+      "question": "What does the speaker recommend?",
+      "options": [
+        "Ignore monthly changes",
+        "Assume all costs are fixed",
+        "Keep a margin for unexpected expenses",
+        "Spend the entire budget immediately"
+      ],
+      "answer": 2,
+      "explain": "The recommendation is to keep a margin for unexpected costs."
+    }
+  ]
+}

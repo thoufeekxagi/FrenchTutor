@@ -1,0 +1,148 @@
+{
+  "id": "b2-u05-words-3",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un antécédent",
+      "en": "a prior condition; medical history",
+      "sound": "uh(n) ahn-tay-say-DAHN",
+      "exampleFr": "Le formulaire demande de signaler tout antécédent pertinent.",
+      "exampleEn": "The form asks the person to report any relevant prior condition."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un effet secondaire",
+      "en": "a side effect",
+      "sound": "uh(n) ay-FEH suh-gohn-DEHR",
+      "exampleFr": "Le pharmacien explique les effets secondaires possibles.",
+      "exampleEn": "The pharmacist explains possible side effects."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un symptôme persistant",
+      "en": "a persistent symptom",
+      "sound": "uh(n) sah(n)-TOHM pehr-see-STA(N)",
+      "exampleFr": "Un symptôme persistant mérite une évaluation professionnelle.",
+      "exampleEn": "A persistent symptom warrants a professional assessment."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une prise en charge",
+      "en": "care; handling; support",
+      "sound": "ün preez ahn sharzh",
+      "exampleFr": "Le service décrit les étapes de la prise en charge.",
+      "exampleEn": "The service explains the steps involved in care."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un accès aux soins",
+      "en": "access to care",
+      "sound": "uh(n) ahk-SEH oh swahn",
+      "exampleFr": "La distance peut compliquer l'accès aux soins.",
+      "exampleEn": "Distance can make access to care more difficult."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une urgence non vitale",
+      "en": "a non-life-threatening emergency",
+      "sound": "ün ür-ZHAHNS nohn vee-TAHL",
+      "exampleFr": "La ligne indique où demander de l'aide pour une urgence non vitale.",
+      "exampleEn": "The line explains where to seek help for a non-life-threatening emergency."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un antécédent",
+      "options": [
+        "care; handling; support",
+        "a prior condition; medical history",
+        "a side effect",
+        "a persistent symptom"
+      ],
+      "answer": 1,
+      "explain": "un antécédent means a prior condition; medical history."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un effet secondaire",
+      "options": [
+        "access to care",
+        "a persistent symptom",
+        "care; handling; support",
+        "a side effect"
+      ],
+      "answer": 3,
+      "explain": "un effet secondaire means a side effect."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un symptôme persistant",
+      "options": [
+        "a non-life-threatening emergency",
+        "a persistent symptom",
+        "care; handling; support",
+        "access to care"
+      ],
+      "answer": 1,
+      "explain": "un symptôme persistant means a persistent symptom."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une prise en charge",
+      "options": [
+        "a prior condition; medical history",
+        "a non-life-threatening emergency",
+        "a side effect",
+        "care; handling; support"
+      ],
+      "answer": 3,
+      "explain": "une prise en charge means care; handling; support."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès aux soins",
+      "options": [
+        "a side effect",
+        "access to care",
+        "a non-life-threatening emergency",
+        "a prior condition; medical history"
+      ],
+      "answer": 1,
+      "explain": "un accès aux soins means access to care."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une urgence non vitale",
+      "options": [
+        "a persistent symptom",
+        "a prior condition; medical history",
+        "a side effect",
+        "a non-life-threatening emergency"
+      ],
+      "answer": 3,
+      "explain": "une urgence non vitale means a non-life-threatening emergency."
+    }
+  ]
+}

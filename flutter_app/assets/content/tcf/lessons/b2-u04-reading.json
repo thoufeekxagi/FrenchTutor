@@ -1,0 +1,52 @@
+{
+  "id": "b2-u04-reading",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What had the first proposal overlooked?",
+      "options": [
+        "Deliveries",
+        "Noise",
+        "The construction calendar",
+        "Public transport"
+      ],
+      "answer": 0,
+      "explain": "The report says deliveries had not been considered.",
+      "promptFr": "Une consultation fictive a recueilli les commentaires de résidents, de commerçants et d'usagers du transport collectif. Plusieurs personnes approuvent l'amélioration des accès, tandis que d'autres craignent une hausse du bruit pendant les travaux. Le rapport note que les livraisons n'avaient pas été prises en compte dans la première proposition. Il recommande un accès temporaire et un calendrier affiché à l'avance. Ces mesures ne régleraient pas chaque désaccord, mais elles permettraient aux personnes concernées de mieux planifier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why do the authors avoid naming one best option?",
+      "options": [
+        "Both options are identical",
+        "Different people may have different priorities",
+        "The prices are unknown",
+        "Neither option has any services"
+      ],
+      "answer": 1,
+      "explain": "The best fit depends on which needs are most important.",
+      "promptFr": "L'option A réduit la distance jusqu'aux services, mais son coût est plus élevé. L'option B respecte mieux le budget et offre moins de correspondances en autobus; elle demande toutefois une marche plus longue. Les auteurs conseillent d'évaluer les besoins prioritaires avant de choisir. Ils ne désignent pas une option qui conviendrait à tout le monde."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does the report claim about earlier notice?",
+      "options": [
+        "It was installed before anyone asked",
+        "It would have ended all construction",
+        "It could have made deliveries easier, but not necessarily prevented every delay",
+        "It had no possible effect"
+      ],
+      "answer": 2,
+      "explain": "The report states a likely benefit but does not claim it would prevent every delay.",
+      "promptFr": "Pendant les travaux, les commerçants avaient demandé une signalisation temporaire. Elle a été installée après plusieurs plaintes. Le compte rendu précise qu'une annonce plus tôt aurait facilité les livraisons, sans affirmer que les retards auraient tous été évités."
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "id": "b2-u02-dialogues",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A radio interview",
+      "body": "A reporter asks what the first figures can establish.",
+      "examples": [
+        {
+          "fr": "Le communiqué annonce une baisse de la demande.",
+          "en": "Journaliste: The statement announces a decrease in demand."
+        },
+        {
+          "fr": "Il indique une baisse pendant la période observée.",
+          "en": "Analyste: It indicates a decrease during the period observed."
+        },
+        {
+          "fr": "Peut-on conclure que la mesure en est la cause ?",
+          "en": "Journaliste: Can we conclude that the measure caused it?"
+        },
+        {
+          "fr": "Pas encore. D'autres facteurs n'ont pas été examinés.",
+          "en": "Analyste: Not yet. Other factors have not been examined."
+        },
+        {
+          "fr": "Le rapport a-t-il été vérifié par une autre équipe ?",
+          "en": "Journaliste: Has another team checked the report?"
+        },
+        {
+          "fr": "Cela n'est pas précisé dans le document.",
+          "en": "Analyste: That is not specified in the document."
+        },
+        {
+          "fr": "Nous devons donc présenter ce résultat comme provisoire.",
+          "en": "Journaliste: So we must present this result as provisional."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A message shared online",
+      "body": "Two neighbours check a circulating claim before repeating it.",
+      "examples": [
+        {
+          "fr": "J'ai lu que le service serait fermé dès lundi.",
+          "en": "Awa: I read that the service would reportedly close on Monday."
+        },
+        {
+          "fr": "Quelle est la source ?",
+          "en": "Marc: What is the source?"
+        },
+        {
+          "fr": "Le message ne donne aucun lien vers un communiqué.",
+          "en": "Awa: The message gives no link to a statement."
+        },
+        {
+          "fr": "Alors, mieux vaut vérifier auprès de l'organisme.",
+          "en": "Marc: Then it is better to check with the organization."
+        },
+        {
+          "fr": "Oui. Pour l'instant, je ne vais pas présenter cela comme un fait.",
+          "en": "Awa: Yes. For now, I will not present that as a fact."
+        }
+      ]
+    }
+  ]
+}

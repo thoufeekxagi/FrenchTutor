@@ -1,0 +1,166 @@
+{
+  "id": "a2-u03-words-4",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Words: moving through a city",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un changement de ligne",
+      "en": "a line change",
+      "sound": "uh(n) shahnzh-MAH(N) duh leen-yuh",
+      "exampleFr": "Le changement de ligne est à la station centrale.",
+      "exampleEn": "The line change is at Central Station."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un itinéraire",
+      "en": "a route; itinerary",
+      "sound": "uh(n) ee-tee-nay-REHR",
+      "exampleFr": "Je regarde l'itinéraire avant de partir.",
+      "exampleEn": "I look at the route before leaving."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une direction",
+      "en": "a direction",
+      "sound": "ün dee-rehk-SYOH(N)",
+      "exampleFr": "Je demande une direction au comptoir.",
+      "exampleEn": "I ask for directions at the counter."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un trajet",
+      "en": "a journey; a trip",
+      "sound": "uh(n) trah-ZHAY",
+      "exampleFr": "Le trajet dure vingt minutes.",
+      "exampleEn": "The trip takes twenty minutes."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un quai",
+      "en": "a platform; a wharf",
+      "sound": "uh(n) keh",
+      "exampleFr": "Le train part du quai numéro deux.",
+      "exampleEn": "The train leaves from platform two."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une station",
+      "en": "a station",
+      "sound": "ün stah-SYOH(N)",
+      "exampleFr": "La station est près du centre.",
+      "exampleEn": "The station is near the centre."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un arrêt",
+      "en": "a stop",
+      "sound": "uh(n) ah-REH",
+      "exampleFr": "Le prochain arrêt est la bibliothèque.",
+      "exampleEn": "The next stop is the library."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un plan de la ville",
+      "en": "a city map",
+      "sound": "uh(n) plah(n) duh veel",
+      "exampleFr": "Le plan de la ville montre la gare.",
+      "exampleEn": "The city map shows the train station."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un changement de ligne",
+      "options": [
+        "a journey; a trip",
+        "a line change",
+        "a stop",
+        "a route; itinerary"
+      ],
+      "answer": 1,
+      "explain": "un changement de ligne means a line change."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un itinéraire",
+      "options": [
+        "a platform; a wharf",
+        "a city map",
+        "a direction",
+        "a route; itinerary"
+      ],
+      "answer": 3,
+      "explain": "un itinéraire means a route; itinerary."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une direction",
+      "options": [
+        "a station",
+        "a direction",
+        "a line change",
+        "a journey; a trip"
+      ],
+      "answer": 1,
+      "explain": "une direction means a direction."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un trajet",
+      "options": [
+        "a stop",
+        "a route; itinerary",
+        "a platform; a wharf",
+        "a journey; a trip"
+      ],
+      "answer": 3,
+      "explain": "un trajet means a journey; a trip."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un quai",
+      "options": [
+        "a city map",
+        "a platform; a wharf",
+        "a direction",
+        "a station"
+      ],
+      "answer": 1,
+      "explain": "un quai means a platform; a wharf."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une station",
+      "options": [
+        "a line change",
+        "a journey; a trip",
+        "a stop",
+        "a station"
+      ],
+      "answer": 3,
+      "explain": "une station means a station."
+    }
+  ]
+}

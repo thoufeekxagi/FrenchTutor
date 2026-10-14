@@ -1,0 +1,79 @@
+{
+  "id": "b1-u11-phrases",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Phrases",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Choose a phrase because it matches your meaning. Note one phrase, adapt its details to your own life, close your notes and say it in a different scene."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "La semaine dernière, …",
+      "en": "Last week, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Au début, … puis …",
+      "en": "At first, … then …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Ce qui m'a marqué(e), c'est …",
+      "en": "What stood out to me was …",
+      "say": "Ce qui m'a marqué, c'est …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "J'ai particulièrement apprécié …",
+      "en": "I especially appreciated …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Toutefois, …",
+      "en": "However, …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "À mon avis, … parce que …",
+      "en": "In my view, … because …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Cette expérience m'a appris que …",
+      "en": "This experience taught me that …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Je recommande … à condition de …",
+      "en": "I recommend … provided that …",
+      "tip": "Say it: Link the words smoothly; stress the final syllable group."
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "id": "a2-u05-words-2",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Words: dates and schedule constraints",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une date limite",
+      "en": "a deadline",
+      "sound": "ün daht lee-MEET",
+      "exampleFr": "Mon agenda indique une date limite.",
+      "exampleEn": "My planner shows a deadline."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une date de début",
+      "en": "a start date",
+      "sound": "ün daht duh day-BÜ",
+      "exampleFr": "Mon agenda indique une date de début.",
+      "exampleEn": "My planner shows a start date."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une session d'automne",
+      "en": "a fall term",
+      "sound": "ün seh-SYOH(N) doh-TOHN",
+      "exampleFr": "Mon agenda indique une session d'automne.",
+      "exampleEn": "My planner shows a fall term."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un quart de soir",
+      "en": "an evening shift",
+      "sound": "uh(n) kahr duh swahr",
+      "exampleFr": "Mon agenda indique un quart de soir.",
+      "exampleEn": "My planner shows an evening shift."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un quart de jour",
+      "en": "a day shift",
+      "sound": "uh(n) kahr duh zhoor",
+      "exampleFr": "Mon agenda indique un quart de jour.",
+      "exampleEn": "My planner shows a day shift."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un horaire flexible",
+      "en": "a flexible schedule",
+      "sound": "uh(n) oh-REHR flehk-SEEBL",
+      "exampleFr": "Mon agenda indique un horaire flexible.",
+      "exampleEn": "My planner shows a flexible schedule."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une disponibilité",
+      "en": "availability",
+      "sound": "ün dee-spoh-nee-bee-lee-TAY",
+      "exampleFr": "Mon agenda indique une disponibilité.",
+      "exampleEn": "My planner shows availability."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un conflit d'horaire",
+      "en": "a schedule conflict",
+      "sound": "uh(n) kohn-FLEE doh-REHR",
+      "exampleFr": "Mon agenda indique un conflit d'horaire.",
+      "exampleEn": "My planner shows a schedule conflict."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une date limite",
+      "options": [
+        "an evening shift",
+        "a deadline",
+        "availability",
+        "a start date"
+      ],
+      "answer": 1,
+      "explain": "une date limite means a deadline."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une date de début",
+      "options": [
+        "a day shift",
+        "a schedule conflict",
+        "a fall term",
+        "a start date"
+      ],
+      "answer": 3,
+      "explain": "une date de début means a start date."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une session d'automne",
+      "options": [
+        "a flexible schedule",
+        "a fall term",
+        "a deadline",
+        "an evening shift"
+      ],
+      "answer": 1,
+      "explain": "une session d'automne means a fall term."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un quart de soir",
+      "options": [
+        "availability",
+        "a start date",
+        "a schedule conflict",
+        "an evening shift"
+      ],
+      "answer": 3,
+      "explain": "un quart de soir means an evening shift."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un quart de jour",
+      "options": [
+        "a schedule conflict",
+        "a day shift",
+        "a fall term",
+        "a flexible schedule"
+      ],
+      "answer": 1,
+      "explain": "un quart de jour means a day shift."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un horaire flexible",
+      "options": [
+        "a deadline",
+        "an evening shift",
+        "availability",
+        "a flexible schedule"
+      ],
+      "answer": 3,
+      "explain": "un horaire flexible means a flexible schedule."
+    }
+  ]
+}

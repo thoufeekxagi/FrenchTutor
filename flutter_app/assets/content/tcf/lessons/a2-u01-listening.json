@@ -1,0 +1,86 @@
+{
+  "id": "a2-u01-listening",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "D'habitude, je travaille le lundi et le mardi. Cette semaine, je suis libre mardi parce que je vais à un atelier.",
+      "question": "Why is the speaker free on Tuesday this week?",
+      "options": [
+        "The speaker is attending a workshop.",
+        "The speaker is sick.",
+        "The speaker has no work this month.",
+        "The speaker is visiting a friend."
+      ],
+      "answer": 0,
+      "explain": "The speaker says je suis libre mardi parce que je vais à un atelier."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je prépare ma liste de tâches le dimanche. Ensuite, je vérifie les heures de mon cours et de mon travail.",
+      "question": "What does the speaker do after making a to-do list?",
+      "options": [
+        "Checks class and work times",
+        "Calls a colleague",
+        "Changes the class",
+        "Takes a nap"
+      ],
+      "answer": 0,
+      "explain": "The next action is checking the hours for class and work."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je suis un peu débordée, donc je reporte la séance à jeudi. Je vais me reposer ce soir.",
+      "question": "When is the session now?",
+      "options": [
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Sunday"
+      ],
+      "answer": 2,
+      "explain": "The speaker says je reporte la séance à jeudi."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Si j'ai bien compris, tu es libre après seize heures ? Oui, c'est ça.",
+      "question": "When is the person free?",
+      "options": [
+        "After 14:00",
+        "After 16:00",
+        "After 18:00",
+        "After 20:00"
+      ],
+      "answer": 1,
+      "explain": "The response confirms that the person is free after seize heures, or 16:00."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Je révise rarement le matin. En général, je prends des notes après le cours et je relis le tout le soir.",
+      "question": "When does the speaker usually reread the notes?",
+      "options": [
+        "Before the class",
+        "At lunchtime",
+        "In the evening",
+        "On Sunday morning"
+      ],
+      "answer": 2,
+      "explain": "The speaker says je relis le tout le soir."
+    }
+  ]
+}

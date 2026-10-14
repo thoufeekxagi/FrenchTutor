@@ -1,0 +1,203 @@
+{
+  "id": "a2-u01-words-3",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Words: study and practice",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une séance",
+      "en": "a session",
+      "sound": "ün say-AH(N)S",
+      "exampleFr": "J'ai une séance de français ce soir.",
+      "exampleEn": "I have a French session tonight."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un atelier",
+      "en": "a workshop",
+      "sound": "uh(n) ah-tuh-LYAY",
+      "exampleFr": "L'atelier commence à neuf heures.",
+      "exampleEn": "The workshop starts at nine o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une présentation",
+      "en": "a presentation",
+      "sound": "ün pray-zah(n)-tah-SYOH(N)",
+      "exampleFr": "La présentation est courte.",
+      "exampleEn": "The presentation is short."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "prendre des notes",
+      "en": "to take notes",
+      "sound": "prah(n)-dr day noht",
+      "exampleFr": "Je prends des notes en classe.",
+      "exampleEn": "I take notes in class."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "relire",
+      "en": "to reread; review",
+      "sound": "ruh-LEER",
+      "exampleFr": "Je relis mes notes après le cours.",
+      "exampleEn": "I reread my notes after class."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "réviser",
+      "en": "to review; study",
+      "sound": "ray-vee-ZAY",
+      "exampleFr": "Je révise avant le cours.",
+      "exampleEn": "I review before class."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "s'entraîner",
+      "en": "to practise; train",
+      "sound": "sah(n)-tray-NAY",
+      "exampleFr": "Je m'entraîne à parler.",
+      "exampleEn": "I practise speaking."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un progrès",
+      "en": "progress; an improvement",
+      "sound": "uh(n) proh-GREH",
+      "exampleFr": "Je vois un progrès cette semaine.",
+      "exampleEn": "I see progress this week."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "un créneau",
+      "en": "a time slot",
+      "sound": "uh(n) kray-NOH",
+      "exampleFr": "J'ai un créneau libre jeudi matin.",
+      "exampleEn": "I have a free time slot Thursday morning."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une séance",
+      "options": [
+        "to take notes",
+        "a session",
+        "to practise; train",
+        "a workshop"
+      ],
+      "answer": 1,
+      "explain": "une séance means a session."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un atelier",
+      "options": [
+        "to reread; review",
+        "progress; an improvement",
+        "a presentation",
+        "a workshop"
+      ],
+      "answer": 3,
+      "explain": "un atelier means a workshop."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une présentation",
+      "options": [
+        "to review; study",
+        "a presentation",
+        "a time slot",
+        "to take notes"
+      ],
+      "answer": 1,
+      "explain": "une présentation means a presentation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "prendre des notes",
+      "options": [
+        "to practise; train",
+        "a session",
+        "to reread; review",
+        "to take notes"
+      ],
+      "answer": 3,
+      "explain": "prendre des notes means to take notes."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "relire",
+      "options": [
+        "progress; an improvement",
+        "to reread; review",
+        "a workshop",
+        "to practise; train"
+      ],
+      "answer": 1,
+      "explain": "relire means to reread; review."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "réviser",
+      "options": [
+        "a time slot",
+        "a presentation",
+        "to practise; train",
+        "to review; study"
+      ],
+      "answer": 3,
+      "explain": "réviser means to review; study."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un atelier",
+      "question": "Which word did you hear?",
+      "options": [
+        "relire",
+        "un atelier",
+        "s'entraîner",
+        "un créneau"
+      ],
+      "answer": 1,
+      "explain": "You heard un atelier: a workshop."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "relire",
+      "question": "Which word did you hear?",
+      "options": [
+        "relire",
+        "s'entraîner",
+        "un créneau",
+        "un atelier"
+      ],
+      "answer": 0,
+      "explain": "You heard relire: to reread; review."
+    }
+  ]
+}

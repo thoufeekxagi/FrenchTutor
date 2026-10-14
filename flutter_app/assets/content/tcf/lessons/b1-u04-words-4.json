@@ -1,0 +1,148 @@
+{
+  "id": "b1-u04-words-4",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une annonce détaillée",
+      "en": "a detailed listing",
+      "sound": "ün ah-nohns day-tah-YAY",
+      "exampleFr": "Une annonce détaillée précise le montant des charges.",
+      "exampleEn": "A detailed listing specifies the amount of the extra costs."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la superficie",
+      "en": "the floor area",
+      "sound": "lah sü-pehr-fee-SEE",
+      "exampleFr": "La superficie du studio est indiquée dans l'annonce.",
+      "exampleEn": "The studio's floor area is listed in the advertisement."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la lumière naturelle",
+      "en": "natural light",
+      "sound": "lah lü-MYEHR nah-tü-REHL",
+      "exampleFr": "La grande fenêtre apporte beaucoup de lumière naturelle.",
+      "exampleEn": "The large window brings in a lot of natural light."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un environnement calme",
+      "en": "a quiet environment",
+      "sound": "uh(n) ahn-vee-rohn-mahn kalm",
+      "exampleFr": "Un environnement calme l'aide à étudier.",
+      "exampleEn": "A quiet environment helps her study."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un quartier animé",
+      "en": "a lively neighbourhood",
+      "sound": "uh(n) kar-tyay ah-nee-MAY",
+      "exampleFr": "Le quartier animé offre plusieurs commerces à proximité.",
+      "exampleEn": "The lively neighbourhood has several shops nearby."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "se trouver à proximité",
+      "en": "to be located nearby",
+      "sound": "suh troo-vay ah prohk-see-mee-TAY",
+      "exampleFr": "L'arrêt d'autobus se trouve à proximité de l'immeuble.",
+      "exampleEn": "The bus stop is located near the building."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une annonce détaillée",
+      "options": [
+        "a quiet environment",
+        "a detailed listing",
+        "the floor area",
+        "natural light"
+      ],
+      "answer": 1,
+      "explain": "une annonce détaillée means a detailed listing."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la superficie",
+      "options": [
+        "a lively neighbourhood",
+        "natural light",
+        "a quiet environment",
+        "the floor area"
+      ],
+      "answer": 3,
+      "explain": "la superficie means the floor area."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la lumière naturelle",
+      "options": [
+        "to be located nearby",
+        "natural light",
+        "a quiet environment",
+        "a lively neighbourhood"
+      ],
+      "answer": 1,
+      "explain": "la lumière naturelle means natural light."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un environnement calme",
+      "options": [
+        "a detailed listing",
+        "a lively neighbourhood",
+        "to be located nearby",
+        "a quiet environment"
+      ],
+      "answer": 3,
+      "explain": "un environnement calme means a quiet environment."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un quartier animé",
+      "options": [
+        "the floor area",
+        "a lively neighbourhood",
+        "to be located nearby",
+        "a detailed listing"
+      ],
+      "answer": 1,
+      "explain": "un quartier animé means a lively neighbourhood."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "se trouver à proximité",
+      "options": [
+        "natural light",
+        "a detailed listing",
+        "the floor area",
+        "to be located nearby"
+      ],
+      "answer": 3,
+      "explain": "se trouver à proximité means to be located nearby."
+    }
+  ]
+}

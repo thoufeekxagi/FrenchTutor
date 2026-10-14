@@ -1,0 +1,56 @@
+{
+  "id": "b1-u11-write-speak",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word post for classmates about a learning, work or community experience. Recount what happened, include a reaction or opinion with a reason and end with a relevant lesson or next step. Revise for task completion, sequence and frequent past-participle agreement.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Le mois dernier, j'ai participé à une journée d'orientation organisée pour les nouveaux étudiants. Au début, je ne connaissais personne et je craignais de ne pas comprendre toutes les consignes. Une bénévole m'a expliqué le programme et m'a présenté deux personnes de mon groupe. Les informations que j'ai reçues avant la rencontre m'ont aidée à trouver le bon bâtiment. Nous avons ensuite visité la bibliothèque et participé à un atelier sur les ressources disponibles. J'ai particulièrement apprécié les échanges en petits groupes, car chacun pouvait poser une question sans interrompre la présentation. Toutefois, le programme était chargé et nous avons eu peu de temps pour parler avec les conseillers. À mon avis, une pause plus longue permettrait de mieux profiter de la journée. Cette expérience m'a montré qu'une préparation simple peut réduire le stress. Je recommande l'activité aux nouveaux étudiants, à condition qu'ils reçoivent l'horaire à l'avance.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Recount the event, add a relevant comment or opinion and explain why.\n• Check that the response fits the audience and covers every part of the prompt.\n• Review frequent agreement after the meaning and timeline are clear."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. Ask a fictional course organizer about an experience-sharing event. Prepare for two minutes; ask what participants will do, how long they can speak, whether notes are allowed, who the audience is and how to register. Interact for 3 minutes 30. Use the answers to confirm what you should prepare.\n\n• Use the prompt's audience and purpose to select what details to include.\n• Answer follow-ups with a relevant example rather than a memorized paragraph.\n• After drafting, check the official range: 120–150 words for writing Task 2."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de la rencontre de partage. Pourriez-vous me dire combien de temps chaque personne pourra parler ?",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Est-ce qu'il faut raconter une expérience ou donner une opinion ? J'aimerais aussi savoir si je peux apporter quelques notes. À qui s'adresse la rencontre ?",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si j'ai bien compris, les participants écriront aussi un court compte rendu après l'activité. Est-ce que l'inscription est obligatoire ?",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Merci, je vais préparer un exemple et vérifier l'horaire.",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

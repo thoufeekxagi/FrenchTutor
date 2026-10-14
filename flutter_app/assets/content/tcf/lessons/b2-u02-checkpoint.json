@@ -1,0 +1,75 @@
+{
+  "id": "b2-u02-checkpoint",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "A spokesperson states a claim. What should your summary preserve?",
+      "options": [
+        "A stronger conclusion",
+        "An invented statistic",
+        "Only your reaction",
+        "Who made the claim"
+      ],
+      "answer": 3,
+      "explain": "Attribution preserves who said what."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is a rumeur?",
+      "options": [
+        "A rumour",
+        "A method",
+        "A result",
+        "A source"
+      ],
+      "answer": 0,
+      "explain": "Une rumeur is a rumour."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "A survey uses volunteers. What is a reasonable caution?",
+      "options": [
+        "No interpretation is possible",
+        "The sample may be self-selected",
+        "The data proves causation",
+        "The result represents everyone"
+      ],
+      "answer": 1,
+      "explain": "Volunteer samples can limit generalization."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does passive voice change?",
+      "options": [
+        "The date of publication",
+        "The source's reliability",
+        "The focus of the sentence",
+        "The certainty of the evidence"
+      ],
+      "answer": 2,
+      "explain": "Passive voice changes focus, not evidence quality."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which wording marks an estimate?",
+      "options": [
+        "Le coût n'existe pas",
+        "Le coût était identique partout",
+        "Le coût est confirmé",
+        "Le coût pourrait augmenter"
+      ],
+      "answer": 3,
+      "explain": "Pourrait marks a possibility rather than a confirmed fact."
+    }
+  ]
+}

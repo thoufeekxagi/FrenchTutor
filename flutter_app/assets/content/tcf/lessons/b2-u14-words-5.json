@@ -1,0 +1,148 @@
+{
+  "id": "b2-u14-words-5",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une reformulation spontanée",
+      "en": "spontaneous paraphrasing",
+      "sound": "ün ruh-for-mü-lah-SYOH(N) spohn-tah-NAY",
+      "exampleFr": "Une reformulation spontanée permet de réparer un oubli.",
+      "exampleEn": "Spontaneous paraphrasing makes it possible to recover from a lapse."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un degré de confiance",
+      "en": "a degree of confidence",
+      "sound": "uh(n) duh-gray duh kohn-FYAHNS",
+      "exampleFr": "Elle note son degré de confiance après chaque tâche.",
+      "exampleEn": "She records her confidence level after each task."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une limite du résultat",
+      "en": "a limitation of the result",
+      "sound": "ün lee-MEET dü ray-zül-TAH",
+      "exampleFr": "Le bilan indique une limite du résultat obtenu.",
+      "exampleEn": "The review identifies a limitation of the result obtained."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une méthode transférable",
+      "en": "a transferable method",
+      "sound": "ün may-TOHD trahn-sfay-RAHBL",
+      "exampleFr": "La méthode transférable fonctionne avec un sujet différent.",
+      "exampleEn": "The transferable method works with a different topic."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "en conditions réelles",
+      "en": "under real conditions",
+      "sound": "ahn kohn-dee-SYOH(N) ray-EHL",
+      "exampleFr": "Il refait l'exercice en conditions réelles, sans notes.",
+      "exampleEn": "He repeats the exercise under real conditions, without notes."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une réponse ciblée",
+      "en": "a focused response",
+      "sound": "ün ray-POHNS see-BLAY",
+      "exampleFr": "Une réponse ciblée traite chaque partie de la consigne.",
+      "exampleEn": "A focused response addresses every part of the prompt."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une reformulation spontanée",
+      "options": [
+        "a transferable method",
+        "spontaneous paraphrasing",
+        "a degree of confidence",
+        "a limitation of the result"
+      ],
+      "answer": 1,
+      "explain": "une reformulation spontanée means spontaneous paraphrasing."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un degré de confiance",
+      "options": [
+        "under real conditions",
+        "a limitation of the result",
+        "a transferable method",
+        "a degree of confidence"
+      ],
+      "answer": 3,
+      "explain": "un degré de confiance means a degree of confidence."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une limite du résultat",
+      "options": [
+        "a focused response",
+        "a limitation of the result",
+        "a transferable method",
+        "under real conditions"
+      ],
+      "answer": 1,
+      "explain": "une limite du résultat means a limitation of the result."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une méthode transférable",
+      "options": [
+        "spontaneous paraphrasing",
+        "under real conditions",
+        "a focused response",
+        "a transferable method"
+      ],
+      "answer": 3,
+      "explain": "une méthode transférable means a transferable method."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "en conditions réelles",
+      "options": [
+        "a degree of confidence",
+        "under real conditions",
+        "a focused response",
+        "spontaneous paraphrasing"
+      ],
+      "answer": 1,
+      "explain": "en conditions réelles means under real conditions."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une réponse ciblée",
+      "options": [
+        "a limitation of the result",
+        "spontaneous paraphrasing",
+        "a degree of confidence",
+        "a focused response"
+      ],
+      "answer": 3,
+      "explain": "une réponse ciblée means a focused response."
+    }
+  ]
+}

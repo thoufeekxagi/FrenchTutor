@@ -1,0 +1,87 @@
+{
+  "id": "b1-u11-grammar-a",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Grammar: Past-participle agreement in common written accounts",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Past-participle agreement in common written accounts",
+      "body": "When writing about past events, check agreement after the timeline and task are clear. With être, the past participle agrees with the subject: les participantes sont arrivées. With avoir, it normally stays unchanged unless a direct object appears before the verb: j'ai reçu les informations; les informations que j'ai reçues. First identify the direct object and where it appears; do not confuse an indirect object with a direct object. At this level, focus on frequent forms and meaning-changing edits rather than correcting every minor issue before the message is complete."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Past-participle agreement in common written accounts",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "With être",
+          "past participle agrees with subject",
+          "Les bénévoles sont arrivés à l'heure.",
+          "The volunteers arrived on time."
+        ],
+        [
+          "With avoir; object after",
+          "no agreement in this pattern",
+          "J'ai reçu les consignes.",
+          "I received the instructions."
+        ],
+        [
+          "With avoir; direct object before",
+          "agree with preceding direct object",
+          "Les consignes que j'ai reçues étaient utiles.",
+          "The instructions I received were useful."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the correct form: Les participantes sont ___.",
+      "options": [
+        "arrivé",
+        "arriver",
+        "arrivés",
+        "arrivées"
+      ],
+      "answer": 3,
+      "explain": "The participle with être agrees with the feminine plural subject."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the correct form: Les informations que j'ai ___ étaient utiles.",
+      "options": [
+        "reçu",
+        "reçus",
+        "reçues",
+        "recevoir"
+      ],
+      "answer": 2,
+      "explain": "The direct object les informations appears before ai reçu, so the participle agrees."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the usual form: J'ai ___ les documents hier.",
+      "options": [
+        "envoyé",
+        "envoyées",
+        "envoyer",
+        "envoyés"
+      ],
+      "answer": 0,
+      "explain": "With avoir and the direct object after the verb, there is no agreement here."
+    }
+  ]
+}

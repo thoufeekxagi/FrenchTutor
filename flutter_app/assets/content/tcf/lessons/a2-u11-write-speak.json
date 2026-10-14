@@ -1,0 +1,42 @@
+{
+  "id": "a2-u11-write-speak",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Explain the problem and ask for a next step",
+      "body": "Write 60–90 French words to an unfamiliar service contact. State one problem, give a useful detail such as a tracking or confirmation number, make one polite request with pourriez-vous or je voudrais, and ask when or how you will receive a response. This is an original learning task, not a full official TCF writing task.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour, Je n'ai pas reçu le colis. Voici le numéro de suivi : 4071. Pourriez-vous vérifier la confirmation de livraison et me dire quel est le prochain créneau ? Je voudrais une réponse écrite, s'il vous plaît. Je peux prendre le colis jeudi après 14 h. Merci de confirmer le délai de traitement et la prochaine étape. Merci, Nadia\n\nCheck:\n• State one problem clearly and include a useful detail.\n• Make one specific request with a polite conditional form.\n• Ask for one clear next step or time.\n• Use an appropriate greeting and sign-off for an unfamiliar contact.\n• Write 60–90 words, then close the example and retry with a repair or form problem."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Explain a service problem to Marie",
+      "body": "Role-play a short exchange with Marie as an unfamiliar service contact. Choose a missing delivery, bill question, incomplete form or repair request. Give one detail, ask for one action politely and confirm what happens next. Marie then changes one condition; adapt without reading a prepared script.\n\n• Use vous in the service role-play unless the relationship is clearly familiar.\n• Give the problem before asking for an action.\n• Ask one polite question at a time, then listen for the answer.\n• Repeat the next step in your own words so you can confirm it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour. Il y a une fuite d'eau près du robinet. Pourriez-vous confirmer le rendez-vous d'entretien ? Je voudrais une réponse écrite avec le délai de traitement.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Dois-je attacher une photo à ma demande ? Merci. Je confirme : vous m'envoyez la date demain ?",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

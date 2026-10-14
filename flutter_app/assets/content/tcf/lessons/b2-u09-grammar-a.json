@@ -1,0 +1,99 @@
+{
+  "id": "b2-u09-grammar-a",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Grammar: Nominalization and impersonal phrasing: sound concise without hiding the claim",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Nominalization and impersonal phrasing: sound concise without hiding the claim",
+      "body": "Formal reports often turn actions into nouns (les coûts augmentent → une hausse des coûts). Nominalization can make a comparison concise, but too many abstract nouns can hide who did what. Use an impersonal phrase (il semble que, il est possible que) to mark a cautious interpretation, not to avoid naming a source. Keep the actor or evidence visible when it matters: les ménages interrogés signalent… Before using a noun phrase, ask whether a clear verb would be easier to understand."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Nominalization and impersonal phrasing: sound concise without hiding the claim",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Direct verb",
+          "subject + verb",
+          "Les frais ont augmenté pendant la période.",
+          "Costs increased during the period."
+        ],
+        [
+          "Nominalized",
+          "noun phrase",
+          "Une hausse des frais a été observée.",
+          "An increase in costs was observed."
+        ],
+        [
+          "Impersonal caution",
+          "il semble que + subjunctive",
+          "Il semble que les coûts soient plus élevés.",
+          "It appears that costs are higher."
+        ],
+        [
+          "Source visible",
+          "according to + source",
+          "Selon les ménages interrogés, le transport coûte davantage.",
+          "According to the households surveyed, transportation costs more."
+        ],
+        [
+          "Limit of evidence",
+          "ne pas permettre de + infinitive",
+          "Les chiffres ne permettent pas de prévoir chaque dépense.",
+          "The figures do not allow every expense to be predicted."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which version makes the actor clear?",
+      "options": [
+        "Il y a une hausse, car demain.",
+        "Une hausse fut opérée par le signalement.",
+        "Les ménages interrogés signalent une hausse.",
+        "La hausse est une moyenne de contrat."
+      ],
+      "answer": 2,
+      "explain": "The direct sentence names who reported the increase."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does il semble que do?",
+      "options": [
+        "Names a sample",
+        "Marks a cautious interpretation",
+        "Introduces a past event",
+        "Proves the statement"
+      ],
+      "answer": 1,
+      "explain": "It presents an interpretation cautiously; evidence still matters."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why avoid too many nominalizations?",
+      "options": [
+        "They can hide who did what",
+        "They cannot be used in writing",
+        "They make every claim false",
+        "They always change a noun's gender"
+      ],
+      "answer": 0,
+      "explain": "A dense series of abstract nouns can obscure the actor and action."
+    }
+  ]
+}

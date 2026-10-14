@@ -1,0 +1,42 @@
+{
+  "id": "a2-u10-write-speak",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Agree on amounts for a shared meal",
+      "body": "Write 60–90 French words to a classmate. Suggest two foods and exact quantities, say whether one product fits a preference, and ask the other person to bring one item. Use en at least twice while keeping amounts clear. Use fictional prices if you mention them.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour Nadia, Pour le repas, je prends un sachet de lentilles et une conserve de tomates. J'en prends un paquet, et je vais aussi acheter une barquette de fraises. Le plat préparé n'est pas un bon choix pour le groupe; je vais en choisir un autre. Peux-tu apporter un litre de lait végétal ? Le prix au kilo des lentilles est sur l'étiquette. Je garde le reçu détaillé dans mon sac. Merci, Karim\n\nCheck:\n• Name the food before replacing it with en.\n• Keep the number, package or measurement after en when it matters.\n• Use a clear quantity and make the request easy to act on.\n• Check that a preference or restriction is described neutrally, without making health claims.\n• Write 60–90 words and rewrite once with different foods and amounts."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Choose a basket for the meal",
+      "body": "Explain to Marie which two items you will buy and how much of each. Compare one price or package and check that the choice fits the stated preference. Marie changes one item; respond with a new amount using en. Retry with an unfamiliar product and no written model.\n\n• Say the food once so en has a clear reference.\n• Keep the amount after en: j'en prends deux; j'en prends un paquet.\n• Explain one reason for choosing the product, such as the amount or price information.\n• If Marie changes the item, name it clearly before using en in the new answer."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je prends un sachet de lentilles et deux barquettes de fraises. J'en prends un sachet pour le repas. Le lot de yaourts est en promotion, mais le prix au kilo des lentilles est plus bas.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Le plat préparé n'est pas un bon choix pour le groupe; je vais en choisir un autre.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

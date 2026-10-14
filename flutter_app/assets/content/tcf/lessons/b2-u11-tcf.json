@@ -1,0 +1,72 @@
+{
+  "id": "b2-u11-tcf",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le tarif comprend les outils, mais pas le cahier. Les participants peuvent apporter le leur ou en acheter un sur place.",
+      "question": "What is not included in the price?",
+      "options": [
+        "The workbook",
+        "The room",
+        "The instructor",
+        "The tools"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the workbook is not included."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Pourriez-vous me dire à quelle date la prochaine séance commence ? Elle commence le 12, si la salle reste disponible.",
+      "question": "What condition affects the date?",
+      "options": [
+        "Whether the learner brings a workbook",
+        "Whether the room remains available",
+        "Whether registration is online",
+        "Whether the instructor travels"
+      ],
+      "answer": 1,
+      "explain": "The date depends on the room's availability."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should participants bring?",
+      "options": [
+        "A notebook",
+        "A supporting document",
+        "A camera supplied by the organizer",
+        "A reservation receipt"
+      ],
+      "answer": 0,
+      "explain": "The notice asks participants to bring a notebook.",
+      "promptFr": "Atelier fictif : initiation à la photographie, samedi de 10 h à 12 h. Tarif : 15 $. Les outils de base sont fournis; les participants apportent leur cahier. Réservation conseillée, mais non obligatoire. Pour les demandes d'annulation ou d'accessibilité, écrire à la personne-ressource indiquée dans la confirmation. L'horaire pourrait changer si la salle devient indisponible."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What information is missing?",
+      "options": [
+        "The contact person's role",
+        "Whether travel costs are reimbursed",
+        "The workshop price",
+        "The listed schedule"
+      ],
+      "answer": 1,
+      "explain": "The brochure does not say whether travel costs are reimbursed.",
+      "promptFr": "La brochure précise le prix et l'horaire, mais elle ne dit pas si les frais de déplacement sont remboursés. Elle renvoie les questions sur l'accessibilité à la personne-ressource. Le texte invite donc les lecteurs à demander ces détails directement plutôt qu'à les supposer."
+    }
+  ]
+}

@@ -1,0 +1,343 @@
+{
+  "id": "b1-les-questions-de-nadia",
+  "title": "Les questions de Nadia",
+  "titleEn": "Nadia's questions",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "Nadia calls a fictional training centre, clarifies an application step and checks the detail that remains uncertain.",
+  "unit": "b1-u08",
+  "sentences": [
+    {
+      "fr": "Nadia avait trouvé une formation qui correspondait à son expérience, mais la page d'inscription restait vague.",
+      "en": "Nadia had found a program that matched her experience, but the registration page was still vague."
+    },
+    {
+      "fr": "Elle a appelé le centre pour savoir si une entrevue était obligatoire avant le dépôt du dossier.",
+      "en": "She called the centre to ask whether an interview was required before submitting the application."
+    },
+    {
+      "fr": "La conseillère lui a expliqué que l'entrevue servait à vérifier les objectifs et les besoins de chaque personne.",
+      "en": "The adviser explained that the interview was used to discuss each person's goals and needs."
+    },
+    {
+      "fr": "Nadia a ensuite demandé quels documents elle devait apporter et si une copie numérique suffisait.",
+      "en": "Nadia then asked which documents she should bring and whether a digital copy was enough."
+    },
+    {
+      "fr": "La réponse était claire pour les relevés, mais la conseillère devait vérifier la règle sur les attestations étrangères.",
+      "en": "The answer was clear for transcripts, but the adviser needed to check the rule for foreign certificates."
+    },
+    {
+      "fr": "Nadia a demandé qu'on lui confirme cette dernière information par courriel.",
+      "en": "Nadia asked for that final piece of information to be confirmed by email."
+    },
+    {
+      "fr": "Avant de raccrocher, elle a résumé les étapes et vérifié la date limite de la demande.",
+      "en": "Before hanging up, she summarized the steps and checked the application deadline.",
+      "note": "When an answer is uncertain, ask for a written confirmation and repeat the next steps before ending the call."
+    }
+  ],
+  "words": {
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "name"
+    },
+    "avait": {
+      "en": "had"
+    },
+    "trouvé": {
+      "en": "found (trouver)",
+      "pos": "verb"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "formation": {
+      "en": "training program"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "correspondait": {
+      "en": "matched"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "expérience": {
+      "en": "experience",
+      "sound": "lehk-spay-ree-AH(N)S"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "page": {
+      "en": "page"
+    },
+    "d'inscription": {
+      "en": "of registration"
+    },
+    "restait": {
+      "en": "remained"
+    },
+    "vague": {
+      "en": "vague; unclear"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "appelé": {
+      "en": "called"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "savoir": {
+      "en": "to know"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "entrevue": {
+      "en": "interview"
+    },
+    "était": {
+      "en": "was"
+    },
+    "obligatoire": {
+      "en": "required; mandatory"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "dépôt": {
+      "en": "submission; deposit"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "dossier": {
+      "en": "a file"
+    },
+    "conseillère": {
+      "en": "adviser"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "expliqué": {
+      "en": "explained"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "l'entrevue": {
+      "en": "the interview"
+    },
+    "servait": {
+      "en": "served; was used for"
+    },
+    "vérifier": {
+      "en": "to check, verify",
+      "sound": "vay-ree-FYAY"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "objectifs": {
+      "en": "goals; objectives"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "besoins": {
+      "en": "needs"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "chaque": {
+      "en": "each; every"
+    },
+    "personne": {
+      "en": "person"
+    },
+    "ensuite": {
+      "en": "then, next",
+      "sound": "ah(n)-SWEET"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "quels": {
+      "en": "which; what (masculine plural)"
+    },
+    "documents": {
+      "en": "documents"
+    },
+    "devait": {
+      "en": "had to; was supposed to"
+    },
+    "apporter": {
+      "en": "to bring",
+      "sound": "ah-pohr-TAY"
+    },
+    "copie": {
+      "en": "copy"
+    },
+    "numérique": {
+      "en": "digital"
+    },
+    "suffisait": {
+      "en": "was enough"
+    },
+    "réponse": {
+      "en": "answer"
+    },
+    "claire": {
+      "en": "clear"
+    },
+    "relevés": {
+      "en": "transcripts; statements"
+    },
+    "règle": {
+      "en": "rule"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "attestations": {
+      "en": "certificates; attestations"
+    },
+    "étrangères": {
+      "en": "foreign"
+    },
+    "qu'on": {
+      "en": "we, one",
+      "sound": "oh(n)"
+    },
+    "confirme": {
+      "en": "confirms"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "dernière": {
+      "en": "last; final"
+    },
+    "information": {
+      "en": "information"
+    },
+    "par": {
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    "courriel": {
+      "en": "email",
+      "sound": "koo-ree-EL"
+    },
+    "raccrocher": {
+      "en": "to hang up"
+    },
+    "résumé": {
+      "en": "summary"
+    },
+    "étapes": {
+      "en": "steps"
+    },
+    "vérifié": {
+      "en": "checked"
+    },
+    "date": {
+      "en": "date"
+    },
+    "limite": {
+      "en": "limit; deadline",
+      "pos": "noun, feminine"
+    },
+    "demande": {
+      "en": "asks for (demander)",
+      "pos": "verb"
+    }
+  },
+  "keywords": [
+    "formation",
+    "entrevue",
+    "dossier",
+    "documents",
+    "attestations",
+    "courriel",
+    "étapes"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why did Nadia call the training centre?",
+      "options": [
+        "She needed to change her work schedule",
+        "The registration page did not clearly explain the process",
+        "The centre had lost her application",
+        "She wanted to cancel a finished course"
+      ],
+      "answer": 1,
+      "explain": "The first sentence says the registration page was vague."
+    },
+    {
+      "prompt": "What point still needed to be checked?",
+      "options": [
+        "The rule about foreign certificates",
+        "Whether transcripts existed",
+        "The centre's street address",
+        "The date of Nadia's interview"
+      ],
+      "answer": 0,
+      "explain": "The adviser still had to verify the rule for foreign certificates."
+    },
+    {
+      "prompt": "How did Nadia make sure she understood the next steps?",
+      "options": [
+        "She sent the same form twice",
+        "She asked another applicant to decide",
+        "She summarized them and checked the deadline",
+        "She ended the call before hearing the answer"
+      ],
+      "answer": 2,
+      "explain": "The final sentence gives both actions."
+    }
+  ]
+}

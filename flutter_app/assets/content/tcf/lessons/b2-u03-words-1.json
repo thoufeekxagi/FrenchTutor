@@ -1,0 +1,148 @@
+{
+  "id": "b2-u03-words-1",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un préalable",
+      "en": "a prerequisite",
+      "sound": "uh(n) pray-ah-LAHBL",
+      "exampleFr": "Le cours exige un préalable en rédaction.",
+      "exampleEn": "The course requires a writing prerequisite."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une compétence",
+      "en": "a skill; a competency",
+      "sound": "ün kohn-pay-TAH(N)S",
+      "exampleFr": "La candidature décrit une compétence transférable.",
+      "exampleEn": "The application describes a transferable skill."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un parcours",
+      "en": "a pathway; a career or study route",
+      "sound": "uh(n) par-KOOR",
+      "exampleFr": "Son parcours combine travail et études.",
+      "exampleEn": "Her pathway combines work and study."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une candidature",
+      "en": "an application",
+      "sound": "ün kohn-dee-dah-TÜHR",
+      "exampleFr": "Il prépare une candidature pour le programme.",
+      "exampleEn": "He is preparing an application for the program."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un échéancier",
+      "en": "a timeline; schedule",
+      "sound": "uh(n) ay-shay-ahn-SYAY",
+      "exampleFr": "L'échéancier prévoit des étapes mensuelles.",
+      "exampleEn": "The timeline includes monthly steps."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un mentor",
+      "en": "a mentor",
+      "sound": "uh(n) mahn-TOR",
+      "exampleFr": "La personne qui l'accompagne est son mentor.",
+      "exampleEn": "The person supporting her is her mentor."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un préalable",
+      "options": [
+        "an application",
+        "a prerequisite",
+        "a skill; a competency",
+        "a pathway; a career or study route"
+      ],
+      "answer": 1,
+      "explain": "un préalable means a prerequisite."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une compétence",
+      "options": [
+        "a timeline; schedule",
+        "a pathway; a career or study route",
+        "an application",
+        "a skill; a competency"
+      ],
+      "answer": 3,
+      "explain": "une compétence means a skill; a competency."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un parcours",
+      "options": [
+        "a mentor",
+        "a pathway; a career or study route",
+        "an application",
+        "a timeline; schedule"
+      ],
+      "answer": 1,
+      "explain": "un parcours means a pathway; a career or study route."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une candidature",
+      "options": [
+        "a prerequisite",
+        "a timeline; schedule",
+        "a mentor",
+        "an application"
+      ],
+      "answer": 3,
+      "explain": "une candidature means an application."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un échéancier",
+      "options": [
+        "a skill; a competency",
+        "a timeline; schedule",
+        "a mentor",
+        "a prerequisite"
+      ],
+      "answer": 1,
+      "explain": "un échéancier means a timeline; schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un mentor",
+      "options": [
+        "a pathway; a career or study route",
+        "a prerequisite",
+        "a skill; a competency",
+        "a mentor"
+      ],
+      "answer": 3,
+      "explain": "un mentor means a mentor."
+    }
+  ]
+}

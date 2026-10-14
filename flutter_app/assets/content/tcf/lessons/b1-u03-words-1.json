@@ -1,0 +1,148 @@
+{
+  "id": "b1-u03-words-1",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une proposition",
+      "en": "a proposal",
+      "sound": "ün proh-poh-zee-SYOH(N)",
+      "exampleFr": "Sa proposition permettrait à plus de personnes de participer.",
+      "exampleEn": "Her proposal would let more people take part."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une contrainte",
+      "en": "a constraint",
+      "sound": "ün kohn-TREHNT",
+      "exampleFr": "Le transport constitue une contrainte pour certains membres.",
+      "exampleEn": "Transportation is a constraint for some members."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un compromis",
+      "en": "a compromise",
+      "sound": "uh(n) kohn-proh-MEE",
+      "exampleFr": "Un compromis pourrait satisfaire les deux groupes.",
+      "exampleEn": "A compromise could satisfy both groups."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une préférence",
+      "en": "a preference",
+      "sound": "ün pray-fay-RAH(N)S",
+      "exampleFr": "Chacun peut expliquer sa préférence.",
+      "exampleEn": "Everyone can explain their preference."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une disponibilité",
+      "en": "availability",
+      "sound": "ün dee-spoh-nee-bee-lee-TAY",
+      "exampleFr": "Le sondage vérifierait les disponibilités.",
+      "exampleEn": "The survey would check availability."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une option",
+      "en": "an option",
+      "sound": "ün op-SYOH(N)",
+      "exampleFr": "Une option en ligne serait plus accessible pour elle.",
+      "exampleEn": "An online option would be more accessible for her."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une proposition",
+      "options": [
+        "a preference",
+        "a proposal",
+        "a constraint",
+        "a compromise"
+      ],
+      "answer": 1,
+      "explain": "une proposition means a proposal."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une contrainte",
+      "options": [
+        "availability",
+        "a compromise",
+        "a preference",
+        "a constraint"
+      ],
+      "answer": 3,
+      "explain": "une contrainte means a constraint."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un compromis",
+      "options": [
+        "an option",
+        "a compromise",
+        "a preference",
+        "availability"
+      ],
+      "answer": 1,
+      "explain": "un compromis means a compromise."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une préférence",
+      "options": [
+        "a proposal",
+        "availability",
+        "an option",
+        "a preference"
+      ],
+      "answer": 3,
+      "explain": "une préférence means a preference."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une disponibilité",
+      "options": [
+        "a constraint",
+        "availability",
+        "an option",
+        "a proposal"
+      ],
+      "answer": 1,
+      "explain": "une disponibilité means availability."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une option",
+      "options": [
+        "a compromise",
+        "a proposal",
+        "a constraint",
+        "an option"
+      ],
+      "answer": 3,
+      "explain": "une option means an option."
+    }
+  ]
+}

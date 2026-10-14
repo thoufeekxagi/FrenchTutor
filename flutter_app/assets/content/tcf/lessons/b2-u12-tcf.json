@@ -1,0 +1,72 @@
+{
+  "id": "b2-u12-tcf",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le premier document propose de rendre les horaires plus souples. Le second craint que les changements fréquents compliquent l'organisation des équipes.",
+      "question": "What is the difference between the viewpoints?",
+      "options": [
+        "Evening classes versus daytime exams",
+        "Flexibility versus predictability for teams",
+        "Online access versus printed material",
+        "Cost versus environmental impact"
+      ],
+      "answer": 1,
+      "explain": "The first values flexibility; the second worries about organization."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Les deux intervenants souhaitent que l'information soit plus claire. Ils ne s'entendent pas sur la meilleure façon de la diffuser.",
+      "question": "What do both speakers agree on?",
+      "options": [
+        "Only one channel should be used",
+        "The topic should be removed",
+        "Information should be clearer",
+        "The current notice is final"
+      ],
+      "answer": 2,
+      "explain": "Both want clearer information."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "On what do the two documents agree?",
+      "options": [
+        "Offline access is unnecessary",
+        "Only one digital option is needed",
+        "No data should be collected",
+        "Processes should be clear"
+      ],
+      "answer": 3,
+      "explain": "Both documents say processes should be clear.",
+      "promptFr": "Document A — Une plateforme commune réduirait le nombre de démarches et permettrait de mettre à jour les renseignements plus rapidement. Un seul point d'accès simplifierait le suivi pour les utilisateurs qui maîtrisent déjà les outils numériques. Document B — Une plateforme unique ne convient pas à toutes les situations. Il faut maintenir une option hors ligne et expliquer quelles données sont conservées. Les auteurs des deux textes souhaitent que les démarches soient claires; ils divergent sur le nombre de voies d'accès à proposer."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What can the reader conclude from the documents?",
+      "options": [
+        "Both documents report the same result",
+        "Centralization has failed",
+        "The consequences are hypotheses, not measured outcomes",
+        "The system has already been tested"
+      ],
+      "answer": 2,
+      "explain": "The texts present possible consequences but give no results from a trial.",
+      "promptFr": "Document A — La centralisation pourrait réduire les répétitions. Document B — La centralisation pourrait aussi créer un point de défaillance unique. Les deux idées sont présentées comme des possibilités; aucun résultat d'essai n'est fourni. Le lecteur ne peut donc pas conclure que l'une de ces conséquences s'est déjà produite."
+    }
+  ]
+}

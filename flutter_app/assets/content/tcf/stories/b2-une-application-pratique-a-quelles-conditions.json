@@ -1,0 +1,383 @@
+{
+  "id": "b2-une-application-pratique-a-quelles-conditions",
+  "title": "Une application pratique, à quelles conditions ?",
+  "titleEn": "A useful app, under what conditions?",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "A nonprofit weighs the convenience of a digital booking tool against privacy, access and support for people without reliable internet.",
+  "unit": "b2-u06",
+  "sentences": [
+    {
+      "fr": "Une association voulait remplacer son formulaire papier par un outil de réservation en ligne.",
+      "en": "An association wanted to replace its paper form with an online booking tool."
+    },
+    {
+      "fr": "L'outil permettrait aux membres de choisir une heure sans téléphoner, ce qui simplifierait certaines demandes.",
+      "en": "The tool would let members choose a time without calling, which would simplify some requests."
+    },
+    {
+      "fr": "Toutefois, le comité ignorait combien de renseignements personnels seraient conservés et pendant combien de temps.",
+      "en": "However, the committee did not know how much personal information would be stored or for how long."
+    },
+    {
+      "fr": "Une bénévole a aussi rappelé que certains membres utilisaient un téléphone partagé ou une connexion limitée.",
+      "en": "A volunteer also noted that some members used a shared phone or had limited internet access."
+    },
+    {
+      "fr": "L'association a demandé au fournisseur comment supprimer les dossiers, limiter les accès et offrir une solution hors ligne.",
+      "en": "The association asked the provider how to delete records, limit access and offer an offline option."
+    },
+    {
+      "fr": "Le fournisseur a répondu à deux questions, mais n'a pas encore confirmé la durée de conservation.",
+      "en": "The provider answered two questions but had not yet confirmed the retention period."
+    },
+    {
+      "fr": "Le comité a reporté sa décision jusqu'à ce que cette information soit claire et qu'une option sans téléphone soit prévue.",
+      "en": "The committee postponed its decision until that information was clear and an option without a phone was planned.",
+      "note": "A digital service should be evaluated for privacy and for people who cannot use its preferred device or connection."
+    }
+  ],
+  "words": {
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "association": {
+      "en": "association; organization"
+    },
+    "voulait": {
+      "en": "wanted"
+    },
+    "remplacer": {
+      "en": "to replace",
+      "sound": "rah(n)-plah-SAY"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "formulaire": {
+      "en": "form"
+    },
+    "papier": {
+      "en": "paper"
+    },
+    "par": {
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "outil": {
+      "en": "tool"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "réservation": {
+      "en": "reservation; booking"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "ligne": {
+      "en": "line, route"
+    },
+    "l'outil": {
+      "en": "the tool"
+    },
+    "permettrait": {
+      "en": "would allow"
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "membres": {
+      "en": "members"
+    },
+    "choisir": {
+      "en": "to choose",
+      "sound": "shwah-ZEER"
+    },
+    "heure": {
+      "en": "hour; time on a clock",
+      "sound": "luhR"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "téléphoner": {
+      "en": "to phone, to call",
+      "sound": "tay-lay-foh-NAY"
+    },
+    "ce": {
+      "en": "this; that (masculine)",
+      "pos": "determiner"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "simplifierait": {
+      "en": "would simplify"
+    },
+    "certaines": {
+      "en": "some"
+    },
+    "demandes": {
+      "en": "requests"
+    },
+    "toutefois": {
+      "en": "however"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "comité": {
+      "en": "committee"
+    },
+    "ignorait": {
+      "en": "did not know"
+    },
+    "combien": {
+      "en": "how much, how many",
+      "sound": "koh(n)-BYA(N)"
+    },
+    "renseignements": {
+      "en": "information; details"
+    },
+    "personnels": {
+      "en": "personal"
+    },
+    "seraient": {
+      "en": "would be"
+    },
+    "conservés": {
+      "en": "kept; retained"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "pendant": {
+      "en": "during; while"
+    },
+    "temps": {
+      "en": "weather"
+    },
+    "bénévole": {
+      "en": "a volunteer"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "rappelé": {
+      "en": "reminded"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "certains": {
+      "en": "some"
+    },
+    "utilisaient": {
+      "en": "used"
+    },
+    "téléphone": {
+      "en": "telephone"
+    },
+    "partagé": {
+      "en": "shared"
+    },
+    "ou": {
+      "en": "or",
+      "sound": "oo"
+    },
+    "connexion": {
+      "en": "connection"
+    },
+    "limitée": {
+      "en": "limited"
+    },
+    "l'association": {
+      "en": "the association"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "fournisseur": {
+      "en": "a supplier; provider"
+    },
+    "comment": {
+      "en": "how",
+      "sound": "koh-MAH(N)"
+    },
+    "supprimer": {
+      "en": "to delete; to remove"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "dossiers": {
+      "en": "files; records"
+    },
+    "limiter": {
+      "en": "to limit"
+    },
+    "accès": {
+      "en": "access"
+    },
+    "offrir": {
+      "en": "to offer"
+    },
+    "solution": {
+      "en": "solution"
+    },
+    "hors": {
+      "en": "outside; without"
+    },
+    "répondu": {
+      "en": "answered"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "questions": {
+      "en": "questions"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "n'a": {
+      "en": "does not have",
+      "pos": "verb"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "encore": {
+      "en": "again, still",
+      "sound": "ah(n)-KOHR"
+    },
+    "confirmé": {
+      "en": "confirmed",
+      "sound": "kohn-feer-MAY"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "durée": {
+      "en": "duration",
+      "pos": "noun, feminine"
+    },
+    "conservation": {
+      "en": "retention; preservation"
+    },
+    "reporté": {
+      "en": "postponed"
+    },
+    "sa": {
+      "en": "his; her (feminine noun)",
+      "pos": "possessive"
+    },
+    "décision": {
+      "en": "decision"
+    },
+    "jusqu'à": {
+      "en": "until, up to",
+      "sound": "zhüs-kah"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "information": {
+      "en": "information"
+    },
+    "soit": {
+      "en": "be; whether"
+    },
+    "claire": {
+      "en": "clear"
+    },
+    "qu'une": {
+      "en": "that a; than a (feminine)"
+    },
+    "option": {
+      "en": "option"
+    },
+    "prévue": {
+      "en": "planned; scheduled"
+    }
+  },
+  "keywords": [
+    "association",
+    "outil",
+    "demandes",
+    "renseignements",
+    "connexion",
+    "solution",
+    "décision"
+  ],
+  "quiz": [
+    {
+      "prompt": "What was one expected benefit of the online tool?",
+      "options": [
+        "Every member already had reliable internet",
+        "Members could choose a time without calling",
+        "The association could stop offering appointments",
+        "All personal data would disappear automatically"
+      ],
+      "answer": 1,
+      "explain": "The second sentence states the expected convenience."
+    },
+    {
+      "prompt": "What information had the provider not confirmed?",
+      "options": [
+        "How long records would be kept",
+        "The association's opening date",
+        "Whether the tool had a calendar",
+        "Whether members could call"
+      ],
+      "answer": 0,
+      "explain": "The sixth sentence names the unanswered retention question."
+    },
+    {
+      "prompt": "Why did the committee delay its decision?",
+      "options": [
+        "The provider had closed permanently",
+        "The tool had already been installed",
+        "It still needed clear data-retention information and a non-phone option",
+        "The members had rejected every digital service"
+      ],
+      "answer": 2,
+      "explain": "The final sentence gives both conditions for deciding."
+    }
+  ]
+}

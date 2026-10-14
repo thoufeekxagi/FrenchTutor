@@ -1,0 +1,148 @@
+{
+  "id": "b1-u06-words-4",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "puisque",
+      "en": "since; given that",
+      "sound": "pü-eess-kuh",
+      "exampleFr": "Puisque le pont est fermé, l'autobus suit un détour.",
+      "exampleEn": "Since the bridge is closed, the bus follows a detour."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "malgré",
+      "en": "despite",
+      "sound": "mahl-gray",
+      "exampleFr": "Malgré la pluie, le chantier avance.",
+      "exampleEn": "Despite the rain, construction is progressing."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "en raison de",
+      "en": "because of; due to",
+      "sound": "ahn reh-zohn duh",
+      "exampleFr": "Le trajet a changé en raison des travaux.",
+      "exampleEn": "The route changed because of the construction."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "par conséquent",
+      "en": "as a result",
+      "sound": "par kohn-say-KAH(N)",
+      "exampleFr": "La rue est inaccessible; par conséquent, l'arrêt a été déplacé.",
+      "exampleEn": "The street is inaccessible; as a result, the stop was moved."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un facteur déterminant",
+      "en": "a determining factor",
+      "sound": "uh(n) fahk-tuhr day-tehr-mee-NAHN",
+      "exampleFr": "Le coût est un facteur déterminant dans cette décision.",
+      "exampleEn": "Cost is a determining factor in this decision."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un effet direct",
+      "en": "a direct effect",
+      "sound": "uh(n) ay-FEH dee-REHK",
+      "exampleFr": "La fermeture a un effet direct sur le service du soir.",
+      "exampleEn": "The closure has a direct effect on evening service."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "puisque",
+      "options": [
+        "as a result",
+        "since; given that",
+        "despite",
+        "because of; due to"
+      ],
+      "answer": 1,
+      "explain": "puisque means since; given that."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "malgré",
+      "options": [
+        "a determining factor",
+        "because of; due to",
+        "as a result",
+        "despite"
+      ],
+      "answer": 3,
+      "explain": "malgré means despite."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "en raison de",
+      "options": [
+        "a direct effect",
+        "because of; due to",
+        "as a result",
+        "a determining factor"
+      ],
+      "answer": 1,
+      "explain": "en raison de means because of; due to."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "par conséquent",
+      "options": [
+        "since; given that",
+        "a determining factor",
+        "a direct effect",
+        "as a result"
+      ],
+      "answer": 3,
+      "explain": "par conséquent means as a result."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un facteur déterminant",
+      "options": [
+        "despite",
+        "a determining factor",
+        "a direct effect",
+        "since; given that"
+      ],
+      "answer": 1,
+      "explain": "un facteur déterminant means a determining factor."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un effet direct",
+      "options": [
+        "because of; due to",
+        "since; given that",
+        "despite",
+        "a direct effect"
+      ],
+      "answer": 3,
+      "explain": "un effet direct means a direct effect."
+    }
+  ]
+}

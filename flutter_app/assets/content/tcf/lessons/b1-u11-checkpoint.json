@@ -1,0 +1,75 @@
+{
+  "id": "b1-u11-checkpoint",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the official TCF writing Task 2 range?",
+      "options": [
+        "200–250 words",
+        "120–150 words",
+        "120–180 words",
+        "60–120 words"
+      ],
+      "answer": 1,
+      "explain": "Task 2 requires 120 to 150 words."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should be checked before fine grammar edits?",
+      "options": [
+        "Whether every word is advanced",
+        "Whether each line is a question",
+        "Whether the title is long",
+        "Whether the task is fully answered"
+      ],
+      "answer": 3,
+      "explain": "Task completion and meaning come first."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which form agrees with les informations before the verb?",
+      "options": [
+        "Les informations que j'ai reçues",
+        "Les informations que j'ai reçus",
+        "Les informations que j'ai recevoir",
+        "Les informations que j'ai reçu"
+      ],
+      "answer": 0,
+      "explain": "The preceding feminine plural direct object triggers agreement."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which task asks for an account with relevant comments or reasons?",
+      "options": [
+        "Writing Task 3",
+        "Oral Task 1",
+        "Writing Task 2",
+        "Oral Task 3"
+      ],
+      "answer": 2,
+      "explain": "Writing Task 2 is an account or narrative with comments or arguments."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is an effective revision?",
+      "options": [
+        "Ignore the word range",
+        "Remove an off-topic sentence and restore a missing prompt point",
+        "Add a difficult word without checking meaning",
+        "Copy the model paragraph"
+      ],
+      "answer": 1,
+      "explain": "Revise for relevance and prompt coverage before polishing style."
+    }
+  ]
+}

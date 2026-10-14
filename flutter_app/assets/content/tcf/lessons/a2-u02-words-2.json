@@ -1,0 +1,194 @@
+{
+  "id": "a2-u02-words-2",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Words: classes and events",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un devoir",
+      "en": "an assignment; homework",
+      "sound": "uh(n) duh-VWAHR",
+      "exampleFr": "Le devoir est presque terminé.",
+      "exampleEn": "The assignment is almost finished."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un exposé",
+      "en": "a presentation",
+      "sound": "uh(n) ehk-poh-ZAY",
+      "exampleFr": "Mon exposé porte sur le logement.",
+      "exampleEn": "My presentation is about housing."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un résultat",
+      "en": "a result",
+      "sound": "uh(n) ray-zül-TAH",
+      "exampleFr": "Le résultat arrive vendredi.",
+      "exampleEn": "The result arrives Friday."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un projet",
+      "en": "a project",
+      "sound": "uh(n) proh-ZHEH",
+      "exampleFr": "Notre projet commence en avril.",
+      "exampleEn": "Our project starts in April."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une sortie scolaire",
+      "en": "a school outing",
+      "sound": "ün sor-TEE skoh-LEHR",
+      "exampleFr": "La sortie scolaire dure une journée.",
+      "exampleEn": "The school outing lasts one day."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une visite guidée",
+      "en": "a guided tour",
+      "sound": "ün vee-ZEET gee-DAY",
+      "exampleFr": "La visite guidée commence à dix heures.",
+      "exampleEn": "The guided tour starts at ten."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une réservation",
+      "en": "a reservation",
+      "sound": "ün ray-zehr-vah-SYOH(N)",
+      "exampleFr": "La réservation est à mon nom.",
+      "exampleEn": "The reservation is in my name."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un rendez-vous de suivi",
+      "en": "a follow-up appointment",
+      "sound": "uh(n) rah(n)-day-VOO duh swee-VEE",
+      "exampleFr": "Mon rendez-vous de suivi est lundi.",
+      "exampleEn": "My follow-up appointment is Monday."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un devoir",
+      "options": [
+        "a project",
+        "an assignment; homework",
+        "a reservation",
+        "a presentation"
+      ],
+      "answer": 1,
+      "explain": "un devoir means an assignment; homework."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un exposé",
+      "options": [
+        "a school outing",
+        "a follow-up appointment",
+        "a result",
+        "a presentation"
+      ],
+      "answer": 3,
+      "explain": "un exposé means a presentation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un résultat",
+      "options": [
+        "a guided tour",
+        "a result",
+        "an assignment; homework",
+        "a project"
+      ],
+      "answer": 1,
+      "explain": "un résultat means a result."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un projet",
+      "options": [
+        "a reservation",
+        "a presentation",
+        "a school outing",
+        "a project"
+      ],
+      "answer": 3,
+      "explain": "un projet means a project."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une sortie scolaire",
+      "options": [
+        "a follow-up appointment",
+        "a school outing",
+        "a result",
+        "a guided tour"
+      ],
+      "answer": 1,
+      "explain": "une sortie scolaire means a school outing."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une visite guidée",
+      "options": [
+        "an assignment; homework",
+        "a project",
+        "a reservation",
+        "a guided tour"
+      ],
+      "answer": 3,
+      "explain": "une visite guidée means a guided tour."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un exposé",
+      "question": "Which word did you hear?",
+      "options": [
+        "un projet",
+        "un exposé",
+        "un devoir",
+        "un résultat"
+      ],
+      "answer": 1,
+      "explain": "You heard un exposé: a presentation."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un résultat",
+      "question": "Which word did you hear?",
+      "options": [
+        "une réservation",
+        "un exposé",
+        "un projet",
+        "un résultat"
+      ],
+      "answer": 3,
+      "explain": "You heard un résultat: a result."
+    }
+  ]
+}

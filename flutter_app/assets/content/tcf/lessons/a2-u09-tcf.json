@@ -1,0 +1,100 @@
+{
+  "id": "a2-u09-tcf",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le trajet change aujourd'hui. L'employée indique l'arrêt provisoire près du carrefour.",
+      "question": "What should a traveller ask for?",
+      "options": [
+        "The temporary stop",
+        "The ticket price",
+        "The final destination",
+        "A reserved seat"
+      ],
+      "answer": 0,
+      "explain": "The first instruction is to ask the staff member for the temporary stop."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Nous allons au centre communautaire. Je vais leur demander l'heure de départ.",
+      "question": "Who will the speaker ask?",
+      "options": [
+        "Several people",
+        "One woman",
+        "One man",
+        "The community centre"
+      ],
+      "answer": 0,
+      "explain": "Leur refers to multiple people."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La bibliothèque est près du carrefour. Nous y allons après le cours.",
+      "question": "Where are the speakers going after class?",
+      "options": [
+        "The library",
+        "The final stop",
+        "The station office",
+        "The community centre"
+      ],
+      "answer": 0,
+      "explain": "Y refers to the previously named library."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where is the temporary stop?",
+      "options": [
+        "Near the intersection",
+        "At the main entrance",
+        "At the library",
+        "At the final stop"
+      ],
+      "answer": 0,
+      "explain": "The notice places the temporary stop near the intersection.",
+      "promptFr": "AVIS — Arrêt provisoire près du carrefour. La ligne express va au centre communautaire."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does Karim ask Nadia to give the group?",
+      "options": [
+        "The departure time",
+        "The address",
+        "A ticket",
+        "The route map"
+      ],
+      "answer": 0,
+      "explain": "The message asks Nadia to give them the departure time.",
+      "promptFr": "Bonjour Nadia, je suis au terminus. Peux-tu leur donner l'heure de départ ? Merci, Karim"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where will the group meet?",
+      "options": [
+        "At the main entrance of the community centre",
+        "At the station platform",
+        "At the public library",
+        "At the temporary stop"
+      ],
+      "answer": 0,
+      "explain": "The notice gives the community centre's main entrance as the meeting point.",
+      "promptFr": "RENDEZ-VOUS — Le groupe attend près de l'entrée principale du centre communautaire à 14 h."
+    }
+  ]
+}

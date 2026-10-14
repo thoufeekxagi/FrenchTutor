@@ -1,0 +1,72 @@
+{
+  "id": "b2-u05-tcf",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Il faut que vous confirmiez l'heure directement auprès du service. Le message d'exercice ne précise pas si les horaires ont changé.",
+      "question": "What should the learner confirm?",
+      "options": [
+        "A diagnosis from the tutor",
+        "A fictional fee",
+        "The time directly with the service",
+        "The identity of another learner"
+      ],
+      "answer": 2,
+      "explain": "The speaker says to confirm the time with the service."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je sais que le formulaire demande une date de contact. En revanche, je ne suis pas certain que le délai indiqué s'applique à chaque cas.",
+      "question": "What is the speaker uncertain about?",
+      "options": [
+        "Whether the stated time limit applies to every case",
+        "Whether the meeting happened",
+        "Whether the form asks for a date",
+        "Who filled out the form"
+      ],
+      "answer": 0,
+      "explain": "The speaker knows the form asks for a date but is unsure about the deadline's scope."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should the reader do if a detail is unclear?",
+      "options": [
+        "Assume the same rule fits every case",
+        "Treat the practice notice as official",
+        "Ask for clarification before filling in the form",
+        "Skip the meeting"
+      ],
+      "answer": 2,
+      "explain": "The notice advises asking for clarification before completing the form.",
+      "promptFr": "Avis de pratique fictif : veuillez préparer vos questions avant la rencontre. La personne responsable pourra expliquer les étapes générales, mais elle ne pourra pas confirmer chaque cas particulier sans consulter le dossier. Si un délai ou un document vous semble ambigu, demandez une précision avant de remplir le formulaire. Cet avis sert à pratiquer la lecture; il ne décrit pas les règles d'un service réel."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is Marie's role in the example?",
+      "options": [
+        "Make an official decision",
+        "Help with language and comprehension",
+        "Confirm every current rule",
+        "Replace a professional"
+      ],
+      "answer": 1,
+      "explain": "The text limits the tutor's role to language support and comprehension.",
+      "promptFr": "Dans une conversation d'apprentissage, Marie peut aider à formuler une question polie et à vérifier la compréhension d'une réponse. Elle ne connaît pas nécessairement les règles actuelles d'un service. Pour une démarche réelle, l'apprenant doit consulter la source officielle ou un professionnel compétent."
+    }
+  ]
+}

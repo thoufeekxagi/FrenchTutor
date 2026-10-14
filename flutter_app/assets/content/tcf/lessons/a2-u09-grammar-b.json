@@ -1,0 +1,87 @@
+{
+  "id": "a2-u09-grammar-b",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Grammar: Refer back to a place: y",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "In this unit, y refers to a named place with aller or être. It goes before a conjugated verb, or before the infinitive when two verbs are used.",
+      "headers": [
+        "Place named first",
+        "Short form",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Nous allons à la gare.",
+          "Nous y allons.",
+          "We are going there."
+        ],
+        [
+          "Nadia est au terminus.",
+          "Nadia y est.",
+          "Nadia is there."
+        ],
+        [
+          "Tu vas au centre communautaire ?",
+          "Tu y vas ?",
+          "Are you going there?"
+        ],
+        [
+          "Je vais retourner à la bibliothèque.",
+          "Je vais y retourner.",
+          "I am going to return there."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Refer back to a place: y",
+      "body": "• Name the place first, then use y to mean 'there': à la gare → nous y allons.\n• Place y before its verb: j'y vais; elle y est. With a second verb, place it before the infinitive: je vais y retourner.\n• In these patterns, y refers to a place, not a person. Compare je lui parle (to that person) and j'y vais (to that place).\n• This unit practises y with common location patterns. Do not assume it replaces every phrase beginning with à."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Nous allons à la bibliothèque. Nous ___ allons après le cours.",
+      "options": [
+        "y",
+        "lui",
+        "leur",
+        "la"
+      ],
+      "answer": 0,
+      "explain": "Y replaces the previously named place, à la bibliothèque."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Nadia est au terminus. Nadia ___ est.",
+      "options": [
+        "y",
+        "leur",
+        "les",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Use y to refer to the previously named place."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which sentence refers to a person?",
+      "options": [
+        "Je lui demande le quai.",
+        "J'y vais.",
+        "Elle y est.",
+        "Nous y retournons."
+      ],
+      "answer": 0,
+      "explain": "Lui refers to the person being asked; y refers to a place in these examples."
+    }
+  ]
+}

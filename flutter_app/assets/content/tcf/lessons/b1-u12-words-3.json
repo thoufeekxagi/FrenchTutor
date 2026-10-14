@@ -1,0 +1,148 @@
+{
+  "id": "b1-u12-words-3",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un impact concret",
+      "en": "a concrete impact",
+      "sound": "uh(n) ehn-pahkt kohn-KREH",
+      "exampleFr": "La nouvelle formule a eu un impact concret sur les présences.",
+      "exampleEn": "The new format had a concrete impact on attendance."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "prendre l'initiative",
+      "en": "to take the initiative",
+      "sound": "prahn-dr lee-nee-syah-TEEV",
+      "exampleFr": "Elle a pris l'initiative de vérifier l'horaire.",
+      "exampleEn": "She took the initiative to check the schedule."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un choix raisonnable",
+      "en": "a reasonable choice",
+      "sound": "uh(n) shwah reh-zoh-NAH-bl",
+      "exampleFr": "Un essai de deux semaines semble un choix raisonnable.",
+      "exampleEn": "A two-week trial seems like a reasonable choice."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une solution de rechange",
+      "en": "an alternative solution",
+      "sound": "ün soh-lü-SYOH(N) duh ruh-SHAHNZH",
+      "exampleFr": "Le centre propose une solution de rechange en ligne.",
+      "exampleEn": "The centre offers an alternative online solution."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un défi récurrent",
+      "en": "a recurring challenge",
+      "sound": "uh(n) day-FEE ray-koo-RAHN",
+      "exampleFr": "Le transport demeure un défi récurrent pour le groupe.",
+      "exampleEn": "Transportation remains a recurring challenge for the group."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une donnée vérifiable",
+      "en": "a verifiable piece of information",
+      "sound": "ün doh-NAY vay-ree-fee-AH-bl",
+      "exampleFr": "Le rapport contient une donnée vérifiable sur les horaires.",
+      "exampleEn": "The report contains verifiable information about schedules."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un impact concret",
+      "options": [
+        "an alternative solution",
+        "a concrete impact",
+        "to take the initiative",
+        "a reasonable choice"
+      ],
+      "answer": 1,
+      "explain": "un impact concret means a concrete impact."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "prendre l'initiative",
+      "options": [
+        "a recurring challenge",
+        "a reasonable choice",
+        "an alternative solution",
+        "to take the initiative"
+      ],
+      "answer": 3,
+      "explain": "prendre l'initiative means to take the initiative."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un choix raisonnable",
+      "options": [
+        "a verifiable piece of information",
+        "a reasonable choice",
+        "an alternative solution",
+        "a recurring challenge"
+      ],
+      "answer": 1,
+      "explain": "un choix raisonnable means a reasonable choice."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une solution de rechange",
+      "options": [
+        "a concrete impact",
+        "a recurring challenge",
+        "a verifiable piece of information",
+        "an alternative solution"
+      ],
+      "answer": 3,
+      "explain": "une solution de rechange means an alternative solution."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un défi récurrent",
+      "options": [
+        "to take the initiative",
+        "a recurring challenge",
+        "a verifiable piece of information",
+        "a concrete impact"
+      ],
+      "answer": 1,
+      "explain": "un défi récurrent means a recurring challenge."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une donnée vérifiable",
+      "options": [
+        "a reasonable choice",
+        "a concrete impact",
+        "to take the initiative",
+        "a verifiable piece of information"
+      ],
+      "answer": 3,
+      "explain": "une donnée vérifiable means a verifiable piece of information."
+    }
+  ]
+}

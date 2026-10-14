@@ -1,0 +1,140 @@
+{
+  "id": "a2-u11-checkpoint",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the polite request to check the tracking number.",
+      "options": [
+        "Pourriez-vous vérifier le numéro de suivi ?",
+        "Pourriez vérifier-vous le numéro de suivi ?",
+        "Pourriez-vous vérifiez le numéro de suivi ?",
+        "Pouvez-vous vérifié le numéro de suivi ?"
+      ],
+      "answer": 0,
+      "explain": "Use pourriez-vous followed by the infinitive vérifier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the correct negative imperative.",
+      "options": [
+        "N'appuyez pas sur le bouton.",
+        "Ne appuyez pas sur le bouton.",
+        "N'appuyez sur pas le bouton.",
+        "N'appuyez pas bouton sur le."
+      ],
+      "answer": 0,
+      "explain": "Use n' before a vowel sound, with pas after the verb."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the familiar instruction for one person using cocher.",
+      "options": [
+        "Coche la case.",
+        "Coches la case.",
+        "Tu coche la case.",
+        "Cochez la case."
+      ],
+      "answer": 0,
+      "explain": "A tu imperative of regular -er cocher drops final -s."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Choose the polite way to say 'I would like a written reply.'",
+      "options": [
+        "Je voudrais une réponse écrite.",
+        "Je voudrais une répondre écrite.",
+        "Je veux une réponse écrite maintenant !",
+        "Je voudrais à une réponse écrite."
+      ],
+      "answer": 0,
+      "explain": "Je voudrais is followed by the noun phrase une réponse écrite."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Choose the polite request to send a confirmation.",
+      "options": [
+        "Pourriez-vous envoyer la confirmation ?",
+        "Pourriez-vous envoyez la confirmation ?",
+        "Pourriez envoyer-vous la confirmation ?",
+        "Vous pourriez envoyer la confirmation hier ?"
+      ],
+      "answer": 0,
+      "explain": "Use the infinitive envoyer after pourriez-vous."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Which form is appropriate for an unfamiliar service contact?",
+      "options": [
+        "Pourriez-vous vérifier le formulaire ?",
+        "Vérifie le formulaire !",
+        "Tu vérifies le formulaire.",
+        "Vérifier le formulaire."
+      ],
+      "answer": 0,
+      "explain": "A polite conditional request with vous fits an unfamiliar service interaction."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Choose the correct instruction to a group: 'Do not sign the incomplete form.'",
+      "options": [
+        "Ne signez pas le formulaire incomplet.",
+        "Ne signe pas le formulaire incomplet.",
+        "Vous ne signez pas le formulaire incomplet.",
+        "Ne pas signez le formulaire incomplet."
+      ],
+      "answer": 0,
+      "explain": "Use the vous imperative without a subject; place ne...pas around the verb."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "A customer wants an answer by email. Which request is clearest?",
+      "options": [
+        "Je voudrais une réponse écrite, s'il vous plaît.",
+        "Je veux parler demain et vous faites ça.",
+        "La réponse écrite est hier.",
+        "Donnez une réponse maintenant !"
+      ],
+      "answer": 0,
+      "explain": "This is clear, specific and politely phrased."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "What should a short service request include after the problem?",
+      "options": [
+        "A specific action request and a next-step question",
+        "Several unrelated personal stories",
+        "Only a greeting and no request",
+        "A guess about the service's legal duty"
+      ],
+      "answer": 0,
+      "explain": "State what happened, ask for one useful action, and confirm the next step."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which reply best confirms the next step?",
+      "options": [
+        "Merci, je confirme : vous envoyez la réponse demain ?",
+        "Le formulaire est bleu.",
+        "Je ne sais pas, au revoir.",
+        "Vous devez tout résoudre maintenant."
+      ],
+      "answer": 0,
+      "explain": "Restating the action and checking the timing confirms the next step respectfully."
+    }
+  ]
+}

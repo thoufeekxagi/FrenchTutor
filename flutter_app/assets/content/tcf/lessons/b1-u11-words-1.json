@@ -1,0 +1,148 @@
+{
+  "id": "b1-u11-words-1",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un récit",
+      "en": "an account; story",
+      "sound": "uh(n) ruh-SEE",
+      "exampleFr": "Son récit présente les faits dans un ordre clair.",
+      "exampleEn": "Her account presents the events in a clear order."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un destinataire",
+      "en": "a recipient; audience",
+      "sound": "uh(n) dehs-tee-nah-TEHR",
+      "exampleFr": "Le ton dépend du destinataire.",
+      "exampleEn": "The tone depends on the audience."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un commentaire",
+      "en": "a comment",
+      "sound": "uh(n) koh-mahn-TEHR",
+      "exampleFr": "Ajoutez un commentaire lié à l'expérience.",
+      "exampleEn": "Add a comment related to the experience."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un argument",
+      "en": "a reason; argument",
+      "sound": "uh(n) ar-gü-MAH(N)",
+      "exampleFr": "Son argument s'appuie sur un exemple concret.",
+      "exampleEn": "Her argument rests on a concrete example."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un paragraphe",
+      "en": "a paragraph",
+      "sound": "uh(n) pah-rah-GRAHF",
+      "exampleFr": "Chaque paragraphe développe une idée principale.",
+      "exampleEn": "Each paragraph develops one main idea."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une transition",
+      "en": "a transition",
+      "sound": "ün trahn-zee-SYOH(N)",
+      "exampleFr": "Une transition relie les deux moments du récit.",
+      "exampleEn": "A transition connects the two moments in the account."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un récit",
+      "options": [
+        "a reason; argument",
+        "an account; story",
+        "a recipient; audience",
+        "a comment"
+      ],
+      "answer": 1,
+      "explain": "un récit means an account; story."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un destinataire",
+      "options": [
+        "a paragraph",
+        "a comment",
+        "a reason; argument",
+        "a recipient; audience"
+      ],
+      "answer": 3,
+      "explain": "un destinataire means a recipient; audience."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un commentaire",
+      "options": [
+        "a transition",
+        "a comment",
+        "a reason; argument",
+        "a paragraph"
+      ],
+      "answer": 1,
+      "explain": "un commentaire means a comment."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un argument",
+      "options": [
+        "an account; story",
+        "a paragraph",
+        "a transition",
+        "a reason; argument"
+      ],
+      "answer": 3,
+      "explain": "un argument means a reason; argument."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un paragraphe",
+      "options": [
+        "a recipient; audience",
+        "a paragraph",
+        "a transition",
+        "an account; story"
+      ],
+      "answer": 1,
+      "explain": "un paragraphe means a paragraph."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une transition",
+      "options": [
+        "a comment",
+        "an account; story",
+        "a recipient; audience",
+        "a transition"
+      ],
+      "answer": 3,
+      "explain": "une transition means a transition."
+    }
+  ]
+}

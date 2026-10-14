@@ -1,0 +1,200 @@
+{
+  "id": "a2-u07-words-6",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Words: describe changes and communicate",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "décrire",
+      "en": "to describe",
+      "sound": "day-KREER",
+      "exampleFr": "Je vais décrire le changement depuis hier.",
+      "exampleEn": "I am going to describe the change since yesterday."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "ajouter",
+      "en": "to add",
+      "sound": "ah-zhoo-TAY",
+      "exampleFr": "Je vais ajouter l'heure du début du symptôme.",
+      "exampleEn": "I am going to add the time when the symptom began."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "indiquer",
+      "en": "to indicate",
+      "sound": "a(n)-dee-KAY",
+      "exampleFr": "Je vais indiquer la durée sur le formulaire.",
+      "exampleEn": "I am going to indicate the duration on the form."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "consulter",
+      "en": "to consult",
+      "sound": "kohn-sül-TAY",
+      "exampleFr": "Je vais consulter un professionnel de la santé.",
+      "exampleEn": "I am going to consult a health professional."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "rappeler",
+      "en": "to call back; remind",
+      "sound": "rah-puh-LAY",
+      "exampleFr": "Le service va me rappeler demain.",
+      "exampleEn": "The service is going to call me back tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "transmettre",
+      "en": "to pass on; send",
+      "sound": "trah(n)s-MEHTR",
+      "exampleFr": "Je vais transmettre le résultat au professionnel.",
+      "exampleEn": "I am going to pass the result to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "compléter",
+      "en": "to complete",
+      "sound": "kohn-play-TAY",
+      "exampleFr": "Je vais compléter le formulaire avant l'appel.",
+      "exampleEn": "I am going to complete the form before the call."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "noter",
+      "en": "to write down",
+      "sound": "noh-TAY",
+      "exampleFr": "Je vais noter les consignes et la date du suivi.",
+      "exampleEn": "I am going to write down the instructions and the follow-up date."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "décrire",
+      "options": [
+        "to consult",
+        "to describe",
+        "to complete",
+        "to add"
+      ],
+      "answer": 1,
+      "explain": "décrire means to describe."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "ajouter",
+      "options": [
+        "to call back; remind",
+        "to write down",
+        "to indicate",
+        "to add"
+      ],
+      "answer": 3,
+      "explain": "ajouter means to add."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "indiquer",
+      "options": [
+        "to pass on; send",
+        "to indicate",
+        "to describe",
+        "to consult"
+      ],
+      "answer": 1,
+      "explain": "indiquer means to indicate."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "consulter",
+      "options": [
+        "to complete",
+        "to add",
+        "to call back; remind",
+        "to consult"
+      ],
+      "answer": 3,
+      "explain": "consulter means to consult."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "rappeler",
+      "options": [
+        "to write down",
+        "to call back; remind",
+        "to indicate",
+        "to pass on; send"
+      ],
+      "answer": 1,
+      "explain": "rappeler means to call back; remind."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "transmettre",
+      "options": [
+        "to describe",
+        "to consult",
+        "to complete",
+        "to pass on; send"
+      ],
+      "answer": 3,
+      "explain": "transmettre means to pass on; send."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "ajouter",
+      "question": "Which word did you hear?",
+      "options": [
+        "consulter",
+        "ajouter",
+        "transmettre",
+        "noter"
+      ],
+      "answer": 1,
+      "explain": "You heard ajouter: to add."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "consulter",
+      "question": "Which word did you hear?",
+      "options": [
+        "consulter",
+        "transmettre",
+        "noter",
+        "ajouter"
+      ],
+      "answer": 0,
+      "explain": "You heard consulter: to consult."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: describe changes and communicate",
+      "body": "Health-service routes, fees and referral steps differ by province and territory. The clinic and examples here are fictional and are not medical advice. For a real health concern, use the official provincial or territorial health service; urgent or severe symptoms need prompt help from local emergency services."
+    }
+  ]
+}

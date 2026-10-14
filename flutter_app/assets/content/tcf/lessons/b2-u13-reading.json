@@ -1,0 +1,66 @@
+{
+  "id": "b2-u13-reading",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is a useful self-correction?",
+      "options": [
+        "Restarting every sentence",
+        "Adding a connector without meaning",
+        "Repeating an overgeneralization",
+        "A short reformulation that makes the idea more accurate"
+      ],
+      "answer": 3,
+      "explain": "A brief reformulation can clarify and correct a broad statement.",
+      "promptFr": "Une réponse orale claire n'a pas besoin d'annoncer chaque partie comme un plan écrit. Elle doit toutefois rendre les relations compréhensibles. Un connecteur peut introduire un contraste, un exemple ou une conclusion. Une formule utilisée sans rapport logique ajoute du bruit. Si un candidat se rend compte qu'une affirmation est trop générale, une courte reformulation peut montrer qu'il ajuste son idée au lieu de défendre une erreur."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why should the candidate avoid reciting a memorized speech?",
+      "options": [
+        "It always has too few words",
+        "It may not answer the prompt",
+        "It uses too many sources",
+        "It cannot include a conclusion"
+      ],
+      "answer": 1,
+      "explain": "A memorized speech may not fit the actual prompt.",
+      "promptFr": "Pour une réponse spontanée, le candidat peut garder en tête quatre mots : position, raisons, exemple, limite. Cette structure sert de repère, pas de texte à réciter. Le candidat doit écouter la question et adapter ses exemples; un discours préparé qui ne répond pas au sujet peut sembler fluide tout en étant hors tâche."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How should a personal example be used?",
+      "options": [
+        "As an illustration with a stated limit",
+        "As a source quotation",
+        "As proof about every person",
+        "Instead of answering the prompt"
+      ],
+      "answer": 0,
+      "explain": "The example illustrates one case; its limit should be clear.",
+      "promptFr": "Un exemple personnel rend parfois une idée plus concrète. Il ne prouve pas que la même situation concerne tout le monde. Le candidat peut l'introduire comme une illustration, puis préciser la limite et revenir à la question générale."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What distinction do the two documents make?",
+      "options": [
+        "Both say that only group learning works",
+        "Neither mentions a learning goal",
+        "Group work supports interaction; individual work supports focus and pacing",
+        "They compare two exam scores"
+      ],
+      "answer": 2,
+      "explain": "Document A emphasizes interaction; Document B emphasizes focus and pace.",
+      "promptFr": "Document A — Les ateliers en petit groupe donnent aux apprenants l'occasion de comparer leurs idées et de recevoir une réaction immédiate. Ils conviennent surtout lorsque l'objectif est de s'entraîner à interagir. Document B — Le travail individuel permet de relire à son rythme et de limiter les distractions. Il peut être plus utile lorsqu'on consolide une règle ou qu'on prépare une question. Les deux textes décrivent des objectifs différents et ne concluent pas qu'une seule méthode soit toujours supérieure."
+    }
+  ]
+}

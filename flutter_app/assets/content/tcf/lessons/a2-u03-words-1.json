@@ -1,0 +1,194 @@
+{
+  "id": "a2-u03-words-1",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Words: common actions and choices",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "effectuer",
+      "en": "to carry out; perform",
+      "sound": "eh-fehk-tü-AY",
+      "exampleFr": "J'effectue une demande à l'accueil.",
+      "exampleEn": "I make a request at the welcome desk."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "attraper",
+      "en": "to catch",
+      "sound": "ah-trah-PAY",
+      "exampleFr": "J'attrape le train de huit heures.",
+      "exampleEn": "I catch the eight o'clock train."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "repérer",
+      "en": "to spot; locate",
+      "sound": "ruh-pay-RAY",
+      "exampleFr": "Je repère le quai sur le plan.",
+      "exampleEn": "I locate the platform on the map."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "parcourir",
+      "en": "to read through; browse",
+      "sound": "par-koo-REER",
+      "exampleFr": "Je parcours l'article avant le cours.",
+      "exampleEn": "I read through the article before class."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "obtenir",
+      "en": "to obtain; get",
+      "sound": "ob-tuh-NEER",
+      "exampleFr": "Je veux obtenir une réponse claire.",
+      "exampleEn": "I want to get a clear answer."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "choisir",
+      "en": "to choose",
+      "sound": "shwah-ZEER",
+      "exampleFr": "Je choisis un livre facile.",
+      "exampleEn": "I choose an easy book."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "essayer",
+      "en": "to try",
+      "sound": "eh-seh-YAY",
+      "exampleFr": "J'essaie une nouvelle activité.",
+      "exampleEn": "I try a new activity."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "réussir",
+      "en": "to succeed; manage",
+      "sound": "ray-ü-SEER",
+      "exampleFr": "Je réussis le premier exercice.",
+      "exampleEn": "I manage the first exercise."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "effectuer",
+      "options": [
+        "to read through; browse",
+        "to carry out; perform",
+        "to try",
+        "to catch"
+      ],
+      "answer": 1,
+      "explain": "effectuer means to carry out; perform."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "attraper",
+      "options": [
+        "to obtain; get",
+        "to succeed; manage",
+        "to spot; locate",
+        "to catch"
+      ],
+      "answer": 3,
+      "explain": "attraper means to catch."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "repérer",
+      "options": [
+        "to choose",
+        "to spot; locate",
+        "to carry out; perform",
+        "to read through; browse"
+      ],
+      "answer": 1,
+      "explain": "repérer means to spot; locate."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "parcourir",
+      "options": [
+        "to try",
+        "to catch",
+        "to obtain; get",
+        "to read through; browse"
+      ],
+      "answer": 3,
+      "explain": "parcourir means to read through; browse."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "obtenir",
+      "options": [
+        "to succeed; manage",
+        "to obtain; get",
+        "to spot; locate",
+        "to choose"
+      ],
+      "answer": 1,
+      "explain": "obtenir means to obtain; get."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "choisir",
+      "options": [
+        "to carry out; perform",
+        "to read through; browse",
+        "to try",
+        "to choose"
+      ],
+      "answer": 3,
+      "explain": "choisir means to choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "attraper",
+      "question": "Which word did you hear?",
+      "options": [
+        "parcourir",
+        "attraper",
+        "choisir",
+        "réussir"
+      ],
+      "answer": 1,
+      "explain": "You heard attraper: to catch."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "parcourir",
+      "question": "Which word did you hear?",
+      "options": [
+        "parcourir",
+        "choisir",
+        "réussir",
+        "attraper"
+      ],
+      "answer": 0,
+      "explain": "You heard parcourir: to read through; browse."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "id": "b1-u12-checkpoint",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How should the course track progress across skills?",
+      "options": [
+        "Only speaking speed",
+        "Listening, reading, speaking and writing separately",
+        "Only vocabulary recognition",
+        "One single score based on lesson completion"
+      ],
+      "answer": 1,
+      "explain": "The four skills can develop at different rates."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should a learner do if a key answer is unclear?",
+      "options": [
+        "Switch to a memorized monologue",
+        "Ignore the answer",
+        "Ask for repetition or clarification",
+        "Invent a detail"
+      ],
+      "answer": 2,
+      "explain": "Repair strategies help keep the interaction accurate."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Does finishing B1 certify a TCF or NCLC result?",
+      "options": [
+        "No; only the official test provider issues results",
+        "Only for reading",
+        "Only after one checkpoint",
+        "Yes, automatically"
+      ],
+      "answer": 0,
+      "explain": "Course completion is not an official test result."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What is the purpose of the capstone transfer task?",
+      "options": [
+        "Repeat every model exactly",
+        "Measure note-taking speed",
+        "Replace the official exam",
+        "Use familiar language in a changed situation"
+      ],
+      "answer": 3,
+      "explain": "A changed task checks transferable use."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which is a suitable next step after a weak attempt?",
+      "options": [
+        "Skip the skill permanently",
+        "Identify one high-impact gap, review it and retry later with a changed prompt",
+        "Memorize every answer immediately",
+        "Treat one attempt as a final score"
+      ],
+      "answer": 1,
+      "explain": "A focused delayed retry gives useful evidence and practice."
+    }
+  ]
+}

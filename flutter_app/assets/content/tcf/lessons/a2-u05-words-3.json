@@ -1,0 +1,194 @@
+{
+  "id": "a2-u05-words-3",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Words: applications and course tasks",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "s'inscrire à",
+      "en": "to enrol in",
+      "sound": "sa(n)-skreer ah",
+      "exampleFr": "Je vais m'inscrire à la formation du soir.",
+      "exampleEn": "I am going to enrol in the evening course."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "soumettre",
+      "en": "to submit",
+      "sound": "soo-MEHTR",
+      "exampleFr": "Je vais soumettre ma candidature vendredi.",
+      "exampleEn": "I am going to submit my application on Friday."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "postuler à",
+      "en": "to apply for",
+      "sound": "pohs-tü-LAY ah",
+      "exampleFr": "Elle va postuler à un stage rémunéré.",
+      "exampleEn": "She is going to apply for a paid internship."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "valider",
+      "en": "to validate; confirm",
+      "sound": "vah-lee-DAY",
+      "exampleFr": "Nous allons valider la date de début.",
+      "exampleEn": "We are going to confirm the start date."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "décaler",
+      "en": "to move to a later time",
+      "sound": "day-kah-LAY",
+      "exampleFr": "Le centre va décaler la séance d'information.",
+      "exampleEn": "The centre is going to move the information session to a later time."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "modifier",
+      "en": "to change; modify",
+      "sound": "moh-dee-fee-AY",
+      "exampleFr": "Je vais modifier mon horaire de jeudi.",
+      "exampleEn": "I am going to change my schedule for Thursday."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "participer à",
+      "en": "to take part in",
+      "sound": "pahr-tee-see-PAY ah",
+      "exampleFr": "Elle va participer à un atelier de français.",
+      "exampleEn": "She is going to take part in a French workshop."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "rattraper",
+      "en": "to catch up on",
+      "sound": "rah-trah-PAY",
+      "exampleFr": "Je vais rattraper le cours manqué.",
+      "exampleEn": "I am going to catch up on the missed class."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "s'inscrire à",
+      "options": [
+        "to validate; confirm",
+        "to enrol in",
+        "to take part in",
+        "to submit"
+      ],
+      "answer": 1,
+      "explain": "s'inscrire à means to enrol in."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "soumettre",
+      "options": [
+        "to move to a later time",
+        "to catch up on",
+        "to apply for",
+        "to submit"
+      ],
+      "answer": 3,
+      "explain": "soumettre means to submit."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "postuler à",
+      "options": [
+        "to change; modify",
+        "to apply for",
+        "to enrol in",
+        "to validate; confirm"
+      ],
+      "answer": 1,
+      "explain": "postuler à means to apply for."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "valider",
+      "options": [
+        "to take part in",
+        "to submit",
+        "to move to a later time",
+        "to validate; confirm"
+      ],
+      "answer": 3,
+      "explain": "valider means to validate; confirm."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "décaler",
+      "options": [
+        "to catch up on",
+        "to move to a later time",
+        "to apply for",
+        "to change; modify"
+      ],
+      "answer": 1,
+      "explain": "décaler means to move to a later time."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "modifier",
+      "options": [
+        "to enrol in",
+        "to validate; confirm",
+        "to take part in",
+        "to change; modify"
+      ],
+      "answer": 3,
+      "explain": "modifier means to change; modify."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "soumettre",
+      "question": "Which word did you hear?",
+      "options": [
+        "valider",
+        "soumettre",
+        "modifier",
+        "rattraper"
+      ],
+      "answer": 1,
+      "explain": "You heard soumettre: to submit."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "valider",
+      "question": "Which word did you hear?",
+      "options": [
+        "valider",
+        "modifier",
+        "rattraper",
+        "soumettre"
+      ],
+      "answer": 0,
+      "explain": "You heard valider: to validate; confirm."
+    }
+  ]
+}

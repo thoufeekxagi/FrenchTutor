@@ -1,0 +1,194 @@
+{
+  "id": "a2-u04-words-2",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Words: past routines and habits",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "se promener",
+      "en": "to go for a walk",
+      "sound": "suh proh-muh-NAY",
+      "exampleFr": "Le dimanche, je me promenais dans le parc.",
+      "exampleEn": "On Sundays, I used to walk in the park."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "se rendre",
+      "en": "to go; make one's way",
+      "sound": "suh rah(n)dr",
+      "exampleFr": "Chaque matin, je me rendais à la bibliothèque.",
+      "exampleEn": "Every morning, I used to go to the library."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "rentrer",
+      "en": "to return home",
+      "sound": "rah(n)-TRAY",
+      "exampleFr": "Je rentrais chez moi avant le dîner.",
+      "exampleEn": "I used to go home before dinner."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "passer",
+      "en": "to spend; pass",
+      "sound": "pah-SAY",
+      "exampleFr": "Je passais du temps avec ma famille.",
+      "exampleEn": "I used to spend time with my family."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "rencontrer",
+      "en": "to meet",
+      "sound": "rah(n)-kohn-TRAY",
+      "exampleFr": "Je rencontrais mes amis au café.",
+      "exampleEn": "I used to meet my friends at the café."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "revenir",
+      "en": "to come back",
+      "sound": "ruh-vuh-NEER",
+      "exampleFr": "Je revenais à la maison à midi.",
+      "exampleEn": "I used to come back home at noon."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "s'occuper de",
+      "en": "to take care of",
+      "sound": "soh-kü-PAY duh",
+      "exampleFr": "Je m'occupais du jardin après le travail.",
+      "exampleEn": "I used to take care of the garden after work."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "se retrouver",
+      "en": "to meet up",
+      "sound": "suh ruh-troo-VAY",
+      "exampleFr": "Nous nous retrouvions au parc le dimanche.",
+      "exampleEn": "We used to meet up at the park on Sundays."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "se promener",
+      "options": [
+        "to spend; pass",
+        "to go for a walk",
+        "to take care of",
+        "to go; make one's way"
+      ],
+      "answer": 1,
+      "explain": "se promener means to go for a walk."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "se rendre",
+      "options": [
+        "to meet",
+        "to meet up",
+        "to return home",
+        "to go; make one's way"
+      ],
+      "answer": 3,
+      "explain": "se rendre means to go; make one's way."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "rentrer",
+      "options": [
+        "to come back",
+        "to return home",
+        "to go for a walk",
+        "to spend; pass"
+      ],
+      "answer": 1,
+      "explain": "rentrer means to return home."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "passer",
+      "options": [
+        "to take care of",
+        "to go; make one's way",
+        "to meet",
+        "to spend; pass"
+      ],
+      "answer": 3,
+      "explain": "passer means to spend; pass."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "rencontrer",
+      "options": [
+        "to return home",
+        "to meet",
+        "to come back",
+        "to go for a walk"
+      ],
+      "answer": 1,
+      "explain": "rencontrer means to meet."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "revenir",
+      "options": [
+        "to go for a walk",
+        "to spend; pass",
+        "to take care of",
+        "to come back"
+      ],
+      "answer": 3,
+      "explain": "revenir means to come back."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "se rendre",
+      "question": "Which word did you hear?",
+      "options": [
+        "passer",
+        "se rendre",
+        "revenir",
+        "se retrouver"
+      ],
+      "answer": 1,
+      "explain": "You heard se rendre: to go; make one's way."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "passer",
+      "question": "Which word did you hear?",
+      "options": [
+        "passer",
+        "revenir",
+        "se retrouver",
+        "se rendre"
+      ],
+      "answer": 0,
+      "explain": "You heard passer: to spend; pass."
+    }
+  ]
+}

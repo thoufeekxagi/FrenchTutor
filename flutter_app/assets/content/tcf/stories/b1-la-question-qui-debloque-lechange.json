@@ -1,0 +1,349 @@
+{
+  "id": "b1-la-question-qui-debloque-lechange",
+  "title": "La question qui débloque l'échange",
+  "titleEn": "The question that moves the conversation forward",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "A learner prepares for a community information call and gets a useful answer by asking about one missing detail.",
+  "unit": "b1-u10",
+  "sentences": [
+    {
+      "fr": "Marc voulait participer à une rencontre sur les possibilités de formation dans son quartier.",
+      "en": "Marc wanted to attend a meeting about training options in his neighbourhood."
+    },
+    {
+      "fr": "L'annonce indiquait la date et l'adresse, mais ne précisait pas s'il fallait s'inscrire.",
+      "en": "The notice gave the date and address, but did not say whether registration was required."
+    },
+    {
+      "fr": "Il a appelé l'organisatrice et lui a demandé si les personnes pouvaient venir sans réservation.",
+      "en": "He called the organizer and asked whether people could attend without booking."
+    },
+    {
+      "fr": "Elle a répondu que l'inscription était conseillée, surtout pour recevoir les documents après la rencontre.",
+      "en": "She replied that registration was recommended, especially for receiving the documents after the meeting."
+    },
+    {
+      "fr": "Marc a ensuite demandé si une personne qui travaillait tard pouvait obtenir un résumé par courriel.",
+      "en": "Marc then asked whether someone who worked late could receive a summary by email."
+    },
+    {
+      "fr": "L'organisatrice a confirmé qu'elle enverrait le résumé le lendemain à toutes les personnes inscrites.",
+      "en": "The organizer confirmed she would send the summary the next day to everyone who registered."
+    },
+    {
+      "fr": "Marc a répété la date, l'heure et la condition d'inscription avant de terminer l'appel.",
+      "en": "Marc repeated the date, time and registration condition before ending the call.",
+      "note": "Repeating key details at the end of a call is a practical way to catch a misunderstanding while there is still time to correct it."
+    }
+  ],
+  "words": {
+    "marc": {
+      "en": "Marc (a man's name)"
+    },
+    "voulait": {
+      "en": "wanted"
+    },
+    "participer": {
+      "en": "to participate",
+      "sound": "par-tee-see-PAY"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "rencontre": {
+      "en": "meeting"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "possibilités": {
+      "en": "possibilities"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "formation": {
+      "en": "training program"
+    },
+    "dans": {
+      "en": "in",
+      "sound": "dah(n)"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "quartier": {
+      "en": "neighbourhood"
+    },
+    "l'annonce": {
+      "en": "the advertisement; the notice",
+      "pos": "noun, feminine"
+    },
+    "indiquait": {
+      "en": "indicated; listed"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "date": {
+      "en": "date"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "l'adresse": {
+      "en": "address",
+      "sound": "lah-DREHS"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "précisait": {
+      "en": "specified"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "s'il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "fallait": {
+      "en": "had to; was necessary"
+    },
+    "s'inscrire": {
+      "en": "to register"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "appelé": {
+      "en": "called"
+    },
+    "l'organisatrice": {
+      "en": "the organizer"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "pouvaient": {
+      "en": "could"
+    },
+    "venir": {
+      "en": "to come"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "réservation": {
+      "en": "reservation; booking"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "répondu": {
+      "en": "answered"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "l'inscription": {
+      "en": "the registration"
+    },
+    "était": {
+      "en": "was"
+    },
+    "conseillée": {
+      "en": "recommended"
+    },
+    "surtout": {
+      "en": "especially; above all"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "recevoir": {
+      "en": "to receive"
+    },
+    "documents": {
+      "en": "documents"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "ensuite": {
+      "en": "then, next",
+      "sound": "ah(n)-SWEET"
+    },
+    "personne": {
+      "en": "person"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "travaillait": {
+      "en": "worked"
+    },
+    "tard": {
+      "en": "late",
+      "sound": "tahr"
+    },
+    "pouvait": {
+      "en": "could"
+    },
+    "obtenir": {
+      "en": "to obtain; get",
+      "sound": "ob-tuh-NEER"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "résumé": {
+      "en": "summary"
+    },
+    "par": {
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    "courriel": {
+      "en": "email",
+      "sound": "koo-ree-EL"
+    },
+    "confirmé": {
+      "en": "confirmed",
+      "sound": "kohn-feer-MAY"
+    },
+    "qu'elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "enverrait": {
+      "en": "would send"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "lendemain": {
+      "en": "the next day"
+    },
+    "toutes": {
+      "en": "all, everyone",
+      "sound": "toot"
+    },
+    "inscrites": {
+      "en": "registered"
+    },
+    "répété": {
+      "en": "repeated"
+    },
+    "l'heure": {
+      "en": "hour; time on a clock",
+      "sound": "luhR"
+    },
+    "condition": {
+      "en": "condition"
+    },
+    "d'inscription": {
+      "en": "of registration"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "terminer": {
+      "en": "to finish; to end"
+    },
+    "l'appel": {
+      "en": "the call"
+    }
+  },
+  "keywords": [
+    "rencontre",
+    "l'annonce",
+    "l'organisatrice",
+    "réservation",
+    "l'inscription",
+    "résumé",
+    "condition"
+  ],
+  "quiz": [
+    {
+      "prompt": "What information was missing from the notice?",
+      "options": [
+        "The organizer's name",
+        "The meeting address",
+        "Whether people needed to register",
+        "The meeting date"
+      ],
+      "answer": 2,
+      "explain": "The second sentence says the notice did not specify whether registration was needed."
+    },
+    {
+      "prompt": "Why did the organizer recommend registration?",
+      "options": [
+        "The address changed each day",
+        "Only registered people could ask questions",
+        "The meeting had been cancelled",
+        "Registered people would receive the documents after the meeting"
+      ],
+      "answer": 3,
+      "explain": "The organizer linked registration to receiving the documents."
+    },
+    {
+      "prompt": "What did Marc do before ending the call?",
+      "options": [
+        "Asked the organizer to change the neighbourhood",
+        "Repeated the date, time and registration condition",
+        "Cancelled his registration",
+        "Requested a different meeting topic"
+      ],
+      "answer": 1,
+      "explain": "The last sentence lists the details he repeated."
+    }
+  ]
+}

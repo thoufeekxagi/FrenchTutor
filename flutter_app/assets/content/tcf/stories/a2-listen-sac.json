@@ -1,0 +1,398 @@
+{
+  "id": "a2-listen-sac",
+  "title": "Le sac oublié au centre",
+  "titleEn": "The bag left at the centre",
+  "level": "A2",
+  "mode": "listening",
+  "minutes": 4,
+  "summary": "After leaving a bag at a community centre, Léa calls, describes it clearly, and collects it before closing.",
+  "unit": "a2-u06",
+  "sentences": [
+    {
+      "fr": "Après son cours, Léa rentre chez elle sans son sac bleu.",
+      "en": "After class, Léa goes home without her blue bag."
+    },
+    {
+      "fr": "Elle se rappelle l'avoir posé près de la salle de réunion.",
+      "en": "She remembers putting it near the meeting room."
+    },
+    {
+      "fr": "Elle téléphone au centre communautaire avant la fermeture.",
+      "en": "She calls the community centre before it closes."
+    },
+    {
+      "fr": "À l'accueil, un employé lui demande de décrire le sac.",
+      "en": "At reception, an employee asks her to describe the bag."
+    },
+    {
+      "fr": "Léa précise qu'il est bleu, avec une petite étiquette rouge.",
+      "en": "Léa explains that it is blue, with a small red tag."
+    },
+    {
+      "fr": "L'employé retrouve le sac dans la salle.",
+      "en": "The employee finds the bag in the room."
+    },
+    {
+      "fr": "Léa revient au centre avec sa carte d'identité.",
+      "en": "Léa returns to the centre with her ID card."
+    },
+    {
+      "fr": "Elle vérifie le contenu avant de partir.",
+      "en": "She checks the contents before leaving."
+    },
+    {
+      "fr": "Elle remercie l'équipe et met son sac près de la porte.",
+      "en": "She thanks the staff and puts her bag by the door."
+    }
+  ],
+  "words": {
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "cours": {
+      "en": "a course, class",
+      "sound": "uh(n) koor",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "cours"
+    },
+    "léa": {
+      "en": "Léa (a woman's name)",
+      "pos": "proper name"
+    },
+    "rentre": {
+      "en": "returns home",
+      "pos": "verb",
+      "lemma": "rentrer",
+      "note": "Present form of rentrer."
+    },
+    "chez": {
+      "en": "at someone's home or workplace",
+      "pos": "preposition"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "sans": {
+      "en": "without",
+      "pos": "preposition"
+    },
+    "sac": {
+      "en": "bag",
+      "pos": "noun, masculine",
+      "sound": "sahk"
+    },
+    "bleu": {
+      "en": "blue",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "bleu",
+      "note": "Masculine singular form."
+    },
+    "se": {
+      "en": "oneself; reflexive pronoun",
+      "pos": "pronoun"
+    },
+    "rappelle": {
+      "en": "remembers; calls back",
+      "pos": "verb",
+      "lemma": "se rappeler / rappeler",
+      "note": "Present form; context determines whether it means remember or call."
+    },
+    "l'avoir": {
+      "en": "to have it",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Elided object pronoun l' + infinitive avoir."
+    },
+    "posé": {
+      "en": "put; placed",
+      "pos": "verb",
+      "lemma": "poser",
+      "note": "Past participle of poser."
+    },
+    "près": {
+      "en": "near; close to",
+      "pos": "preposition / adverb"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "la": {
+      "en": "the"
+    },
+    "salle": {
+      "en": "room",
+      "pos": "noun, feminine",
+      "sound": "sal"
+    },
+    "réunion": {
+      "en": "meeting",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "réunion"
+    },
+    "téléphone": {
+      "en": "telephone",
+      "sound": "luh tay-lay-FOHN",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "téléphone"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "communautaire": {
+      "en": "community",
+      "pos": "adjective"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "fermeture": {
+      "en": "closing",
+      "sound": "lah fehr-muh-TÜR",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "fermeture"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "l'accueil": {
+      "en": "reception; welcome desk",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "accueil",
+      "note": "Elided le before a vowel."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "employé": {
+      "en": "an employee",
+      "sound": "uh(n) ah(n)-plwah-YAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "employé"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "demande"
+    },
+    "décrire": {
+      "en": "to describe",
+      "pos": "verb",
+      "lemma": "décrire",
+      "note": "Infinitive."
+    },
+    "le": {
+      "en": "the"
+    },
+    "précise": {
+      "en": "explains; specifies",
+      "pos": "verb",
+      "lemma": "préciser",
+      "note": "Present form of préciser."
+    },
+    "qu'il": {
+      "en": "that he; than he",
+      "pos": "conjunction + pronoun",
+      "note": "Elided que + il."
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "petite": {
+      "en": "small (feminine)",
+      "pos": "adjective"
+    },
+    "étiquette": {
+      "en": "label",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "étiquette"
+    },
+    "rouge": {
+      "en": "red",
+      "pos": "adjective",
+      "number": "singular",
+      "lemma": "rouge",
+      "note": "Same written form for masculine and feminine singular."
+    },
+    "l'employé": {
+      "en": "employee",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "employé",
+      "note": "Elided le before a vowel."
+    },
+    "retrouve": {
+      "en": "finds; locates",
+      "pos": "verb",
+      "lemma": "retrouver",
+      "note": "Present form of retrouver."
+    },
+    "dans": {
+      "en": "in"
+    },
+    "revient": {
+      "en": "comes back; returns",
+      "pos": "verb",
+      "lemma": "revenir",
+      "note": "Present form of revenir."
+    },
+    "sa": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Feminine singular noun form."
+    },
+    "carte": {
+      "en": "map",
+      "pos": "noun, feminine",
+      "sound": "kahrt",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "carte"
+    },
+    "d'identité": {
+      "en": "of identity",
+      "pos": "expression",
+      "note": "Elided de before a vowel."
+    },
+    "vérifie": {
+      "en": "checks",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Present form of vérifier."
+    },
+    "contenu": {
+      "en": "contents; content",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "partir": {
+      "en": "to leave",
+      "pos": "verb",
+      "lemma": "partir",
+      "note": "Infinitive."
+    },
+    "remercie": {
+      "en": "thanks",
+      "pos": "verb",
+      "lemma": "remercier",
+      "note": "Present form of remercier."
+    },
+    "l'équipe": {
+      "en": "team",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "équipe",
+      "note": "Elided la before a vowel."
+    },
+    "et": {
+      "en": "and"
+    },
+    "met": {
+      "en": "puts; places",
+      "pos": "verb",
+      "lemma": "mettre",
+      "note": "Present form of mettre."
+    },
+    "porte": {
+      "en": "wears (porter)",
+      "pos": "verb",
+      "sound": "port",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "porte"
+    }
+  },
+  "keywords": [
+    "sac",
+    "communautaire",
+    "étiquette",
+    "retrouve",
+    "remercie"
+  ],
+  "quiz": [
+    {
+      "prompt": "Where does Léa leave the bag?",
+      "options": [
+        "At the community centre",
+        "On the bus",
+        "At a restaurant",
+        "At the clinic"
+      ],
+      "answer": 0,
+      "explain": "She remembers leaving it near the meeting room at the centre."
+    },
+    {
+      "prompt": "Which detail helps identify it?",
+      "options": [
+        "A small red tag",
+        "A green handle",
+        "A paper label",
+        "A broken zip"
+      ],
+      "answer": 0,
+      "explain": "She describes a blue bag with a small red tag."
+    },
+    {
+      "prompt": "What does Léa do before leaving?",
+      "options": [
+        "Checks the contents",
+        "Calls her teacher",
+        "Books another class",
+        "Buys a new bag"
+      ],
+      "answer": 0,
+      "explain": "She checks what is inside before she leaves."
+    }
+  ]
+}

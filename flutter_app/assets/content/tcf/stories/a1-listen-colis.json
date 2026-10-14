@@ -1,0 +1,276 @@
+{
+  "id": "a1-listen-colis",
+  "title": "Le colis chez le voisin",
+  "titleEn": "The parcel next door",
+  "level": "A1",
+  "mode": "listening",
+  "minutes": 3,
+  "summary": "A missed parcel brings two neighbours together and leads to a simple plan for next time.",
+  "unit": "a1-u06",
+  "sentences": [
+    {
+      "fr": "Nadia attend un colis à Ottawa.",
+      "en": "Nadia is waiting for a parcel in Ottawa."
+    },
+    {
+      "fr": "Elle travaille le matin.",
+      "en": "She works in the morning."
+    },
+    {
+      "fr": "Le livreur arrive à dix heures.",
+      "en": "The delivery person arrives at ten o’clock."
+    },
+    {
+      "fr": "Nadia n'est pas à la maison.",
+      "en": "Nadia is not at home."
+    },
+    {
+      "fr": "Le livreur laisse un avis à la porte.",
+      "en": "The delivery person leaves a notice at the door."
+    },
+    {
+      "fr": "Son voisin Marc prend le colis.",
+      "en": "Her neighbour Marc takes the parcel."
+    },
+    {
+      "fr": "Le soir, Marc frappe chez Nadia.",
+      "en": "In the evening, Marc knocks at Nadia’s door."
+    },
+    {
+      "fr": "Il lui donne le colis.",
+      "en": "He gives her the parcel."
+    },
+    {
+      "fr": "Nadia le remercie et propose un café demain.",
+      "en": "Nadia thanks him and suggests a coffee tomorrow."
+    }
+  ],
+  "words": {
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "proper name"
+    },
+    "attend": {
+      "en": "waits for (attendre)",
+      "pos": "verb",
+      "sound": "ah-tah(n)"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "colis": {
+      "en": "parcel",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "colis"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "ottawa": {
+      "en": "Ottawa (the capital of Canada)",
+      "pos": "proper noun"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "travaille": {
+      "en": "works (travailler)",
+      "pos": "verb",
+      "sound": "trah-VAHY"
+    },
+    "le": {
+      "en": "the"
+    },
+    "matin": {
+      "en": "morning",
+      "pos": "noun, masculine",
+      "sound": "mah-TA(N)",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "matin"
+    },
+    "livreur": {
+      "en": "delivery person",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "livreur"
+    },
+    "arrive": {
+      "en": "arrives (arriver)",
+      "pos": "verb",
+      "sound": "ah-REEV"
+    },
+    "dix": {
+      "en": "ten",
+      "pos": "number"
+    },
+    "heures": {
+      "en": "hours, o'clock",
+      "pos": "noun, feminine plural"
+    },
+    "n'est": {
+      "en": "is not",
+      "pos": "verb"
+    },
+    "pas": {
+      "en": "not"
+    },
+    "la": {
+      "en": "the"
+    },
+    "maison": {
+      "en": "home; house",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "laisse": {
+      "en": "leaves",
+      "pos": "verb",
+      "lemma": "laisser",
+      "note": "Present form of laisser."
+    },
+    "avis": {
+      "en": "notice",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "avis"
+    },
+    "porte": {
+      "en": "wears (porter)",
+      "pos": "verb",
+      "sound": "port",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "porte"
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "voisin": {
+      "en": "neighbour",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "voisin"
+    },
+    "marc": {
+      "en": "Marc (a man's name)",
+      "pos": "proper name"
+    },
+    "prend": {
+      "en": "takes (prendre)",
+      "pos": "verb",
+      "sound": "pra(n)"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine",
+      "sound": "swahr",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "soir"
+    },
+    "frappe": {
+      "en": "knocks",
+      "pos": "verb",
+      "lemma": "frapper",
+      "note": "Present form of frapper."
+    },
+    "chez": {
+      "en": "at someone's home or workplace",
+      "pos": "preposition"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "donne": {
+      "en": "gives (donner)",
+      "pos": "verb",
+      "sound": "dohn"
+    },
+    "remercie": {
+      "en": "thanks",
+      "pos": "verb",
+      "lemma": "remercier",
+      "note": "Present form of remercier."
+    },
+    "et": {
+      "en": "and"
+    },
+    "propose": {
+      "en": "suggests",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Present form of proposer."
+    },
+    "café": {
+      "en": "coffee",
+      "sound": "luh kah-FAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "café"
+    },
+    "demain": {
+      "en": "tomorrow",
+      "pos": "time expression"
+    }
+  },
+  "keywords": [
+    "colis",
+    "voisin",
+    "porte",
+    "livreur",
+    "remercie"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why does Nadia miss the delivery?",
+      "options": [
+        "She is at work.",
+        "She is on a bus.",
+        "She is at the clinic.",
+        "She is asleep."
+      ],
+      "answer": 0,
+      "explain": "Nadia works in the morning, when the delivery arrives."
+    },
+    {
+      "prompt": "Who takes the parcel?",
+      "options": [
+        "Her neighbour Marc",
+        "The building manager",
+        "A friend from work",
+        "The delivery person"
+      ],
+      "answer": 0,
+      "explain": "Marc, her neighbour, takes the parcel."
+    },
+    {
+      "prompt": "What does Nadia suggest?",
+      "options": [
+        "A coffee tomorrow",
+        "A walk tonight",
+        "Lunch at work",
+        "A ride to the store"
+      ],
+      "answer": 0,
+      "explain": "She proposes a coffee the next day."
+    }
+  ]
+}

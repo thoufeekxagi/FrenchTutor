@@ -1,0 +1,75 @@
+{
+  "id": "b2-u07-checkpoint",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does un déchet mean?",
+      "options": [
+        "A result",
+        "A budget",
+        "Waste",
+        "A resource"
+      ],
+      "answer": 2,
+      "explain": "Un déchet means waste."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does afin que express?",
+      "options": [
+        "Purpose",
+        "A concession",
+        "A quoted claim",
+        "A completed event"
+      ],
+      "answer": 0,
+      "explain": "Afin que introduces purpose."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does a fictional pilot's goal prove?",
+      "options": [
+        "That the goal was achieved",
+        "That every cost is known",
+        "That the method works everywhere",
+        "Nothing by itself about the measured effect"
+      ],
+      "answer": 3,
+      "explain": "A goal is not proof that the outcome occurred."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "When is à moins que useful?",
+      "options": [
+        "To describe a repeated past habit",
+        "To introduce an exception or condition",
+        "To report a data source",
+        "To end an email"
+      ],
+      "answer": 1,
+      "explain": "À moins que means unless."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Why compare similar-sized events?",
+      "options": [
+        "To avoid collecting information",
+        "To guarantee a positive effect",
+        "To reduce a difference that could distort results",
+        "To remove every limitation"
+      ],
+      "answer": 2,
+      "explain": "Comparable conditions make an assessment more informative."
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "id": "a2-u05-grammar-a",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Grammar: Near future: present of aller + infinitive",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Near future: present of aller + infinitive",
+      "body": "French often uses the present tense of aller plus an infinitive for an intention. The futur simple also expresses plans, schedules and predictions. These forms can overlap; the choice does not mean simply 'soon versus far away'."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Keep the second verb in the infinitive: vais suivre, not vais suivrai.",
+      "headers": [
+        "Person",
+        "Form of aller",
+        "Plan with suivre"
+      ],
+      "rows": [
+        [
+          "je",
+          "vais",
+          "je vais suivre un cours"
+        ],
+        [
+          "tu",
+          "vas",
+          "tu vas suivre un cours"
+        ],
+        [
+          "il / elle / on",
+          "va",
+          "elle va suivre un cours"
+        ],
+        [
+          "nous",
+          "allons",
+          "nous allons suivre un cours"
+        ],
+        [
+          "vous",
+          "allez",
+          "vous allez suivre un cours"
+        ],
+        [
+          "ils / elles",
+          "vont",
+          "ils vont suivre un cours"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Near future: present of aller + infinitive",
+      "body": "• Use the present of aller with a second verb in the infinitive: nous allons vérifier; elle va participer.\n• This pattern is common in everyday speech for a plan or intention. It can refer to a later date too; the date alone does not decide the tense.\n• In your notes, change the subject in one plan: je vais suivre → nous allons suivre. Close the notes and rebuild the sentence."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the correct near-future form: Demain, nous ___ le dossier.",
+      "options": [
+        "allons préparer",
+        "préparons allons",
+        "irons préparer",
+        "va préparer"
+      ],
+      "answer": 0,
+      "explain": "Use present allons plus the infinitive préparer."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Complete: Cette semaine, elle ___ au test de niveau.",
+      "options": [
+        "va participer",
+        "participera va",
+        "participer",
+        "vont participer"
+      ],
+      "answer": 0,
+      "explain": "With elle, present aller is va, followed by the infinitive participer."
+    }
+  ]
+}

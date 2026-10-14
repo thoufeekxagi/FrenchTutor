@@ -1,0 +1,166 @@
+{
+  "id": "a2-u09-words-3",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Words: service changes and delays",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un retard",
+      "en": "a delay",
+      "sound": "uh(n) ruh-TAHR",
+      "exampleFr": "L'avis annonce un retard sur la ligne express.",
+      "exampleEn": "The notice reports a delay on the express line."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une panne",
+      "en": "a breakdown",
+      "sound": "ün pahn",
+      "exampleFr": "Le service annonce une panne à la station.",
+      "exampleEn": "The service reports a breakdown at the station."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une déviation",
+      "en": "a detour; diversion",
+      "sound": "ün day-vee-ah-SYOH(N)",
+      "exampleFr": "Une déviation change le trajet habituel.",
+      "exampleEn": "A detour changes the usual route."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une interruption de service",
+      "en": "a service interruption",
+      "sound": "ün a(n)-tehr-ühp-SYOH(N) duh sehr-VEES",
+      "exampleFr": "Le panneau indique une interruption de service.",
+      "exampleEn": "The board shows a service interruption."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une voie",
+      "en": "a track; lane",
+      "sound": "ün vwah",
+      "exampleFr": "L'écran indique la voie de départ.",
+      "exampleEn": "The screen shows the departure track."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un avis de service",
+      "en": "a service notice",
+      "sound": "uh(n) ah-VEE duh sehr-VEES",
+      "exampleFr": "Je lis l'avis de service sur le panneau.",
+      "exampleEn": "I read the service notice on the board."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une mise à jour",
+      "en": "an update",
+      "sound": "ün meez ah zhoor",
+      "exampleFr": "Je consulte la mise à jour avant de partir.",
+      "exampleEn": "I check the update before leaving."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un changement de trajet",
+      "en": "a route change",
+      "sound": "uh(n) shah(n)zh-MAH(N) duh trah-ZHEH",
+      "exampleFr": "Je regarde le changement de trajet sur le plan.",
+      "exampleEn": "I check the route change on the map."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un retard",
+      "options": [
+        "a service interruption",
+        "a delay",
+        "an update",
+        "a breakdown"
+      ],
+      "answer": 1,
+      "explain": "un retard means a delay."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une panne",
+      "options": [
+        "a track; lane",
+        "a route change",
+        "a detour; diversion",
+        "a breakdown"
+      ],
+      "answer": 3,
+      "explain": "une panne means a breakdown."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une déviation",
+      "options": [
+        "a service notice",
+        "a detour; diversion",
+        "a delay",
+        "a service interruption"
+      ],
+      "answer": 1,
+      "explain": "une déviation means a detour; diversion."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une interruption de service",
+      "options": [
+        "an update",
+        "a breakdown",
+        "a track; lane",
+        "a service interruption"
+      ],
+      "answer": 3,
+      "explain": "une interruption de service means a service interruption."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une voie",
+      "options": [
+        "a route change",
+        "a track; lane",
+        "a detour; diversion",
+        "a service notice"
+      ],
+      "answer": 1,
+      "explain": "une voie means a track; lane."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un avis de service",
+      "options": [
+        "a delay",
+        "an update",
+        "a breakdown",
+        "a service notice"
+      ],
+      "answer": 3,
+      "explain": "un avis de service means a service notice."
+    }
+  ]
+}

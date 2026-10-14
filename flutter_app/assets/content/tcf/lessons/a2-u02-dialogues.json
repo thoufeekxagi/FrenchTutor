@@ -1,0 +1,140 @@
+{
+  "id": "a2-u02-dialogues",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Notice how each speaker gives a time, an action and one useful detail. The listener asks a short follow-up question."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "The parcel came late",
+      "body": "Awa asks a neighbour whether a delivery notice arrived.",
+      "examples": [
+        {
+          "fr": "Tu as trouvé un avis de passage hier ?",
+          "en": "Awa: Did you find a delivery notice yesterday?"
+        },
+        {
+          "fr": "Oui. J'ai trouvé l'avis près de la porte hier soir.",
+          "en": "Sam: Yes. I found the notice by the door yesterday evening."
+        },
+        {
+          "fr": "Merci. Le colis est pour moi; je téléphone au service aujourd'hui.",
+          "en": "Awa: Thanks. The parcel is for me; I am calling the service today."
+        },
+        {
+          "fr": "Malheureusement, la livraison a commencé en retard.",
+          "en": "Sam: Unfortunately, the delivery started late."
+        },
+        {
+          "fr": "J'ai appelé le service, puis j'ai réclamé un remboursement.",
+          "en": "Awa: I called the service, then requested a refund."
+        },
+        {
+          "fr": "Et quel événement a changé ton horaire ?",
+          "en": "Sam: And what event changed your schedule?"
+        },
+        {
+          "fr": "Heureusement, ils ont confirmé la livraison pour demain.",
+          "en": "Awa: Fortunately, they confirmed the delivery for tomorrow."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "After the course",
+      "body": "Two classmates compare their afternoons.",
+      "examples": [
+        {
+          "fr": "Tu as étudié après le cours ?",
+          "en": "Nadia: Did you study after class?"
+        },
+        {
+          "fr": "J'ai emprunté un livre et j'ai préparé mon exposé.",
+          "en": "Sam: I borrowed a book and prepared my presentation."
+        },
+        {
+          "fr": "Tu as terminé le devoir aussi ?",
+          "en": "Nadia: Did you finish the assignment too?"
+        },
+        {
+          "fr": "Oui, j'ai terminé le devoir à six heures.",
+          "en": "Sam: Yes, I finished the assignment at six."
+        },
+        {
+          "fr": "Moi, j'ai marché vingt minutes après le cours.",
+          "en": "Nadia: I walked for twenty minutes after class."
+        },
+        {
+          "fr": "Tu as commencé le cours à l'heure prévue ?",
+          "en": "Sam: Did you start class at the scheduled time?"
+        },
+        {
+          "fr": "Oui, finalement. J'ai marché jusqu'à la station.",
+          "en": "Nadia: Yes, in the end. I walked to the station."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where did Sam find the delivery notice?",
+      "options": [
+        "By the door",
+        "At the library",
+        "On the bus",
+        "At the clinic"
+      ],
+      "answer": 0,
+      "explain": "Sam says he found it near the door."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What did Awa ask the service for?",
+      "options": [
+        "A refund",
+        "A new course",
+        "A different address",
+        "A guided tour"
+      ],
+      "answer": 0,
+      "explain": "Awa says she asked for a refund."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What did Sam do after borrowing a book?",
+      "options": [
+        "He prepared his presentation.",
+        "He called the delivery service.",
+        "He missed the bus.",
+        "He visited the clinic."
+      ],
+      "answer": 0,
+      "explain": "Sam says he borrowed a book and prepared his presentation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "How did Nadia get to the station?",
+      "options": [
+        "She walked.",
+        "She took a taxi.",
+        "She rode a bicycle.",
+        "She took the train."
+      ],
+      "answer": 0,
+      "explain": "Nadia says she walked to the station."
+    }
+  ]
+}

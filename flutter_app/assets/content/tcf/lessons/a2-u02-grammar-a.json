@@ -1,0 +1,117 @@
+{
+  "id": "a2-u02-grammar-a",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Grammar: Grammar",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Grammar",
+      "body": "For the verbs practised in this lesson, build the passé composé with the present of avoir plus a past participle. Most French verbs use avoir, but some common verbs use être; Unit 3 introduces a starter set. For a regular -er verb such as réserver, remove -er and add -é. The subject still controls the form of avoir."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "A finished action: avoir + a regular past participle",
+      "headers": [
+        "Subject",
+        "Avoir",
+        "Example"
+      ],
+      "rows": [
+        [
+          "j'",
+          "ai",
+          "J'ai réservé une place."
+        ],
+        [
+          "tu",
+          "as",
+          "Tu as téléphoné hier."
+        ],
+        [
+          "il / elle / on",
+          "a",
+          "Elle a terminé son devoir."
+        ],
+        [
+          "nous",
+          "avons",
+          "Nous avons étudié ensemble."
+        ],
+        [
+          "vous",
+          "avez",
+          "Vous avez confirmé la visite."
+        ],
+        [
+          "ils / elles",
+          "ont",
+          "Ils ont préparé le projet."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Grammar",
+      "body": "• Look for the time clue, then ask: what finished action happened?\n• Keep avoir in the present: j'ai, tu as, elle a. Put the main action in the past participle.\n• Most regular -er participles end in -é. Hear the difference between je réserve (now) and j'ai réservé (finished).\n• Do not add -s to the past participle with avoir just because the subject is plural: elles ont réservé."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Hier, nous ___ la salle.",
+      "options": [
+        "avons réservé",
+        "sommes réserver",
+        "avons réserver",
+        "réservons hier"
+      ],
+      "answer": 0,
+      "explain": "Use present avoir plus the past participle réservé: nous avons réservé."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Elle ___ son devoir hier soir.",
+      "options": [
+        "a terminé",
+        "est terminer",
+        "a terminer",
+        "termine hier"
+      ],
+      "answer": 0,
+      "explain": "With elle, use a plus terminé."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Vous ___ la visite ?",
+      "options": [
+        "avez confirmé",
+        "avez confirmer",
+        "êtes confirmé",
+        "confirmé avez"
+      ],
+      "answer": 0,
+      "explain": "The order is subject + avoir + past participle: vous avez confirmé."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which sentence describes a finished action?",
+      "options": [
+        "Ils ont étudié hier.",
+        "Ils étudient demain.",
+        "Ils vont étudier demain.",
+        "Ils étudient maintenant."
+      ],
+      "answer": 0,
+      "explain": "Ont étudié is a completed past action; the other sentences are present or future."
+    }
+  ]
+}

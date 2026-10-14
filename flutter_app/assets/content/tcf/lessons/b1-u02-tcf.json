@@ -1,0 +1,72 @@
+{
+  "id": "b1-u02-tcf",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le centre confirmera la date lundi. Si l'atelier commence en septembre, Karim s'inscrira cette semaine; sinon, il attendra le prochain groupe.",
+      "question": "What will Karim do if the workshop starts in September?",
+      "options": [
+        "He will move to another city",
+        "He will register this week",
+        "He will cancel his application",
+        "He will ask to teach the course"
+      ],
+      "answer": 1,
+      "explain": "He says he will register this week if the workshop starts in September."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Quand elle recevra son horaire de travail, elle appellera le centre. Si les cours ont lieu le soir, elle pourra participer.",
+      "question": "What information is she waiting for before calling?",
+      "options": [
+        "Her work schedule",
+        "The course certificate",
+        "A bus ticket",
+        "A new address"
+      ],
+      "answer": 0,
+      "explain": "She is waiting for her work schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When will the date be confirmed?",
+      "options": [
+        "August 15",
+        "September 9",
+        "The next term",
+        "August 1"
+      ],
+      "answer": 0,
+      "explain": "The notice says confirmation will be emailed August 15.",
+      "promptFr": "PROGRAMME DU SOIR — Début prévu : 9 septembre. La date sera confirmée par courriel le 15 août. Si le groupe compte assez de participants, les cours auront lieu les mardis et jeudis. Les candidatures reçues après le 1er août seront examinées pour le trimestre suivant."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What will the writer do if the leave is not confirmed?",
+      "options": [
+        "Apply for a different job",
+        "Ask whether remote participation is possible",
+        "Cancel all future courses",
+        "Move the course to August"
+      ],
+      "answer": 1,
+      "explain": "The writer will ask about a remote option.",
+      "promptFr": "Message — Si mon employeur confirme mes congés, je suivrai la formation en personne. Sinon, je demanderai si une option à distance est possible. Quand j'aurai une réponse, je vous écrirai."
+    }
+  ]
+}

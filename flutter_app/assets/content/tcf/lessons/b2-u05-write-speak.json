@@ -1,0 +1,49 @@
+{
+  "id": "b2-u05-write-speak",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 1 practice",
+      "body": "Write a 70–100-word message to an information office asking for clarification about a fictional appointment notice. Identify the unclear point, ask two focused questions and request confirmation of the next step. Do not ask for medical, legal or immigration advice.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour, Je vous écris au sujet de l'avis de rendez-vous reçu hier. La consigne mentionne un document à apporter, mais elle ne précise pas lequel. Pourriez-vous m'indiquer où trouver cette information et me confirmer l'heure de la rencontre ? Il est possible que mon dossier nécessite une précision supplémentaire; si c'est le cas, à quelle personne dois-je m'adresser ? Si j'ai bien compris, je dois attendre votre confirmation avant de remplir la dernière partie du formulaire. Merci de me dire si cette interprétation est correcte. Cordialement, Awa\n\nCheck:\n• Task 1 range: 60–120 words.\n• Ask clear questions and identify the information you need.\n• Use a suitable formal greeting and closing.\n• Keep real service instructions outside the fictional exercise."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF Task 2: use a fictional notice to ask an information agent about the appointment time, required document, next step and whom to contact if a case is unusual. Prepare for two minutes; interact for three minutes thirty. Marie should provide partial answers so you need to follow up and confirm.\n\n• Use a question plan, not a fully memorized speech.\n• Subjunctive: il est possible que…; certainty: je sais que….\n• Repeat the agent's answer in your own words to confirm it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de l'avis que j'ai reçu. Pourriez-vous confirmer l'heure du rendez-vous ? La consigne parle d'un document, mais je ne sais pas lequel.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Pourriez-vous préciser où trouver cette information ? Il est possible que mon cas demande une démarche différente. Dans ce cas, à qui dois-je poser la question ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si j'ai bien compris, la prochaine étape consiste à attendre votre confirmation. Est-ce exact ? Merci. Je vais noter vos indications et vérifier les détails auprès de la source appropriée.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

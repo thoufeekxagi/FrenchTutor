@@ -1,0 +1,63 @@
+{
+  "id": "b2-u03-write-speak",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word message to a classmate about choosing between two training options. Describe the criterion that matters most, explain what you learned from one contact person, and give a qualified recommendation. Use at least three different relative structures accurately.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Je compare deux programmes qui pourraient compléter mon expérience. Le premier, auquel je peux assister le soir, comprend un stage. Le second offre davantage de cours en ligne, ce qui me donnerait plus de souplesse. La personne à qui j'ai écrit m'a expliqué que les préalables dont il faut tenir compte varient selon le parcours. J'ai donc vérifié les horaires avant de prendre une décision. À mon avis, le premier programme me conviendrait mieux si le stage est confirmé, puisque je souhaite mettre en pratique les compétences que j'ai acquises. Ce qui reste à clarifier, ce sont les frais associés au matériel. Je te conseille de comparer les conditions qui comptent pour toi plutôt que de choisir uniquement selon le titre du programme.\n\nCheck:\n• Task 2 range: 120–150 words.\n• Use relative clauses to make relationships clear, not just to display forms.\n• Check dont against the expression with de.\n• State one condition or caveat in your recommendation."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF Task 2 information-seeking practice: use this fictional course notice to ask an adviser for missing details about prerequisites, schedule, cost, placement and application documents. Prepare for two minutes, then interact for three minutes thirty. Marie should answer naturally, change one detail and wait for a relevant follow-up.\n\n• Task 2 is an information-seeking interaction, not a memorized monologue.\n• Prepare question purposes, then listen closely and ask follow-ups based on the answer.\n• Use ce qui / ce que / dont / auquel to clarify a relationship naturally."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet du programme du soir. Pourriez-vous me préciser les préalables auxquels les candidats doivent répondre ?",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'aimerais aussi savoir à quelle date les cours commencent et combien de soirs par semaine ils ont lieu.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Le document mentionne un stage; pourriez-vous m'expliquer à quel moment il se déroule et si tous les participants peuvent y accéder ?",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Enfin, quels documents faut-il joindre au dossier et à quelle personne puis-je écrire si j'ai une question sur la reconnaissance de mon expérience ?",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Si j'ai bien compris, la prochaine étape est de vérifier les conditions avant la date limite. Est-ce exact ? Merci pour ces précisions.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

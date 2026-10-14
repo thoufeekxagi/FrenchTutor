@@ -1,0 +1,148 @@
+{
+  "id": "b2-u09-words-5",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une marge d'erreur",
+      "en": "a margin of error",
+      "sound": "ün marzh deh-RUHR",
+      "exampleFr": "Le sondage comporte une marge d'erreur indiquée.",
+      "exampleEn": "The survey has a stated margin of error."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un revenu disponible",
+      "en": "disposable income",
+      "sound": "uh(n) ruh-vuh-NÜ dee-spoh-NEEBL",
+      "exampleFr": "Le loyer absorbe une partie du revenu disponible.",
+      "exampleEn": "Rent takes up part of the disposable income."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "le coût total de possession",
+      "en": "total cost of ownership",
+      "sound": "luh koo toh-TAHL duh poh-seh-SYOH(N)",
+      "exampleFr": "Le calcul inclut le coût total de possession du véhicule.",
+      "exampleEn": "The calculation includes the vehicle's total cost of ownership."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une hypothèse de calcul",
+      "en": "a calculation assumption",
+      "sound": "ün ee-poh-TEHZ duh kahl-KÜL",
+      "exampleFr": "Le rapport explique chaque hypothèse de calcul.",
+      "exampleEn": "The report explains each calculation assumption."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "mettre en perspective",
+      "en": "to put into perspective",
+      "sound": "mehtr ahn pehrs-pehk-TEEV",
+      "exampleFr": "Il faut mettre cette hausse en perspective avec les salaires.",
+      "exampleEn": "This increase needs to be put in perspective with wages."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une dépense discrétionnaire",
+      "en": "a discretionary expense",
+      "sound": "ün day-pahns dees-kray-syoh-NEHR",
+      "exampleFr": "Le budget distingue les besoins des dépenses discrétionnaires.",
+      "exampleEn": "The budget distinguishes needs from discretionary expenses."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une marge d'erreur",
+      "options": [
+        "a calculation assumption",
+        "a margin of error",
+        "disposable income",
+        "total cost of ownership"
+      ],
+      "answer": 1,
+      "explain": "une marge d'erreur means a margin of error."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un revenu disponible",
+      "options": [
+        "to put into perspective",
+        "total cost of ownership",
+        "a calculation assumption",
+        "disposable income"
+      ],
+      "answer": 3,
+      "explain": "un revenu disponible means disposable income."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "le coût total de possession",
+      "options": [
+        "a discretionary expense",
+        "total cost of ownership",
+        "a calculation assumption",
+        "to put into perspective"
+      ],
+      "answer": 1,
+      "explain": "le coût total de possession means total cost of ownership."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une hypothèse de calcul",
+      "options": [
+        "a margin of error",
+        "to put into perspective",
+        "a discretionary expense",
+        "a calculation assumption"
+      ],
+      "answer": 3,
+      "explain": "une hypothèse de calcul means a calculation assumption."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "mettre en perspective",
+      "options": [
+        "disposable income",
+        "to put into perspective",
+        "a discretionary expense",
+        "a margin of error"
+      ],
+      "answer": 1,
+      "explain": "mettre en perspective means to put into perspective."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une dépense discrétionnaire",
+      "options": [
+        "total cost of ownership",
+        "a margin of error",
+        "disposable income",
+        "a discretionary expense"
+      ],
+      "answer": 3,
+      "explain": "une dépense discrétionnaire means a discretionary expense."
+    }
+  ]
+}

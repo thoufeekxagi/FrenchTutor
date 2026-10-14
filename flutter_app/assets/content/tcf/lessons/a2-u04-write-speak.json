@@ -1,0 +1,42 @@
+{
+  "id": "a2-u04-write-speak",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Tell a classmate what happened",
+      "body": "Write 60–90 French words to a classmate. Describe a past routine or place, then tell one completed event that happened during that period and its result. Use at least two imparfait forms, one passé composé form and a time link. This is a short learning task, not a complete TCF writing task.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Salut Nadia, Quand j'étais étudiant, j'habitais près d'une petite bibliothèque. Chaque matin, je prenais le bus à sept heures et je lisais pendant le trajet. La salle de lecture était au deuxième étage. Elle avait de grandes fenêtres et l'ambiance était calme. Un dimanche, ma famille a préparé le repas ensemble chez ma tante. C'était une bonne journée. À bientôt, Sam\n\nCheck:\n• Give the reader a setting or repeated habit before the event.\n• Use the imparfait for the background and passé composé for the completed event.\n• Include a clear time link and explain what happened next.\n• Count 60–90 words and check that every subject matches its verb.\n• Close your notes tomorrow and tell a different short story."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Tell Marie about a day that changed",
+      "body": "Speak for 35–50 seconds about an ordinary past routine and one event that changed a particular day. Set the scene, say what happened, and explain the result. Marie asks one follow-up. After feedback, retell a different event without notes.\n\n• Start with a scene or repeated routine using the imparfait.\n• Use passé composé to report one finished event; keep the action sequence clear.\n• Say what changed or happened as a result.\n• On the retry, change the place, event and outcome rather than repeating the model."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Quand j'habitais près du centre, le quartier était animé le matin. Chaque jour, je prenais le bus pour aller au travail. Il y avait un café près de l'arrêt.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Un matin, le bus a changé de trajet. J'ai lu l'avis et j'ai pris un autre bus. La réunion a commencé plus tard.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

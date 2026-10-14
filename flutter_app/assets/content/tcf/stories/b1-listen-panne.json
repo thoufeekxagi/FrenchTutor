@@ -1,0 +1,608 @@
+{
+  "id": "b1-listen-panne",
+  "title": "La panne avant la rencontre",
+  "titleEn": "The outage before the meeting",
+  "level": "B1",
+  "mode": "listening",
+  "minutes": 5,
+  "summary": "A power outage interrupts a community workshop; the organizer moves the group, preserves access, and explains the decision afterward.",
+  "unit": "b1-u02",
+  "sentences": [
+    {
+      "fr": "À quelques minutes du début d'un atelier de recherche d'emploi, l'éclairage s'est éteint dans la salle.",
+      "en": "A few minutes before a job-search workshop, the lights went out in the room."
+    },
+    {
+      "fr": "L'organisatrice a d'abord vérifié si le problème touchait tout l'immeuble.",
+      "en": "The organizer first checked whether the problem affected the whole building."
+    },
+    {
+      "fr": "Comme l'ascenseur ne fonctionnait plus, elle a écarté l'idée de déplacer les participants à l'étage.",
+      "en": "Since the elevator no longer worked, she ruled out moving participants upstairs."
+    },
+    {
+      "fr": "Elle a appelé le centre voisin, qui avait une salle libre au rez-de-chaussée.",
+      "en": "She called a nearby centre, which had a room free on the ground floor."
+    },
+    {
+      "fr": "Un collègue a envoyé l'adresse et les consignes d'accès par texto.",
+      "en": "A colleague sent the address and access instructions by text."
+    },
+    {
+      "fr": "La moitié du groupe était déjà arrivée; l'organisatrice a donc attendu quelques minutes avant de partir.",
+      "en": "Half the group had already arrived, so the organizer waited a few minutes before leaving."
+    },
+    {
+      "fr": "Tout le monde a pu suivre l'atelier, même si le début a été retardé.",
+      "en": "Everyone was able to attend the workshop, even though the start was delayed."
+    },
+    {
+      "fr": "Après la séance, elle a proposé de confirmer l'accessibilité des salles de remplacement à l'avance.",
+      "en": "After the session, she proposed confirming the accessibility of backup rooms in advance."
+    },
+    {
+      "fr": "Le groupe a accepté, car cette vérification évitera de décider dans l'urgence la prochaine fois.",
+      "en": "The group agreed because this check will prevent them from deciding in a rush next time."
+    }
+  ],
+  "words": {
+    "à": {
+      "en": "in, at"
+    },
+    "quelques": {
+      "en": "a few; several",
+      "pos": "determiner"
+    },
+    "minutes": {
+      "en": "minutes",
+      "pos": "noun, feminine",
+      "lemma": "minute",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "début": {
+      "en": "beginning, start",
+      "sound": "luh day-BÜ",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "début"
+    },
+    "d'un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "atelier": {
+      "en": "a workshop",
+      "sound": "uh(n) ah-tuh-LYAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "atelier"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "recherche": {
+      "en": "search; job search",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "d'emploi": {
+      "en": "of employment",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "emploi",
+      "note": "Elided de before a vowel; emploi is masculine."
+    },
+    "l'éclairage": {
+      "en": "lighting",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "éclairage",
+      "note": "Elided le before a vowel."
+    },
+    "s'est": {
+      "en": "has (reflexive past auxiliary)",
+      "pos": "verb"
+    },
+    "éteint": {
+      "en": "went out; turned off",
+      "pos": "verb",
+      "lemma": "éteindre",
+      "note": "Past participle of éteindre."
+    },
+    "dans": {
+      "en": "in"
+    },
+    "la": {
+      "en": "the"
+    },
+    "salle": {
+      "en": "room",
+      "pos": "noun, feminine",
+      "sound": "sal"
+    },
+    "l'organisatrice": {
+      "en": "the organizer",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "organisateur",
+      "note": "Feminine form of organisateur."
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "d'abord": {
+      "en": "first; to begin with",
+      "pos": "adverbial phrase"
+    },
+    "vérifié": {
+      "en": "checked; verified",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Past participle of vérifier."
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "le": {
+      "en": "the"
+    },
+    "problème": {
+      "en": "problem",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "touchait": {
+      "en": "affected; touched",
+      "pos": "verb",
+      "lemma": "toucher",
+      "note": "Imperfect form of toucher."
+    },
+    "tout": {
+      "en": "everyone; all",
+      "pos": "determiner / pronoun"
+    },
+    "l'immeuble": {
+      "en": "building",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "immeuble",
+      "note": "Elided le before a vowel."
+    },
+    "comme": {
+      "en": "as; like; since",
+      "pos": "connector",
+      "note": "Meaning depends on the clause."
+    },
+    "l'ascenseur": {
+      "en": "elevator",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "ascenseur",
+      "note": "Elided le before a vowel."
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "fonctionnait": {
+      "en": "was working",
+      "pos": "verb",
+      "lemma": "fonctionner",
+      "note": "Imperfect form of fonctionner."
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "écarté": {
+      "en": "ruled out; set aside",
+      "pos": "verb",
+      "lemma": "écarter",
+      "note": "Past participle of écarter."
+    },
+    "l'idée": {
+      "en": "the idea",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "idée",
+      "note": "Elided la before a vowel."
+    },
+    "déplacer": {
+      "en": "to move; reschedule",
+      "pos": "verb",
+      "lemma": "déplacer",
+      "note": "Infinitive."
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "participants": {
+      "en": "a participant",
+      "sound": "uh(n) par-tee-see-PAH(N)",
+      "lemma": "participant",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "l'étage": {
+      "en": "floor, storey",
+      "sound": "lay-TAHZH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "l'étage"
+    },
+    "appelé": {
+      "en": "called (appeler)",
+      "pos": "verb"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "voisin": {
+      "en": "neighbour",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "voisin"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "avait": {
+      "en": "had",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Imperfect form of avoir."
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "libre": {
+      "en": "free; available",
+      "pos": "adjective",
+      "lemma": "libre"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "rez-de-chaussée": {
+      "en": "ground floor",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "rez-de-chaussée",
+      "note": "The ground floor in Canada is the street-level floor."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "collègue": {
+      "en": "colleague",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "collègue",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "envoyé": {
+      "en": "sent",
+      "pos": "verb",
+      "lemma": "envoyer",
+      "note": "Past participle of envoyer."
+    },
+    "l'adresse": {
+      "en": "the address",
+      "pos": "noun, feminine",
+      "sound": "lah-DREHS",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "l'adresse"
+    },
+    "et": {
+      "en": "and"
+    },
+    "consignes": {
+      "en": "instructions",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "consigne",
+      "note": "Plural of consigne."
+    },
+    "d'accès": {
+      "en": "of access",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "accès",
+      "note": "Elided de before a vowel; accès is masculine."
+    },
+    "par": {
+      "en": "by"
+    },
+    "texto": {
+      "en": "text message",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "moitié": {
+      "en": "half",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "était": {
+      "en": "was (être)",
+      "pos": "verb"
+    },
+    "déjà": {
+      "en": "already",
+      "pos": "adverb"
+    },
+    "arrivée": {
+      "en": "arrived",
+      "pos": "verb",
+      "lemma": "arriver",
+      "note": "Feminine agreement of the past participle arrivée."
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "attendu": {
+      "en": "expected; waited",
+      "pos": "verb",
+      "lemma": "attendre",
+      "note": "Past participle of attendre."
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "partir": {
+      "en": "to leave",
+      "pos": "verb",
+      "lemma": "partir",
+      "note": "Infinitive."
+    },
+    "monde": {
+      "en": "people; world",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "pu": {
+      "en": "could; was able to",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Past participle used with avoir."
+    },
+    "suivre": {
+      "en": "to follow; to attend",
+      "pos": "verb",
+      "lemma": "suivre",
+      "note": "Infinitive."
+    },
+    "l'atelier": {
+      "en": "workshop",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "atelier",
+      "note": "Elided le before a vowel."
+    },
+    "même": {
+      "en": "same; even",
+      "pos": "adjective",
+      "lemma": "même"
+    },
+    "été": {
+      "en": "been",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Past participle of être; this form does not agree."
+    },
+    "retardé": {
+      "en": "delayed",
+      "pos": "verb",
+      "lemma": "retarder",
+      "note": "Past participle of retarder."
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "séance": {
+      "en": "session",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "séance"
+    },
+    "proposé": {
+      "en": "proposed",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Past participle of proposer."
+    },
+    "confirmer": {
+      "en": "to confirm",
+      "pos": "verb",
+      "lemma": "confirmer",
+      "note": "Infinitive."
+    },
+    "l'accessibilité": {
+      "en": "accessibility",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "accessibilité",
+      "note": "Elided la before a vowel."
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "salles": {
+      "en": "rooms",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "salle",
+      "note": "Plural of salle."
+    },
+    "remplacement": {
+      "en": "a replacement",
+      "sound": "uh(n) rah(n)-plahs-MAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "remplacement"
+    },
+    "l'avance": {
+      "en": "advance",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "avance",
+      "note": "In à l'avance, it means beforehand."
+    },
+    "accepté": {
+      "en": "accepted",
+      "pos": "verb",
+      "lemma": "accepter",
+      "note": "Masculine singular past participle of accepter."
+    },
+    "car": {
+      "en": "because; for",
+      "pos": "connector",
+      "note": "Introduces a reason or explanation."
+    },
+    "cette": {
+      "en": "this",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ce",
+      "note": "Feminine singular demonstrative."
+    },
+    "vérification": {
+      "en": "check; verification",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "évitera": {
+      "en": "will prevent; will avoid",
+      "pos": "verb",
+      "lemma": "éviter",
+      "note": "Future form of éviter."
+    },
+    "décider": {
+      "en": "to decide",
+      "pos": "verb",
+      "lemma": "décider",
+      "note": "Infinitive."
+    },
+    "l'urgence": {
+      "en": "urgent situation",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "urgence",
+      "note": "Elided la before a vowel."
+    },
+    "prochaine": {
+      "en": "next",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "prochain",
+      "note": "Feminine form of prochain."
+    },
+    "fois": {
+      "en": "time; occasion",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "fois",
+      "note": "The form fois does not change in the plural."
+    }
+  },
+  "keywords": [
+    "atelier",
+    "problème",
+    "l'ascenseur",
+    "l'éclairage",
+    "rez-de-chaussée"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why does the organizer reject moving the group upstairs?",
+      "options": [
+        "The elevator is not working.",
+        "The upper room is occupied.",
+        "The group is too small.",
+        "The workshop needs more light."
+      ],
+      "answer": 0,
+      "explain": "She rules out the upper floor because the elevator has stopped working."
+    },
+    {
+      "prompt": "What makes the nearby centre suitable?",
+      "options": [
+        "It has an available ground-floor room.",
+        "It is next to the job office.",
+        "It has a working elevator upstairs.",
+        "It is already hosting the same workshop."
+      ],
+      "answer": 0,
+      "explain": "The centre has a free room on the ground floor."
+    },
+    {
+      "prompt": "What improvement does the organizer propose?",
+      "options": [
+        "Check backup-room accessibility in advance",
+        "Cancel the workshop earlier",
+        "Ask participants to bring lamps",
+        "Use the upstairs room next time"
+      ],
+      "answer": 0,
+      "explain": "She proposes confirming access before a future disruption."
+    }
+  ]
+}

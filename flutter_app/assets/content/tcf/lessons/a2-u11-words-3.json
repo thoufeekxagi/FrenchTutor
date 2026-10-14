@@ -1,0 +1,166 @@
+{
+  "id": "a2-u11-words-3",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Words: steps and service contacts",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une première étape",
+      "en": "a first step",
+      "sound": "ün pruh-MYEHR ay-TAHP",
+      "exampleFr": "La première étape consiste à remplir le formulaire.",
+      "exampleEn": "The first step is to fill in the form."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une deuxième étape",
+      "en": "a second step",
+      "sound": "ün duh-ZYEHM ay-TAHP",
+      "exampleFr": "À la deuxième étape, je vérifie le numéro de dossier.",
+      "exampleEn": "At the second step, I check the file number."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un mode d'emploi",
+      "en": "an instruction manual",
+      "sound": "uh(n) mohd dah(n)-plwah",
+      "exampleFr": "Le mode d'emploi explique comment installer l'appareil.",
+      "exampleEn": "The instruction manual explains how to install the device."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un bouton de validation",
+      "en": "a submit button",
+      "sound": "uh(n) boo-TOH(N) duh vah-lee-dah-SYOH(N)",
+      "exampleFr": "Appuyez sur le bouton de validation pour envoyer le formulaire.",
+      "exampleEn": "Press the submit button to send the form."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un délai de traitement",
+      "en": "a processing time",
+      "sound": "uh(n) day-LEH duh treht-MAH(N)",
+      "exampleFr": "On m'a indiqué un délai de traitement de deux jours.",
+      "exampleEn": "I was told the processing time is two days."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un service à la clientèle",
+      "en": "a customer service department",
+      "sound": "uh(n) sehr-VEES ah lah klee-ah(n)-TEHL",
+      "exampleFr": "J'appelle le service à la clientèle pour poser une question.",
+      "exampleEn": "I call customer service to ask a question."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un message automatique",
+      "en": "an automated message",
+      "sound": "uh(n) meh-SAHZH oh-toh-mah-TEEK",
+      "exampleFr": "Un message automatique confirme la réception de ma demande.",
+      "exampleEn": "An automated message confirms receipt of my request."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une page de confirmation",
+      "en": "a confirmation page",
+      "sound": "ün pahzh duh kohn-feer-mah-SYOH(N)",
+      "exampleFr": "La page de confirmation affiche mon numéro de dossier.",
+      "exampleEn": "The confirmation page displays my file number."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une première étape",
+      "options": [
+        "a submit button",
+        "a first step",
+        "an automated message",
+        "a processing time"
+      ],
+      "answer": 1,
+      "explain": "une première étape means a first step."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une deuxième étape",
+      "options": [
+        "a processing time",
+        "a confirmation page",
+        "an instruction manual",
+        "a second step"
+      ],
+      "answer": 3,
+      "explain": "une deuxième étape means a second step."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un mode d'emploi",
+      "options": [
+        "a customer service department",
+        "an instruction manual",
+        "a first step",
+        "a submit button"
+      ],
+      "answer": 1,
+      "explain": "un mode d'emploi means an instruction manual."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un bouton de validation",
+      "options": [
+        "an automated message",
+        "a second step",
+        "a processing time",
+        "a submit button"
+      ],
+      "answer": 3,
+      "explain": "un bouton de validation means a submit button."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un délai de traitement",
+      "options": [
+        "a confirmation page",
+        "a processing time",
+        "an instruction manual",
+        "a customer service department"
+      ],
+      "answer": 1,
+      "explain": "un délai de traitement means a processing time."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un service à la clientèle",
+      "options": [
+        "a first step",
+        "a submit button",
+        "an automated message",
+        "a customer service department"
+      ],
+      "answer": 3,
+      "explain": "un service à la clientèle means a customer service department."
+    }
+  ]
+}

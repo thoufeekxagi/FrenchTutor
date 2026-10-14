@@ -1,0 +1,80 @@
+{
+  "id": "b2-u08-dialogues",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Two interview excerpts",
+      "body": "A learner compares two fictional guests without treating either story as universal.",
+      "examples": [
+        {
+          "fr": "Qu'est-ce qui vous a aidée à continuer vos études ?",
+          "en": "Animatrice: What helped you continue your studies?"
+        },
+        {
+          "fr": "Les échanges avec le groupe m'ont donné confiance.",
+          "en": "Invitée 1: Discussion with the group gave me confidence."
+        },
+        {
+          "fr": "Et vous, quelle a été votre expérience ?",
+          "en": "Animatrice: And you, what was your experience?"
+        },
+        {
+          "fr": "J'ai surtout appris en pratiquant au travail.",
+          "en": "Invité 2: I mostly learned by practising at work."
+        },
+        {
+          "fr": "Vous avez donc suivi des parcours différents.",
+          "en": "Animatrice: So you followed different pathways."
+        },
+        {
+          "fr": "Oui, mais nous nous accordons sur l'importance d'avoir accès à plusieurs options.",
+          "en": "Invitée 1: Yes, but we agree on the importance of having access to several options."
+        },
+        {
+          "fr": "Et il ne faut pas conclure qu'une méthode convient à tout le monde.",
+          "en": "Invité 2: And we should not conclude that one method suits everyone."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Summarizing a discussion",
+      "body": "A learner reports a class discussion to a colleague.",
+      "examples": [
+        {
+          "fr": "Awa a raconté qu'elle avait appris le français en parlant avec ses voisins.",
+          "en": "Sam: Awa said she had learned French by speaking with her neighbours."
+        },
+        {
+          "fr": "Est-ce qu'elle a dit que cette méthode était la seule ?",
+          "en": "Mina: Did she say that this method was the only one?"
+        },
+        {
+          "fr": "Non. Elle a précisé que cela dépendait des occasions qu'on avait.",
+          "en": "Sam: No. She clarified that it depended on the opportunities one had."
+        },
+        {
+          "fr": "C'est une nuance importante.",
+          "en": "Mina: That is an important qualification."
+        },
+        {
+          "fr": "Oui. Son récit illustre son expérience, sans représenter chaque apprenant.",
+          "en": "Sam: Yes. Her story illustrates her experience without representing every learner."
+        }
+      ]
+    }
+  ]
+}

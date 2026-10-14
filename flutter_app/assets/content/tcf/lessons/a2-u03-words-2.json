@@ -1,0 +1,166 @@
+{
+  "id": "a2-u03-words-2",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Words: first experiences and milestones",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une première fois",
+      "en": "a first time",
+      "sound": "ün pruh-MYEHR fwah",
+      "exampleFr": "C'est ma première fois dans ce centre.",
+      "exampleEn": "It is my first time at this centre."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un souvenir",
+      "en": "a memory; a souvenir",
+      "sound": "uh(n) soo-vuh-NEER",
+      "exampleFr": "Je garde un souvenir de cette visite.",
+      "exampleEn": "I keep a memory of this visit."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une expérience",
+      "en": "an experience",
+      "sound": "ün ehk-spay-ree-AH(N)S",
+      "exampleFr": "Cette expérience est utile.",
+      "exampleEn": "This experience is useful."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une séance de découverte",
+      "en": "an introductory session",
+      "sound": "ün say-AH(N)S duh day-koo-VEHRT",
+      "exampleFr": "La séance de découverte commence à neuf heures.",
+      "exampleEn": "The introductory session starts at nine."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un exercice pratique",
+      "en": "a practical exercise",
+      "sound": "uh(n) ehk-zehr-SEES prah-TEEK",
+      "exampleFr": "L'exercice pratique dure une heure.",
+      "exampleEn": "The practical exercise lasts one hour."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une confirmation écrite",
+      "en": "written confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N) ay-KREET",
+      "exampleFr": "La confirmation écrite arrive par courriel.",
+      "exampleEn": "The written confirmation arrives by email."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un message vocal",
+      "en": "a voice message",
+      "sound": "uh(n) meh-SAHZH voh-KAHL",
+      "exampleFr": "Je laisse un message vocal à mon ami.",
+      "exampleEn": "I leave my friend a voice message."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une découverte",
+      "en": "a discovery",
+      "sound": "ün day-koo-VEHRT",
+      "exampleFr": "La bibliothèque est une belle découverte.",
+      "exampleEn": "The library is a lovely discovery."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une première fois",
+      "options": [
+        "an introductory session",
+        "a first time",
+        "a voice message",
+        "a memory; a souvenir"
+      ],
+      "answer": 1,
+      "explain": "une première fois means a first time."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un souvenir",
+      "options": [
+        "a practical exercise",
+        "a discovery",
+        "an experience",
+        "a memory; a souvenir"
+      ],
+      "answer": 3,
+      "explain": "un souvenir means a memory; a souvenir."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une expérience",
+      "options": [
+        "written confirmation",
+        "an experience",
+        "a first time",
+        "an introductory session"
+      ],
+      "answer": 1,
+      "explain": "une expérience means an experience."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une séance de découverte",
+      "options": [
+        "a voice message",
+        "a memory; a souvenir",
+        "a practical exercise",
+        "an introductory session"
+      ],
+      "answer": 3,
+      "explain": "une séance de découverte means an introductory session."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un exercice pratique",
+      "options": [
+        "a discovery",
+        "a practical exercise",
+        "an experience",
+        "written confirmation"
+      ],
+      "answer": 1,
+      "explain": "un exercice pratique means a practical exercise."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation écrite",
+      "options": [
+        "a first time",
+        "an introductory session",
+        "a voice message",
+        "written confirmation"
+      ],
+      "answer": 3,
+      "explain": "une confirmation écrite means written confirmation."
+    }
+  ]
+}

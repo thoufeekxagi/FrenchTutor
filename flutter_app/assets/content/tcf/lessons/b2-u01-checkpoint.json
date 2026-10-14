@@ -1,0 +1,75 @@
+{
+  "id": "b2-u01-checkpoint",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is a counterargument?",
+      "options": [
+        "A numerical result",
+        "A final greeting",
+        "A reason that challenges a position",
+        "A neutral topic title"
+      ],
+      "answer": 2,
+      "explain": "A counterargument challenges or limits a position."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which phrase explicitly adds a caveat?",
+      "options": [
+        "Par exemple",
+        "Tout d'abord",
+        "À demain",
+        "Cela dit"
+      ],
+      "answer": 3,
+      "explain": "Cela dit can introduce a qualification."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "A small survey shows a preference. What should you avoid?",
+      "options": [
+        "Naming the sample limit",
+        "Treating it as proof about everyone",
+        "Comparing it with another source",
+        "Attributing the finding"
+      ],
+      "answer": 1,
+      "explain": "A small sample does not automatically represent a whole population."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does une réserve mean?",
+      "options": [
+        "A caveat or reservation",
+        "A schedule",
+        "A commute",
+        "A device"
+      ],
+      "answer": 0,
+      "explain": "Une réserve is a reservation or caveat."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which ending makes the position more balanced?",
+      "options": [
+        "It is always perfect in every situation",
+        "The topic has no conditions",
+        "The option may work if access remains fair",
+        "No other view deserves attention"
+      ],
+      "answer": 2,
+      "explain": "The first conclusion keeps the position while naming a condition."
+    }
+  ]
+}

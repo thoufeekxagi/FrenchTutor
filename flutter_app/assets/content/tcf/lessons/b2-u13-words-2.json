@@ -1,0 +1,148 @@
+{
+  "id": "b2-u13-words-2",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une reformulation",
+      "en": "a reformulation",
+      "sound": "ün ruh-for-mü-lah-SYOH(N)",
+      "exampleFr": "Une reformulation permet de préciser sa pensée.",
+      "exampleEn": "Reformulating helps clarify one's thought."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un marqueur",
+      "en": "a marker; signpost",
+      "sound": "uh(n) mar-KUHR",
+      "exampleFr": "Un marqueur annonce un changement d'idée.",
+      "exampleEn": "A signpost signals a change of idea."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une conclusion",
+      "en": "a conclusion",
+      "sound": "ün kohn-klü-ZYOH(N)",
+      "exampleFr": "La conclusion reprend la réponse principale.",
+      "exampleEn": "The conclusion returns to the main answer."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un exemple",
+      "en": "an example",
+      "sound": "uh(n) ehk-ZAH(N)PL",
+      "exampleFr": "L'exemple doit soutenir l'argument.",
+      "exampleEn": "The example should support the argument."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une hésitation",
+      "en": "a hesitation",
+      "sound": "ün ay-zee-tah-SYOH(N)",
+      "exampleFr": "Une courte hésitation n'empêche pas de continuer.",
+      "exampleEn": "A brief hesitation does not prevent continuing."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un ajustement",
+      "en": "an adjustment",
+      "sound": "uh(n) ah-zhüs-tuh-MAH(N)",
+      "exampleFr": "Un ajustement peut rendre la position plus précise.",
+      "exampleEn": "An adjustment can make the position more precise."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une reformulation",
+      "options": [
+        "an example",
+        "a reformulation",
+        "a marker; signpost",
+        "a conclusion"
+      ],
+      "answer": 1,
+      "explain": "une reformulation means a reformulation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un marqueur",
+      "options": [
+        "a hesitation",
+        "a conclusion",
+        "an example",
+        "a marker; signpost"
+      ],
+      "answer": 3,
+      "explain": "un marqueur means a marker; signpost."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une conclusion",
+      "options": [
+        "an adjustment",
+        "a conclusion",
+        "an example",
+        "a hesitation"
+      ],
+      "answer": 1,
+      "explain": "une conclusion means a conclusion."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un exemple",
+      "options": [
+        "a reformulation",
+        "a hesitation",
+        "an adjustment",
+        "an example"
+      ],
+      "answer": 3,
+      "explain": "un exemple means an example."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une hésitation",
+      "options": [
+        "a marker; signpost",
+        "a hesitation",
+        "an adjustment",
+        "a reformulation"
+      ],
+      "answer": 1,
+      "explain": "une hésitation means a hesitation."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un ajustement",
+      "options": [
+        "a conclusion",
+        "a reformulation",
+        "a marker; signpost",
+        "an adjustment"
+      ],
+      "answer": 3,
+      "explain": "un ajustement means an adjustment."
+    }
+  ]
+}

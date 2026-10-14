@@ -1,0 +1,80 @@
+{
+  "id": "a2-u07-reading",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should the person have ready?",
+      "options": [
+        "A confirmation code and questions",
+        "A lease and utility bill",
+        "A course application",
+        "A transit map"
+      ],
+      "answer": 0,
+      "explain": "The message asks the person to prepare the confirmation code and question list.",
+      "promptFr": "CONFIRMATION — Consultation téléphonique mardi 14 h. À préparer : votre code de confirmation et votre liste de questions."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What information does the form ask for?",
+      "options": [
+        "The start time and duration",
+        "The price of a consultation",
+        "The bus stop and route",
+        "A work reference"
+      ],
+      "answer": 0,
+      "explain": "The form asks for the beginning, duration and time when the symptom is stronger.",
+      "promptFr": "FORMULAIRE — Symptôme : début et durée. Heure où il est plus fort : ______. À noter : l'heure et la durée."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Who will the service call?",
+      "options": [
+        "The person who called today",
+        "Everyone in the clinic",
+        "The person's employer",
+        "The pharmacy"
+      ],
+      "answer": 0,
+      "explain": "The note says the service will call the person who telephoned today.",
+      "promptFr": "RAPPEL — Le service de triage va rappeler la personne qui téléphone aujourd'hui. Téléphone près de vous pendant la journée."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where can the patient find the address?",
+      "options": [
+        "In the confirmation message",
+        "On the result document",
+        "In the work schedule",
+        "At the pharmacy"
+      ],
+      "answer": 0,
+      "explain": "The notice says the address is in the confirmation message.",
+      "promptFr": "RENDEZ-VOUS DE SUIVI — Mercredi, 9 h 30. Adresse dans le message de confirmation. À apporter : le résultat de laboratoire."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does the note say about timing?",
+      "options": [
+        "The discomfort starts after a meal.",
+        "It occurs only during work.",
+        "It began last month.",
+        "It stops at the clinic."
+      ],
+      "answer": 0,
+      "explain": "The note says the discomfort starts after a meal.",
+      "promptFr": "NOTE — La gêne a commencé lundi. Elle commence après le repas. Le professionnel va lire la note pendant la consultation."
+    }
+  ]
+}

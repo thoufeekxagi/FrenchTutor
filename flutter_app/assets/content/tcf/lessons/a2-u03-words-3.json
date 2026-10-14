@@ -1,0 +1,194 @@
+{
+  "id": "a2-u03-words-3",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Words: at a desk or service counter",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un accueil",
+      "en": "a reception area; welcome desk",
+      "sound": "uh(n) ah-KUHY",
+      "exampleFr": "L'accueil est près de l'entrée.",
+      "exampleEn": "The welcome desk is near the entrance."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une file d'attente",
+      "en": "a queue; a line",
+      "sound": "ün feel dah-TAH(N)t",
+      "exampleFr": "La file d'attente avance lentement.",
+      "exampleEn": "The line moves slowly."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un guichet",
+      "en": "a service window; counter",
+      "sound": "uh(n) gee-SHAY",
+      "exampleFr": "Le guichet ouvre à huit heures.",
+      "exampleEn": "The service window opens at eight."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une carte mensuelle",
+      "en": "a monthly pass",
+      "sound": "ün kahrt mah(n)-sü-EL",
+      "exampleFr": "Ma carte mensuelle est dans mon sac.",
+      "exampleEn": "My monthly pass is in my bag."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un reçu",
+      "en": "a receipt",
+      "sound": "uh(n) ruh-SÜ",
+      "exampleFr": "Je garde le reçu après l'achat.",
+      "exampleEn": "I keep the receipt after the purchase."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un document",
+      "en": "a document",
+      "sound": "uh(n) doh-kü-MAH(N)",
+      "exampleFr": "Le document est prêt.",
+      "exampleEn": "The document is ready."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une demande",
+      "en": "a request; an application",
+      "sound": "ün duh-MAH(N)d",
+      "exampleFr": "La demande est complète.",
+      "exampleEn": "The application is complete."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un numéro de dossier",
+      "en": "a file number",
+      "sound": "uh(n) nü-may-ROH duh doh-SYAY",
+      "exampleFr": "Je note le numéro de dossier.",
+      "exampleEn": "I write down the file number."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un accueil",
+      "options": [
+        "a monthly pass",
+        "a reception area; welcome desk",
+        "a request; an application",
+        "a queue; a line"
+      ],
+      "answer": 1,
+      "explain": "un accueil means a reception area; welcome desk."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une file d'attente",
+      "options": [
+        "a receipt",
+        "a file number",
+        "a service window; counter",
+        "a queue; a line"
+      ],
+      "answer": 3,
+      "explain": "une file d'attente means a queue; a line."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un guichet",
+      "options": [
+        "a document",
+        "a service window; counter",
+        "a reception area; welcome desk",
+        "a monthly pass"
+      ],
+      "answer": 1,
+      "explain": "un guichet means a service window; counter."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une carte mensuelle",
+      "options": [
+        "a request; an application",
+        "a queue; a line",
+        "a receipt",
+        "a monthly pass"
+      ],
+      "answer": 3,
+      "explain": "une carte mensuelle means a monthly pass."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un reçu",
+      "options": [
+        "a file number",
+        "a receipt",
+        "a service window; counter",
+        "a document"
+      ],
+      "answer": 1,
+      "explain": "un reçu means a receipt."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un document",
+      "options": [
+        "a reception area; welcome desk",
+        "a monthly pass",
+        "a request; an application",
+        "a document"
+      ],
+      "answer": 3,
+      "explain": "un document means a document."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un guichet",
+      "question": "Which word did you hear?",
+      "options": [
+        "un document",
+        "un guichet",
+        "un accueil",
+        "un reçu"
+      ],
+      "answer": 1,
+      "explain": "You heard un guichet: a service window; counter."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un reçu",
+      "question": "Which word did you hear?",
+      "options": [
+        "une demande",
+        "un guichet",
+        "un document",
+        "un reçu"
+      ],
+      "answer": 3,
+      "explain": "You heard un reçu: a receipt."
+    }
+  ]
+}

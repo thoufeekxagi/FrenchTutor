@@ -1,0 +1,87 @@
+{
+  "id": "b1-u01-grammar-a",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Grammar: Plus-que-parfait: show what had happened before",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Plus-que-parfait: show what had happened before",
+      "body": "A2 already gives you passé composé for completed events and imparfait for background or habit. Add plus-que-parfait when one past event was already complete before another past moment. Form it with the imparfait of avoir or être plus the past participle. Keep the order clear: background (il pleuvait), earlier event (le cours avait commencé), then the event you are telling (je suis arrivé). With être, agree the participle with the subject. Do not use plus-que-parfait for every past action."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Plus-que-parfait: show what had happened before",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Earlier completed event",
+          "avait / était + past participle",
+          "La réunion avait commencé quand je suis arrivé.",
+          "The meeting had started when I arrived."
+        ],
+        [
+          "Background",
+          "imparfait",
+          "Il pleuvait pendant que nous attendions.",
+          "It was raining while we waited."
+        ],
+        [
+          "Main event",
+          "passé composé",
+          "L'organisatrice a annoncé le changement.",
+          "The organizer announced the change."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "The class was already underway when I arrived. Which sentence marks the earlier event?",
+      "options": [
+        "Le cours a commencer quand je suis arrivé.",
+        "Le cours avait commencé quand je suis arrivé.",
+        "Le cours commençait demain.",
+        "Le cours commencera quand j'arriverai."
+      ],
+      "answer": 1,
+      "explain": "Avait commencé marks an event completed before the arrival."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which form best sets an ongoing background?",
+      "options": [
+        "Il a plu demain.",
+        "Il pleuvra hier.",
+        "Il pleuvait pendant que nous attendions.",
+        "Il avait pleuvoir."
+      ],
+      "answer": 2,
+      "explain": "The imparfait describes the ongoing background."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does plus-que-parfait add?",
+      "options": [
+        "A future prediction",
+        "A polite request",
+        "A repeated present habit",
+        "An event completed before another past reference point"
+      ],
+      "answer": 3,
+      "explain": "It places one past event earlier than another past moment."
+    }
+  ]
+}

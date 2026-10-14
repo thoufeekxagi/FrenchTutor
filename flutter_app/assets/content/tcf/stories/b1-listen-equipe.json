@@ -1,0 +1,584 @@
+{
+  "id": "b1-listen-equipe",
+  "title": "La réunion en deux temps",
+  "titleEn": "A meeting in two parts",
+  "level": "B1",
+  "mode": "listening",
+  "minutes": 5,
+  "summary": "A team meeting excludes remote colleagues because of poor audio; the group changes the format and records clear follow-up actions.",
+  "unit": "b1-u12",
+  "sentences": [
+    {
+      "fr": "L'équipe avait prévu de décider du nouvel horaire pendant une réunion hybride.",
+      "en": "The team planned to decide on the new schedule during a hybrid meeting."
+    },
+    {
+      "fr": "Dès le premier sujet, les personnes à distance ont signalé qu'elles entendaient mal.",
+      "en": "As soon as the first topic began, remote participants said they could not hear well."
+    },
+    {
+      "fr": "La responsable aurait pu continuer, mais elle a constaté que seules les personnes dans la salle répondaient.",
+      "en": "The manager could have continued, but she noticed that only people in the room were responding."
+    },
+    {
+      "fr": "Elle a proposé de suspendre la décision et de reprendre après une pause technique.",
+      "en": "She proposed suspending the decision and resuming after a technical break."
+    },
+    {
+      "fr": "Entre-temps, un collègue a testé un micro central et envoyé les documents à tout le monde.",
+      "en": "Meanwhile, a colleague tested a central microphone and sent the documents to everyone."
+    },
+    {
+      "fr": "À la reprise, chacun a pu commenter les deux horaires possibles.",
+      "en": "When the meeting resumed, everyone could comment on the two possible schedules."
+    },
+    {
+      "fr": "Le groupe a choisi une période d'essai de quatre semaines, avec une date de révision.",
+      "en": "The group chose a four-week trial period, with a review date."
+    },
+    {
+      "fr": "La responsable a inscrit les raisons et les objections dans le compte rendu.",
+      "en": "The manager wrote the reasons and objections in the minutes."
+    },
+    {
+      "fr": "Cette trace permettra de réviser la décision à partir de l'expérience, plutôt que de l'impression du jour.",
+      "en": "This record will allow them to review the decision based on experience rather than that day's impression."
+    }
+  ],
+  "words": {
+    "l'équipe": {
+      "en": "team",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "équipe",
+      "note": "Elided la before a vowel."
+    },
+    "avait": {
+      "en": "had",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Imperfect form of avoir."
+    },
+    "prévu": {
+      "en": "planned; expected",
+      "pos": "verb",
+      "lemma": "prévoir",
+      "note": "Past participle of prévoir."
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "décider": {
+      "en": "to decide",
+      "pos": "verb",
+      "lemma": "décider",
+      "note": "Infinitive."
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "nouvel": {
+      "en": "new (masculine before a vowel)",
+      "pos": "adjective"
+    },
+    "horaire": {
+      "en": "schedule",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "horaire"
+    },
+    "pendant": {
+      "en": "during; while",
+      "pos": "preposition / connector"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "réunion": {
+      "en": "meeting",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "réunion"
+    },
+    "hybride": {
+      "en": "hybrid; in-person and remote",
+      "pos": "adjective",
+      "lemma": "hybride"
+    },
+    "dès": {
+      "en": "as soon as; from",
+      "pos": "preposition"
+    },
+    "le": {
+      "en": "the"
+    },
+    "premier": {
+      "en": "the first",
+      "sound": "luh pruh-MYAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "premier"
+    },
+    "sujet": {
+      "en": "subject; topic",
+      "pos": "noun, masculine"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "personnes": {
+      "en": "person",
+      "sound": "lah pehR-SUN",
+      "lemma": "personne",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "distance": {
+      "en": "distance",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "signalé": {
+      "en": "reported; pointed out",
+      "pos": "verb",
+      "lemma": "signaler",
+      "note": "Past participle of signaler."
+    },
+    "qu'elles": {
+      "en": "that they; than they",
+      "pos": "conjunction + pronoun",
+      "note": "Elided que + elles."
+    },
+    "entendaient": {
+      "en": "could hear",
+      "pos": "verb",
+      "lemma": "entendre",
+      "note": "Imperfect form of entendre."
+    },
+    "mal": {
+      "en": "pain",
+      "pos": "noun, masculine"
+    },
+    "la": {
+      "en": "the"
+    },
+    "responsable": {
+      "en": "manager; person in charge",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "responsable",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "aurait": {
+      "en": "would have; could have",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Conditional form of avoir."
+    },
+    "pu": {
+      "en": "could; was able to",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Past participle used with avoir."
+    },
+    "continuer": {
+      "en": "to continue",
+      "pos": "verb",
+      "lemma": "continuer",
+      "note": "Infinitive."
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "constaté": {
+      "en": "noticed; observed",
+      "pos": "verb",
+      "lemma": "constater",
+      "note": "Past participle of constater."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "seules": {
+      "en": "only; alone",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "seul",
+      "note": "Feminine plural form."
+    },
+    "dans": {
+      "en": "in"
+    },
+    "salle": {
+      "en": "room",
+      "pos": "noun, feminine",
+      "sound": "sal"
+    },
+    "répondaient": {
+      "en": "were replying",
+      "pos": "verb",
+      "lemma": "répondre",
+      "note": "Imperfect form of répondre."
+    },
+    "proposé": {
+      "en": "proposed",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Past participle of proposer."
+    },
+    "suspendre": {
+      "en": "to suspend; to pause",
+      "pos": "verb",
+      "lemma": "suspendre",
+      "note": "Infinitive."
+    },
+    "décision": {
+      "en": "decision",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "et": {
+      "en": "and"
+    },
+    "reprendre": {
+      "en": "to resume; to take up again",
+      "pos": "verb",
+      "lemma": "reprendre",
+      "note": "Infinitive."
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "pause": {
+      "en": "break",
+      "sound": "lah pohz",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "pause"
+    },
+    "technique": {
+      "en": "technical",
+      "pos": "adjective",
+      "lemma": "technique"
+    },
+    "entre-temps": {
+      "en": "meanwhile",
+      "pos": "time expression"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "collègue": {
+      "en": "colleague",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "collègue",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "testé": {
+      "en": "tested",
+      "pos": "verb",
+      "lemma": "tester",
+      "note": "Past participle of tester."
+    },
+    "micro": {
+      "en": "microphone",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "micro",
+      "note": "Short for microphone."
+    },
+    "central": {
+      "en": "central",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "central",
+      "note": "Masculine singular form."
+    },
+    "envoyé": {
+      "en": "sent",
+      "pos": "verb",
+      "lemma": "envoyer",
+      "note": "Past participle of envoyer."
+    },
+    "documents": {
+      "en": "document",
+      "sound": "luh doh-kü-MAH(N)",
+      "lemma": "document",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "tout": {
+      "en": "everyone; all",
+      "pos": "determiner / pronoun"
+    },
+    "monde": {
+      "en": "people; world",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "reprise": {
+      "en": "resumption; restart",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "chacun": {
+      "en": "each person; everyone",
+      "pos": "pronoun",
+      "note": "Masculine singular form."
+    },
+    "commenter": {
+      "en": "to comment on",
+      "pos": "verb",
+      "lemma": "commenter",
+      "note": "Infinitive."
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "horaires": {
+      "en": "schedules",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "horaire",
+      "note": "Plural of horaire."
+    },
+    "possibles": {
+      "en": "possible",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "possible",
+      "note": "Plural form; same spelling for masculine and feminine."
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "choisi": {
+      "en": "chosen",
+      "pos": "verb",
+      "lemma": "choisir",
+      "note": "Past participle of choisir."
+    },
+    "période": {
+      "en": "period; trial period",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "d'essai": {
+      "en": "trial; pilot",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "essai"
+    },
+    "quatre": {
+      "en": "four",
+      "pos": "number"
+    },
+    "semaines": {
+      "en": "week, weekday period",
+      "sound": "lah suh-MEHN",
+      "lemma": "semaine",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "date": {
+      "en": "date",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "date"
+    },
+    "révision": {
+      "en": "review; revision",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "révision"
+    },
+    "inscrit": {
+      "en": "records; registered",
+      "pos": "verb",
+      "lemma": "inscrire",
+      "note": "Past participle or present form of inscrire, depending on context."
+    },
+    "raisons": {
+      "en": "reasons",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "raison",
+      "note": "Plural of raison."
+    },
+    "objections": {
+      "en": "objections",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "objection",
+      "note": "Plural of objection."
+    },
+    "compte": {
+      "en": "an account; report",
+      "sound": "uh(n) koh(n)t",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "compte"
+    },
+    "rendu": {
+      "en": "made; rendered",
+      "pos": "verb",
+      "lemma": "rendre",
+      "note": "Past participle of rendre."
+    },
+    "cette": {
+      "en": "this",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ce",
+      "note": "Feminine singular demonstrative."
+    },
+    "trace": {
+      "en": "record; trace",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "permettra": {
+      "en": "will allow; will make possible",
+      "pos": "verb",
+      "lemma": "permettre",
+      "note": "Future form of permettre."
+    },
+    "réviser": {
+      "en": "to revise; review",
+      "pos": "verb",
+      "lemma": "réviser",
+      "note": "Infinitive."
+    },
+    "partir": {
+      "en": "to leave",
+      "pos": "verb",
+      "lemma": "partir",
+      "note": "Infinitive."
+    },
+    "l'expérience": {
+      "en": "experience",
+      "sound": "lehk-spay-ree-AH(N)S",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "l'expérience"
+    },
+    "plutôt": {
+      "en": "rather; instead",
+      "pos": "adverb"
+    },
+    "l'impression": {
+      "en": "the impression",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "impression",
+      "note": "Elided la before a vowel."
+    },
+    "jour": {
+      "en": "day",
+      "pos": "noun, masculine",
+      "sound": "zhoor"
+    }
+  },
+  "keywords": [
+    "réunion",
+    "distance",
+    "horaire",
+    "décision",
+    "l'équipe"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why does the manager pause the decision?",
+      "options": [
+        "Remote participants cannot hear well.",
+        "The documents are missing.",
+        "The meeting room is too small.",
+        "The new schedule is already final."
+      ],
+      "answer": 0,
+      "explain": "The remote participants report poor audio, and the manager notices they cannot contribute."
+    },
+    {
+      "prompt": "What does the team decide?",
+      "options": [
+        "Try a schedule for four weeks and review it",
+        "Adopt the first schedule permanently",
+        "Cancel all remote meetings",
+        "Let only the manager choose"
+      ],
+      "answer": 0,
+      "explain": "They choose a four-week trial with a review date."
+    },
+    {
+      "prompt": "What is included in the meeting record?",
+      "options": [
+        "Reasons and objections",
+        "Only the final time",
+        "Personal opinions about colleagues",
+        "A transcript of every sentence"
+      ],
+      "answer": 0,
+      "explain": "The manager records both the reasons and the objections."
+    }
+  ]
+}

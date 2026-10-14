@@ -1,0 +1,200 @@
+{
+  "id": "a2-u11-words-6",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Words: actions that move a request forward",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "attacher",
+      "en": "to attach",
+      "sound": "ah-tah-SHAY",
+      "exampleFr": "Je peux attacher une copie au formulaire.",
+      "exampleEn": "I can attach a copy to the form."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "appuyer sur",
+      "en": "to press",
+      "sound": "ah-pü-yay sür",
+      "exampleFr": "Je peux appuyer sur le bouton de validation.",
+      "exampleEn": "I can press the submit button."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "relancer",
+      "en": "to follow up; prompt",
+      "sound": "ruh-lahn-SAY",
+      "exampleFr": "Je peux relancer le service à la clientèle.",
+      "exampleEn": "I can follow up with customer service."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "cocher",
+      "en": "to check a box",
+      "sound": "koh-SHAY",
+      "exampleFr": "Je peux cocher la case obligatoire.",
+      "exampleEn": "I can check the required box."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "remplacer",
+      "en": "to replace",
+      "sound": "rah(n)-plah-SAY",
+      "exampleFr": "Je peux remplacer la copie abîmée.",
+      "exampleEn": "I can replace the damaged copy."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "réactiver",
+      "en": "to reactivate",
+      "sound": "ray-ahk-tee-VAY",
+      "exampleFr": "Je peux réactiver le compte après la confirmation.",
+      "exampleEn": "I can reactivate the account after confirmation."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "traiter",
+      "en": "to process; handle",
+      "sound": "treh-TAY",
+      "exampleFr": "Le service peut traiter la demande demain.",
+      "exampleEn": "The service can process the request tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "renseigner",
+      "en": "to fill in; provide information",
+      "sound": "rah(n)-seh-nyay",
+      "exampleFr": "Je peux renseigner le champ manquant.",
+      "exampleEn": "I can fill in the missing field."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "attacher",
+      "options": [
+        "to check a box",
+        "to attach",
+        "to process; handle",
+        "to press"
+      ],
+      "answer": 1,
+      "explain": "attacher means to attach."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "appuyer sur",
+      "options": [
+        "to replace",
+        "to fill in; provide information",
+        "to follow up; prompt",
+        "to press"
+      ],
+      "answer": 3,
+      "explain": "appuyer sur means to press."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "relancer",
+      "options": [
+        "to reactivate",
+        "to follow up; prompt",
+        "to attach",
+        "to check a box"
+      ],
+      "answer": 1,
+      "explain": "relancer means to follow up; prompt."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "cocher",
+      "options": [
+        "to process; handle",
+        "to press",
+        "to replace",
+        "to check a box"
+      ],
+      "answer": 3,
+      "explain": "cocher means to check a box."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "remplacer",
+      "options": [
+        "to fill in; provide information",
+        "to replace",
+        "to follow up; prompt",
+        "to reactivate"
+      ],
+      "answer": 1,
+      "explain": "remplacer means to replace."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "réactiver",
+      "options": [
+        "to attach",
+        "to check a box",
+        "to process; handle",
+        "to reactivate"
+      ],
+      "answer": 3,
+      "explain": "réactiver means to reactivate."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "appuyer sur",
+      "question": "Which word did you hear?",
+      "options": [
+        "cocher",
+        "appuyer sur",
+        "réactiver",
+        "renseigner"
+      ],
+      "answer": 1,
+      "explain": "You heard appuyer sur: to press."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "cocher",
+      "question": "Which word did you hear?",
+      "options": [
+        "cocher",
+        "réactiver",
+        "renseigner",
+        "appuyer sur"
+      ],
+      "answer": 0,
+      "explain": "You heard cocher: to check a box."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: actions that move a request forward",
+      "body": "The service, landlord and delivery examples are fictional. In Canada, company and landlord procedures vary. The phrases here help you explain a problem and ask what to do next; they are not legal, tenancy, billing or repair advice."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b2-u14-words-3",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une lacune",
+      "en": "a gap; deficiency",
+      "sound": "ün lah-KÜN",
+      "exampleFr": "Le bilan révèle une lacune précise en compréhension orale.",
+      "exampleEn": "The review reveals a specific gap in listening comprehension."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une compétence transversale",
+      "en": "a transferable skill",
+      "sound": "ün kohn-pay-TAHNS trahn-vehr-SAHL",
+      "exampleFr": "La reformulation est une compétence transversale.",
+      "exampleEn": "Paraphrasing is a transferable skill."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une preuve de progression",
+      "en": "evidence of progress",
+      "sound": "ün preuv duh proh-greh-SYOH(N)",
+      "exampleFr": "Une tâche nouvelle fournit une meilleure preuve de progression.",
+      "exampleEn": "A new task provides better evidence of progress."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un enjeu de fiabilité",
+      "en": "a reliability concern",
+      "sound": "uh(n) ahn-ZHUH duh fee-ah-bee-lee-TAY",
+      "exampleFr": "La source pose un enjeu de fiabilité qu'il faut signaler.",
+      "exampleEn": "The source raises a reliability concern that should be noted."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une réponse nuancée",
+      "en": "a nuanced response",
+      "sound": "ün ray-POHNS nü-ahn-SAY",
+      "exampleFr": "Une réponse nuancée distingue les faits des hypothèses.",
+      "exampleEn": "A nuanced response distinguishes facts from hypotheses."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une stratégie de révision",
+      "en": "a revision strategy",
+      "sound": "ün strah-tay-ZHEE duh ray-vee-ZYOH(N)",
+      "exampleFr": "La stratégie de révision commence par la tâche demandée.",
+      "exampleEn": "The revision strategy begins with the task requirements."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une lacune",
+      "options": [
+        "a reliability concern",
+        "a gap; deficiency",
+        "a transferable skill",
+        "evidence of progress"
+      ],
+      "answer": 1,
+      "explain": "une lacune means a gap; deficiency."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une compétence transversale",
+      "options": [
+        "a nuanced response",
+        "evidence of progress",
+        "a reliability concern",
+        "a transferable skill"
+      ],
+      "answer": 3,
+      "explain": "une compétence transversale means a transferable skill."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une preuve de progression",
+      "options": [
+        "a revision strategy",
+        "evidence of progress",
+        "a reliability concern",
+        "a nuanced response"
+      ],
+      "answer": 1,
+      "explain": "une preuve de progression means evidence of progress."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un enjeu de fiabilité",
+      "options": [
+        "a gap; deficiency",
+        "a nuanced response",
+        "a revision strategy",
+        "a reliability concern"
+      ],
+      "answer": 3,
+      "explain": "un enjeu de fiabilité means a reliability concern."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une réponse nuancée",
+      "options": [
+        "a transferable skill",
+        "a nuanced response",
+        "a revision strategy",
+        "a gap; deficiency"
+      ],
+      "answer": 1,
+      "explain": "une réponse nuancée means a nuanced response."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une stratégie de révision",
+      "options": [
+        "evidence of progress",
+        "a gap; deficiency",
+        "a transferable skill",
+        "a revision strategy"
+      ],
+      "answer": 3,
+      "explain": "une stratégie de révision means a revision strategy."
+    }
+  ]
+}

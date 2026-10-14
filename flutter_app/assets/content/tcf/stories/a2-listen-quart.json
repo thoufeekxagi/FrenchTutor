@@ -1,0 +1,413 @@
+{
+  "id": "a2-listen-quart",
+  "title": "Un quart à échanger",
+  "titleEn": "A shift to exchange",
+  "level": "A2",
+  "mode": "listening",
+  "minutes": 4,
+  "summary": "A childcare conflict threatens a work shift, so two colleagues make a clear exchange and confirm it with their supervisor.",
+  "unit": "a2-u07",
+  "sentences": [
+    {
+      "fr": "Mina reçoit un message de la garderie : elle ferme plus tôt jeudi.",
+      "en": "Mina gets a message from daycare: it is closing early on Thursday."
+    },
+    {
+      "fr": "Ce jour-là, Mina termine son quart à six heures.",
+      "en": "That day, Mina's shift ends at six."
+    },
+    {
+      "fr": "Elle demande à son collègue Hugo s'il peut échanger son horaire.",
+      "en": "She asks her colleague Hugo whether he can exchange shifts."
+    },
+    {
+      "fr": "Hugo travaille le matin, mais il est libre jeudi après-midi.",
+      "en": "Hugo works in the morning, but he is free Thursday afternoon."
+    },
+    {
+      "fr": "Ils proposent de changer les deux quarts.",
+      "en": "They suggest swapping the two shifts."
+    },
+    {
+      "fr": "Mina envoie la proposition à leur responsable.",
+      "en": "Mina sends the proposal to their supervisor."
+    },
+    {
+      "fr": "La responsable vérifie l'horaire de l'équipe et confirme l'échange.",
+      "en": "The supervisor checks the team's schedule and confirms the swap."
+    },
+    {
+      "fr": "Mina peut maintenant chercher son enfant à l'heure.",
+      "en": "Mina can now pick up her child on time."
+    },
+    {
+      "fr": "Hugo reçoit le nouveau calendrier par écrit.",
+      "en": "Hugo receives the new schedule in writing."
+    }
+  ],
+  "words": {
+    "mina": {
+      "en": "Mina (a woman's name)",
+      "pos": "proper name"
+    },
+    "reçoit": {
+      "en": "receives",
+      "pos": "verb",
+      "lemma": "recevoir",
+      "note": "Present form of recevoir."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "message": {
+      "en": "message",
+      "sound": "luh meh-SAHZH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "message"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "la": {
+      "en": "the"
+    },
+    "garderie": {
+      "en": "daycare",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "garderie"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "ferme": {
+      "en": "closes",
+      "pos": "verb",
+      "lemma": "fermer",
+      "note": "Present form of fermer."
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "tôt": {
+      "en": "early",
+      "pos": "adverb"
+    },
+    "jeudi": {
+      "en": "Thursday",
+      "pos": "day"
+    },
+    "ce": {
+      "en": "this; it",
+      "pos": "determiner / pronoun",
+      "note": "Meaning depends on the sentence."
+    },
+    "jour-là": {
+      "en": "that day",
+      "pos": "time expression",
+      "note": "Jour + là points to a specific day."
+    },
+    "termine": {
+      "en": "finishes",
+      "pos": "verb",
+      "lemma": "terminer",
+      "note": "Present form of terminer."
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "quart": {
+      "en": "work shift",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "quart"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "six": {
+      "en": "six",
+      "pos": "number"
+    },
+    "heures": {
+      "en": "hours, o'clock",
+      "pos": "noun, feminine plural"
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "demande"
+    },
+    "collègue": {
+      "en": "colleague",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "collègue",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "hugo": {
+      "en": "Hugo (a man's name)",
+      "pos": "proper name"
+    },
+    "s'il": {
+      "en": "if he; if it",
+      "pos": "conjunction + pronoun",
+      "note": "Elided si + il."
+    },
+    "peut": {
+      "en": "can (pouvoir)",
+      "pos": "verb"
+    },
+    "échanger": {
+      "en": "to exchange; swap",
+      "pos": "verb",
+      "lemma": "échanger",
+      "note": "Infinitive."
+    },
+    "horaire": {
+      "en": "schedule",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "horaire"
+    },
+    "travaille": {
+      "en": "works (travailler)",
+      "pos": "verb",
+      "sound": "trah-VAHY"
+    },
+    "le": {
+      "en": "the"
+    },
+    "matin": {
+      "en": "morning",
+      "pos": "noun, masculine",
+      "sound": "mah-TA(N)",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "matin"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "libre": {
+      "en": "free; available",
+      "pos": "adjective",
+      "lemma": "libre"
+    },
+    "après-midi": {
+      "en": "afternoon",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "après-midi",
+      "note": "This noun can also be feminine in some usage."
+    },
+    "ils": {
+      "en": "they",
+      "pos": "pronoun"
+    },
+    "proposent": {
+      "en": "propose",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Present form of proposer."
+    },
+    "changer": {
+      "en": "to change; to swap",
+      "pos": "verb",
+      "lemma": "changer",
+      "note": "Infinitive."
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "quarts": {
+      "en": "work shifts",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "quart",
+      "note": "Plural of quart."
+    },
+    "envoie": {
+      "en": "sends",
+      "pos": "verb",
+      "lemma": "envoyer",
+      "note": "Present form of envoyer."
+    },
+    "proposition": {
+      "en": "proposal",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "leur": {
+      "en": "their; to them",
+      "pos": "determiner / pronoun",
+      "note": "Meaning depends on its place in the sentence."
+    },
+    "responsable": {
+      "en": "manager; person in charge",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "responsable",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "vérifie": {
+      "en": "checks",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Present form of vérifier."
+    },
+    "l'horaire": {
+      "en": "schedule",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "horaire",
+      "note": "Elided le before a vowel."
+    },
+    "l'équipe": {
+      "en": "team",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "équipe",
+      "note": "Elided la before a vowel."
+    },
+    "et": {
+      "en": "and"
+    },
+    "confirme": {
+      "en": "confirms (confirmer)",
+      "pos": "verb",
+      "sound": "koh(n)-FEERM"
+    },
+    "l'échange": {
+      "en": "exchange; swap",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "échange"
+    },
+    "maintenant": {
+      "en": "now",
+      "pos": "adverb"
+    },
+    "chercher": {
+      "en": "to look for",
+      "pos": "verb",
+      "lemma": "chercher",
+      "note": "Infinitive."
+    },
+    "enfant": {
+      "en": "child",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "enfant",
+      "note": "Grammatical masculine; the noun can refer to a child of any gender."
+    },
+    "l'heure": {
+      "en": "time; hour",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "heure",
+      "note": "Elided la before a vowel."
+    },
+    "nouveau": {
+      "en": "new",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "nouveau",
+      "note": "Masculine singular form; feminine is nouvelle."
+    },
+    "calendrier": {
+      "en": "calendar",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "calendrier"
+    },
+    "par": {
+      "en": "by"
+    },
+    "écrit": {
+      "en": "writes (écrire)",
+      "pos": "verb",
+      "sound": "ay-KREE"
+    }
+  },
+  "keywords": [
+    "quart",
+    "collègue",
+    "garderie",
+    "échanger",
+    "confirme"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why does Mina need a schedule change?",
+      "options": [
+        "Daycare closes early.",
+        "She has a clinic visit.",
+        "Her bus route changes.",
+        "She has an exam."
+      ],
+      "answer": 0,
+      "explain": "Daycare says it will close early on Thursday."
+    },
+    {
+      "prompt": "What do Mina and Hugo propose?",
+      "options": [
+        "Swap their shifts",
+        "Cancel both shifts",
+        "Work from home",
+        "Hire another colleague"
+      ],
+      "answer": 0,
+      "explain": "They propose changing the two shifts."
+    },
+    {
+      "prompt": "Who confirms the exchange?",
+      "options": [
+        "Their supervisor",
+        "A daycare employee",
+        "Mina's neighbour",
+        "The bus driver"
+      ],
+      "answer": 0,
+      "explain": "Their supervisor checks the team's schedule and confirms it."
+    }
+  ]
+}

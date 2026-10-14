@@ -1,0 +1,288 @@
+{
+  "id": "a1-listen-cafe",
+  "title": "Le déjeuner sans arachides",
+  "titleEn": "Lunch without peanuts",
+  "level": "A1",
+  "mode": "listening",
+  "minutes": 3,
+  "summary": "At lunch, Priya asks a clear ingredient question before choosing a safe meal with the server's help.",
+  "unit": "a1-u07",
+  "sentences": [
+    {
+      "fr": "Priya entre dans un petit restaurant.",
+      "en": "Priya enters a small restaurant."
+    },
+    {
+      "fr": "Elle commande un déjeuner avec une collègue.",
+      "en": "She orders lunch with a colleague."
+    },
+    {
+      "fr": "Priya a une allergie aux arachides.",
+      "en": "Priya has a peanut allergy."
+    },
+    {
+      "fr": "Elle demande à la serveuse : « Y a-t-il des arachides dans ce plat ? »",
+      "en": "She asks the server, “Are there peanuts in this dish?”"
+    },
+    {
+      "fr": "La serveuse vérifie avec la cuisine.",
+      "en": "The server checks with the kitchen."
+    },
+    {
+      "fr": "Elle propose une soupe sans arachides.",
+      "en": "She suggests a soup without peanuts."
+    },
+    {
+      "fr": "Priya choisit la soupe et de l'eau.",
+      "en": "Priya chooses the soup and some water."
+    },
+    {
+      "fr": "Elle remercie la serveuse pour la vérification.",
+      "en": "She thanks the server for checking."
+    }
+  ],
+  "words": {
+    "priya": {
+      "en": "Priya (a woman's name)",
+      "pos": "proper name"
+    },
+    "entre": {
+      "en": "between; among",
+      "pos": "preposition"
+    },
+    "dans": {
+      "en": "in"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "petit": {
+      "en": "small",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "petit",
+      "note": "Masculine singular form; feminine is petite."
+    },
+    "restaurant": {
+      "en": "restaurant",
+      "sound": "rehs-toh-RAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "restaurant"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "commande": {
+      "en": "orders",
+      "pos": "verb",
+      "lemma": "commander",
+      "note": "Present form of commander."
+    },
+    "déjeuner": {
+      "en": "breakfast in Québec and much of French-speaking Canada; lunch in France",
+      "sound": "luh day-zhuh-NAY",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "déjeuner"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "collègue": {
+      "en": "colleague",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "collègue",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "allergie": {
+      "en": "allergy",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "allergie"
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "arachides": {
+      "en": "peanuts",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "arachide",
+      "note": "Plural of arachide."
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "demande"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "la": {
+      "en": "the"
+    },
+    "serveuse": {
+      "en": "server; waitress",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "serveur",
+      "note": "Feminine form of serveur."
+    },
+    "y": {
+      "en": "there (in il y a)"
+    },
+    "a-t-il": {
+      "en": "is there?; does he have?",
+      "pos": "question form",
+      "note": "Inversion: a + subject pronoun."
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "ce": {
+      "en": "this; it",
+      "pos": "determiner / pronoun",
+      "note": "Meaning depends on the sentence."
+    },
+    "plat": {
+      "en": "dish",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "plat"
+    },
+    "vérifie": {
+      "en": "checks",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Present form of vérifier."
+    },
+    "cuisine": {
+      "en": "cooking; food; kitchen",
+      "sound": "lah kwee-ZEEN",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "cuisine"
+    },
+    "propose": {
+      "en": "suggests",
+      "pos": "verb",
+      "lemma": "proposer",
+      "note": "Present form of proposer."
+    },
+    "soupe": {
+      "en": "soup",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "soupe"
+    },
+    "sans": {
+      "en": "without",
+      "pos": "preposition"
+    },
+    "choisit": {
+      "en": "chooses",
+      "pos": "verb",
+      "lemma": "choisir",
+      "note": "Present form of choisir."
+    },
+    "et": {
+      "en": "and"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "l'eau": {
+      "en": "the water",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "l'eau"
+    },
+    "remercie": {
+      "en": "thanks",
+      "pos": "verb",
+      "lemma": "remercier",
+      "note": "Present form of remercier."
+    },
+    "pour": {
+      "en": "for"
+    },
+    "vérification": {
+      "en": "check; verification",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    }
+  },
+  "keywords": [
+    "déjeuner",
+    "arachides",
+    "serveuse",
+    "soupe",
+    "choisit"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does Priya need to avoid?",
+      "options": [
+        "Peanuts",
+        "Milk",
+        "Fish",
+        "Bread"
+      ],
+      "answer": 0,
+      "explain": "Priya says she has a peanut allergy."
+    },
+    {
+      "prompt": "What does the server do before answering?",
+      "options": [
+        "Checks with the kitchen",
+        "Calls Priya's colleague",
+        "Changes the menu",
+        "Brings the bill"
+      ],
+      "answer": 0,
+      "explain": "The server checks with the kitchen."
+    },
+    {
+      "prompt": "What does Priya choose?",
+      "options": [
+        "Soup and water",
+        "Chicken and juice",
+        "Salad and coffee",
+        "Bread and tea"
+      ],
+      "answer": 0,
+      "explain": "She chooses the soup and water."
+    }
+  ]
+}

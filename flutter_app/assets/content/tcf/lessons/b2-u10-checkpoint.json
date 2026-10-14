@@ -1,0 +1,75 @@
+{
+  "id": "b2-u10-checkpoint",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does une concertation mean?",
+      "options": [
+        "A feature",
+        "A witness",
+        "An estimate",
+        "A joint consultation"
+      ],
+      "answer": 3,
+      "explain": "Une concertation is a consultation or joint discussion."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does en parler refer to?",
+      "options": [
+        "Ask a person a question",
+        "Finish a debate",
+        "Talk about something previously linked with de",
+        "Return to a physical place"
+      ],
+      "answer": 2,
+      "explain": "En parler means to talk about it, with en replacing de + topic."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why distinguish points of agreement and objections?",
+      "options": [
+        "They show where proposals align and where needs differ",
+        "They prove one speaker is wrong",
+        "They remove the need for evidence",
+        "They guarantee a compromise"
+      ],
+      "answer": 0,
+      "explain": "A summary should preserve both convergence and disagreement."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What should a clear pronoun have?",
+      "options": [
+        "A hidden source",
+        "An identifiable reference",
+        "A second meaning",
+        "A stronger conclusion"
+      ],
+      "answer": 1,
+      "explain": "Pronouns need clear references."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is a useful response to a concern?",
+      "options": [
+        "Say every group agrees",
+        "Replace the issue with a new topic",
+        "Ignore it and repeat your view",
+        "Name the concern and propose a relevant follow-up"
+      ],
+      "answer": 3,
+      "explain": "Responding directly keeps the discussion coherent."
+    }
+  ]
+}

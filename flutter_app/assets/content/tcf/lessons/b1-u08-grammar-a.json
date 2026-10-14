@@ -1,0 +1,87 @@
+{
+  "id": "b1-u08-grammar-a",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Grammar: Indirect questions and familiar en/y patterns",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Indirect questions and familiar en/y patterns",
+      "body": "After je voudrais savoir, pourriez-vous me dire or je me demande, an embedded question uses normal statement word order: Pouvez-vous me dire à quelle heure le bureau ferme ? Use si for a yes/no question and keep a question word such as où, quand, combien. Do not invert the subject inside the embedded question. Review A2 y for a named place and en for a quantity or a familiar verb built with de: j'y retournerai; j'en ai besoin. Do not use these pronouns unless the reference is clear."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Indirect questions and familiar en/y patterns",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Embedded yes/no question",
+          "si + statement order",
+          "Je voudrais savoir si le formulaire est obligatoire.",
+          "I would like to know whether the form is required."
+        ],
+        [
+          "Embedded information question",
+          "question word + statement order",
+          "Pouvez-vous me dire quand le bureau ferme ?",
+          "Can you tell me when the office closes?"
+        ],
+        [
+          "Refer to a known place or item",
+          "y / en in familiar patterns",
+          "J'y retournerai; j'en ai besoin.",
+          "I will go back there; I need some / it."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the natural embedded question.",
+      "options": [
+        "Pourriez-vous me dire à quelle heure le bureau fermer ?",
+        "Pourriez-vous me dire à quelle heure ferme le bureau ?",
+        "Pourriez-vous me dire à quelle heure est-ce que ferme le bureau ?",
+        "Pourriez-vous me dire à quelle heure le bureau ferme ?"
+      ],
+      "answer": 3,
+      "explain": "The embedded question uses statement word order."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Complete: Je voudrais savoir ___ l'inscription est obligatoire.",
+      "options": [
+        "où",
+        "que",
+        "si",
+        "dont"
+      ],
+      "answer": 2,
+      "explain": "Use si for an embedded yes/no question."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which sentence uses y to refer to a previously named place?",
+      "options": [
+        "Je reçois une réponse; j'y reçois.",
+        "Je retournerai au centre; j'y retournerai demain.",
+        "Je retournerai du formulaire; j'y ai besoin.",
+        "Je parle à Nadia; j'y parle."
+      ],
+      "answer": 1,
+      "explain": "Here y replaces the named place, au centre."
+    }
+  ]
+}

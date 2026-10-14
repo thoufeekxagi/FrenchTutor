@@ -1,0 +1,125 @@
+{
+  "id": "a2-u11-grammar-a",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Grammar: Give or follow a short instruction: the imperative",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Give or follow a short instruction: the imperative",
+      "body": "A practical request usually has three parts: state the problem, ask for one action and confirm what happens next. French uses the imperative for a direct instruction and the conditional of pouvoir or vouloir to make many requests sound more courteous."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "These short messages reuse the lesson's document vocabulary and model one useful instruction.",
+      "headers": [
+        "Service message",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Le formulaire est incomplet.",
+          "The form is incomplete."
+        ],
+        [
+          "Il n'y a pas de copie recto verso.",
+          "There is no double-sided copy."
+        ],
+        [
+          "Il vérifie le formulaire.",
+          "He checks the form."
+        ],
+        [
+          "Gardez le numéro de confirmation.",
+          "Keep the confirmation number."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "The imperative has no written subject pronoun. Use vous for an unfamiliar service contact or a plural group. With a regular -er verb, the familiar tu form drops final -s: tu coches → coche.",
+      "headers": [
+        "Infinitive",
+        "tu (familiar)",
+        "vous (polite or plural)",
+        "Negative instruction"
+      ],
+      "rows": [
+        [
+          "cocher",
+          "Coche la case.",
+          "Cochez la case.",
+          "Ne cochez pas la mauvaise case."
+        ],
+        [
+          "appuyer sur",
+          "Appuie sur le bouton.",
+          "Appuyez sur le bouton.",
+          "N'appuyez pas avant de vérifier."
+        ],
+        [
+          "attacher",
+          "Attache le reçu.",
+          "Attachez le reçu.",
+          "N'attachez pas le mauvais document."
+        ],
+        [
+          "choisir",
+          "Choisis une option.",
+          "Choisissez une option.",
+          "Ne choisissez pas sans vérifier."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Give or follow a short instruction: the imperative",
+      "body": "• For an affirmative instruction, use the tu, nous or vous verb form without the subject: coche; cochons; cochez.\n• For a negative instruction, place ne (or n' before a vowel sound) before the verb and pas after it: ne cochez pas; n'appuyez pas.\n• Use tu only when the relationship is familiar. Use vous with an unfamiliar customer-service contact or when speaking to several people.\n• For regular -er verbs, the tu imperative drops final -s: tu coches → coche. Other verbs do not all follow this pattern: tu choisis → choisis.\n• Keep an instruction short and limited to the next action. For a request to another person, the conditional form may be more suitable."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the polite instruction for an unfamiliar service contact.",
+      "options": [
+        "Cochez la case obligatoire.",
+        "Coche la case obligatoire.",
+        "Tu coches la case obligatoire.",
+        "Vous cocher la case obligatoire."
+      ],
+      "answer": 0,
+      "explain": "Use the vous imperative for an unfamiliar service contact."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the correct negative instruction.",
+      "options": [
+        "N'appuyez pas sur le bouton.",
+        "Ne appuyez pas sur le bouton.",
+        "N'appuyez sur pas le bouton.",
+        "N'appuyez pas bouton le sur."
+      ],
+      "answer": 0,
+      "explain": "Before a vowel sound, ne shortens to n'; pas follows the verb."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What happens to a regular -er verb in the familiar tu imperative?",
+      "options": [
+        "The final -s is removed: coche.",
+        "The subject tu stays: tu coche.",
+        "The verb moves after the object.",
+        "The verb takes -ez: cochez."
+      ],
+      "answer": 0,
+      "explain": "The familiar imperative of a regular -er verb drops the final -s."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "b1-u07-tcf",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La responsable a expliqué que la salle serait disponible dès dix-sept heures. Elle a aussi demandé si les bénévoles pouvaient arriver plus tôt pour installer les chaises.",
+      "question": "What did the coordinator ask the volunteers?",
+      "options": [
+        "Whether they had reserved a different room",
+        "Whether they could cancel the event",
+        "Whether they could move the date",
+        "Whether they could arrive early"
+      ],
+      "answer": 3,
+      "explain": "She asked whether they could arrive earlier to set up chairs."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Selon le compte rendu, le comité a retenu l'idée d'un essai. La durée exacte n'a pas été confirmée; elle sera discutée après la vérification du budget.",
+      "question": "What is not confirmed yet?",
+      "options": [
+        "The length of the trial",
+        "Whether the idea was discussed",
+        "Whether a budget exists",
+        "The meeting location"
+      ],
+      "answer": 0,
+      "explain": "The trial duration is still to be discussed."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What will be communicated after registration?",
+      "options": [
+        "The final number of participants",
+        "The workshop topic",
+        "The coordinator's question",
+        "The room address"
+      ],
+      "answer": 0,
+      "explain": "The final participant number will come after registration.",
+      "promptFr": "Extrait du compte rendu — La coordonnatrice a confirmé que l'atelier aurait lieu le 12 juin. Elle a demandé si la salle pouvait accueillir vingt personnes. Le nombre final de participants sera communiqué après la période d'inscription."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should readers do?",
+      "options": [
+        "Assume the course is cancelled",
+        "Forward the message to everyone",
+        "Check the official notice before changing registration",
+        "Cancel their registration immediately"
+      ],
+      "answer": 2,
+      "explain": "The organization says no change is confirmed and asks readers to check the official notice.",
+      "promptFr": "Message transféré — « Le cours du samedi est annulé. » Note de l'organisme : aucun changement n'a été confirmé. Veuillez consulter l'avis officiel avant de modifier votre inscription."
+    }
+  ]
+}

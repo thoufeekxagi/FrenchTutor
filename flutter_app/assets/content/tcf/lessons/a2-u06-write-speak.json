@@ -1,0 +1,49 @@
+{
+  "id": "a2-u06-write-speak",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Ask about a rental listing",
+      "body": "Write 60–90 French words to a housing contact. Ask about two features, explain your budget or travel priority, and compare the listing with one other option. Use two comparison forms. This is an original guided message, not an official TCF task.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour, Je vous écris au sujet du studio près de la bibliothèque. Le loyer du studio est moins élevé que le loyer de l'appartement d'une chambre, et l'arrêt d'autobus est aussi près. La buanderie est-elle dans l'immeuble ? Les frais d'électricité sont-ils compris dans le loyer ? Je cherche un logement paisible, mais je ne cherche pas de balcon privé. Je vais visiter samedi si le logement est encore libre. Merci, Nadia\n\nCheck:\n• Ask specific questions that the notice does not answer.\n• Compare two homes on the same criterion and use que correctly.\n• Use a superlative only when comparing a set of at least three or all available options.\n• Count 60–90 words, then reread the adjective endings and monthly amounts.\n• Close your notes tomorrow and write a new inquiry for a different home."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Choose between two apartments",
+      "body": "You have two rental notices and a monthly budget. Tell Marie which home you would visit first, compare price and travel, and ask one question that the notice does not answer. Marie changes one preference; reconsider your choice without reading your notes.\n\n• Say the criterion before the comparison so the listener can follow your reasoning.\n• Use figures from the notices and give a reason for your recommendation.\n• Ask one practical question that is not answered in the listing.\n• On the retry, respond to Marie's changed need and use a different comparison."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je vais visiter d'abord le studio, parce que le loyer est moins élevé et l'arrêt d'autobus est plus près.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "L'appartement d'une chambre est plus spacieux, mais il coûte cent dollars de plus par mois. Je ne cherche pas de balcon.",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Je vais demander si les frais d'électricité sont compris dans le loyer.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

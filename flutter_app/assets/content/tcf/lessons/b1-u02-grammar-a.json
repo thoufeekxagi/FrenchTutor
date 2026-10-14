@@ -1,0 +1,87 @@
+{
+  "id": "b1-u02-grammar-a",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Grammar: Future forms and future time clauses",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Future forms and future time clauses",
+      "body": "A2 introduced futur proche and common futur simple forms. Here, connect future events precisely. Use futur simple for a future action or prediction. After quand or lorsque for a future time, French normally uses the present in that clause: Quand je recevrai la réponse, je confirmerai. After si meaning 'if' for a real possible condition, use the present, then future in the result: Si la date change, nous reporterons. Do not put futur simple immediately after si in this pattern."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Future forms and future time clauses",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Future action",
+          "futur simple",
+          "Je confirmerai ma présence demain.",
+          "I will confirm my attendance tomorrow."
+        ],
+        [
+          "Future time clause",
+          "quand + présent; future in main clause",
+          "Quand le centre répond, je vérifierai les détails.",
+          "When the centre replies, I will check the details."
+        ],
+        [
+          "Real condition",
+          "si + présent; futur simple",
+          "Si le cours finit tôt, je prendrai le bus.",
+          "If class finishes early, I will take the bus."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Complete: Quand le centre ___ la date, nous réserverons le billet.",
+      "options": [
+        "confirme",
+        "confirmerait",
+        "confirmera",
+        "confirmait"
+      ],
+      "answer": 2,
+      "explain": "The main future clause takes futur simple: confirmera."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Complete the real condition: Si le cours ___ à 17 h, je prendrai le train.",
+      "options": [
+        "finit",
+        "finira",
+        "finissait",
+        "finirait"
+      ],
+      "answer": 0,
+      "explain": "Use the present after si for a real possible condition."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which is the natural sequence?",
+      "options": [
+        "Quand j'aurai le courriel, je répondrais hier.",
+        "Quand j'aurai le courriel, je répondrai.",
+        "Si je recevrai le courriel, je répondrai.",
+        "Quand je recevoir le courriel, je répondrai."
+      ],
+      "answer": 1,
+      "explain": "The future time clause uses futur simple here; after si, the real condition uses the present."
+    }
+  ]
+}

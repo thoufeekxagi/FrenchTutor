@@ -1,0 +1,63 @@
+{
+  "id": "b2-u09-write-speak",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two fictional articles discuss a proposed way to reduce household costs. One recommends comparing recurring contracts; the other warns that average figures may not fit each household. Compare the views and give a careful recommendation in 130–160 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux articles cherchent des moyens de mieux gérer les dépenses, mais ils s'appuient sur des éléments différents. Le premier propose de comparer les contrats qui reviennent régulièrement. Le second rappelle qu'une moyenne peut cacher des besoins et des obligations très variés. À mon avis, comparer les frais est une démarche raisonnable, à condition de vérifier les modalités de chaque contrat avant de le modifier. Les chiffres généraux peuvent aider à poser des questions, mais ils ne suffisent pas à décider pour un ménage précis. Il serait aussi prudent de garder une marge pour les dépenses imprévues. Une recommandation utile devrait donc présenter ses hypothèses et expliquer à qui elle peut convenir. Les données peuvent éclairer un choix sans remplacer l'examen de la situation personnelle.\n\nCheck:\n• Task 3 range: 120–180 words.\n• Use figures as evidence only for what they measure.\n• Make an assumption or limitation explicit.\n• Use a clear verb if nominalized wording hides the actor."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Task 3: Les conseils financiers généraux sont-ils utiles ? Give a balanced position, explain what averages can and cannot show, and name a situation in which advice needs adapting. Marie should change one assumption in your example.\n\n• Use cautious phrases such as il semble que or les chiffres ne permettent pas de….\n• Name the evidence and its limitation.\n• Avoid turning a fictional figure into current financial guidance."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Les conseils généraux peuvent être utiles pour repérer des questions à poser, mais ils ne conviennent pas automatiquement à chaque personne.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Une moyenne peut montrer une tendance dans un groupe, tout en cachant des écarts importants. Il est donc nécessaire de vérifier les hypothèses et les besoins individuels.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "À mon avis, un conseil devrait expliquer les limites des données et les conditions dans lesquelles il est pertinent.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Par exemple, comparer des frais peut être raisonnable, à condition de vérifier les modalités avant de modifier un contrat.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "En conclusion, les conseils généraux servent de point de départ, puis doivent être adaptés à la situation.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

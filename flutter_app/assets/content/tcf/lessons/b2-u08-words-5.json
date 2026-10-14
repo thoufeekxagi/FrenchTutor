@@ -1,0 +1,148 @@
+{
+  "id": "b2-u08-words-5",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "s'approprier un espace",
+      "en": "to make a space one's own",
+      "sound": "sah-proh-pree-YAY uh(n) eh-spahs",
+      "exampleFr": "Les artistes aident le quartier à s'approprier cet espace.",
+      "exampleEn": "The artists help the neighbourhood make this space its own."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "préserver un héritage",
+      "en": "to preserve a heritage",
+      "sound": "pray-zehr-VAY uh(n) ay-ree-TAHZH",
+      "exampleFr": "Le musée cherche à préserver un héritage menacé.",
+      "exampleEn": "The museum is seeking to preserve a threatened heritage."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une programmation inclusive",
+      "en": "an inclusive program; schedule",
+      "sound": "ün proh-grah-mah-SYOH(N) ehn-klü-ZEEV",
+      "exampleFr": "La programmation inclusive propose plusieurs formats de visite.",
+      "exampleEn": "The inclusive program offers several types of visit."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "faire ressortir",
+      "en": "to bring out; highlight",
+      "sound": "fehr ruhs-sohr-TEER",
+      "exampleFr": "Le montage fait ressortir les différences entre les récits.",
+      "exampleEn": "The editing highlights the differences between the accounts."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un marqueur identitaire",
+      "en": "an identity marker",
+      "sound": "uh(n) mar-kuhr ee-dahn-tee-TEHR",
+      "exampleFr": "La langue peut être un marqueur identitaire important.",
+      "exampleEn": "Language can be an important identity marker."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une mémoire collective",
+      "en": "collective memory",
+      "sound": "ün may-MWAHR koh-lehk-TEEV",
+      "exampleFr": "Le monument nourrit une mémoire collective.",
+      "exampleEn": "The monument contributes to collective memory."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "s'approprier un espace",
+      "options": [
+        "to bring out; highlight",
+        "to make a space one's own",
+        "to preserve a heritage",
+        "an inclusive program; schedule"
+      ],
+      "answer": 1,
+      "explain": "s'approprier un espace means to make a space one's own."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "préserver un héritage",
+      "options": [
+        "an identity marker",
+        "an inclusive program; schedule",
+        "to bring out; highlight",
+        "to preserve a heritage"
+      ],
+      "answer": 3,
+      "explain": "préserver un héritage means to preserve a heritage."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une programmation inclusive",
+      "options": [
+        "collective memory",
+        "an inclusive program; schedule",
+        "to bring out; highlight",
+        "an identity marker"
+      ],
+      "answer": 1,
+      "explain": "une programmation inclusive means an inclusive program; schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "faire ressortir",
+      "options": [
+        "to make a space one's own",
+        "an identity marker",
+        "collective memory",
+        "to bring out; highlight"
+      ],
+      "answer": 3,
+      "explain": "faire ressortir means to bring out; highlight."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un marqueur identitaire",
+      "options": [
+        "to preserve a heritage",
+        "an identity marker",
+        "collective memory",
+        "to make a space one's own"
+      ],
+      "answer": 1,
+      "explain": "un marqueur identitaire means an identity marker."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une mémoire collective",
+      "options": [
+        "an inclusive program; schedule",
+        "to make a space one's own",
+        "to preserve a heritage",
+        "collective memory"
+      ],
+      "answer": 3,
+      "explain": "une mémoire collective means collective memory."
+    }
+  ]
+}

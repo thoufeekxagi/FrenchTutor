@@ -1,0 +1,72 @@
+{
+  "id": "b2-u07-tcf",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le dispositif a été créé afin que les bénévoles puissent trier les matières plus facilement. Le premier bilan aura lieu après trois événements.",
+      "question": "When will the first assessment happen?",
+      "options": [
+        "After one year",
+        "Before the first event",
+        "Only if the budget changes",
+        "After three events"
+      ],
+      "answer": 3,
+      "explain": "The first assessment is planned after three events."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "En raison d'un manque de bacs, une partie des matières a été triée plus tard. Cela ne signifie pas que le projet a échoué; l'équipe doit d'abord mesurer l'incidence.",
+      "question": "What does the speaker say about the project's result?",
+      "options": [
+        "It is too early to conclude that it failed",
+        "It has already met every target",
+        "It will not be assessed",
+        "It has no relation to the missing bins"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the effect still needs to be measured."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why is more consistent data needed?",
+      "options": [
+        "The events differed in size",
+        "No bins were installed",
+        "The project has already ended",
+        "The guide was never distributed"
+      ],
+      "answer": 0,
+      "explain": "The events had different attendance, which can affect comparison.",
+      "promptFr": "Un projet pilote fictif cherche à réduire les déchets lors de rencontres communautaires. Les organisateurs ont installé des bacs et distribué un guide. Le premier bilan ne compare qu'un événement de petite taille avec un événement plus fréquenté; cette différence peut influencer les résultats. Le rapport conclut que la méthode est prometteuse, mais qu'une collecte de données plus uniforme est nécessaire avant toute décision à long terme."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What has the document not established?",
+      "options": [
+        "That transport can be discussed",
+        "That local products exist",
+        "That the proposed procurement already lowers the overall footprint",
+        "That the group has an intention"
+      ],
+      "answer": 2,
+      "explain": "The document presents an intention, not measured proof of overall impact.",
+      "promptFr": "Les organisateurs souhaitent acheter davantage de matériel local dans le but de limiter certains transports. Toutefois, le document ne compare ni les coûts ni la disponibilité des produits. Il présente une intention et une question à examiner, pas une preuve que l'approvisionnement proposé réduit déjà l'empreinte globale."
+    }
+  ]
+}

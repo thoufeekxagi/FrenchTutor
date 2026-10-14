@@ -1,0 +1,148 @@
+{
+  "id": "b1-u02-words-4",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une formation reconnue",
+      "en": "a recognized training program",
+      "sound": "ün for-mah-SYOH(N) ruh-koh-NÜ",
+      "exampleFr": "Cette formation reconnue mène à un certificat.",
+      "exampleEn": "This recognized training program leads to a certificate."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un certificat",
+      "en": "a certificate",
+      "sound": "uh(n) sehr-tee-fee-KAH",
+      "exampleFr": "Le certificat confirme les compétences acquises.",
+      "exampleEn": "The certificate confirms the skills acquired."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un service de placement",
+      "en": "a job-placement service",
+      "sound": "uh(n) sehr-vees duh plahs-mahn",
+      "exampleFr": "Le service de placement aide les diplômés à trouver un stage.",
+      "exampleEn": "The job-placement service helps graduates find an internship."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "acquérir de l'expérience",
+      "en": "to gain experience",
+      "sound": "ah-kay-REER duh lehks-pay-ree-ahns",
+      "exampleFr": "Elle veut acquérir de l'expérience avant de changer de secteur.",
+      "exampleEn": "She wants to gain experience before changing fields."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "mettre à jour son CV",
+      "en": "to update one's résumé",
+      "sound": "mehtr ah zhoor sohn say-vay",
+      "exampleFr": "Je dois mettre à jour mon CV avant de postuler.",
+      "exampleEn": "I need to update my résumé before applying."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "compléter un dossier",
+      "en": "to complete an application file",
+      "sound": "kohn-play-tay uh(n) doh-syay",
+      "exampleFr": "Il faut compléter le dossier avant vendredi.",
+      "exampleEn": "The application file must be completed before Friday."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une formation reconnue",
+      "options": [
+        "to gain experience",
+        "a recognized training program",
+        "a certificate",
+        "a job-placement service"
+      ],
+      "answer": 1,
+      "explain": "une formation reconnue means a recognized training program."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un certificat",
+      "options": [
+        "to update one's résumé",
+        "a job-placement service",
+        "to gain experience",
+        "a certificate"
+      ],
+      "answer": 3,
+      "explain": "un certificat means a certificate."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un service de placement",
+      "options": [
+        "to complete an application file",
+        "a job-placement service",
+        "to gain experience",
+        "to update one's résumé"
+      ],
+      "answer": 1,
+      "explain": "un service de placement means a job-placement service."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "acquérir de l'expérience",
+      "options": [
+        "a recognized training program",
+        "to update one's résumé",
+        "to complete an application file",
+        "to gain experience"
+      ],
+      "answer": 3,
+      "explain": "acquérir de l'expérience means to gain experience."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "mettre à jour son CV",
+      "options": [
+        "a certificate",
+        "to update one's résumé",
+        "to complete an application file",
+        "a recognized training program"
+      ],
+      "answer": 1,
+      "explain": "mettre à jour son CV means to update one's résumé."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "compléter un dossier",
+      "options": [
+        "a job-placement service",
+        "a recognized training program",
+        "a certificate",
+        "to complete an application file"
+      ],
+      "answer": 3,
+      "explain": "compléter un dossier means to complete an application file."
+    }
+  ]
+}

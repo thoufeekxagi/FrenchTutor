@@ -1,0 +1,140 @@
+{
+  "id": "a2-u08-checkpoint",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Le rapport est prêt. Je ___ relis.",
+      "options": [
+        "le",
+        "la",
+        "les",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Rapport is masculine singular, so use le."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "La note ? Je vais ___ envoyer.",
+      "options": [
+        "l'",
+        "le",
+        "les",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Note is feminine singular, so use la; before envoyer it becomes l'."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Les dossiers ? Nous allons ___ classer.",
+      "options": [
+        "les",
+        "la",
+        "le",
+        "lui"
+      ],
+      "answer": 0,
+      "explain": "Dossiers is plural, so use les before the infinitive."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where does the direct object pronoun go in Je corrige la version?",
+      "options": [
+        "Before the conjugated verb: Je la corrige",
+        "After the verb: Je corrige la",
+        "At the end: Je corrige-la",
+        "Before the subject: La je corrige"
+      ],
+      "answer": 0,
+      "explain": "A direct object pronoun goes before its conjugated verb."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Choose the correct near-future sentence for les fichiers.",
+      "options": [
+        "Je vais les envoyer.",
+        "Je les vais envoyer.",
+        "Je vais envoyer les.",
+        "Je les envoyer vais."
+      ],
+      "answer": 0,
+      "explain": "With aller + infinitive, put the pronoun before the infinitive: vais les envoyer."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Choose the negative sentence for 'I cannot find the file.'",
+      "options": [
+        "Je ne le trouve pas.",
+        "Je le ne trouve pas.",
+        "Je ne trouve le pas.",
+        "Je ne pas le trouve."
+      ],
+      "answer": 0,
+      "explain": "In a simple negative, ne and pas go around the conjugated verb, with the pronoun before it."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "A speaker says Je vais l'archiver. Which noun could l' replace?",
+      "options": [
+        "Le dossier",
+        "Les copies",
+        "La personne-ressource",
+        "Les réunions"
+      ],
+      "answer": 0,
+      "explain": "L' can replace one masculine or feminine singular object before a vowel; dossier is singular and masculine."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Nous les classons par date. What does les replace?",
+      "options": [
+        "Several documents or files",
+        "One report",
+        "One presentation",
+        "A person"
+      ],
+      "answer": 0,
+      "explain": "Les replaces a plural direct object."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Who is responsible for proofreading in the sentence Sam va le relire?",
+      "options": [
+        "Sam",
+        "The report",
+        "The committee",
+        "The instructor"
+      ],
+      "answer": 0,
+      "explain": "Sam is the subject; le is the report being reread."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which reply best clarifies Tu la remets ? when the reference is unclear?",
+      "options": [
+        "Tu parles de la liste de corrections ?",
+        "Oui, je la remets.",
+        "Le dossier est confidentiel.",
+        "Nous les classons par date."
+      ],
+      "answer": 0,
+      "explain": "Name the possible noun and check the reference before acting."
+    }
+  ]
+}

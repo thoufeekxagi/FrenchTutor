@@ -1,0 +1,176 @@
+{
+  "id": "b1-u03-words-2",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un essai",
+      "en": "a trial",
+      "sound": "uh(n) eh-SEH",
+      "exampleFr": "Un essai de quatre semaines donnerait des renseignements utiles.",
+      "exampleEn": "A four-week trial would provide useful information."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un désaccord",
+      "en": "a disagreement",
+      "sound": "uh(n) day-zah-KOR",
+      "exampleFr": "Le désaccord porte sur l'heure, pas sur l'activité.",
+      "exampleEn": "The disagreement is about the time, not the activity."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "s'adapter",
+      "en": "to adapt",
+      "sound": "sah-dahp-TAY",
+      "exampleFr": "Le groupe pourrait s'adapter à un horaire partagé.",
+      "exampleEn": "The group could adapt to a shared schedule."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "proposer",
+      "en": "to suggest",
+      "sound": "proh-poh-ZAY",
+      "exampleFr": "Je proposerais une période d'essai.",
+      "exampleEn": "I would suggest a trial period."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "permettre",
+      "en": "to allow",
+      "sound": "pehr-MEHTR",
+      "exampleFr": "Une salle plus grande permettrait d'accueillir le groupe.",
+      "exampleEn": "A larger room would allow the group to host everyone."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "à condition de",
+      "en": "provided that",
+      "sound": "ah kohn-dee-SYOH(N) duh",
+      "exampleFr": "L'option fonctionnerait à condition de confirmer le transport.",
+      "exampleEn": "The option would work provided that transportation is confirmed."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un essai",
+      "options": [
+        "to suggest",
+        "a trial",
+        "a disagreement",
+        "to adapt"
+      ],
+      "answer": 1,
+      "explain": "un essai means a trial."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un désaccord",
+      "options": [
+        "to allow",
+        "to adapt",
+        "to suggest",
+        "a disagreement"
+      ],
+      "answer": 3,
+      "explain": "un désaccord means a disagreement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "s'adapter",
+      "options": [
+        "provided that",
+        "to adapt",
+        "to suggest",
+        "to allow"
+      ],
+      "answer": 1,
+      "explain": "s'adapter means to adapt."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "proposer",
+      "options": [
+        "a trial",
+        "to allow",
+        "provided that",
+        "to suggest"
+      ],
+      "answer": 3,
+      "explain": "proposer means to suggest."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "permettre",
+      "options": [
+        "a disagreement",
+        "to allow",
+        "provided that",
+        "a trial"
+      ],
+      "answer": 1,
+      "explain": "permettre means to allow."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "à condition de",
+      "options": [
+        "to adapt",
+        "a trial",
+        "a disagreement",
+        "provided that"
+      ],
+      "answer": 3,
+      "explain": "à condition de means provided that."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un désaccord",
+      "question": "Which word did you hear?",
+      "options": [
+        "proposer",
+        "un désaccord",
+        "un essai",
+        "s'adapter"
+      ],
+      "answer": 1,
+      "explain": "You heard un désaccord: a disagreement."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "s'adapter",
+      "question": "Which word did you hear?",
+      "options": [
+        "permettre",
+        "un désaccord",
+        "proposer",
+        "s'adapter"
+      ],
+      "answer": 3,
+      "explain": "You heard s'adapter: to adapt."
+    }
+  ]
+}

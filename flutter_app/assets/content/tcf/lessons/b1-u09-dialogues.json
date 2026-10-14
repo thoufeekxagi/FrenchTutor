@@ -1,0 +1,72 @@
+{
+  "id": "b1-u09-dialogues",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Helping at an event",
+      "body": "Two volunteers describe how a fictional event was organized.",
+      "examples": [
+        {
+          "fr": "Les tables ont été installées avant notre arrivée.",
+          "en": "Nadia: The tables were set up before we arrived."
+        },
+        {
+          "fr": "Qui a préparé les badges ?",
+          "en": "Sam: Who prepared the badges?"
+        },
+        {
+          "fr": "On les a préparés hier, puis ils ont été rangés à l'accueil.",
+          "en": "Nadia: They were prepared yesterday, then stored at reception."
+        },
+        {
+          "fr": "En accueillant les participants, je vais vérifier leur inscription.",
+          "en": "Sam: While welcoming participants, I will check their registration."
+        },
+        {
+          "fr": "Bonne idée. À la fin, on lira les commentaires ensemble.",
+          "en": "Nadia: Good idea. At the end, we will read the comments together."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Describing a workshop",
+      "body": "A participant explains the steps to a new classmate.",
+      "examples": [
+        {
+          "fr": "L'atelier a été organisé par le centre communautaire.",
+          "en": "Lina: The workshop was organized by the community centre."
+        },
+        {
+          "fr": "Comment peut-on s'inscrire ?",
+          "en": "Omar: How can one register?"
+        },
+        {
+          "fr": "On remplit un court formulaire en ligne.",
+          "en": "Lina: You fill in a short online form."
+        },
+        {
+          "fr": "Et le matériel ?",
+          "en": "Omar: And the equipment?"
+        },
+        {
+          "fr": "Il est fourni sur place. En participant, tu rencontreras aussi les bénévoles.",
+          "en": "Lina: It is provided on site. By taking part, you will also meet the volunteers."
+        }
+      ]
+    }
+  ]
+}

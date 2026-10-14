@@ -1,0 +1,52 @@
+{
+  "id": "b2-u07-reading",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why is more consistent data needed?",
+      "options": [
+        "The project has already ended",
+        "The guide was never distributed",
+        "No bins were installed",
+        "The events differed in size"
+      ],
+      "answer": 3,
+      "explain": "The events had different attendance, which can affect comparison.",
+      "promptFr": "Un projet pilote fictif cherche à réduire les déchets lors de rencontres communautaires. Les organisateurs ont installé des bacs et distribué un guide. Le premier bilan ne compare qu'un événement de petite taille avec un événement plus fréquenté; cette différence peut influencer les résultats. Le rapport conclut que la méthode est prometteuse, mais qu'une collecte de données plus uniforme est nécessaire avant toute décision à long terme."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What has the document not established?",
+      "options": [
+        "That the group has an intention",
+        "That the proposed procurement already lowers the overall footprint",
+        "That transport can be discussed",
+        "That local products exist"
+      ],
+      "answer": 1,
+      "explain": "The document presents an intention, not measured proof of overall impact.",
+      "promptFr": "Les organisateurs souhaitent acheter davantage de matériel local dans le but de limiter certains transports. Toutefois, le document ne compare ni les coûts ni la disponibilité des produits. Il présente une intention et une question à examiner, pas une preuve que l'approvisionnement proposé réduit déjà l'empreinte globale."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why might a demonstration be added?",
+      "options": [
+        "The guide may still be difficult to understand",
+        "The method has already been generalized",
+        "The team wants to stop testing",
+        "The volunteers requested more paperwork"
+      ],
+      "answer": 0,
+      "explain": "A demonstration is a possible support if the guide remains difficult.",
+      "promptFr": "Une version simplifiée du guide a été préparée afin que les bénévoles puissent le consulter rapidement. Si le texte reste trop difficile, une courte démonstration sera ajoutée. L'équipe veut vérifier la compréhension avant de généraliser la méthode."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b2-u03-words-5",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une pénurie de main-d'œuvre",
+      "en": "a labour shortage",
+      "sound": "ün pay-nü-REE duh mehn-duvr",
+      "exampleFr": "Une pénurie de main-d'œuvre touche plusieurs métiers.",
+      "exampleEn": "A labour shortage affects several trades."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une perspective d'avancement",
+      "en": "a prospect for advancement",
+      "sound": "ün pehrs-pehk-TEEV dah-vahn-suh-MAH(N)",
+      "exampleFr": "L'entretien permet de discuter des perspectives d'avancement.",
+      "exampleEn": "The interview makes it possible to discuss advancement prospects."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un transfert de compétences",
+      "en": "a transfer of skills",
+      "sound": "uh(n) trahns-fehr duh kohn-pay-TAHNS",
+      "exampleFr": "Le mentorat facilite le transfert de compétences.",
+      "exampleEn": "Mentoring facilitates the transfer of skills."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une réorientation",
+      "en": "a career change; reorientation",
+      "sound": "ün ray-oh-ree-ahn-tah-SYOH(N)",
+      "exampleFr": "Une réorientation exige de comparer les options de formation.",
+      "exampleEn": "A career change requires comparing training options."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une candidature retenue",
+      "en": "a shortlisted application",
+      "sound": "ün kahn-dee-dah-TÜR ruh-tuh-NÜ",
+      "exampleFr": "Une candidature retenue mène à une entrevue.",
+      "exampleEn": "A shortlisted application leads to an interview."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un équilibre professionnel",
+      "en": "work-life balance",
+      "sound": "uh(n) ay-kee-lee-br proh-feh-syoh-NEHL",
+      "exampleFr": "Un horaire prévisible favorise un meilleur équilibre professionnel.",
+      "exampleEn": "A predictable schedule supports better work-life balance."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une pénurie de main-d'œuvre",
+      "options": [
+        "a career change; reorientation",
+        "a labour shortage",
+        "a prospect for advancement",
+        "a transfer of skills"
+      ],
+      "answer": 1,
+      "explain": "une pénurie de main-d'œuvre means a labour shortage."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une perspective d'avancement",
+      "options": [
+        "a shortlisted application",
+        "a transfer of skills",
+        "a career change; reorientation",
+        "a prospect for advancement"
+      ],
+      "answer": 3,
+      "explain": "une perspective d'avancement means a prospect for advancement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un transfert de compétences",
+      "options": [
+        "work-life balance",
+        "a transfer of skills",
+        "a career change; reorientation",
+        "a shortlisted application"
+      ],
+      "answer": 1,
+      "explain": "un transfert de compétences means a transfer of skills."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une réorientation",
+      "options": [
+        "a labour shortage",
+        "a shortlisted application",
+        "work-life balance",
+        "a career change; reorientation"
+      ],
+      "answer": 3,
+      "explain": "une réorientation means a career change; reorientation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une candidature retenue",
+      "options": [
+        "a prospect for advancement",
+        "a shortlisted application",
+        "work-life balance",
+        "a labour shortage"
+      ],
+      "answer": 1,
+      "explain": "une candidature retenue means a shortlisted application."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un équilibre professionnel",
+      "options": [
+        "a transfer of skills",
+        "a labour shortage",
+        "a prospect for advancement",
+        "work-life balance"
+      ],
+      "answer": 3,
+      "explain": "un équilibre professionnel means work-life balance."
+    }
+  ]
+}

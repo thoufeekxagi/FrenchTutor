@@ -1,0 +1,52 @@
+{
+  "id": "b1-u08-reading",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When should applicants follow up?",
+      "options": [
+        "Before sending the form",
+        "After five business days",
+        "Before getting proof of address",
+        "On August 15 at 16 h"
+      ],
+      "answer": 1,
+      "explain": "The notice recommends following up after five business days.",
+      "promptFr": "INSCRIPTION — Envoyez le formulaire et une preuve d'adresse avant le 15 août. Pour confirmer que votre dossier est complet, communiquez avec le bureau après cinq jours ouvrables. Les documents originaux ne doivent pas être envoyés par la poste."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What information does the writer need?",
+      "options": [
+        "Whether the office is moving",
+        "Who will translate the form",
+        "How to replace the document",
+        "Whether an appointment is required and where to see availability"
+      ],
+      "answer": 3,
+      "explain": "The writer asks whether an appointment is required and where to check openings.",
+      "promptFr": "Message — Bonjour, je voudrais savoir si je dois prendre rendez-vous pour remettre le document. Si oui, pourriez-vous me dire où je peux consulter les disponibilités ? Merci."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When does processing time begin?",
+      "options": [
+        "When all documents have been received",
+        "When the paper form is requested",
+        "When the online form is opened",
+        "When the person calls"
+      ],
+      "answer": 0,
+      "explain": "The FAQ says the time begins after all documents arrive.",
+      "promptFr": "Foire aux questions — Le formulaire peut être rempli en ligne. Une personne qui n'a pas accès à Internet peut appeler le centre afin de demander une version papier. Le délai de traitement commence lorsque tous les documents sont reçus."
+    }
+  ]
+}

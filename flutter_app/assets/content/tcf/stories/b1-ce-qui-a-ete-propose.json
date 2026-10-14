@@ -1,0 +1,351 @@
+{
+  "id": "b1-ce-qui-a-ete-propose",
+  "title": "Ce qui a été proposé",
+  "titleEn": "What was proposed",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "Nadia writes a careful meeting summary that separates a confirmed decision from an idea still under discussion.",
+  "unit": "b1-u07",
+  "sentences": [
+    {
+      "fr": "Après une rencontre sur les activités du centre, Nadia devait envoyer un compte rendu aux membres.",
+      "en": "After a meeting about centre activities, Nadia had to send the members a summary."
+    },
+    {
+      "fr": "La responsable a confirmé que la prochaine séance aurait lieu le 14 octobre.",
+      "en": "The coordinator confirmed that the next session would take place on October 14."
+    },
+    {
+      "fr": "Un participant a suggéré d'ajouter une activité le samedi, car plusieurs personnes travaillaient le soir.",
+      "en": "One participant suggested adding a Saturday activity because several people worked in the evening."
+    },
+    {
+      "fr": "Une autre personne a demandé si le centre pouvait aussi proposer une option en ligne.",
+      "en": "Another person asked whether the centre could also offer an online option."
+    },
+    {
+      "fr": "La responsable a répondu que l'équipe examinerait les deux idées avant la prochaine réunion.",
+      "en": "The coordinator replied that the team would examine both ideas before the next meeting."
+    },
+    {
+      "fr": "Nadia a écrit que la date était confirmée, mais que les nouveaux formats restaient à l'étude.",
+      "en": "Nadia wrote that the date was confirmed, but the new formats were still being considered.",
+      "note": "In a summary, attribute proposals to the person who made them and label decisions only when they are confirmed."
+    },
+    {
+      "fr": "Elle a relu son texte pour ne pas présenter une suggestion comme une décision officielle.",
+      "en": "She reread her text to avoid presenting a suggestion as an official decision."
+    }
+  ],
+  "words": {
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "rencontre": {
+      "en": "meeting"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "activités": {
+      "en": "activities"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "name"
+    },
+    "devait": {
+      "en": "had to; was supposed to"
+    },
+    "envoyer": {
+      "en": "to send",
+      "sound": "ah(n)-vwah-YAY"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "compte": {
+      "en": "an account; report"
+    },
+    "rendu": {
+      "en": "report; made"
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "membres": {
+      "en": "members"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "responsable": {
+      "en": "coordinator; person in charge"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "confirmé": {
+      "en": "confirmed",
+      "sound": "kohn-feer-MAY"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "prochaine": {
+      "en": "next",
+      "sound": "proh-SHEN"
+    },
+    "séance": {
+      "en": "session"
+    },
+    "aurait": {
+      "en": "would have"
+    },
+    "lieu": {
+      "en": "place; location"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "14": {
+      "en": "number 14"
+    },
+    "octobre": {
+      "en": "October"
+    },
+    "participant": {
+      "en": "participant"
+    },
+    "suggéré": {
+      "en": "suggested"
+    },
+    "d'ajouter": {
+      "en": "to add",
+      "sound": "ah-zhoo-TAY"
+    },
+    "activité": {
+      "en": "activity"
+    },
+    "samedi": {
+      "en": "Saturday",
+      "sound": "sahm-DEE"
+    },
+    "car": {
+      "en": "because; for"
+    },
+    "plusieurs": {
+      "en": "several"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "travaillaient": {
+      "en": "worked"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "autre": {
+      "en": "other; another"
+    },
+    "personne": {
+      "en": "person"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "pouvait": {
+      "en": "could"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "proposer": {
+      "en": "to suggest, propose",
+      "sound": "proh-poh-ZAY"
+    },
+    "option": {
+      "en": "option"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "ligne": {
+      "en": "line, route"
+    },
+    "répondu": {
+      "en": "answered"
+    },
+    "l'équipe": {
+      "en": "the team",
+      "pos": "noun, feminine"
+    },
+    "examinerait": {
+      "en": "would examine"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "idées": {
+      "en": "ideas"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "réunion": {
+      "en": "meeting"
+    },
+    "écrit": {
+      "en": "writes",
+      "sound": "ay-KREE"
+    },
+    "date": {
+      "en": "date"
+    },
+    "était": {
+      "en": "was"
+    },
+    "confirmée": {
+      "en": "confirmed"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "nouveaux": {
+      "en": "new"
+    },
+    "formats": {
+      "en": "formats"
+    },
+    "restaient": {
+      "en": "remained"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "l'étude": {
+      "en": "the study; consideration"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "relu": {
+      "en": "reread"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "texte": {
+      "en": "text"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "présenter": {
+      "en": "to present",
+      "sound": "pray-zah(n)-TAY"
+    },
+    "suggestion": {
+      "en": "suggestion"
+    },
+    "comme": {
+      "en": "as; like; since"
+    },
+    "décision": {
+      "en": "decision"
+    },
+    "officielle": {
+      "en": "official"
+    }
+  },
+  "keywords": [
+    "compte",
+    "rendu",
+    "confirmée",
+    "participant",
+    "suggestion",
+    "décision",
+    "formats"
+  ],
+  "quiz": [
+    {
+      "prompt": "Which detail was confirmed?",
+      "options": [
+        "A permanent online format",
+        "A new Saturday activity",
+        "The next session's date",
+        "The end of the centre's program"
+      ],
+      "answer": 2,
+      "explain": "The coordinator confirmed the October 14 date."
+    },
+    {
+      "prompt": "What would the team do with the two proposals?",
+      "options": [
+        "Start both the next day",
+        "Examine them before the next meeting",
+        "Ask Nadia to choose one alone",
+        "Reject them without discussion"
+      ],
+      "answer": 1,
+      "explain": "The coordinator said the team would examine both ideas."
+    },
+    {
+      "prompt": "Why did Nadia review her summary?",
+      "options": [
+        "To distinguish a suggestion from an official decision",
+        "To change what the participant said",
+        "To make the online option mandatory",
+        "To remove the confirmed date"
+      ],
+      "answer": 0,
+      "explain": "The last sentence explains that she wanted to avoid misrepresenting a suggestion."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b1-u11-words-4",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "d'autre part",
+      "en": "on the other hand; furthermore",
+      "sound": "dohtr par",
+      "exampleFr": "D'autre part, les participants peuvent apporter des idées.",
+      "exampleEn": "On the other hand, participants can bring ideas."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "cela dit",
+      "en": "that said",
+      "sound": "suh-lah dee",
+      "exampleFr": "Cela dit, une période d'essai serait raisonnable.",
+      "exampleEn": "That said, a trial period would be reasonable."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "par la suite",
+      "en": "afterward; subsequently",
+      "sound": "par lah sü-eet",
+      "exampleFr": "Par la suite, le comité a publié un résumé.",
+      "exampleEn": "Afterward, the committee published a summary."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "en dernier lieu",
+      "en": "lastly",
+      "sound": "ahn dehr-nee-YAY lyuh",
+      "exampleFr": "En dernier lieu, elle a remercié les bénévoles.",
+      "exampleEn": "Lastly, she thanked the volunteers."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une impression durable",
+      "en": "a lasting impression",
+      "sound": "ün ehn-preh-SYOH(N) dü-RAH-bl",
+      "exampleFr": "La visite a laissé une impression durable aux enfants.",
+      "exampleEn": "The visit left a lasting impression on the children."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une expérience décevante",
+      "en": "a disappointing experience",
+      "sound": "ün ehk-spay-ree-ahns day-suh-VAHNT",
+      "exampleFr": "Le retard a rendu l'expérience décevante.",
+      "exampleEn": "The delay made the experience disappointing."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "d'autre part",
+      "options": [
+        "lastly",
+        "on the other hand; furthermore",
+        "that said",
+        "afterward; subsequently"
+      ],
+      "answer": 1,
+      "explain": "d'autre part means on the other hand; furthermore."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "cela dit",
+      "options": [
+        "a lasting impression",
+        "afterward; subsequently",
+        "lastly",
+        "that said"
+      ],
+      "answer": 3,
+      "explain": "cela dit means that said."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "par la suite",
+      "options": [
+        "a disappointing experience",
+        "afterward; subsequently",
+        "lastly",
+        "a lasting impression"
+      ],
+      "answer": 1,
+      "explain": "par la suite means afterward; subsequently."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "en dernier lieu",
+      "options": [
+        "on the other hand; furthermore",
+        "a lasting impression",
+        "a disappointing experience",
+        "lastly"
+      ],
+      "answer": 3,
+      "explain": "en dernier lieu means lastly."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une impression durable",
+      "options": [
+        "that said",
+        "a lasting impression",
+        "a disappointing experience",
+        "on the other hand; furthermore"
+      ],
+      "answer": 1,
+      "explain": "une impression durable means a lasting impression."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une expérience décevante",
+      "options": [
+        "afterward; subsequently",
+        "on the other hand; furthermore",
+        "that said",
+        "a disappointing experience"
+      ],
+      "answer": 3,
+      "explain": "une expérience décevante means a disappointing experience."
+    }
+  ]
+}

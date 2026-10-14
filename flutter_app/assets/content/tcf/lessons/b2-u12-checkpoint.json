@@ -1,0 +1,75 @@
+{
+  "id": "b2-u12-checkpoint",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does une divergence mean?",
+      "options": [
+        "A witness",
+        "A difference in views",
+        "A budget",
+        "A confirmation"
+      ],
+      "answer": 1,
+      "explain": "Une divergence is a difference or disagreement."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What are the three moves for Task 3 writing?",
+      "options": [
+        "Describe, narrate, sign",
+        "Greet, ask, close",
+        "Attribute, compare, state and support your position",
+        "Copy, lengthen, submit"
+      ],
+      "answer": 2,
+      "explain": "Task 3 requires comparison and the candidate's position."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is the official Task 3 writing range?",
+      "options": [
+        "120–180 words",
+        "120–150 words",
+        "200–250 words",
+        "60–120 words"
+      ],
+      "answer": 0,
+      "explain": "Task 3 is 120 to 180 words."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Should Task 3 oral and writing be treated as identical?",
+      "options": [
+        "Yes; both compare two supplied texts",
+        "No; writing has no prompt",
+        "Yes; both have the same preparation time",
+        "No; they have different task purposes"
+      ],
+      "answer": 3,
+      "explain": "Writing Task 3 compares two views; oral Task 3 is a spontaneous opinion task."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What should you remove from a timed response?",
+      "options": [
+        "Your position",
+        "An off-topic digression",
+        "A source's main view",
+        "A needed conclusion"
+      ],
+      "answer": 1,
+      "explain": "Off-topic material uses limited time and words without answering the task."
+    }
+  ]
+}

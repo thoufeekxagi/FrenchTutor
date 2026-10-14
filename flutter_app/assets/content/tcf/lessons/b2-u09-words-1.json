@@ -1,0 +1,148 @@
+{
+  "id": "b2-u09-words-1",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une dépense",
+      "en": "an expense",
+      "sound": "ün day-PAH(N)S",
+      "exampleFr": "Le loyer est une dépense importante.",
+      "exampleEn": "Rent is an important expense."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une hausse",
+      "en": "an increase",
+      "sound": "ün ohs",
+      "exampleFr": "Le rapport note une hausse sur une période limitée.",
+      "exampleEn": "The report notes an increase over a limited period."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une baisse",
+      "en": "a decrease",
+      "sound": "ün behs",
+      "exampleFr": "La baisse observée reste modeste.",
+      "exampleEn": "The observed decrease remains modest."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une tendance",
+      "en": "a trend",
+      "sound": "ün tahn-DAH(N)S",
+      "exampleFr": "Trois points ne suffisent pas à confirmer une tendance.",
+      "exampleEn": "Three data points are not enough to confirm a trend."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une estimation",
+      "en": "an estimate",
+      "sound": "ün ehs-tee-mah-SYOH(N)",
+      "exampleFr": "L'estimation dépend des hypothèses retenues.",
+      "exampleEn": "The estimate depends on the assumptions used."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une moyenne",
+      "en": "an average",
+      "sound": "ün mwah-YEN",
+      "exampleFr": "La moyenne peut cacher des situations différentes.",
+      "exampleEn": "The average can hide different situations."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une dépense",
+      "options": [
+        "a trend",
+        "an expense",
+        "an increase",
+        "a decrease"
+      ],
+      "answer": 1,
+      "explain": "une dépense means an expense."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une hausse",
+      "options": [
+        "an estimate",
+        "a decrease",
+        "a trend",
+        "an increase"
+      ],
+      "answer": 3,
+      "explain": "une hausse means an increase."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une baisse",
+      "options": [
+        "an average",
+        "a decrease",
+        "a trend",
+        "an estimate"
+      ],
+      "answer": 1,
+      "explain": "une baisse means a decrease."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une tendance",
+      "options": [
+        "an expense",
+        "an estimate",
+        "an average",
+        "a trend"
+      ],
+      "answer": 3,
+      "explain": "une tendance means a trend."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une estimation",
+      "options": [
+        "an increase",
+        "an estimate",
+        "an average",
+        "an expense"
+      ],
+      "answer": 1,
+      "explain": "une estimation means an estimate."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une moyenne",
+      "options": [
+        "a decrease",
+        "an expense",
+        "an increase",
+        "an average"
+      ],
+      "answer": 3,
+      "explain": "une moyenne means an average."
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "b2-u13-write-speak",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two short original viewpoints address whether group learning is more effective than individual study. View A emphasizes discussion and immediate feedback; View B values focus, pacing and quiet. Compare them and give your position in 130–160 words. This written task is distinct from the oral Task 3 format.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux points de vue décrivent des avantages réels, mais ils ne mettent pas l'accent sur les mêmes conditions. Le premier souligne que la discussion permet de comparer des idées et d'obtenir une réaction immédiate. Le second rappelle que le travail individuel aide à avancer à son rythme et à se concentrer. À mon avis, l'efficacité dépend de l'objectif et de la personne. Un groupe peut être utile pour pratiquer l'interaction, tandis qu'un moment seul permet de consolider une règle. Il ne s'agit donc pas nécessairement de choisir une seule méthode. Une combinaison des deux peut être plus adaptée, à condition que l'apprenant dispose d'assez de temps et sache ce qu'il veut travailler. Les textes présentent des possibilités; ils ne prouvent pas qu'une méthode convient à tout le monde.\n\nCheck:\n• Task 3 range: 120–180 words; this practice target is 130–160.\n• Represent both viewpoints before giving your position.\n• Use a relevant contrast and one qualification.\n• Do not confuse written source comparison with oral Task 3."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Official TCF oral Task 3: answer this prompt with no preparation: Les activités de groupe sont-elles plus efficaces que l'apprentissage individuel ? Speak for a sustained, structured response. Marie should ask a follow-up that changes one condition; answer it rather than returning to a memorized speech.\n\n• Official Task 3 has no preparation and lasts 4 minutes 30 seconds.\n• Use the model to notice structure after your first answer, not to memorize.\n• If you correct a broad claim, explain the narrower version."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "À mon avis, les activités de groupe et l'apprentissage individuel répondent à des besoins différents. D'abord, le groupe donne l'occasion d'échanger des idées et de demander des précisions.",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Prenons l'exemple d'un atelier de conversation, où les participants peuvent réagir les uns aux autres.",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Ensuite, le travail individuel permet de relire un texte ou de revoir une règle à son propre rythme. Cela dit, l'efficacité dépend de l'objectif et du temps disponible.",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Un groupe nombreux ne garantit pas que chacun parle. En somme, les deux méthodes peuvent se compléter; le choix devrait tenir compte des besoins de l'apprenant.",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

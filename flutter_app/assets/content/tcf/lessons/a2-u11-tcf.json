@@ -1,0 +1,100 @@
+{
+  "id": "a2-u11-tcf",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je n'ai pas le colis. Pourriez-vous vérifier le numéro de suivi et confirmer le prochain créneau ?",
+      "question": "What two things does the speaker request?",
+      "options": [
+        "Check the tracking number and confirm the next time slot",
+        "Replace the heating and repair the tap",
+        "Sign the form and attach a copy",
+        "Change the payment and refund the bill"
+      ],
+      "answer": 0,
+      "explain": "The speaker asks to check the number and confirm the time slot."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il manque un justificatif de domicile. Attachez la copie recto verso avant d'appuyer sur le bouton.",
+      "question": "What should be attached?",
+      "options": [
+        "The double-sided copy",
+        "The itemized receipt",
+        "The tracking number",
+        "The maintenance appointment"
+      ],
+      "answer": 0,
+      "explain": "The message says to attach the double-sided copy."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je voudrais une réponse écrite. Le service va traiter la demande demain.",
+      "question": "When will the service handle the request?",
+      "options": [
+        "Tomorrow",
+        "Today",
+        "On Thursday",
+        "In two days"
+      ],
+      "answer": 0,
+      "explain": "The message says the service will handle it tomorrow."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When is the delivery time slot?",
+      "options": [
+        "Friday from 9 to 11 a.m.",
+        "Thursday from 9 to 11 a.m.",
+        "Friday from 11 a.m. to 1 p.m.",
+        "Monday from 9 to 11 a.m."
+      ],
+      "answer": 0,
+      "explain": "The confirmation gives Friday from 9 h to 11 h.",
+      "promptFr": "CONFIRMATION — Numéro de commande 8126. Créneau de livraison : vendredi, de 9 h à 11 h."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When should the reader press the button?",
+      "options": [
+        "After adding the copy",
+        "Before checking the box",
+        "Before opening the form",
+        "After contacting the landlord"
+      ],
+      "answer": 0,
+      "explain": "The notice says not to press the button before adding the copy.",
+      "promptFr": "FORMULAIRE — Cochez la case obligatoire. N'appuyez pas sur le bouton avant d'ajouter la copie."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should the reader keep?",
+      "options": [
+        "The confirmation number",
+        "The repair manual",
+        "The parcel",
+        "The payment option"
+      ],
+      "answer": 0,
+      "explain": "The notice asks the reader to keep the confirmation number.",
+      "promptFr": "SERVICE — Une réponse écrite est prévue dans deux jours. Gardez le numéro de confirmation."
+    }
+  ]
+}

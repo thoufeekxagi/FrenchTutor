@@ -1,0 +1,75 @@
+{
+  "id": "b1-u10-checkpoint",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How long is the preparation for TCF Canada oral Task 2?",
+      "options": [
+        "Ten minutes",
+        "No preparation",
+        "Four minutes",
+        "Two minutes"
+      ],
+      "answer": 3,
+      "explain": "The official format gives two minutes of preparation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How long is the Task 2 dialogue?",
+      "options": [
+        "4 minutes 30 seconds",
+        "12 minutes",
+        "3 minutes 30 seconds",
+        "2 minutes"
+      ],
+      "answer": 2,
+      "explain": "The dialogue lasts 3 minutes 30 seconds."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should you do after an incomplete answer?",
+      "options": [
+        "Ask a relevant follow-up",
+        "Move to an unrelated topic",
+        "Repeat all questions",
+        "End immediately"
+      ],
+      "answer": 0,
+      "explain": "A follow-up fills the information gap."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which is a polite embedded question?",
+      "options": [
+        "Pourriez-vous me dire la salle où ?",
+        "Pourriez-vous me dire où se trouve la salle ?",
+        "Pourriez-vous me dire où est-ce que la salle se trouve-t-elle ?",
+        "Pourriez-vous me dire où se trouve-t-elle la salle ?"
+      ],
+      "answer": 1,
+      "explain": "Embedded questions use statement order."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Does TCF oral Task 2 ask for a prepared monologue?",
+      "options": [
+        "Yes; it compares two written sources",
+        "No; it is a grammar quiz",
+        "Yes; it is a memorized speech",
+        "No; it is an information-seeking interaction"
+      ],
+      "answer": 3,
+      "explain": "The purpose is to obtain information in an interaction."
+    }
+  ]
+}

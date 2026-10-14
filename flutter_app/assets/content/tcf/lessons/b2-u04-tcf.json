@@ -1,0 +1,72 @@
+{
+  "id": "b2-u04-tcf",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le quartier était déjà très fréquenté le matin. Après la fermeture de la voie, les autobus ont été redirigés. Les résidents avaient toutefois reçu l'information trop tard pour modifier leurs déplacements.",
+      "question": "What problem does the speaker identify?",
+      "options": [
+        "The bus service was permanently removed",
+        "No road work took place",
+        "The area was empty in the morning",
+        "Residents learned about the change too late"
+      ],
+      "answer": 3,
+      "explain": "The information arrived too late for residents to adjust."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il aurait fallu garder un accès de livraison. Plusieurs commerces avaient prévenu le comité, mais cette contrainte n'apparaît pas dans la première version du plan.",
+      "question": "What had the shops already done?",
+      "options": [
+        "Approved the final plan",
+        "Warned the committee about a constraint",
+        "Closed before construction",
+        "Moved to another neighbourhood"
+      ],
+      "answer": 1,
+      "explain": "The shops had alerted the committee to the delivery constraint."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What had the first proposal overlooked?",
+      "options": [
+        "Noise",
+        "Public transport",
+        "Deliveries",
+        "The construction calendar"
+      ],
+      "answer": 2,
+      "explain": "The report says deliveries had not been considered.",
+      "promptFr": "Une consultation fictive a recueilli les commentaires de résidents, de commerçants et d'usagers du transport collectif. Plusieurs personnes approuvent l'amélioration des accès, tandis que d'autres craignent une hausse du bruit pendant les travaux. Le rapport note que les livraisons n'avaient pas été prises en compte dans la première proposition. Il recommande un accès temporaire et un calendrier affiché à l'avance. Ces mesures ne régleraient pas chaque désaccord, mais elles permettraient aux personnes concernées de mieux planifier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why do the authors avoid naming one best option?",
+      "options": [
+        "Different people may have different priorities",
+        "The prices are unknown",
+        "Both options are identical",
+        "Neither option has any services"
+      ],
+      "answer": 0,
+      "explain": "The best fit depends on which needs are most important.",
+      "promptFr": "L'option A réduit la distance jusqu'aux services, mais son coût est plus élevé. L'option B respecte mieux le budget et offre moins de correspondances en autobus; elle demande toutefois une marche plus longue. Les auteurs conseillent d'évaluer les besoins prioritaires avant de choisir. Ils ne désignent pas une option qui conviendrait à tout le monde."
+    }
+  ]
+}

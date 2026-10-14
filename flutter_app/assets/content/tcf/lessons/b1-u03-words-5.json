@@ -1,0 +1,148 @@
+{
+  "id": "b1-u03-words-5",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une conséquence inattendue",
+      "en": "an unexpected consequence",
+      "sound": "ün kohn-say-kahns ee-nah-tahn-DÜ",
+      "exampleFr": "La fermeture a eu une conséquence inattendue pour les voisins.",
+      "exampleEn": "The closure had an unexpected consequence for the neighbours."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "l'intérêt collectif",
+      "en": "the common interest",
+      "sound": "lehn-tay-reh koh-lehk-TEEF",
+      "exampleFr": "La décision doit aussi servir l'intérêt collectif.",
+      "exampleEn": "The decision should also serve the common interest."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "faire un compromis",
+      "en": "to reach a compromise",
+      "sound": "fehr uh(n) kohn-proh-MEE",
+      "exampleFr": "Les deux équipes ont fait un compromis sur la durée.",
+      "exampleEn": "The two teams reached a compromise on the duration."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une consultation",
+      "en": "a consultation",
+      "sound": "ün kohn-sül-tah-SYOH(N)",
+      "exampleFr": "Une consultation donnera la parole aux résidents.",
+      "exampleEn": "A consultation will give residents a chance to speak."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "adapter une proposition",
+      "en": "to adapt a proposal",
+      "sound": "ah-dahp-tay ün proh-poh-zee-SYOH(N)",
+      "exampleFr": "Le comité peut adapter la proposition après l'essai.",
+      "exampleEn": "The committee can adapt the proposal after the trial."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "à titre d'essai",
+      "en": "on a trial basis",
+      "sound": "ah teetr deh-SEH",
+      "exampleFr": "L'activité sera offerte à titre d'essai pendant un mois.",
+      "exampleEn": "The activity will be offered on a trial basis for one month."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une conséquence inattendue",
+      "options": [
+        "a consultation",
+        "an unexpected consequence",
+        "the common interest",
+        "to reach a compromise"
+      ],
+      "answer": 1,
+      "explain": "une conséquence inattendue means an unexpected consequence."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "l'intérêt collectif",
+      "options": [
+        "to adapt a proposal",
+        "to reach a compromise",
+        "a consultation",
+        "the common interest"
+      ],
+      "answer": 3,
+      "explain": "l'intérêt collectif means the common interest."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "faire un compromis",
+      "options": [
+        "on a trial basis",
+        "to reach a compromise",
+        "a consultation",
+        "to adapt a proposal"
+      ],
+      "answer": 1,
+      "explain": "faire un compromis means to reach a compromise."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une consultation",
+      "options": [
+        "an unexpected consequence",
+        "to adapt a proposal",
+        "on a trial basis",
+        "a consultation"
+      ],
+      "answer": 3,
+      "explain": "une consultation means a consultation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "adapter une proposition",
+      "options": [
+        "the common interest",
+        "to adapt a proposal",
+        "on a trial basis",
+        "an unexpected consequence"
+      ],
+      "answer": 1,
+      "explain": "adapter une proposition means to adapt a proposal."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "à titre d'essai",
+      "options": [
+        "to reach a compromise",
+        "an unexpected consequence",
+        "the common interest",
+        "on a trial basis"
+      ],
+      "answer": 3,
+      "explain": "à titre d'essai means on a trial basis."
+    }
+  ]
+}

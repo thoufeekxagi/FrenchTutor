@@ -1,0 +1,176 @@
+{
+  "id": "b2-u09-words-2",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une proportion",
+      "en": "a proportion",
+      "sound": "ün proh-por-SYOH(N)",
+      "exampleFr": "La proportion varie selon les ménages interrogés.",
+      "exampleEn": "The proportion varies among the households surveyed."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un budget",
+      "en": "a budget",
+      "sound": "uh(n) bü-JEH",
+      "exampleFr": "Le budget doit inclure les frais imprévus.",
+      "exampleEn": "The budget must include unexpected costs."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un poste de dépense",
+      "en": "an expense category",
+      "sound": "uh(n) post duh day-PAH(N)S",
+      "exampleFr": "Le transport est un poste de dépense distinct.",
+      "exampleEn": "Transportation is a separate expense category."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un écart",
+      "en": "a gap; a difference",
+      "sound": "uh(n) ay-KAR",
+      "exampleFr": "L'écart entre les deux estimations est faible.",
+      "exampleEn": "The gap between the two estimates is small."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une hypothèse",
+      "en": "an assumption; hypothesis",
+      "sound": "ün ee-poh-TEHZ",
+      "exampleFr": "Cette hypothèse doit être vérifiée.",
+      "exampleEn": "This assumption needs to be checked."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une marge",
+      "en": "a margin",
+      "sound": "ün marzh",
+      "exampleFr": "Il faut garder une marge pour les imprévus.",
+      "exampleEn": "A margin should be kept for unexpected costs."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une proportion",
+      "options": [
+        "a gap; a difference",
+        "a proportion",
+        "a budget",
+        "an expense category"
+      ],
+      "answer": 1,
+      "explain": "une proportion means a proportion."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un budget",
+      "options": [
+        "an assumption; hypothesis",
+        "an expense category",
+        "a gap; a difference",
+        "a budget"
+      ],
+      "answer": 3,
+      "explain": "un budget means a budget."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un poste de dépense",
+      "options": [
+        "a margin",
+        "an expense category",
+        "a gap; a difference",
+        "an assumption; hypothesis"
+      ],
+      "answer": 1,
+      "explain": "un poste de dépense means an expense category."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un écart",
+      "options": [
+        "a proportion",
+        "an assumption; hypothesis",
+        "a margin",
+        "a gap; a difference"
+      ],
+      "answer": 3,
+      "explain": "un écart means a gap; a difference."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une hypothèse",
+      "options": [
+        "a budget",
+        "an assumption; hypothesis",
+        "a margin",
+        "a proportion"
+      ],
+      "answer": 1,
+      "explain": "une hypothèse means an assumption; hypothesis."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une marge",
+      "options": [
+        "an expense category",
+        "a proportion",
+        "a budget",
+        "a margin"
+      ],
+      "answer": 3,
+      "explain": "une marge means a margin."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un budget",
+      "question": "Which word did you hear?",
+      "options": [
+        "une hypothèse",
+        "un budget",
+        "une proportion",
+        "un écart"
+      ],
+      "answer": 1,
+      "explain": "You heard un budget: a budget."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un écart",
+      "question": "Which word did you hear?",
+      "options": [
+        "une marge",
+        "un budget",
+        "une hypothèse",
+        "un écart"
+      ],
+      "answer": 3,
+      "explain": "You heard un écart: a gap; a difference."
+    }
+  ]
+}

@@ -1,0 +1,369 @@
+{
+  "id": "b1-larret-qui-a-change-le-trajet",
+  "title": "L'arrêt qui a changé le trajet",
+  "titleEn": "The stop that changed the trip",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "Residents compare the effects of a temporary route change and decide what information to send back.",
+  "unit": "b1-u06",
+  "sentences": [
+    {
+      "fr": "Pendant les travaux, l'autobus ne passait plus devant le centre communautaire.",
+      "en": "During construction, the bus no longer passed in front of the community centre."
+    },
+    {
+      "fr": "L'arrêt temporaire se trouvait près d'une entrée accessible, mais le détour allongeait le trajet de plusieurs résidents.",
+      "en": "The temporary stop was near an accessible entrance, but the detour lengthened several residents' trips."
+    },
+    {
+      "fr": "Mina, qui travaillait tôt, arrivait encore à l'heure en partant dix minutes plus tôt.",
+      "en": "Mina, who started work early, could still arrive on time by leaving ten minutes earlier."
+    },
+    {
+      "fr": "Son voisin, qui accompagnait sa mère au centre, disait que le détour était plus difficile avec un fauteuil roulant.",
+      "en": "Her neighbour, who accompanied his mother to the centre, said the detour was harder with a wheelchair."
+    },
+    {
+      "fr": "Le comité a donc demandé où se trouvait la rampe et combien de temps les travaux dureraient.",
+      "en": "The committee therefore asked where the ramp was and how long construction would last."
+    },
+    {
+      "fr": "La ville a répondu que l'accès serait vérifié chaque semaine et que l'arrêt reviendrait après les travaux.",
+      "en": "The city replied that access would be checked each week and the stop would return after construction."
+    },
+    {
+      "fr": "Les résidents ont envoyé leurs observations, sans conclure qu'un trajet convenait à tout le monde.",
+      "en": "Residents sent their observations without concluding that one route suited everyone.",
+      "note": "A change can help one group and create difficulty for another; a useful report names both effects."
+    }
+  ],
+  "words": {
+    "pendant": {
+      "en": "during; while"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "travaux": {
+      "en": "construction work"
+    },
+    "l'autobus": {
+      "en": "bus",
+      "sound": "loh-toh-BÜS"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "passait": {
+      "en": "passed; went by"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "devant": {
+      "en": "in front of",
+      "sound": "duh-VAH(N)"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "communautaire": {
+      "en": "community",
+      "pos": "adjective"
+    },
+    "l'arrêt": {
+      "en": "stop",
+      "sound": "ah-RAY"
+    },
+    "temporaire": {
+      "en": "temporary"
+    },
+    "se": {
+      "en": "oneself",
+      "pos": "pronoun"
+    },
+    "trouvait": {
+      "en": "was located; found"
+    },
+    "près": {
+      "en": "near",
+      "pos": "preposition"
+    },
+    "d'une": {
+      "en": "of a; of one (feminine)",
+      "pos": "contraction"
+    },
+    "entrée": {
+      "en": "entrance",
+      "sound": "ah(n)-TRAY"
+    },
+    "accessible": {
+      "en": "accessible"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "détour": {
+      "en": "detour"
+    },
+    "allongeait": {
+      "en": "was lengthening"
+    },
+    "trajet": {
+      "en": "a journey; a trip"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "plusieurs": {
+      "en": "several"
+    },
+    "résidents": {
+      "en": "residents"
+    },
+    "mina": {
+      "en": "Mina (a woman's name)"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "travaillait": {
+      "en": "worked"
+    },
+    "tôt": {
+      "en": "early",
+      "sound": "toh"
+    },
+    "arrivait": {
+      "en": "was arriving; arrived"
+    },
+    "encore": {
+      "en": "again, still",
+      "sound": "ah(n)-KOHR"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "l'heure": {
+      "en": "hour; time on a clock",
+      "sound": "luhR"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "partant": {
+      "en": "leaving; by leaving"
+    },
+    "dix": {
+      "en": "ten"
+    },
+    "minutes": {
+      "en": "minutes"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "voisin": {
+      "en": "neighbour"
+    },
+    "accompagnait": {
+      "en": "accompanied"
+    },
+    "sa": {
+      "en": "his; her (feminine noun)",
+      "pos": "possessive"
+    },
+    "mère": {
+      "en": "mother"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "disait": {
+      "en": "said; was saying"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "était": {
+      "en": "was"
+    },
+    "difficile": {
+      "en": "difficult"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "fauteuil": {
+      "en": "armchair; wheelchair (in fauteuil roulant)"
+    },
+    "roulant": {
+      "en": "wheeled; rolling"
+    },
+    "comité": {
+      "en": "committee"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "où": {
+      "en": "where",
+      "sound": "oo"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "rampe": {
+      "en": "ramp"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "combien": {
+      "en": "how much, how many",
+      "sound": "koh(n)-BYA(N)"
+    },
+    "temps": {
+      "en": "weather"
+    },
+    "dureraient": {
+      "en": "would last"
+    },
+    "ville": {
+      "en": "city, town"
+    },
+    "répondu": {
+      "en": "answered"
+    },
+    "l'accès": {
+      "en": "access"
+    },
+    "serait": {
+      "en": "would be"
+    },
+    "vérifié": {
+      "en": "checked"
+    },
+    "chaque": {
+      "en": "each; every"
+    },
+    "semaine": {
+      "en": "week, weekday period"
+    },
+    "reviendrait": {
+      "en": "would return"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "envoyé": {
+      "en": "sent"
+    },
+    "leurs": {
+      "en": "their (plural)",
+      "pos": "possessive"
+    },
+    "observations": {
+      "en": "observations"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "conclure": {
+      "en": "to conclude"
+    },
+    "qu'un": {
+      "en": "that a; than a"
+    },
+    "convenait": {
+      "en": "suited"
+    },
+    "tout": {
+      "en": "all; whole"
+    },
+    "monde": {
+      "en": "people; crowd"
+    }
+  },
+  "keywords": [
+    "travaux",
+    "l'arrêt",
+    "détour",
+    "trajet",
+    "résidents",
+    "rampe",
+    "observations"
+  ],
+  "quiz": [
+    {
+      "prompt": "What made Mina's trip manageable?",
+      "options": [
+        "The construction ended that morning",
+        "She left ten minutes earlier",
+        "The community centre moved closer",
+        "The bus returned to its usual route"
+      ],
+      "answer": 1,
+      "explain": "Mina could arrive on time if she left ten minutes earlier."
+    },
+    {
+      "prompt": "Who found the detour harder, and why?",
+      "options": [
+        "A neighbour accompanying his mother in a wheelchair",
+        "The bus driver, because the stop was permanent",
+        "Mina, because she worked late",
+        "The committee, because it had no meeting"
+      ],
+      "answer": 0,
+      "explain": "The fourth sentence gives the neighbour's situation and reason."
+    },
+    {
+      "prompt": "What did the residents avoid claiming?",
+      "options": [
+        "That construction affected the trip",
+        "That the stop was temporary",
+        "That one route suited everyone",
+        "That the city would check access"
+      ],
+      "answer": 2,
+      "explain": "The last sentence says they did not claim one route worked for everyone."
+    }
+  ]
+}

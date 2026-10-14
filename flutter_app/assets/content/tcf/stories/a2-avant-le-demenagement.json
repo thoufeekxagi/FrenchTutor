@@ -1,0 +1,342 @@
+{
+  "id": "a2-avant-le-demenagement",
+  "title": "Avant le déménagement",
+  "titleEn": "Before the move",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Awa describes her weekday and family routine before moving.",
+  "unit": "a2-u04",
+  "sentences": [
+    {
+      "fr": "Avant son déménagement, Awa habitait près du collège.",
+      "en": "Before her move, Awa lived near the college."
+    },
+    {
+      "fr": "Chaque matin, elle prenait le bus à sept heures.",
+      "en": "Every morning, she used to take the bus at seven."
+    },
+    {
+      "fr": "Le quartier était calme avant huit heures.",
+      "en": "The neighbourhood was quiet before eight."
+    },
+    {
+      "fr": "Un commerce ouvrait plus tard.",
+      "en": "A shop opened later."
+    },
+    {
+      "fr": "La salle de français était au deuxième étage.",
+      "en": "The French room was on the second floor."
+    },
+    {
+      "fr": "Il y avait une grande fenêtre près du bureau.",
+      "en": "There was a large window near the desk."
+    },
+    {
+      "fr": "Le soir, Awa lisait un chapitre et écrivait dans son cahier.",
+      "en": "In the evening, Awa used to read a chapter and write in her notebook."
+    },
+    {
+      "fr": "Le dimanche, sa famille se retrouvait chez sa tante.",
+      "en": "On Sundays, her family used to meet at her aunt's home."
+    },
+    {
+      "fr": "Un dimanche, sa famille a préparé le repas ensemble.",
+      "en": "One Sunday, her family prepared the meal together."
+    }
+  ],
+  "words": {
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "son": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "déménagement": {
+      "en": "move; moving house",
+      "pos": "noun, masculine"
+    },
+    "awa": {
+      "en": "Awa (a woman's name)",
+      "pos": "name"
+    },
+    "habitait": {
+      "en": "used to live (habiter)",
+      "pos": "verb"
+    },
+    "près": {
+      "en": "near",
+      "pos": "preposition"
+    },
+    "du": {
+      "en": "of the",
+      "pos": "contraction"
+    },
+    "collège": {
+      "en": "college; secondary school",
+      "pos": "noun, masculine"
+    },
+    "chaque": {
+      "en": "each; every",
+      "pos": "determiner"
+    },
+    "matin": {
+      "en": "morning"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "prenait": {
+      "en": "used to take (prendre)",
+      "pos": "verb"
+    },
+    "le": {
+      "en": "the",
+      "pos": "article"
+    },
+    "bus": {
+      "en": "bus",
+      "pos": "noun, masculine"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "sept": {
+      "en": "seven",
+      "pos": "number"
+    },
+    "heures": {
+      "en": "hours; o'clock",
+      "pos": "noun"
+    },
+    "quartier": {
+      "en": "neighbourhood",
+      "pos": "noun, masculine"
+    },
+    "était": {
+      "en": "was (être)",
+      "pos": "verb"
+    },
+    "calme": {
+      "en": "quiet",
+      "pos": "adjective"
+    },
+    "huit": {
+      "en": "eight",
+      "pos": "number"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "commerce": {
+      "en": "a shop; business"
+    },
+    "ouvrait": {
+      "en": "used to open (ouvrir)",
+      "pos": "verb"
+    },
+    "plus": {
+      "en": "more",
+      "pos": "adverb"
+    },
+    "tard": {
+      "en": "later",
+      "pos": "adverb"
+    },
+    "la": {
+      "en": "the (feminine)",
+      "pos": "article"
+    },
+    "salle": {
+      "en": "room; hall",
+      "pos": "noun, feminine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "français": {
+      "en": "French",
+      "pos": "language"
+    },
+    "au": {
+      "en": "at the",
+      "pos": "contraction"
+    },
+    "deuxième": {
+      "en": "second",
+      "pos": "ordinal"
+    },
+    "étage": {
+      "en": "floor; storey",
+      "pos": "noun, masculine"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "y": {
+      "en": "there; to that place",
+      "pos": "pronoun"
+    },
+    "avait": {
+      "en": "there was; had (avoir)",
+      "pos": "verb"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "grande": {
+      "en": "tall, big",
+      "sound": "grah(n)d"
+    },
+    "fenêtre": {
+      "en": "window",
+      "pos": "noun, feminine"
+    },
+    "bureau": {
+      "en": "desk; office",
+      "pos": "noun, masculine"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine"
+    },
+    "lisait": {
+      "en": "used to read (lire)",
+      "pos": "verb"
+    },
+    "chapitre": {
+      "en": "chapter",
+      "pos": "noun, masculine"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "écrivait": {
+      "en": "used to write (écrire)",
+      "pos": "verb"
+    },
+    "dans": {
+      "en": "in",
+      "pos": "preposition"
+    },
+    "cahier": {
+      "en": "notebook",
+      "pos": "noun, masculine"
+    },
+    "dimanche": {
+      "en": "Sunday",
+      "pos": "day"
+    },
+    "sa": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "famille": {
+      "en": "family",
+      "pos": "noun, feminine"
+    },
+    "se": {
+      "en": "oneself",
+      "pos": "pronoun"
+    },
+    "retrouvait": {
+      "en": "used to meet up (se retrouver)",
+      "pos": "verb"
+    },
+    "chez": {
+      "en": "at someone's home or workplace",
+      "pos": "preposition"
+    },
+    "tante": {
+      "en": "aunt",
+      "pos": "noun, feminine"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "préparé": {
+      "en": "prepared (préparer)",
+      "pos": "verb"
+    },
+    "repas": {
+      "en": "meal"
+    },
+    "ensemble": {
+      "en": "together",
+      "pos": "adverb"
+    }
+  },
+  "keywords": [
+    "collège",
+    "quartier",
+    "fenêtre",
+    "cahier",
+    "déménagement"
+  ],
+  "quiz": [
+    {
+      "prompt": "Where did Awa live before her move?",
+      "options": [
+        "Near the college",
+        "Near the airport",
+        "Above the library",
+        "Beside the clinic"
+      ],
+      "answer": 0,
+      "explain": "The first sentence says she lived near the college."
+    },
+    {
+      "prompt": "What did she do each morning?",
+      "options": [
+        "She took the bus at seven.",
+        "She read at the library.",
+        "She walked to a café.",
+        "She met her aunt."
+      ],
+      "answer": 0,
+      "explain": "The second sentence gives her repeated morning routine."
+    },
+    {
+      "prompt": "Where was the French room?",
+      "options": [
+        "On the second floor",
+        "In the basement",
+        "Near the station",
+        "In the courtyard"
+      ],
+      "answer": 0,
+      "explain": "The story places the room on the second floor."
+    },
+    {
+      "prompt": "Where did the family meet on Sundays?",
+      "options": [
+        "At her aunt's home",
+        "At the college",
+        "At the café",
+        "At the bus stop"
+      ],
+      "answer": 0,
+      "explain": "The final sentence says they met at her aunt's home."
+    },
+    {
+      "prompt": "What did the family do one Sunday?",
+      "options": [
+        "They prepared the meal together.",
+        "They moved to another city.",
+        "They closed the shop.",
+        "They missed the bus."
+      ],
+      "answer": 0,
+      "explain": "The final sentence reports one completed event: the family prepared a meal together."
+    }
+  ]
+}

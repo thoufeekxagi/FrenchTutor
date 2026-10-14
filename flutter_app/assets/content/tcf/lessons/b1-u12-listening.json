@@ -1,0 +1,58 @@
+{
+  "id": "b1-u12-listening",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le comité étudie une séance en ligne pour les personnes qui habitent loin. La responsable précise qu'il ne s'agit pas encore d'une décision. Elle demande aux participants d'envoyer leurs commentaires avant vendredi.",
+      "question": "What is confirmed?",
+      "options": [
+        "The centre is closing",
+        "The online session starts Friday",
+        "The committee is studying an online session, but no decision has been made",
+        "All members voted for the change"
+      ],
+      "answer": 2,
+      "explain": "The idea is under study; the deadline is for feedback."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "J'avais déjà réservé la salle quand j'ai appris qu'elle serait fermée. J'ai appelé l'organisateur, qui m'a indiqué qu'une autre salle avait été prévue.",
+      "question": "What had already been arranged?",
+      "options": [
+        "The participants had gone home",
+        "Another room had been planned",
+        "The event had been cancelled",
+        "The organizer had left"
+      ],
+      "answer": 1,
+      "explain": "The organizer says a different room had already been planned."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Pour que chacun puisse donner son avis, le groupe a envoyé un court questionnaire. Les réponses montrent un intérêt pour l'horaire du samedi, mais peu de personnes ont répondu.",
+      "question": "What limitation applies to the result?",
+      "options": [
+        "Few people responded",
+        "Everyone answered twice",
+        "The Saturday option was removed",
+        "The survey had no question"
+      ],
+      "answer": 0,
+      "explain": "The response count is low, so the result may not represent the full group."
+    }
+  ]
+}

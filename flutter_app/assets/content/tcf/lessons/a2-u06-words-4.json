@@ -1,0 +1,166 @@
+{
+  "id": "a2-u06-words-4",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Words: rent and monthly costs",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un loyer mensuel",
+      "en": "monthly rent",
+      "sound": "uh(n) lwah-YAY mah(n)-sü-EHL",
+      "exampleFr": "Je compare le loyer mensuel des deux logements.",
+      "exampleEn": "I compare the monthly rent for the two homes."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un budget maximal",
+      "en": "a maximum budget",
+      "sound": "uh(n) büzh-EH mahk-see-MAHL",
+      "exampleFr": "Mon budget maximal est de 1 400 $ par mois.",
+      "exampleEn": "My maximum budget is $1,400 a month."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "des frais d'électricité",
+      "en": "electricity costs",
+      "sound": "day freh day-lehk-tree-see-TAY",
+      "exampleFr": "Je vérifie si les frais d'électricité sont compris dans le loyer.",
+      "exampleEn": "I check whether electricity costs are included in the rent."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un loyer hors charges",
+      "en": "rent excluding utilities",
+      "sound": "uh(n) lwah-YAY or sharzh",
+      "exampleFr": "L'annonce indique un loyer hors charges.",
+      "exampleEn": "The listing shows rent excluding utilities."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un coût mensuel",
+      "en": "a monthly cost",
+      "sound": "uh(n) koo mah(n)-sü-EHL",
+      "exampleFr": "Je calcule le coût mensuel avant de choisir.",
+      "exampleEn": "I calculate the monthly cost before choosing."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une hausse de loyer",
+      "en": "a rent increase",
+      "sound": "ün ohs duh lwah-YAY",
+      "exampleFr": "Le propriétaire annonce une hausse de loyer.",
+      "exampleEn": "The landlord announces a rent increase."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une durée de location",
+      "en": "a rental period",
+      "sound": "ün dü-RAY duh loh-kah-SYOH(N)",
+      "exampleFr": "La durée de location est de douze mois.",
+      "exampleEn": "The rental period is twelve months."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un bail d'un an",
+      "en": "a one-year lease",
+      "sound": "uh(n) bahy du(n) ah(n)",
+      "exampleFr": "Le bail est d'un an.",
+      "exampleEn": "The lease is for one year."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un loyer mensuel",
+      "options": [
+        "a rental period",
+        "monthly rent",
+        "a maximum budget",
+        "a one-year lease"
+      ],
+      "answer": 1,
+      "explain": "un loyer mensuel means monthly rent."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un budget maximal",
+      "options": [
+        "a monthly cost",
+        "a one-year lease",
+        "electricity costs",
+        "a maximum budget"
+      ],
+      "answer": 3,
+      "explain": "un budget maximal means a maximum budget."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "des frais d'électricité",
+      "options": [
+        "a rent increase",
+        "electricity costs",
+        "monthly rent",
+        "rent excluding utilities"
+      ],
+      "answer": 1,
+      "explain": "des frais d'électricité means electricity costs."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un loyer hors charges",
+      "options": [
+        "a rental period",
+        "a maximum budget",
+        "a monthly cost",
+        "rent excluding utilities"
+      ],
+      "answer": 3,
+      "explain": "un loyer hors charges means rent excluding utilities."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un coût mensuel",
+      "options": [
+        "a one-year lease",
+        "a monthly cost",
+        "electricity costs",
+        "a rent increase"
+      ],
+      "answer": 1,
+      "explain": "un coût mensuel means a monthly cost."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une hausse de loyer",
+      "options": [
+        "a rental period",
+        "a maximum budget",
+        "a monthly cost",
+        "a rent increase"
+      ],
+      "answer": 3,
+      "explain": "une hausse de loyer means a rent increase."
+    }
+  ]
+}

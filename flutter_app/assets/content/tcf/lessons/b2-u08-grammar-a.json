@@ -1,0 +1,99 @@
+{
+  "id": "b2-u08-grammar-a",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Grammar: Reported speech: preserve the speaker, time and degree of certainty",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Reported speech: preserve the speaker, time and degree of certainty",
+      "body": "When you report an idea, make clear whose idea it is. With a present reporting verb, the original time often stays the same (elle dit qu'elle participe). With a past reporting verb, French often shifts the time reference: present → imperfect, passé composé → plus-que-parfait, future → conditional. Keep the shift only when the reporting time calls for it; do not change a statement just to make it sound formal. Direct quotation preserves exact wording; paraphrase preserves the meaning in your own words."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Reported speech: preserve the speaker, time and degree of certainty",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Present report",
+          "dire que + present",
+          "Elle dit qu'elle apprend en échangeant.",
+          "She says she learns by exchanging ideas."
+        ],
+        [
+          "Past report: present shifts",
+          "imparfait",
+          "Elle a dit qu'elle apprenait en échangeant.",
+          "She said she learned by exchanging ideas."
+        ],
+        [
+          "Past report: completed event shifts",
+          "plus-que-parfait",
+          "Il a expliqué qu'il avait suivi un atelier.",
+          "He explained that he had attended a workshop."
+        ],
+        [
+          "Past report: future shifts",
+          "conditionnel",
+          "Elle a annoncé qu'elle reviendrait.",
+          "She announced that she would return."
+        ],
+        [
+          "Same subject",
+          "reporting verb + infinitive",
+          "Il explique avoir changé de démarche.",
+          "He explains having changed his approach."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "A present-tense report: Elle dit qu'elle ___ en groupe.",
+      "options": [
+        "avait appris",
+        "apprenait",
+        "apprendrait",
+        "apprend"
+      ],
+      "answer": 3,
+      "explain": "With elle dit, the reported present can remain present."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Past report of a completed earlier action: Il a expliqué qu'il ___ un atelier.",
+      "options": [
+        "suivrait hier",
+        "suivra",
+        "avait suivi",
+        "suit"
+      ],
+      "answer": 2,
+      "explain": "The plus-que-parfait marks a completed action earlier than the past report."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why attribute a reported view?",
+      "options": [
+        "To avoid listening",
+        "To show whose claim it is",
+        "To make the claim universally true",
+        "To remove its context"
+      ],
+      "answer": 1,
+      "explain": "Attribution prevents the speaker's view from being confused with the writer's."
+    }
+  ]
+}

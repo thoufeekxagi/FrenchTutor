@@ -1,0 +1,148 @@
+{
+  "id": "b1-u01-words-1",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un imprévu",
+      "en": "an unexpected event",
+      "sound": "uh(n) an-pray-VÜ",
+      "exampleFr": "Un imprévu a modifié l'horaire du cours.",
+      "exampleEn": "An unexpected event changed the class schedule."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un contretemps",
+      "en": "a setback; a delay",
+      "sound": "uh(n) kohn-truh-TAH(N)",
+      "exampleFr": "Un contretemps a retardé le départ.",
+      "exampleEn": "A setback delayed the departure."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une annulation",
+      "en": "a cancellation",
+      "sound": "ün ah-nü-lah-SYOH(N)",
+      "exampleFr": "L'annulation a été annoncée le matin même.",
+      "exampleEn": "The cancellation was announced that morning."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un remplacement",
+      "en": "a replacement",
+      "sound": "uh(n) rah(n)-plahs-MAH(N)",
+      "exampleFr": "Un remplacement était déjà prévu pour le cours.",
+      "exampleEn": "A replacement had already been arranged for class."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une consigne",
+      "en": "an instruction",
+      "sound": "ün kohn-SEENY",
+      "exampleFr": "La consigne avait changé avant notre arrivée.",
+      "exampleEn": "The instruction had changed before we arrived."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un retard",
+      "en": "a delay",
+      "sound": "uh(n) ruh-TAHR",
+      "exampleFr": "Le retard a déplacé toute la rencontre.",
+      "exampleEn": "The delay shifted the whole meeting."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un imprévu",
+      "options": [
+        "a replacement",
+        "an unexpected event",
+        "a setback; a delay",
+        "a cancellation"
+      ],
+      "answer": 1,
+      "explain": "un imprévu means an unexpected event."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un contretemps",
+      "options": [
+        "an instruction",
+        "a cancellation",
+        "a replacement",
+        "a setback; a delay"
+      ],
+      "answer": 3,
+      "explain": "un contretemps means a setback; a delay."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une annulation",
+      "options": [
+        "a delay",
+        "a cancellation",
+        "a replacement",
+        "an instruction"
+      ],
+      "answer": 1,
+      "explain": "une annulation means a cancellation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un remplacement",
+      "options": [
+        "an unexpected event",
+        "an instruction",
+        "a delay",
+        "a replacement"
+      ],
+      "answer": 3,
+      "explain": "un remplacement means a replacement."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une consigne",
+      "options": [
+        "a setback; a delay",
+        "an instruction",
+        "a delay",
+        "an unexpected event"
+      ],
+      "answer": 1,
+      "explain": "une consigne means an instruction."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un retard",
+      "options": [
+        "a cancellation",
+        "an unexpected event",
+        "a replacement",
+        "a delay"
+      ],
+      "answer": 3,
+      "explain": "un retard means a delay."
+    }
+  ]
+}

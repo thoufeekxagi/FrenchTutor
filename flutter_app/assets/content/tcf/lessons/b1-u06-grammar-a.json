@@ -1,0 +1,87 @@
+{
+  "id": "b1-u06-grammar-a",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Grammar: Choose connectors by the relationship between ideas",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Choose connectors by the relationship between ideas",
+      "body": "A connector should show the relationship you mean. Use parce que / car for a reason; donc / par conséquent for a result; afin de + infinitive when the subject stays the same; pour que + subjunctive when the subject changes; and alors que / toutefois for contrast or qualification. Avoid stacking connectors. When evidence is limited, use peut or pourrait rather than claiming a result is certain."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Choose connectors by the relationship between ideas",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Cause",
+          "parce que / car + clause",
+          "Le trajet est plus long parce que la ligne est détournée.",
+          "The trip is longer because the route is diverted."
+        ],
+        [
+          "Purpose; same subject",
+          "afin de + infinitive",
+          "Le centre ouvre tôt afin de recevoir le groupe.",
+          "The centre opens early in order to welcome the group."
+        ],
+        [
+          "Purpose; different subject",
+          "pour que + subjunctive",
+          "Nous affichons l'avis pour que chacun connaisse le détour.",
+          "We post the notice so that everyone knows about the detour."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "The centre opens early so it can welcome the group. Choose the connector.",
+      "options": [
+        "alors que accueillir",
+        "pour que accueillir",
+        "afin d'accueillir",
+        "donc accueillir"
+      ],
+      "answer": 2,
+      "explain": "The subject remains the centre, so use afin de + infinitive."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "We post a notice so that residents know. Choose the right structure.",
+      "options": [
+        "afin que les résidents savoir",
+        "parce que les résidents sachent",
+        "donc les résidents savent",
+        "pour que les résidents sachent"
+      ],
+      "answer": 3,
+      "explain": "The subject changes, so use pour que + subjunctive."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which word signals contrast?",
+      "options": [
+        "toutefois",
+        "afin de",
+        "par conséquent",
+        "parce que"
+      ],
+      "answer": 0,
+      "explain": "Toutefois introduces a contrast or qualification."
+    }
+  ]
+}

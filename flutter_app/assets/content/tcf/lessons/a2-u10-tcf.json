@@ -1,0 +1,100 @@
+{
+  "id": "a2-u10-tcf",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je vais acheter des lentilles sèches. J'en prends un sachet pour le groupe.",
+      "question": "What amount will the speaker buy?",
+      "options": [
+        "One packet",
+        "Four packets",
+        "One litre",
+        "A handful"
+      ],
+      "answer": 0,
+      "explain": "The speaker says un sachet; four refers to the people."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je n'achète pas de boisson sans sucre. Je vais en choisir une autre pour le groupe.",
+      "question": "What will the speaker choose?",
+      "options": [
+        "Another drink",
+        "A glass jar",
+        "A tray of eggs",
+        "A kilogram of lentils"
+      ],
+      "answer": 0,
+      "explain": "The speaker will choose another drink."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le prix au kilo est plus bas pour les lentilles. J'en prends un paquet.",
+      "question": "Why does the shopper choose the lentils?",
+      "options": [
+        "Their price per kilogram is lower",
+        "They are in a glass jar",
+        "The receipt is itemized",
+        "They are the only local product"
+      ],
+      "answer": 0,
+      "explain": "The speaker says their price per kilogram is lower."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should the shopper keep?",
+      "options": [
+        "The itemized receipt",
+        "The measuring cup",
+        "The price label",
+        "The ingredient list"
+      ],
+      "answer": 0,
+      "explain": "The notice asks the shopper to keep the itemized receipt.",
+      "promptFr": "LISTE — Un bocal de sauce : 3,40 $. Promotion : 2,90 $. Reçu détaillé."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the meal quantity?",
+      "options": [
+        "One serving per person",
+        "One packet for the group",
+        "A half serving",
+        "Two servings per person"
+      ],
+      "answer": 0,
+      "explain": "The menu states one serving per person.",
+      "promptFr": "MENU — Repas sans gluten : lentilles, tomates et sauce maison. Quantité : une portion individuelle."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is mentioned for a product exchange?",
+      "options": [
+        "The store policy",
+        "The recipe",
+        "The bus schedule",
+        "The ingredient list"
+      ],
+      "answer": 0,
+      "explain": "The notice mentions the return policy and itemized receipt.",
+      "promptFr": "AVIS — Politique de retour : pour échanger un produit, un reçu détaillé."
+    }
+  ]
+}

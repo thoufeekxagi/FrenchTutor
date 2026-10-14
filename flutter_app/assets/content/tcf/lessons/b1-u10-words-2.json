@@ -1,0 +1,176 @@
+{
+  "id": "b1-u10-words-2",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une confirmation",
+      "en": "confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Une confirmation écrite sera envoyée demain.",
+      "exampleEn": "Written confirmation will be sent tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un détail",
+      "en": "a detail",
+      "sound": "uh(n) day-TAHY",
+      "exampleFr": "Il manque un détail sur le matériel.",
+      "exampleEn": "One detail about the equipment is missing."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "confirmer",
+      "en": "to confirm",
+      "sound": "kohn-feer-MAY",
+      "exampleFr": "Pourriez-vous confirmer l'heure de fermeture ?",
+      "exampleEn": "Could you confirm the closing time?"
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "reformuler",
+      "en": "to rephrase",
+      "sound": "ruh-for-mü-LAY",
+      "exampleFr": "Je vais reformuler ma question.",
+      "exampleEn": "I will rephrase my question."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "s'inscrire",
+      "en": "to register",
+      "sound": "san-skREER",
+      "exampleFr": "Les participants peuvent s'inscrire en ligne.",
+      "exampleEn": "Participants can register online."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "au cas où",
+      "en": "in case",
+      "sound": "oh kah oo",
+      "exampleFr": "Au cas où le bus serait en retard, appelez l'accueil.",
+      "exampleEn": "In case the bus is late, call reception."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation",
+      "options": [
+        "to rephrase",
+        "confirmation",
+        "a detail",
+        "to confirm"
+      ],
+      "answer": 1,
+      "explain": "une confirmation means confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un détail",
+      "options": [
+        "to register",
+        "to confirm",
+        "to rephrase",
+        "a detail"
+      ],
+      "answer": 3,
+      "explain": "un détail means a detail."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "confirmer",
+      "options": [
+        "in case",
+        "to confirm",
+        "to rephrase",
+        "to register"
+      ],
+      "answer": 1,
+      "explain": "confirmer means to confirm."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "reformuler",
+      "options": [
+        "confirmation",
+        "to register",
+        "in case",
+        "to rephrase"
+      ],
+      "answer": 3,
+      "explain": "reformuler means to rephrase."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "s'inscrire",
+      "options": [
+        "a detail",
+        "to register",
+        "in case",
+        "confirmation"
+      ],
+      "answer": 1,
+      "explain": "s'inscrire means to register."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "au cas où",
+      "options": [
+        "to confirm",
+        "confirmation",
+        "a detail",
+        "in case"
+      ],
+      "answer": 3,
+      "explain": "au cas où means in case."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un détail",
+      "question": "Which word did you hear?",
+      "options": [
+        "reformuler",
+        "un détail",
+        "une confirmation",
+        "confirmer"
+      ],
+      "answer": 1,
+      "explain": "You heard un détail: a detail."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "confirmer",
+      "question": "Which word did you hear?",
+      "options": [
+        "s'inscrire",
+        "un détail",
+        "reformuler",
+        "confirmer"
+      ],
+      "answer": 3,
+      "explain": "You heard confirmer: to confirm."
+    }
+  ]
+}

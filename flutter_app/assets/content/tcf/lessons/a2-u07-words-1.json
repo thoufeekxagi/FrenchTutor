@@ -1,0 +1,166 @@
+{
+  "id": "a2-u07-words-1",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Words: health services and appointments",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un rendez-vous de contrôle",
+      "en": "a follow-up check-up",
+      "sound": "uh(n) rah(n)-day-VOO duh kohn-TROHL",
+      "exampleFr": "J'ai un rendez-vous de contrôle mercredi.",
+      "exampleEn": "I have a follow-up check-up on Wednesday."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une clinique communautaire",
+      "en": "a community clinic",
+      "sound": "ün klee-NEEK koh-mü-noh-TEHR",
+      "exampleFr": "La clinique communautaire est près du centre.",
+      "exampleEn": "The community clinic is near the centre."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un service de triage",
+      "en": "a triage service",
+      "sound": "uh(n) sehr-VEES duh tree-AHZH",
+      "exampleFr": "Je contacte le service de triage pour demander la prochaine étape.",
+      "exampleEn": "I contact the triage service to ask about the next step."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une consultation téléphonique",
+      "en": "a phone consultation",
+      "sound": "ün kohn-sül-tah-SYOH(N) tay-lay-foh-NEEK",
+      "exampleFr": "Je demande une consultation téléphonique.",
+      "exampleEn": "I ask for a phone consultation."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un rendez-vous en personne",
+      "en": "an in-person appointment",
+      "sound": "uh(n) rah(n)-day-VOO ah(n) pehr-SOHN",
+      "exampleFr": "Je préfère un rendez-vous en personne.",
+      "exampleEn": "I prefer an in-person appointment."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un professionnel de la santé",
+      "en": "a health professional",
+      "sound": "uh(n) proh-feh-syoh-NEHL duh lah sah(n)-TAY",
+      "exampleFr": "Je voudrais parler à un professionnel de la santé.",
+      "exampleEn": "I would like to speak with a health professional."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un délai d'attente",
+      "en": "a waiting time",
+      "sound": "uh(n) day-LEH dah-TAH(N)t",
+      "exampleFr": "Je demande quel est le délai d'attente.",
+      "exampleEn": "I ask what the waiting time is."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un dossier médical",
+      "en": "a medical record",
+      "sound": "uh(n) doh-SYAY may-dee-KAHL",
+      "exampleFr": "Le professionnel consulte mon dossier médical avec mon accord.",
+      "exampleEn": "The professional reviews my medical record with my consent."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un rendez-vous de contrôle",
+      "options": [
+        "a phone consultation",
+        "a follow-up check-up",
+        "a waiting time",
+        "a community clinic"
+      ],
+      "answer": 1,
+      "explain": "un rendez-vous de contrôle means a follow-up check-up."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une clinique communautaire",
+      "options": [
+        "an in-person appointment",
+        "a medical record",
+        "a triage service",
+        "a community clinic"
+      ],
+      "answer": 3,
+      "explain": "une clinique communautaire means a community clinic."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un service de triage",
+      "options": [
+        "a health professional",
+        "a triage service",
+        "a follow-up check-up",
+        "a phone consultation"
+      ],
+      "answer": 1,
+      "explain": "un service de triage means a triage service."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une consultation téléphonique",
+      "options": [
+        "a waiting time",
+        "a community clinic",
+        "an in-person appointment",
+        "a phone consultation"
+      ],
+      "answer": 3,
+      "explain": "une consultation téléphonique means a phone consultation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un rendez-vous en personne",
+      "options": [
+        "a medical record",
+        "an in-person appointment",
+        "a triage service",
+        "a health professional"
+      ],
+      "answer": 1,
+      "explain": "un rendez-vous en personne means an in-person appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un professionnel de la santé",
+      "options": [
+        "a follow-up check-up",
+        "a phone consultation",
+        "a waiting time",
+        "a health professional"
+      ],
+      "answer": 3,
+      "explain": "un professionnel de la santé means a health professional."
+    }
+  ]
+}

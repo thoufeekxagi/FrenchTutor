@@ -1,0 +1,100 @@
+{
+  "id": "a2-u08-tcf",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le compte rendu ? Je vais le remettre vendredi. La liste de corrections, je vais la joindre au fichier.",
+      "question": "What will the speaker attach to the file?",
+      "options": [
+        "The correction list",
+        "The meeting report",
+        "The agenda",
+        "The attendance sheet"
+      ],
+      "answer": 0,
+      "explain": "La refers to la liste de corrections."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Les documents sont prêts. Le tuteur va les relire demain matin.",
+      "question": "Who will reread the documents?",
+      "options": [
+        "The internship supervisor",
+        "The project committee",
+        "The instructor's class",
+        "The reception staff"
+      ],
+      "answer": 0,
+      "explain": "The recording says the supervisor will reread them."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La présentation ? Nadia va l'envoyer au comité avant 16 h.",
+      "question": "What will Lina send?",
+      "options": [
+        "The presentation",
+        "The draft",
+        "The report",
+        "The course agenda"
+      ],
+      "answer": 0,
+      "explain": "L' refers to la présentation."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What will the sender reread?",
+      "options": [
+        "The draft",
+        "The final version",
+        "The schedule",
+        "The correction list"
+      ],
+      "answer": 0,
+      "explain": "Le refers to le brouillon.",
+      "promptFr": "Bonjour, le brouillon est dans le dossier partagé. Je vais le relire demain. La version finale sera prête jeudi."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Who will receive the presentation?",
+      "options": [
+        "The committee",
+        "The internship supervisor",
+        "The instructor's class",
+        "The landlord"
+      ],
+      "answer": 0,
+      "explain": "The notice says Nadia will hand it in to the committee.",
+      "promptFr": "RAPPEL — La présentation part avant 16 h. Nadia va la remettre au comité."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What will the group do Friday?",
+      "options": [
+        "Send the files",
+        "Correct the outline",
+        "Print the report",
+        "Cancel the meeting"
+      ],
+      "answer": 0,
+      "explain": "The text says the group will send the files Friday.",
+      "promptFr": "Les fichiers sont prêts. Le groupe va les classer par date et les envoyer vendredi."
+    }
+  ]
+}

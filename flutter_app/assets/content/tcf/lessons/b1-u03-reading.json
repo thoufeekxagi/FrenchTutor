@@ -1,0 +1,52 @@
+{
+  "id": "b1-u03-reading",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the condition for the proposed trial?",
+      "options": [
+        "The committee must cancel the survey",
+        "The room must be available",
+        "Everyone must attend every week",
+        "The activity must move online"
+      ],
+      "answer": 1,
+      "explain": "The room's availability is a stated condition.",
+      "promptFr": "Compte rendu — Plusieurs membres souhaitent une activité plus tôt. D'autres ne peuvent arriver qu'après 19 h. Le comité propose un essai de trois semaines, si la salle est disponible. Après l'essai, les participants pourront donner leur avis."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why would Saturday work for the writer?",
+      "options": [
+        "The workshop is cancelled",
+        "The writer prefers online classes",
+        "The writer is moving on Saturday",
+        "The writer's brother works on weekday evenings"
+      ],
+      "answer": 3,
+      "explain": "The brother works weekday evenings, so Saturday may work.",
+      "promptFr": "Message — Si l'atelier avait lieu le samedi, je pourrais venir avec mon frère. Il travaille le soir en semaine. À mon avis, une séance d'essai permettrait de vérifier si d'autres personnes sont disponibles."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which detail is still unresolved?",
+      "options": [
+        "Who will reserve the room",
+        "Whether the group exists",
+        "Whether the goal is participation",
+        "The name of every participant"
+      ],
+      "answer": 0,
+      "explain": "The text states that the room reservation responsibility is not yet clear.",
+      "promptFr": "La proposition vise à faciliter la participation. Elle ne précise pas encore qui réservera la salle ni comment les absences seront prises en compte. Le groupe devra confirmer ces détails avant de commencer."
+    }
+  ]
+}

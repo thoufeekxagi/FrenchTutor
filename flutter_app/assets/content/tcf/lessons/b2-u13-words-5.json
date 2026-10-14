@@ -1,0 +1,148 @@
+{
+  "id": "b2-u13-words-5",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "s'écarter du sujet",
+      "en": "to go off topic",
+      "sound": "say-kar-TAY dü sü-ZHEH",
+      "exampleFr": "Une anecdote longue peut l'écarter du sujet.",
+      "exampleEn": "A long anecdote can take the speaker off topic."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "à première vue",
+      "en": "at first glance",
+      "sound": "ah pruh-MYEHR VÜ",
+      "exampleFr": "À première vue, les deux solutions semblent semblables.",
+      "exampleEn": "At first glance, the two solutions seem similar."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "de manière convaincante",
+      "en": "convincingly",
+      "sound": "duh mah-NYEHR kohn-vehn-KAHNT",
+      "exampleFr": "Elle présente son exemple de manière convaincante.",
+      "exampleEn": "She presents her example convincingly."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un débit régulier",
+      "en": "a steady speaking pace",
+      "sound": "uh(n) day-BEE ray-gü-LYAY",
+      "exampleFr": "Un débit régulier rend les idées plus faciles à comprendre.",
+      "exampleEn": "A steady speaking pace makes ideas easier to understand."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une hésitation stratégique",
+      "en": "a strategic pause",
+      "sound": "ün ay-zee-tah-SYOH(N) strah-tay-ZHEEK",
+      "exampleFr": "Une hésitation stratégique lui laisse le temps de choisir un mot précis.",
+      "exampleEn": "A strategic pause gives her time to choose a precise word."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une idée directrice",
+      "en": "a guiding idea; central claim",
+      "sound": "ün ee-DAY dee-rehk-TREES",
+      "exampleFr": "Une idée directrice aide à organiser la réponse.",
+      "exampleEn": "A central idea helps organize the response."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "s'écarter du sujet",
+      "options": [
+        "a steady speaking pace",
+        "to go off topic",
+        "at first glance",
+        "convincingly"
+      ],
+      "answer": 1,
+      "explain": "s'écarter du sujet means to go off topic."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "à première vue",
+      "options": [
+        "a strategic pause",
+        "convincingly",
+        "a steady speaking pace",
+        "at first glance"
+      ],
+      "answer": 3,
+      "explain": "à première vue means at first glance."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "de manière convaincante",
+      "options": [
+        "a guiding idea; central claim",
+        "convincingly",
+        "a steady speaking pace",
+        "a strategic pause"
+      ],
+      "answer": 1,
+      "explain": "de manière convaincante means convincingly."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un débit régulier",
+      "options": [
+        "to go off topic",
+        "a strategic pause",
+        "a guiding idea; central claim",
+        "a steady speaking pace"
+      ],
+      "answer": 3,
+      "explain": "un débit régulier means a steady speaking pace."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une hésitation stratégique",
+      "options": [
+        "at first glance",
+        "a strategic pause",
+        "a guiding idea; central claim",
+        "to go off topic"
+      ],
+      "answer": 1,
+      "explain": "une hésitation stratégique means a strategic pause."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une idée directrice",
+      "options": [
+        "convincingly",
+        "to go off topic",
+        "at first glance",
+        "a guiding idea; central claim"
+      ],
+      "answer": 3,
+      "explain": "une idée directrice means a guiding idea; central claim."
+    }
+  ]
+}

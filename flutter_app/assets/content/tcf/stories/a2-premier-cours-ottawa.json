@@ -1,0 +1,297 @@
+{
+  "id": "a2-premier-cours-ottawa",
+  "title": "Un premier cours à Ottawa",
+  "titleEn": "A first class in Ottawa",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Sam follows a new route to his first French class in Ottawa.",
+  "unit": "a2-u03",
+  "sentences": [
+    {
+      "fr": "Sam a pris le bus pour le centre-ville.",
+      "en": "Sam took the bus downtown."
+    },
+    {
+      "fr": "À la station, il a vu un avis avec le nouvel itinéraire.",
+      "en": "At the station, he saw a notice with the new route."
+    },
+    {
+      "fr": "Il a lu le message sur son téléphone.",
+      "en": "He read the message on his phone."
+    },
+    {
+      "fr": "Ensuite, il a pris une correspondance près de la gare.",
+      "en": "Then he took a connection near the train station."
+    },
+    {
+      "fr": "Il est arrivé au centre-ville à neuf heures.",
+      "en": "He arrived downtown at nine o'clock."
+    },
+    {
+      "fr": "Il a fait un arrêt à la bibliothèque municipale.",
+      "en": "He made a stop at the public library."
+    },
+    {
+      "fr": "Au centre, il a trouvé la salle de son cours de français.",
+      "en": "At the centre, he found the room for his French class."
+    },
+    {
+      "fr": "Il a lu une consigne et il a fait l'exercice pratique.",
+      "en": "He read an instruction and did the practical exercise."
+    },
+    {
+      "fr": "À la fin, il a lu un message sur la prochaine séance de français.",
+      "en": "At the end, he read a message about the next French session."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a man's name)",
+      "pos": "name"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "pris": {
+      "en": "taken (prendre)",
+      "pos": "verb"
+    },
+    "le": {
+      "en": "the (masculine)",
+      "pos": "article"
+    },
+    "bus": {
+      "en": "bus",
+      "pos": "noun, masculine"
+    },
+    "pour": {
+      "en": "for",
+      "pos": "preposition"
+    },
+    "centre-ville": {
+      "en": "downtown",
+      "pos": "noun, masculine"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "la": {
+      "en": "the (feminine)",
+      "pos": "article"
+    },
+    "station": {
+      "en": "station",
+      "pos": "noun, feminine"
+    },
+    "il": {
+      "en": "he",
+      "pos": "pronoun"
+    },
+    "vu": {
+      "en": "seen (voir)",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "avis": {
+      "en": "notice",
+      "pos": "noun, masculine"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "nouvel": {
+      "en": "new (masculine before a vowel)",
+      "pos": "adjective"
+    },
+    "itinéraire": {
+      "en": "route",
+      "pos": "noun, masculine"
+    },
+    "lu": {
+      "en": "read (lire)",
+      "pos": "verb"
+    },
+    "message": {
+      "en": "message",
+      "pos": "noun, masculine"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "son": {
+      "en": "his",
+      "pos": "possessive"
+    },
+    "téléphone": {
+      "en": "phone",
+      "pos": "noun, masculine"
+    },
+    "ensuite": {
+      "en": "then; next",
+      "pos": "adverb"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "correspondance": {
+      "en": "connection; transfer",
+      "pos": "noun, feminine"
+    },
+    "près": {
+      "en": "near",
+      "pos": "preposition"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "gare": {
+      "en": "train station",
+      "pos": "noun, feminine"
+    },
+    "est": {
+      "en": "is; has (être)",
+      "pos": "verb"
+    },
+    "arrivé": {
+      "en": "arrived (arriver)",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "at the; to the",
+      "pos": "contraction"
+    },
+    "neuf": {
+      "en": "nine",
+      "pos": "number"
+    },
+    "heures": {
+      "en": "hours; clock times",
+      "pos": "noun, feminine plural"
+    },
+    "fait": {
+      "en": "done; made (faire)",
+      "pos": "verb"
+    },
+    "arrêt": {
+      "en": "stop",
+      "pos": "noun, masculine"
+    },
+    "bibliothèque": {
+      "en": "library",
+      "pos": "noun, feminine"
+    },
+    "municipale": {
+      "en": "public; municipal (feminine)",
+      "pos": "adjective"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "trouvé": {
+      "en": "found (trouver)",
+      "pos": "verb"
+    },
+    "salle": {
+      "en": "room; hall",
+      "pos": "noun, feminine"
+    },
+    "cours": {
+      "en": "class; course",
+      "pos": "noun, masculine"
+    },
+    "français": {
+      "en": "French",
+      "pos": "language"
+    },
+    "consigne": {
+      "en": "instruction",
+      "pos": "noun, feminine"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "l'exercice": {
+      "en": "the exercise",
+      "pos": "noun, masculine"
+    },
+    "pratique": {
+      "en": "practical",
+      "pos": "adjective"
+    },
+    "fin": {
+      "en": "end"
+    },
+    "prochaine": {
+      "en": "next",
+      "sound": "proh-SHEN"
+    },
+    "séance": {
+      "en": "session",
+      "pos": "noun, feminine"
+    }
+  },
+  "keywords": [
+    "itinéraire",
+    "correspondance",
+    "bibliothèque",
+    "consigne",
+    "cours"
+  ],
+  "quiz": [
+    {
+      "prompt": "What did Sam see at the station?",
+      "options": [
+        "A notice with the new route",
+        "A receipt from a shop",
+        "A result from class",
+        "A newspaper article"
+      ],
+      "answer": 0,
+      "explain": "The story says he saw a notice with the new route."
+    },
+    {
+      "prompt": "What did Sam do at the public library?",
+      "options": [
+        "He made a stop.",
+        "He took a class.",
+        "He applied for a card.",
+        "He bought a ticket."
+      ],
+      "answer": 0,
+      "explain": "The story says he made a stop at the public library."
+    },
+    {
+      "prompt": "What did Sam read before doing the practical exercise?",
+      "options": [
+        "An instruction",
+        "A city map",
+        "A receipt",
+        "A voice message"
+      ],
+      "answer": 0,
+      "explain": "The story says he read a consigne, an instruction."
+    },
+    {
+      "prompt": "What did Sam read at the end?",
+      "options": [
+        "A message about the next French session",
+        "A notice about a clinic",
+        "A newspaper about transit",
+        "A receipt for a book"
+      ],
+      "answer": 0,
+      "explain": "The last sentence mentions a message about the next French session."
+    }
+  ]
+}

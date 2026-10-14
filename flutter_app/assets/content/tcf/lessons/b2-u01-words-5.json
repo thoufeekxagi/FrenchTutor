@@ -1,0 +1,148 @@
+{
+  "id": "b2-u01-words-5",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "sous réserve de",
+      "en": "subject to; provided that",
+      "sound": "soo ray-ZEHRV duh",
+      "exampleFr": "La proposition est retenue sous réserve d'une vérification.",
+      "exampleEn": "The proposal is accepted subject to verification."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "en dépit de",
+      "en": "despite",
+      "sound": "ahn day-PEE duh",
+      "exampleFr": "En dépit des critiques, l'essai se poursuit.",
+      "exampleEn": "Despite the criticism, the trial continues."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "d'autant plus que",
+      "en": "all the more because",
+      "sound": "doh-tahn plü kuh",
+      "exampleFr": "Le choix est pertinent, d'autant plus que les coûts restent stables.",
+      "exampleEn": "The choice is relevant, all the more because costs remain stable."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un raisonnement circulaire",
+      "en": "circular reasoning",
+      "sound": "uh(n) reh-zohn-mahn sehr-kü-LEHR",
+      "exampleFr": "Répéter la conclusion comme preuve crée un raisonnement circulaire.",
+      "exampleEn": "Repeating the conclusion as proof creates circular reasoning."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une conséquence indirecte",
+      "en": "an indirect consequence",
+      "sound": "ün kohn-say-kahns ehn-dee-REHKT",
+      "exampleFr": "La nouvelle règle peut avoir une conséquence indirecte sur le transport.",
+      "exampleEn": "The new rule may have an indirect consequence for transportation."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "faire valoir un point",
+      "en": "to make a point; assert a point",
+      "sound": "fehr vah-LWAHR uh(n) pweh(n)",
+      "exampleFr": "Elle fait valoir son point sans écarter l'objection.",
+      "exampleEn": "She makes her point without dismissing the objection."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "sous réserve de",
+      "options": [
+        "circular reasoning",
+        "subject to; provided that",
+        "despite",
+        "all the more because"
+      ],
+      "answer": 1,
+      "explain": "sous réserve de means subject to; provided that."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "en dépit de",
+      "options": [
+        "an indirect consequence",
+        "all the more because",
+        "circular reasoning",
+        "despite"
+      ],
+      "answer": 3,
+      "explain": "en dépit de means despite."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "d'autant plus que",
+      "options": [
+        "to make a point; assert a point",
+        "all the more because",
+        "circular reasoning",
+        "an indirect consequence"
+      ],
+      "answer": 1,
+      "explain": "d'autant plus que means all the more because."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un raisonnement circulaire",
+      "options": [
+        "subject to; provided that",
+        "an indirect consequence",
+        "to make a point; assert a point",
+        "circular reasoning"
+      ],
+      "answer": 3,
+      "explain": "un raisonnement circulaire means circular reasoning."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une conséquence indirecte",
+      "options": [
+        "despite",
+        "an indirect consequence",
+        "to make a point; assert a point",
+        "subject to; provided that"
+      ],
+      "answer": 1,
+      "explain": "une conséquence indirecte means an indirect consequence."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "faire valoir un point",
+      "options": [
+        "all the more because",
+        "subject to; provided that",
+        "despite",
+        "to make a point; assert a point"
+      ],
+      "answer": 3,
+      "explain": "faire valoir un point means to make a point; assert a point."
+    }
+  ]
+}

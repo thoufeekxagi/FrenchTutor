@@ -1,0 +1,203 @@
+{
+  "id": "a2-u01-words-2",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Words: responsibilities and planning",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une responsabilité",
+      "en": "a responsibility",
+      "sound": "ün reh-spohn-sah-bee-lee-TAY",
+      "exampleFr": "J'ai une responsabilité au travail.",
+      "exampleEn": "I have a responsibility at work."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une priorité",
+      "en": "a priority",
+      "sound": "ün pree-oh-ree-TAY",
+      "exampleFr": "Le français est une priorité.",
+      "exampleEn": "French is a priority."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "organiser",
+      "en": "to organize",
+      "sound": "or-gah-nee-ZAY",
+      "exampleFr": "J'organise ma semaine le dimanche.",
+      "exampleEn": "I organize my week on Sunday."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "planifier",
+      "en": "to plan; schedule",
+      "sound": "plah-nee-fee-YAY",
+      "exampleFr": "Je planifie mes études.",
+      "exampleEn": "I plan my studies."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un objectif",
+      "en": "a goal; an objective",
+      "sound": "uh(n) ob-zhehk-TEEF",
+      "exampleFr": "Mon objectif est de parler plus.",
+      "exampleEn": "My goal is to speak more."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une échéance",
+      "en": "a deadline",
+      "sound": "ün ay-shay-AH(N)S",
+      "exampleFr": "L'échéance est vendredi.",
+      "exampleEn": "The deadline is Friday."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "respecter",
+      "en": "to meet; respect",
+      "sound": "rehs-pehk-TAY",
+      "exampleFr": "Je respecte l'échéance.",
+      "exampleEn": "I meet the deadline."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une liste de tâches",
+      "en": "a to-do list",
+      "sound": "ün leest duh tahsh",
+      "exampleFr": "Ma liste de tâches est courte.",
+      "exampleEn": "My to-do list is short."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "une journée chargée",
+      "en": "a busy day",
+      "sound": "ün zhoor-NAY shar-ZHAY",
+      "exampleFr": "Mardi est une journée chargée.",
+      "exampleEn": "Tuesday is a busy day."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une responsabilité",
+      "options": [
+        "to plan; schedule",
+        "a responsibility",
+        "to meet; respect",
+        "a priority"
+      ],
+      "answer": 1,
+      "explain": "une responsabilité means a responsibility."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une priorité",
+      "options": [
+        "a goal; an objective",
+        "a to-do list",
+        "to organize",
+        "a priority"
+      ],
+      "answer": 3,
+      "explain": "une priorité means a priority."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "organiser",
+      "options": [
+        "a deadline",
+        "to organize",
+        "a busy day",
+        "to plan; schedule"
+      ],
+      "answer": 1,
+      "explain": "organiser means to organize."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "planifier",
+      "options": [
+        "to meet; respect",
+        "a responsibility",
+        "a goal; an objective",
+        "to plan; schedule"
+      ],
+      "answer": 3,
+      "explain": "planifier means to plan; schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un objectif",
+      "options": [
+        "a to-do list",
+        "a goal; an objective",
+        "a priority",
+        "a deadline"
+      ],
+      "answer": 1,
+      "explain": "un objectif means a goal; an objective."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une échéance",
+      "options": [
+        "a busy day",
+        "to organize",
+        "to meet; respect",
+        "a deadline"
+      ],
+      "answer": 3,
+      "explain": "une échéance means a deadline."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une priorité",
+      "question": "Which word did you hear?",
+      "options": [
+        "planifier",
+        "une priorité",
+        "une échéance",
+        "une responsabilité"
+      ],
+      "answer": 1,
+      "explain": "You heard une priorité: a priority."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "planifier",
+      "question": "Which word did you hear?",
+      "options": [
+        "planifier",
+        "une échéance",
+        "une responsabilité",
+        "organiser"
+      ],
+      "answer": 0,
+      "explain": "You heard planifier: to plan; schedule."
+    }
+  ]
+}

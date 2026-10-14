@@ -1,0 +1,134 @@
+{
+  "id": "a2-u11-phrases",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Notice the difference between a short instruction and a polite request. In your notes, write the problem, the request and the confirmation question; then say all three with the notes covered."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Cochez la case obligatoire, s'il vous plaît.",
+      "en": "Please check the required box.",
+      "tip": "Say it: koh-SHAY lah kahz oh-blee-gah-TWAHR, seel voo pleh"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "N'appuyez pas sur le bouton avant de vérifier le numéro.",
+      "en": "Do not press the button before checking the number.",
+      "tip": "Say it: nah-pü-yay pah sür luh boo-TOH(N) ah-vah(n) duh vay-ree-FYAY luh nü-may-ROH"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Pourriez-vous vérifier le numéro de suivi ?",
+      "en": "Could you check the tracking number?",
+      "tip": "Say it: poo-ree-YAY voo vay-ree-FYAY luh nü-may-ROH duh sü-vee"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Je voudrais une réponse écrite, s'il vous plaît.",
+      "en": "I would like a written reply, please.",
+      "tip": "Say it: zhuh voo-DREH ün ray-POHNS ay-KREET, seel voo pleh"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Pourriez-vous m'indiquer la première étape ?",
+      "en": "Could you tell me the first step?",
+      "tip": "Say it: poo-ree-YAY voo ma(n)-dee-KAY lah pruh-MYEHR ay-TAHP"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Ne signez pas le formulaire incomplet.",
+      "en": "Do not sign the incomplete form.",
+      "tip": "Say it: nuh see-NYAY pah luh for-mü-LEHR a(n)-kohn-PLEH"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Voudriez-vous un suivi de dossier ?",
+      "en": "Would you like a file follow-up?",
+      "tip": "Say it: voo-dree-YAY voo uh(n) sü-vee duh doh-SYAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Merci. Je confirme le délai de traitement.",
+      "en": "Thank you. I am confirming the processing time.",
+      "tip": "Say it: mehr-SEE; zhuh kohn-FEERM luh day-LEH duh treht-MAH(N)"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Cochez la case obligatoire, s'il vous plaît.",
+      "options": [
+        "Would you like a file follow-up?",
+        "Please check the required box.",
+        "Do not press the button before checking the number.",
+        "Could you tell me the first step?"
+      ],
+      "answer": 1,
+      "explain": "Cochez la case obligatoire, s'il vous plaît. means Please check the required box.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Pourriez-vous vérifier le numéro de suivi ?",
+      "options": [
+        "Do not sign the incomplete form.",
+        "Could you check the tracking number?",
+        "I would like a written reply, please.",
+        "Would you like a file follow-up?"
+      ],
+      "answer": 1,
+      "explain": "Pourriez-vous vérifier le numéro de suivi ? means Could you check the tracking number?."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "Pourriez-vous m'indiquer la première étape ?",
+      "options": [
+        "Thank you. I am confirming the processing time.",
+        "Could you tell me the first step?",
+        "Do not sign the incomplete form.",
+        "Please check the required box."
+      ],
+      "answer": 1,
+      "explain": "Pourriez-vous m'indiquer la première étape ? means Could you tell me the first step?."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Voudriez-vous un suivi de dossier ?",
+      "options": [
+        "Do not press the button before checking the number.",
+        "Would you like a file follow-up?",
+        "Could you tell me the first step?",
+        "Thank you. I am confirming the processing time."
+      ],
+      "answer": 1,
+      "explain": "Voudriez-vous un suivi de dossier ? means Would you like a file follow-up?."
+    }
+  ]
+}

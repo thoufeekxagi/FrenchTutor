@@ -1,0 +1,80 @@
+{
+  "id": "b2-u12-dialogues",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Planning a source comparison",
+      "body": "Two learners plan a response without copying either document.",
+      "examples": [
+        {
+          "fr": "Le premier texte veut accélérer l'accès au service.",
+          "en": "Sam: The first text wants to speed up access to the service."
+        },
+        {
+          "fr": "Et le second s'inquiète des personnes qui n'ont pas de connexion stable.",
+          "en": "Mina: And the second is concerned about people without a stable connection."
+        },
+        {
+          "fr": "Ils s'accordent sur l'importance de simplifier la démarche.",
+          "en": "Sam: They agree that simplifying the process matters."
+        },
+        {
+          "fr": "Oui, mais ils divergent sur le fait de garder une option en personne.",
+          "en": "Mina: Yes, but they differ on keeping an in-person option."
+        },
+        {
+          "fr": "Je vais reformuler ces deux idées avec mes propres mots.",
+          "en": "Sam: I will paraphrase those two ideas in my own words."
+        },
+        {
+          "fr": "Puis donne ta position et justifie-la avec une condition.",
+          "en": "Mina: Then give your position and justify it with a condition."
+        },
+        {
+          "fr": "À mon sens, l'option en ligne est utile, pourvu qu'une autre voie reste accessible.",
+          "en": "Sam: In my view, the online option is useful, provided another route remains accessible."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Checking the word range",
+      "body": "A learner reviews a timed writing plan with a classmate.",
+      "examples": [
+        {
+          "fr": "J'ai 205 mots, mais la tâche en demande au maximum 180.",
+          "en": "Awa: I have 205 words, but the task asks for no more than 180."
+        },
+        {
+          "fr": "Quelles idées répondent directement à la consigne ?",
+          "en": "Marc: Which ideas answer the prompt directly?"
+        },
+        {
+          "fr": "Je peux enlever le second exemple et garder les deux points de vue.",
+          "en": "Awa: I can remove the second example and keep both viewpoints."
+        },
+        {
+          "fr": "N'oublie pas ta position personnelle.",
+          "en": "Marc: Do not forget your personal position."
+        },
+        {
+          "fr": "Je vais réduire la répétition, puis recompter.",
+          "en": "Awa: I will reduce repetition, then count again."
+        }
+      ]
+    }
+  ]
+}

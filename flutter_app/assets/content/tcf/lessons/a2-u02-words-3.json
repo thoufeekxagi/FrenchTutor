@@ -1,0 +1,194 @@
+{
+  "id": "a2-u02-words-3",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Words: a service or delivery issue",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un remboursement",
+      "en": "a refund",
+      "sound": "uh(n) rah(n)-boors-MAH(N)",
+      "exampleFr": "Le remboursement arrive sur ma carte.",
+      "exampleEn": "The refund arrives on my card."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une annulation",
+      "en": "a cancellation",
+      "sound": "ün ah-nü-lah-SYOH(N)",
+      "exampleFr": "L'annulation est confirmée par courriel.",
+      "exampleEn": "The cancellation is confirmed by email."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une livraison",
+      "en": "a delivery",
+      "sound": "ün lee-vray-ZOH(N)",
+      "exampleFr": "La livraison est prévue demain.",
+      "exampleEn": "The delivery is scheduled for tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un colis",
+      "en": "a parcel",
+      "sound": "uh(n) koh-LEE",
+      "exampleFr": "Le colis est devant la porte.",
+      "exampleEn": "The parcel is in front of the door."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un avis de passage",
+      "en": "a delivery notice",
+      "sound": "uh(n) ah-VEE duh pah-SAHZH",
+      "exampleFr": "Je trouve un avis de passage dans la boîte.",
+      "exampleEn": "I find a delivery notice in the mailbox."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une réclamation",
+      "en": "a complaint; a claim",
+      "sound": "ün ray-klah-mah-SYOH(N)",
+      "exampleFr": "La réclamation explique le problème.",
+      "exampleEn": "The complaint explains the problem."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un acompte",
+      "en": "a deposit; a down payment",
+      "sound": "uh(n) ah-koh(n)t",
+      "exampleFr": "J'ai payé un acompte pour la réservation.",
+      "exampleEn": "I paid a deposit for the reservation."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un emballage",
+      "en": "packaging; wrapping",
+      "sound": "uh(n) ah(n)-bah-LAHZH",
+      "exampleFr": "L'emballage est encore fermé.",
+      "exampleEn": "The packaging is still sealed."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un remboursement",
+      "options": [
+        "a parcel",
+        "a refund",
+        "a deposit; a down payment",
+        "a cancellation"
+      ],
+      "answer": 1,
+      "explain": "un remboursement means a refund."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une annulation",
+      "options": [
+        "a delivery notice",
+        "packaging; wrapping",
+        "a delivery",
+        "a cancellation"
+      ],
+      "answer": 3,
+      "explain": "une annulation means a cancellation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une livraison",
+      "options": [
+        "a complaint; a claim",
+        "a delivery",
+        "a refund",
+        "a parcel"
+      ],
+      "answer": 1,
+      "explain": "une livraison means a delivery."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un colis",
+      "options": [
+        "a deposit; a down payment",
+        "a cancellation",
+        "a delivery notice",
+        "a parcel"
+      ],
+      "answer": 3,
+      "explain": "un colis means a parcel."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un avis de passage",
+      "options": [
+        "packaging; wrapping",
+        "a delivery notice",
+        "a complaint; a claim",
+        "a refund"
+      ],
+      "answer": 1,
+      "explain": "un avis de passage means a delivery notice."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une réclamation",
+      "options": [
+        "a refund",
+        "a parcel",
+        "a deposit; a down payment",
+        "a complaint; a claim"
+      ],
+      "answer": 3,
+      "explain": "une réclamation means a complaint; a claim."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une annulation",
+      "question": "Which word did you hear?",
+      "options": [
+        "un colis",
+        "une annulation",
+        "un acompte",
+        "un remboursement"
+      ],
+      "answer": 1,
+      "explain": "You heard une annulation: a cancellation."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un colis",
+      "question": "Which word did you hear?",
+      "options": [
+        "un colis",
+        "un acompte",
+        "un remboursement",
+        "une livraison"
+      ],
+      "answer": 0,
+      "explain": "You heard un colis: a parcel."
+    }
+  ]
+}

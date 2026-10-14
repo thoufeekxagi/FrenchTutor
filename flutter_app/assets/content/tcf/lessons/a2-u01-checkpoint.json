@@ -1,0 +1,140 @@
+{
+  "id": "a2-u01-checkpoint",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does une habitude mean?",
+      "options": [
+        "A habit",
+        "A deadline",
+        "A workshop",
+        "A presentation"
+      ],
+      "answer": 0,
+      "explain": "Une habitude means a habit."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which phrase means 'generally'?",
+      "options": [
+        "en retard",
+        "en général",
+        "à temps",
+        "en forme"
+      ],
+      "answer": 1,
+      "explain": "En général means generally."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does une échéance mean?",
+      "options": [
+        "A break",
+        "A session",
+        "A deadline",
+        "A goal"
+      ],
+      "answer": 2,
+      "explain": "Une échéance is a deadline."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Choose the connector for a reason: Je reporte le cours ___ je travaille.",
+      "options": [
+        "donc",
+        "mais",
+        "parce que",
+        "ensuite"
+      ],
+      "answer": 2,
+      "explain": "Parce que introduces the reason."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Choose the connector for a result: Il est tard, ___ je termine demain.",
+      "options": [
+        "donc",
+        "parce que",
+        "d'abord",
+        "mais"
+      ],
+      "answer": 0,
+      "explain": "Donc introduces the result."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does se reposer mean?",
+      "options": [
+        "To organize",
+        "To rest",
+        "To clarify",
+        "To postpone"
+      ],
+      "answer": 1,
+      "explain": "Se reposer means to rest."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "What does un imprévu mean?",
+      "options": [
+        "An unexpected event",
+        "A weekly goal",
+        "A colleague",
+        "A note"
+      ],
+      "answer": 0,
+      "explain": "Un imprévu is an unexpected event."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "What does préciser mean?",
+      "options": [
+        "To postpone",
+        "To clarify or specify",
+        "To wake up",
+        "To meet a deadline"
+      ],
+      "answer": 1,
+      "explain": "Préciser means to specify or clarify."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which sequence is in the correct order?",
+      "options": [
+        "Enfin, d'abord, ensuite",
+        "Ensuite, enfin, d'abord",
+        "D'abord, ensuite, enfin",
+        "Parce que, mais, donc"
+      ],
+      "answer": 2,
+      "explain": "Use d'abord, then ensuite, and finally enfin."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "A class is postponed because of a work problem. Which sentence states the reason clearly?",
+      "options": [
+        "Je reporte le cours parce que j'ai un imprévu au travail.",
+        "Je reporte le cours, donc j'ai un imprévu au travail.",
+        "Je reporte le cours, mais j'ai un imprévu au travail.",
+        "Je reporte le cours ensuite parce que je suis libre demain."
+      ],
+      "answer": 0,
+      "explain": "Parce que introduces the reason: an unexpected work problem. The other sentences either reverse the cause and result, contrast two ideas, or give a different reason."
+    }
+  ]
+}

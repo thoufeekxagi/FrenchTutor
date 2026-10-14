@@ -1,0 +1,148 @@
+{
+  "id": "b2-u09-words-4",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une estimation prudente",
+      "en": "a conservative estimate",
+      "sound": "ün ehs-tee-mah-SYOH(N) prüdahnt",
+      "exampleFr": "Une estimation prudente inclut les frais imprévus.",
+      "exampleEn": "A conservative estimate includes unexpected costs."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un coût indirect",
+      "en": "an indirect cost",
+      "sound": "uh(n) koo ehn-dee-REHKT",
+      "exampleFr": "Le temps de déplacement représente un coût indirect.",
+      "exampleEn": "Travel time represents an indirect cost."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une variation saisonnière",
+      "en": "a seasonal variation",
+      "sound": "ün vah-ree-ah-SYOH(N) seh-zoh-NYEHR",
+      "exampleFr": "La demande connaît une variation saisonnière.",
+      "exampleEn": "Demand shows seasonal variation."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un panier moyen",
+      "en": "an average basket",
+      "sound": "uh(n) pah-NYAY mwah-YEH(N)",
+      "exampleFr": "Le panier moyen augmente pendant les fêtes.",
+      "exampleEn": "The average basket increases during the holidays."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "en valeur réelle",
+      "en": "in real terms",
+      "sound": "ahn vah-luhr ray-EHL",
+      "exampleFr": "Le revenu a peu changé en valeur réelle.",
+      "exampleEn": "Income has changed little in real terms."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une tendance haussière",
+      "en": "an upward trend",
+      "sound": "ün tahn-dahns oh-syehr",
+      "exampleFr": "La série présente une tendance haussière sur six mois.",
+      "exampleEn": "The series shows an upward trend over six months."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une estimation prudente",
+      "options": [
+        "an average basket",
+        "a conservative estimate",
+        "an indirect cost",
+        "a seasonal variation"
+      ],
+      "answer": 1,
+      "explain": "une estimation prudente means a conservative estimate."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un coût indirect",
+      "options": [
+        "in real terms",
+        "a seasonal variation",
+        "an average basket",
+        "an indirect cost"
+      ],
+      "answer": 3,
+      "explain": "un coût indirect means an indirect cost."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une variation saisonnière",
+      "options": [
+        "an upward trend",
+        "a seasonal variation",
+        "an average basket",
+        "in real terms"
+      ],
+      "answer": 1,
+      "explain": "une variation saisonnière means a seasonal variation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un panier moyen",
+      "options": [
+        "a conservative estimate",
+        "in real terms",
+        "an upward trend",
+        "an average basket"
+      ],
+      "answer": 3,
+      "explain": "un panier moyen means an average basket."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "en valeur réelle",
+      "options": [
+        "an indirect cost",
+        "in real terms",
+        "an upward trend",
+        "a conservative estimate"
+      ],
+      "answer": 1,
+      "explain": "en valeur réelle means in real terms."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une tendance haussière",
+      "options": [
+        "a seasonal variation",
+        "a conservative estimate",
+        "an indirect cost",
+        "an upward trend"
+      ],
+      "answer": 3,
+      "explain": "une tendance haussière means an upward trend."
+    }
+  ]
+}

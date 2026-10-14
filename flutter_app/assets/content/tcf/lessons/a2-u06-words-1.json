@@ -1,0 +1,166 @@
+{
+  "id": "a2-u06-words-1",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Words: rental types and layouts",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un studio",
+      "en": "a studio apartment",
+      "sound": "uh(n) stü-DYOH",
+      "exampleFr": "L'annonce décrit un studio.",
+      "exampleEn": "The listing describes a studio apartment."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un appartement d'une chambre",
+      "en": "a one-bedroom apartment",
+      "sound": "uh(n) ah-pahr-tuh-MAH(N) dü-n shah(n)-br",
+      "exampleFr": "L'annonce décrit un appartement d'une chambre.",
+      "exampleEn": "The listing describes a one-bedroom apartment."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un logement meublé",
+      "en": "a furnished home",
+      "sound": "uh(n) lohzh-MAH(N) muh-BLAY",
+      "exampleFr": "L'annonce décrit un logement meublé.",
+      "exampleEn": "The listing describes a furnished home."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un logement non meublé",
+      "en": "an unfurnished home",
+      "sound": "uh(n) lohzh-MAH(N) noh(n) muh-BLAY",
+      "exampleFr": "L'annonce décrit un logement non meublé.",
+      "exampleEn": "The listing describes an unfurnished home."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une colocation",
+      "en": "a shared apartment",
+      "sound": "ün koh-loh-kah-SYOH(N)",
+      "exampleFr": "L'annonce décrit une colocation.",
+      "exampleEn": "The listing describes a shared apartment."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une résidence étudiante",
+      "en": "a student residence",
+      "sound": "ün ray-zee-DAH(N)S ay-tü-dee-AH(N)t",
+      "exampleFr": "L'annonce décrit une résidence étudiante.",
+      "exampleEn": "The listing describes a student residence."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un sous-sol aménagé",
+      "en": "a finished basement",
+      "sound": "uh(n) soo-SOHL ah-may-nah-ZHAY",
+      "exampleFr": "L'annonce décrit un sous-sol aménagé.",
+      "exampleEn": "The listing describes a finished basement."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un logement temporaire",
+      "en": "temporary housing",
+      "sound": "uh(n) lohzh-MAH(N) tah(n)-poh-REHR",
+      "exampleFr": "L'annonce décrit un logement temporaire.",
+      "exampleEn": "The listing describes temporary housing."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un studio",
+      "options": [
+        "an unfurnished home",
+        "a studio apartment",
+        "a finished basement",
+        "temporary housing"
+      ],
+      "answer": 1,
+      "explain": "un studio means a studio apartment."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un appartement d'une chambre",
+      "options": [
+        "temporary housing",
+        "a furnished home",
+        "a student residence",
+        "a one-bedroom apartment"
+      ],
+      "answer": 3,
+      "explain": "un appartement d'une chambre means a one-bedroom apartment."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un logement meublé",
+      "options": [
+        "a student residence",
+        "a furnished home",
+        "a studio apartment",
+        "a finished basement"
+      ],
+      "answer": 1,
+      "explain": "un logement meublé means a furnished home."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un logement non meublé",
+      "options": [
+        "a finished basement",
+        "a one-bedroom apartment",
+        "a shared apartment",
+        "an unfurnished home"
+      ],
+      "answer": 3,
+      "explain": "un logement non meublé means an unfurnished home."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une colocation",
+      "options": [
+        "temporary housing",
+        "a shared apartment",
+        "a furnished home",
+        "a student residence"
+      ],
+      "answer": 1,
+      "explain": "une colocation means a shared apartment."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une résidence étudiante",
+      "options": [
+        "a studio apartment",
+        "an unfurnished home",
+        "a finished basement",
+        "a student residence"
+      ],
+      "answer": 3,
+      "explain": "une résidence étudiante means a student residence."
+    }
+  ]
+}

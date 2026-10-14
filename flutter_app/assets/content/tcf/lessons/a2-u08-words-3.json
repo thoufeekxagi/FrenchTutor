@@ -1,0 +1,166 @@
+{
+  "id": "a2-u08-words-3",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Words: class and project assignments",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un travail de groupe",
+      "en": "a group assignment",
+      "sound": "uh(n) trah-VAI duh groop",
+      "exampleFr": "La formatrice demande un travail de groupe.",
+      "exampleEn": "The instructor asks for a group assignment."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un exposé oral",
+      "en": "an oral presentation",
+      "sound": "uh(n) ehk-poh-ZAY oh-RAHL",
+      "exampleFr": "La formatrice demande un exposé oral.",
+      "exampleEn": "The instructor asks for an oral presentation."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un retour écrit",
+      "en": "written feedback",
+      "sound": "uh(n) ruh-TOOR ay-KREE",
+      "exampleFr": "La formatrice demande un retour écrit.",
+      "exampleEn": "The instructor asks for written feedback."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une grille d'évaluation",
+      "en": "an evaluation rubric",
+      "sound": "ün greey day-vah-lü-ah-SYOH(N)",
+      "exampleFr": "La formatrice demande une grille d'évaluation.",
+      "exampleEn": "The instructor asks for an evaluation rubric."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un sujet de recherche",
+      "en": "a research topic",
+      "sound": "uh(n) sü-ZHEH duh ruh-SHEHRSH",
+      "exampleFr": "La formatrice demande un sujet de recherche.",
+      "exampleEn": "The instructor asks for a research topic."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une échéance de projet",
+      "en": "a project deadline",
+      "sound": "ün ay-shay-AH(N)S duh proh-ZHEH",
+      "exampleFr": "La formatrice demande une échéance de projet.",
+      "exampleEn": "The instructor asks for a project deadline."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un plan de présentation",
+      "en": "a presentation outline",
+      "sound": "uh(n) plah(n) duh pray-zah(n)-tah-SYOH(N)",
+      "exampleFr": "La formatrice demande un plan de présentation.",
+      "exampleEn": "The instructor asks for a presentation outline."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une liste de corrections",
+      "en": "a list of corrections",
+      "sound": "ün leest duh koh-rehk-SYOH(N)",
+      "exampleFr": "La formatrice demande une liste de corrections.",
+      "exampleEn": "The instructor asks for a list of corrections."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un travail de groupe",
+      "options": [
+        "an evaluation rubric",
+        "a group assignment",
+        "a presentation outline",
+        "an oral presentation"
+      ],
+      "answer": 1,
+      "explain": "un travail de groupe means a group assignment."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un exposé oral",
+      "options": [
+        "a research topic",
+        "a list of corrections",
+        "written feedback",
+        "an oral presentation"
+      ],
+      "answer": 3,
+      "explain": "un exposé oral means an oral presentation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un retour écrit",
+      "options": [
+        "a project deadline",
+        "written feedback",
+        "a group assignment",
+        "an evaluation rubric"
+      ],
+      "answer": 1,
+      "explain": "un retour écrit means written feedback."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une grille d'évaluation",
+      "options": [
+        "a presentation outline",
+        "an oral presentation",
+        "a research topic",
+        "an evaluation rubric"
+      ],
+      "answer": 3,
+      "explain": "une grille d'évaluation means an evaluation rubric."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un sujet de recherche",
+      "options": [
+        "a list of corrections",
+        "a research topic",
+        "written feedback",
+        "a project deadline"
+      ],
+      "answer": 1,
+      "explain": "un sujet de recherche means a research topic."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une échéance de projet",
+      "options": [
+        "a group assignment",
+        "an evaluation rubric",
+        "a presentation outline",
+        "a project deadline"
+      ],
+      "answer": 3,
+      "explain": "une échéance de projet means a project deadline."
+    }
+  ]
+}

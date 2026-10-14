@@ -1,0 +1,172 @@
+{
+  "id": "a2-u09-words-6",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Words: travel actions and access",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une rampe d'accès",
+      "en": "an access ramp",
+      "sound": "ün rah(n)mp dahk-SEH",
+      "exampleFr": "Une rampe d'accès mène à l'entrée de la gare.",
+      "exampleEn": "An access ramp leads to the station entrance."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un escalier roulant",
+      "en": "an escalator",
+      "sound": "uh(n) ehk-ah-LYAY roo-LAH(N)",
+      "exampleFr": "L'escalier roulant mène au quai.",
+      "exampleEn": "The escalator leads to the platform."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un ascenseur public",
+      "en": "a public elevator",
+      "sound": "uh(n) ah-sah(n)-SUHR pü-BLEEK",
+      "exampleFr": "L'ascenseur public est près de l'entrée.",
+      "exampleEn": "The public elevator is near the entrance."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un accès sans marches",
+      "en": "step-free access",
+      "sound": "uh(n) ahk-SEH sah(n) marsh",
+      "exampleFr": "La gare offre un accès sans marches.",
+      "exampleEn": "The station offers step-free access."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une zone d'attente",
+      "en": "a waiting area",
+      "sound": "ün zohn dah-TAH(N)T",
+      "exampleFr": "La zone d'attente est près du quai.",
+      "exampleEn": "The waiting area is near the platform."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un service de navette",
+      "en": "a shuttle service",
+      "sound": "uh(n) sehr-VEES duh nah-VEHT",
+      "exampleFr": "Un service de navette relie la gare à l'aéroport.",
+      "exampleEn": "A shuttle service connects the station to the airport."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un billet électronique",
+      "en": "an electronic ticket",
+      "sound": "uh(n) bee-YEH ay-lehk-troh-NEEK",
+      "exampleFr": "Je montre mon billet électronique au contrôleur.",
+      "exampleEn": "I show my electronic ticket to the conductor."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un point de rencontre",
+      "en": "a meeting point",
+      "sound": "uh(n) pwa(n) duh rah(n)-KOH(N)TR",
+      "exampleFr": "Le point de rencontre est près de la gare.",
+      "exampleEn": "The meeting point is near the station."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une rampe d'accès",
+      "options": [
+        "an electronic ticket",
+        "an access ramp",
+        "an escalator",
+        "a waiting area"
+      ],
+      "answer": 1,
+      "explain": "une rampe d'accès means an access ramp."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un escalier roulant",
+      "options": [
+        "a waiting area",
+        "a meeting point",
+        "a public elevator",
+        "an escalator"
+      ],
+      "answer": 3,
+      "explain": "un escalier roulant means an escalator."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un ascenseur public",
+      "options": [
+        "a shuttle service",
+        "a public elevator",
+        "an access ramp",
+        "step-free access"
+      ],
+      "answer": 1,
+      "explain": "un ascenseur public means a public elevator."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès sans marches",
+      "options": [
+        "an electronic ticket",
+        "an escalator",
+        "a waiting area",
+        "step-free access"
+      ],
+      "answer": 3,
+      "explain": "un accès sans marches means step-free access."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une zone d'attente",
+      "options": [
+        "a meeting point",
+        "a waiting area",
+        "a public elevator",
+        "a shuttle service"
+      ],
+      "answer": 1,
+      "explain": "une zone d'attente means a waiting area."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un service de navette",
+      "options": [
+        "an access ramp",
+        "step-free access",
+        "an electronic ticket",
+        "a shuttle service"
+      ],
+      "answer": 3,
+      "explain": "un service de navette means a shuttle service."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: travel actions and access",
+      "body": "The city, stops and service notices in this unit are fictional practice material. Transit agencies use different names and accessibility information; check the local operator for a real journey."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b2-u11-words-3",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une confirmation écrite",
+      "en": "written confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N) ay-KREET",
+      "exampleFr": "Je demanderai une confirmation écrite de la réservation.",
+      "exampleEn": "I will ask for written confirmation of the booking."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un formulaire d'inscription",
+      "en": "a registration form",
+      "sound": "uh(n) for-mü-LEHR dehn-skree-psyoh(n)",
+      "exampleFr": "Le formulaire d'inscription se trouve sur la page du centre.",
+      "exampleEn": "The registration form is on the centre's page."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un justificatif de domicile",
+      "en": "proof of address",
+      "sound": "uh(n) zhüs-tee-fee-kah-teef duh doh-mee-SEEL",
+      "exampleFr": "Le bureau exige un justificatif de domicile récent.",
+      "exampleEn": "The office requires recent proof of address."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le montant des frais",
+      "en": "the amount of the fees",
+      "sound": "luh mohn-tahn day freh",
+      "exampleFr": "Pouvez-vous préciser le montant des frais ?",
+      "exampleEn": "Could you specify the amount of the fees?"
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "des conditions d'annulation",
+      "en": "cancellation conditions",
+      "sound": "day kohn-dee-SYOH(N) dah-nü-lah-SYOH(N)",
+      "exampleFr": "Je voudrais connaître les conditions d'annulation.",
+      "exampleEn": "I would like to know the cancellation conditions."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un accommodement",
+      "en": "an accommodation; adjustment",
+      "sound": "uh(n) ah-koh-mohd-MAH(N)",
+      "exampleFr": "L'organisateur peut expliquer la procédure pour demander un accommodement.",
+      "exampleEn": "The organizer can explain how to request an accommodation."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation écrite",
+      "options": [
+        "the amount of the fees",
+        "written confirmation",
+        "a registration form",
+        "proof of address"
+      ],
+      "answer": 1,
+      "explain": "une confirmation écrite means written confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un formulaire d'inscription",
+      "options": [
+        "cancellation conditions",
+        "proof of address",
+        "the amount of the fees",
+        "a registration form"
+      ],
+      "answer": 3,
+      "explain": "un formulaire d'inscription means a registration form."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un justificatif de domicile",
+      "options": [
+        "an accommodation; adjustment",
+        "proof of address",
+        "the amount of the fees",
+        "cancellation conditions"
+      ],
+      "answer": 1,
+      "explain": "un justificatif de domicile means proof of address."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le montant des frais",
+      "options": [
+        "written confirmation",
+        "cancellation conditions",
+        "an accommodation; adjustment",
+        "the amount of the fees"
+      ],
+      "answer": 3,
+      "explain": "le montant des frais means the amount of the fees."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "des conditions d'annulation",
+      "options": [
+        "a registration form",
+        "cancellation conditions",
+        "an accommodation; adjustment",
+        "written confirmation"
+      ],
+      "answer": 1,
+      "explain": "des conditions d'annulation means cancellation conditions."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un accommodement",
+      "options": [
+        "proof of address",
+        "written confirmation",
+        "a registration form",
+        "an accommodation; adjustment"
+      ],
+      "answer": 3,
+      "explain": "un accommodement means an accommodation; adjustment."
+    }
+  ]
+}

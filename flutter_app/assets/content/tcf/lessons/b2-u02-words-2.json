@@ -1,0 +1,148 @@
+{
+  "id": "b2-u02-words-2",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une enquête",
+      "en": "a survey; an investigation",
+      "sound": "ün ah(n)-KET",
+      "exampleFr": "L'enquête décrit sa méthode de collecte.",
+      "exampleEn": "The survey describes its collection method."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une vérification",
+      "en": "a check; verification",
+      "sound": "ün vay-ree-fee-kah-SYOH(N)",
+      "exampleFr": "Une vérification indépendante reste nécessaire.",
+      "exampleEn": "An independent check is still necessary."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une rumeur",
+      "en": "a rumour",
+      "sound": "ün rü-MUHR",
+      "exampleFr": "La rumeur circule avant la publication du rapport.",
+      "exampleEn": "The rumour circulates before the report is published."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un porte-parole",
+      "en": "a spokesperson",
+      "sound": "uh(n) port-pah-ROHL",
+      "exampleFr": "Le porte-parole répond aux questions des médias.",
+      "exampleEn": "The spokesperson answers media questions."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un résultat",
+      "en": "a result",
+      "sound": "uh(n) ray-zül-TAH",
+      "exampleFr": "Le résultat ne confirme pas toutes les hypothèses.",
+      "exampleEn": "The result does not confirm every hypothesis."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une interprétation",
+      "en": "an interpretation",
+      "sound": "ün an-tehr-pray-tah-SYOH(N)",
+      "exampleFr": "Il faut séparer le résultat de son interprétation.",
+      "exampleEn": "The result must be separated from its interpretation."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une enquête",
+      "options": [
+        "a spokesperson",
+        "a survey; an investigation",
+        "a check; verification",
+        "a rumour"
+      ],
+      "answer": 1,
+      "explain": "une enquête means a survey; an investigation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une vérification",
+      "options": [
+        "a result",
+        "a rumour",
+        "a spokesperson",
+        "a check; verification"
+      ],
+      "answer": 3,
+      "explain": "une vérification means a check; verification."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une rumeur",
+      "options": [
+        "an interpretation",
+        "a rumour",
+        "a spokesperson",
+        "a result"
+      ],
+      "answer": 1,
+      "explain": "une rumeur means a rumour."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un porte-parole",
+      "options": [
+        "a survey; an investigation",
+        "a result",
+        "an interpretation",
+        "a spokesperson"
+      ],
+      "answer": 3,
+      "explain": "un porte-parole means a spokesperson."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un résultat",
+      "options": [
+        "a check; verification",
+        "a result",
+        "an interpretation",
+        "a survey; an investigation"
+      ],
+      "answer": 1,
+      "explain": "un résultat means a result."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une interprétation",
+      "options": [
+        "a rumour",
+        "a survey; an investigation",
+        "a check; verification",
+        "an interpretation"
+      ],
+      "answer": 3,
+      "explain": "une interprétation means an interpretation."
+    }
+  ]
+}

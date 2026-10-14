@@ -1,0 +1,176 @@
+{
+  "id": "b2-u06-words-2",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un risque",
+      "en": "a risk",
+      "sound": "uh(n) REESK",
+      "exampleFr": "L'équipe cherche à réduire le risque.",
+      "exampleEn": "The team is trying to reduce the risk."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une solution de rechange",
+      "en": "an alternative",
+      "sound": "ün soh-lü-SYOH(N) duh ruh-SHAH(N)ZH",
+      "exampleFr": "Une solution de rechange resterait disponible.",
+      "exampleEn": "An alternative would remain available."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un stockage",
+      "en": "storage",
+      "sound": "uh(n) stoh-KAHZH",
+      "exampleFr": "Le stockage local fonctionne sans réseau.",
+      "exampleEn": "Local storage works without a network."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une autorisation",
+      "en": "permission; authorization",
+      "sound": "ün oh-toh-ree-zah-SYOH(N)",
+      "exampleFr": "L'application demande une autorisation avant d'accéder au micro.",
+      "exampleEn": "The app asks permission before accessing the microphone."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une sauvegarde",
+      "en": "a backup",
+      "sound": "ün soh-vuh-GARD",
+      "exampleFr": "Une sauvegarde protège contre une panne de l'appareil.",
+      "exampleEn": "A backup protects against device failure."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une conséquence",
+      "en": "a consequence",
+      "sound": "ün kohn-say-KAH(N)S",
+      "exampleFr": "Chaque choix peut avoir une conséquence inattendue.",
+      "exampleEn": "Each choice can have an unexpected consequence."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un risque",
+      "options": [
+        "permission; authorization",
+        "a risk",
+        "an alternative",
+        "storage"
+      ],
+      "answer": 1,
+      "explain": "un risque means a risk."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une solution de rechange",
+      "options": [
+        "a backup",
+        "storage",
+        "permission; authorization",
+        "an alternative"
+      ],
+      "answer": 3,
+      "explain": "une solution de rechange means an alternative."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un stockage",
+      "options": [
+        "a consequence",
+        "storage",
+        "permission; authorization",
+        "a backup"
+      ],
+      "answer": 1,
+      "explain": "un stockage means storage."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une autorisation",
+      "options": [
+        "a risk",
+        "a backup",
+        "a consequence",
+        "permission; authorization"
+      ],
+      "answer": 3,
+      "explain": "une autorisation means permission; authorization."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une sauvegarde",
+      "options": [
+        "an alternative",
+        "a backup",
+        "a consequence",
+        "a risk"
+      ],
+      "answer": 1,
+      "explain": "une sauvegarde means a backup."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une conséquence",
+      "options": [
+        "storage",
+        "a risk",
+        "an alternative",
+        "a consequence"
+      ],
+      "answer": 3,
+      "explain": "une conséquence means a consequence."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un stockage",
+      "question": "Which word did you hear?",
+      "options": [
+        "une sauvegarde",
+        "un stockage",
+        "un risque",
+        "une autorisation"
+      ],
+      "answer": 1,
+      "explain": "You heard un stockage: storage."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une autorisation",
+      "question": "Which word did you hear?",
+      "options": [
+        "une conséquence",
+        "un stockage",
+        "une sauvegarde",
+        "une autorisation"
+      ],
+      "answer": 3,
+      "explain": "You heard une autorisation: permission; authorization."
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "id": "a2-u05-grammar-b",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Grammar: Futur simple: endings and common stems",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Add -ai, -as, -a, -ons, -ez, -ont. For an -re verb, drop the final e before adding the ending.",
+      "headers": [
+        "Subject",
+        "-er: préparer",
+        "-ir: choisir",
+        "-re: répondre"
+      ],
+      "rows": [
+        [
+          "je",
+          "préparerai",
+          "choisirai",
+          "répondrai"
+        ],
+        [
+          "tu",
+          "prépareras",
+          "choisiras",
+          "répondras"
+        ],
+        [
+          "il / elle",
+          "préparera",
+          "choisira",
+          "répondra"
+        ],
+        [
+          "nous",
+          "préparerons",
+          "choisirons",
+          "répondrons"
+        ],
+        [
+          "vous",
+          "préparerez",
+          "choisirez",
+          "répondrez"
+        ],
+        [
+          "ils / elles",
+          "prépareront",
+          "choisiront",
+          "répondront"
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "These common verbs use a special stem but keep the same six endings.",
+      "headers": [
+        "Infinitive",
+        "Stem",
+        "je / tu / il, elle",
+        "nous / vous / ils, elles"
+      ],
+      "rows": [
+        [
+          "être",
+          "ser-",
+          "serai / seras / sera",
+          "serons / serez / seront"
+        ],
+        [
+          "avoir",
+          "aur-",
+          "aurai / auras / aura",
+          "aurons / aurez / auront"
+        ],
+        [
+          "avoir lieu",
+          "aur- + lieu",
+          "aura lieu",
+          "auront lieu"
+        ],
+        [
+          "aller",
+          "ir-",
+          "irai / iras / ira",
+          "irons / irez / iront"
+        ],
+        [
+          "faire",
+          "fer-",
+          "ferai / feras / fera",
+          "ferons / ferez / feront"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Futur simple: endings and common stems",
+      "body": "• For most verbs, start with the infinitive and add -ai, -as, -a, -ons, -ez, -ont. With -re verbs, remove the last e: répondre → répondr-.\n• Learn the common future stems together: être → ser-; avoir → aur-; aller → ir-; faire → fer-.\n• A plan can use either form: je vais suivre un cours and je suivrai un cours are both possible. Near future is especially common in conversation; futur simple is common for schedules, written plans and predictions.\n• In a basic future condition, keep present after si: si le groupe est complet, je choisirai un autre horaire. Do not say si le groupe sera complet.\n• Make a six-person ladder in your notes for one regular verb, then retrieve one irregular stem without looking. Use your own real schedule in a new sentence."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Complete: Vendredi, je ___ les documents.",
+      "options": [
+        "préparerai",
+        "prépareras",
+        "prépare",
+        "vais préparerai"
+      ],
+      "answer": 0,
+      "explain": "With je, préparer takes the futur simple ending -ai: je préparerai."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the futur simple form of être with je?",
+      "options": [
+        "je serai",
+        "je êtreai",
+        "je suis",
+        "je vais serai"
+      ],
+      "answer": 0,
+      "explain": "The irregular stem is ser- and the je ending is -ai: je serai."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the natural sentence: If the class is full, I will choose another time.",
+      "options": [
+        "Si le cours est complet, je choisirai un autre horaire.",
+        "Si le cours sera complet, je choisirai un autre horaire.",
+        "Si le cours complet, choisirai horaire.",
+        "Si le cours est complet, je choisir un autre horaire."
+      ],
+      "answer": 0,
+      "explain": "Use present after si for this condition, then futur simple in the result: je choisirai."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which sentence has répondre in the futur simple with nous?",
+      "options": [
+        "Nous répondrons demain.",
+        "Nous répondons demain.",
+        "Nous répondre demain.",
+        "Nous répondra demain."
+      ],
+      "answer": 0,
+      "explain": "Drop final e from répondre, then add -ons: nous répondrons."
+    }
+  ]
+}

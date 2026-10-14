@@ -1,0 +1,148 @@
+{
+  "id": "b2-u12-words-2",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un destinataire",
+      "en": "an intended reader",
+      "sound": "uh(n) dehs-tee-nah-TEHR",
+      "exampleFr": "Le destinataire influence le ton du texte.",
+      "exampleEn": "The intended reader affects the tone."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une synthèse",
+      "en": "a synthesis",
+      "sound": "ün sah(n)-TEHZ",
+      "exampleFr": "La synthèse relie les idées sans les confondre.",
+      "exampleEn": "The synthesis connects ideas without confusing them."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une réserve",
+      "en": "a caveat",
+      "sound": "ün ray-ZEHRV",
+      "exampleFr": "La réserve limite la conclusion.",
+      "exampleEn": "The caveat limits the conclusion."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une position",
+      "en": "a position",
+      "sound": "ün poh-zee-SYOH(N)",
+      "exampleFr": "La position personnelle vient après la comparaison.",
+      "exampleEn": "The personal position comes after the comparison."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un raisonnement",
+      "en": "reasoning",
+      "sound": "uh(n) reh-zohn-MAH(N)",
+      "exampleFr": "Le raisonnement s'appuie sur les deux textes.",
+      "exampleEn": "The reasoning draws on both texts."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une conclusion",
+      "en": "a conclusion",
+      "sound": "ün kohn-klü-ZYOH(N)",
+      "exampleFr": "La conclusion répond directement à la question.",
+      "exampleEn": "The conclusion answers the question directly."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un destinataire",
+      "options": [
+        "a position",
+        "an intended reader",
+        "a synthesis",
+        "a caveat"
+      ],
+      "answer": 1,
+      "explain": "un destinataire means an intended reader."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une synthèse",
+      "options": [
+        "reasoning",
+        "a caveat",
+        "a position",
+        "a synthesis"
+      ],
+      "answer": 3,
+      "explain": "une synthèse means a synthesis."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une réserve",
+      "options": [
+        "a conclusion",
+        "a caveat",
+        "a position",
+        "reasoning"
+      ],
+      "answer": 1,
+      "explain": "une réserve means a caveat."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une position",
+      "options": [
+        "an intended reader",
+        "reasoning",
+        "a conclusion",
+        "a position"
+      ],
+      "answer": 3,
+      "explain": "une position means a position."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un raisonnement",
+      "options": [
+        "a synthesis",
+        "reasoning",
+        "a conclusion",
+        "an intended reader"
+      ],
+      "answer": 1,
+      "explain": "un raisonnement means reasoning."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une conclusion",
+      "options": [
+        "a caveat",
+        "an intended reader",
+        "a synthesis",
+        "a conclusion"
+      ],
+      "answer": 3,
+      "explain": "une conclusion means a conclusion."
+    }
+  ]
+}

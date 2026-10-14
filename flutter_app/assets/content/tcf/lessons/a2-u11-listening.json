@@ -1,0 +1,86 @@
+{
+  "id": "a2-u11-listening",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le formulaire est incomplet. Il manque une signature. Cochez la case obligatoire et appuyez sur le bouton de validation.",
+      "question": "What is missing from the form?",
+      "options": [
+        "A signature",
+        "A payment receipt",
+        "A delivery date",
+        "A repair appointment"
+      ],
+      "answer": 0,
+      "explain": "The recording says a signature is missing."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je n'ai pas reçu le colis. Pourriez-vous vérifier le numéro de suivi ?",
+      "question": "What does the speaker ask the other person to check?",
+      "options": [
+        "The tracking number",
+        "The form field",
+        "The repair request",
+        "The account balance"
+      ],
+      "answer": 0,
+      "explain": "The request is to check the tracking number."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La fuite d'eau est près du robinet. Je voudrais un rendez-vous d'entretien cette semaine.",
+      "question": "What does the speaker want?",
+      "options": [
+        "A maintenance appointment",
+        "A written bill correction",
+        "A delivery confirmation",
+        "A new payment option"
+      ],
+      "answer": 0,
+      "explain": "The speaker asks for a maintenance appointment this week."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Pourriez-vous m'envoyer une réponse écrite ? Je confirme le délai de traitement demain.",
+      "question": "When will the speaker confirm the processing time?",
+      "options": [
+        "Tomorrow",
+        "Today",
+        "In two weeks",
+        "After the delivery"
+      ],
+      "answer": 0,
+      "explain": "The recording says the processing time will be confirmed tomorrow."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le service à la clientèle va traiter la demande. La page de confirmation donne le numéro.",
+      "question": "Where can the customer find the number?",
+      "options": [
+        "On the confirmation page",
+        "On the delivery box",
+        "In the repair manual",
+        "On the receipt"
+      ],
+      "answer": 0,
+      "explain": "The recording says the confirmation page gives the number."
+    }
+  ]
+}

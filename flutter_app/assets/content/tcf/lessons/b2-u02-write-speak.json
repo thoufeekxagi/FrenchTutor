@@ -1,0 +1,63 @@
+{
+  "id": "b2-u02-write-speak",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word post for a community forum about an experience of seeing a public claim shared before it was verified. Explain what the claim said, how you checked it, what you learned and what readers should do next. Use reported speech and distinguish what was confirmed from what was not.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "La semaine dernière, un message partagé dans un groupe affirmait qu'un service local changerait d'horaire dès le lundi suivant. Plusieurs personnes l'ont relayé, mais aucune source n'était indiquée. J'ai consulté le site de l'organisme et j'ai envoyé une question au service d'information. Il m'a été répondu qu'une mise à jour était prévue, sans que la nouvelle plage horaire soit encore confirmée. Le message initial allait donc plus loin que les renseignements disponibles. Cette expérience m'a rappelé qu'une formulation précise compte : une possibilité n'est pas une décision définitive. Avant de transmettre une annonce, il vaut mieux chercher le communiqué d'origine, vérifier sa date et signaler ce qui reste incertain. Cela évite de transformer une rumeur en information fiable. Ce réflexe protège les lecteurs.\n\nCheck:\n• Task 2 range: 120–150 words.\n• Attribute the original claim and the official response.\n• Keep confirmed facts separate from an estimate or rumour.\n• Use reported speech and a suitable community-forum tone."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Task 3 practice: Les médias devraient-ils publier une information dès qu'elle est disponible ? Take a position, distinguish speed from verification, give an example and qualify your conclusion. Marie should challenge whether your example proves a general rule.\n\n• Use selon or d'après to attribute a claim.\n• Distinguish what the source says from what you infer.\n• After Marie's challenge, revise one claim that was too broad."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "La rapidité est importante lorsqu'une information concerne directement le public, mais elle ne devrait pas supprimer la vérification.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Un média peut publier ce qui est confirmé et préciser clairement ce qui reste à vérifier.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Par exemple, il peut annoncer qu'une enquête est en cours sans présenter une hypothèse comme un résultat. Cela dit, attendre trop longtemps peut aussi laisser circuler une rumeur.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "À mon avis, la solution dépend du sujet et du degré d'urgence. Les journalistes devraient indiquer la source, la date et le niveau de certitude.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "La transparence permet au public de comprendre les limites de l'information.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

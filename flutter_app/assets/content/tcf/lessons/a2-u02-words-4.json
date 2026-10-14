@@ -1,0 +1,194 @@
+{
+  "id": "a2-u02-words-4",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Words: actions you may need to report",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "réserver",
+      "en": "to reserve; book",
+      "sound": "ray-zehr-VAY",
+      "exampleFr": "Je réserve une place pour samedi.",
+      "exampleEn": "I reserve a seat for Saturday."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "annuler",
+      "en": "to cancel",
+      "sound": "ah-nü-LAY",
+      "exampleFr": "Je dois annuler ma visite.",
+      "exampleEn": "I have to cancel my visit."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "réclamer",
+      "en": "to make a claim; complain",
+      "sound": "ray-klah-MAY",
+      "exampleFr": "Je réclame le montant payé.",
+      "exampleEn": "I request the amount I paid."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "rapporter",
+      "en": "to take back; return",
+      "sound": "rah-por-TAY",
+      "exampleFr": "Je rapporte le livre demain.",
+      "exampleEn": "I am taking the book back tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "emprunter",
+      "en": "to borrow",
+      "sound": "ah(n)-pruh(n)-TAY",
+      "exampleFr": "Je peux emprunter un dictionnaire.",
+      "exampleEn": "I can borrow a dictionary."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "rendre",
+      "en": "to return; give back",
+      "sound": "rah(n)-dr",
+      "exampleFr": "Je rends le livre à la bibliothèque.",
+      "exampleEn": "I return the book to the library."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "recommencer",
+      "en": "to start again",
+      "sound": "ruh-koh-mah(n)-SAY",
+      "exampleFr": "Je recommence l'exercice calmement.",
+      "exampleEn": "I start the exercise again calmly."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "rater",
+      "en": "to miss; fail to catch",
+      "sound": "rah-TAY",
+      "exampleFr": "Je ne veux pas rater le bus.",
+      "exampleEn": "I do not want to miss the bus."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "réserver",
+      "options": [
+        "to take back; return",
+        "to reserve; book",
+        "to start again",
+        "to cancel"
+      ],
+      "answer": 1,
+      "explain": "réserver means to reserve; book."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "annuler",
+      "options": [
+        "to borrow",
+        "to miss; fail to catch",
+        "to make a claim; complain",
+        "to cancel"
+      ],
+      "answer": 3,
+      "explain": "annuler means to cancel."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "réclamer",
+      "options": [
+        "to return; give back",
+        "to make a claim; complain",
+        "to reserve; book",
+        "to take back; return"
+      ],
+      "answer": 1,
+      "explain": "réclamer means to make a claim; complain."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "rapporter",
+      "options": [
+        "to start again",
+        "to cancel",
+        "to borrow",
+        "to take back; return"
+      ],
+      "answer": 3,
+      "explain": "rapporter means to take back; return."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "emprunter",
+      "options": [
+        "to miss; fail to catch",
+        "to borrow",
+        "to make a claim; complain",
+        "to return; give back"
+      ],
+      "answer": 1,
+      "explain": "emprunter means to borrow."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "rendre",
+      "options": [
+        "to reserve; book",
+        "to start again",
+        "to cancel",
+        "to return; give back"
+      ],
+      "answer": 3,
+      "explain": "rendre means to return; give back."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "annuler",
+      "question": "Which word did you hear?",
+      "options": [
+        "rapporter",
+        "annuler",
+        "rendre",
+        "rater"
+      ],
+      "answer": 1,
+      "explain": "You heard annuler: to cancel."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "rapporter",
+      "question": "Which word did you hear?",
+      "options": [
+        "rapporter",
+        "rendre",
+        "rater",
+        "annuler"
+      ],
+      "answer": 0,
+      "explain": "You heard rapporter: to take back; return."
+    }
+  ]
+}

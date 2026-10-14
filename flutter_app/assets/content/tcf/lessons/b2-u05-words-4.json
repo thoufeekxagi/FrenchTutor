@@ -1,0 +1,148 @@
+{
+  "id": "b2-u05-words-4",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un avis professionnel",
+      "en": "professional advice",
+      "sound": "uh(n) ah-VEE proh-feh-syoh-NEHL",
+      "exampleFr": "Le texte recommande de demander un avis professionnel.",
+      "exampleEn": "The text recommends seeking professional advice."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un dossier confidentiel",
+      "en": "a confidential file",
+      "sound": "uh(n) doh-syay kohn-fee-dahn-see-EHL",
+      "exampleFr": "Les renseignements sont conservés dans un dossier confidentiel.",
+      "exampleEn": "The information is kept in a confidential file."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une demande recevable",
+      "en": "an admissible request",
+      "sound": "ün duh-mahnd ruh-suh-VAHBL",
+      "exampleFr": "Le bureau confirme si la demande est recevable.",
+      "exampleEn": "The office confirms whether the request is admissible."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "signaler un changement",
+      "en": "to report a change",
+      "sound": "seen-yah-LAY uh(n) shahnzh-mahn",
+      "exampleFr": "La personne doit signaler un changement de coordonnées.",
+      "exampleEn": "The person must report a change in contact details."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un parcours de service",
+      "en": "a service pathway",
+      "sound": "uh(n) par-koor duh sehr-VEES",
+      "exampleFr": "Le guide résume le parcours de service sans garantir un résultat.",
+      "exampleEn": "The guide summarizes the service pathway without guaranteeing an outcome."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une ressource d'interprétation",
+      "en": "an interpreting resource",
+      "sound": "ün ruh-soors dehn-tehr-pray-tah-SYOH(N)",
+      "exampleFr": "La clinique peut indiquer une ressource d'interprétation.",
+      "exampleEn": "The clinic can point to an interpreting resource."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un avis professionnel",
+      "options": [
+        "to report a change",
+        "professional advice",
+        "a confidential file",
+        "an admissible request"
+      ],
+      "answer": 1,
+      "explain": "un avis professionnel means professional advice."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un dossier confidentiel",
+      "options": [
+        "a service pathway",
+        "an admissible request",
+        "to report a change",
+        "a confidential file"
+      ],
+      "answer": 3,
+      "explain": "un dossier confidentiel means a confidential file."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une demande recevable",
+      "options": [
+        "an interpreting resource",
+        "an admissible request",
+        "to report a change",
+        "a service pathway"
+      ],
+      "answer": 1,
+      "explain": "une demande recevable means an admissible request."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "signaler un changement",
+      "options": [
+        "professional advice",
+        "a service pathway",
+        "an interpreting resource",
+        "to report a change"
+      ],
+      "answer": 3,
+      "explain": "signaler un changement means to report a change."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un parcours de service",
+      "options": [
+        "a confidential file",
+        "a service pathway",
+        "an interpreting resource",
+        "professional advice"
+      ],
+      "answer": 1,
+      "explain": "un parcours de service means a service pathway."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une ressource d'interprétation",
+      "options": [
+        "an admissible request",
+        "professional advice",
+        "a confidential file",
+        "an interpreting resource"
+      ],
+      "answer": 3,
+      "explain": "une ressource d'interprétation means an interpreting resource."
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "id": "a2-u07-words-2",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Words: forms, records and follow-up",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un formulaire d'inscription",
+      "en": "an intake form",
+      "sound": "uh(n) for-mü-LEHR da(n)-skree-SYOH(N)",
+      "exampleFr": "Je remplis le formulaire d'inscription avant mon rendez-vous.",
+      "exampleEn": "I fill in the intake form before my appointment."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un code de confirmation",
+      "en": "a confirmation code",
+      "sound": "uh(n) kohd duh kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Je note le code de confirmation.",
+      "exampleEn": "I write down the confirmation code."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un résultat de laboratoire",
+      "en": "a lab result",
+      "sound": "uh(n) ray-zül-TAH duh lah-boh-rah-TWAHR",
+      "exampleFr": "J'apporte le résultat de laboratoire à la clinique.",
+      "exampleEn": "I bring the lab result to the clinic."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une liste de questions",
+      "en": "a list of questions",
+      "sound": "ün leest duh keh-STYOH(N)",
+      "exampleFr": "Je prépare une liste de questions pour le rendez-vous.",
+      "exampleEn": "I prepare a list of questions for the appointment."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une note de rappel",
+      "en": "a reminder note",
+      "sound": "ün noht duh rah-PEHL",
+      "exampleFr": "Je garde la note de rappel dans mon agenda.",
+      "exampleEn": "I keep the reminder note in my calendar."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un message de confirmation",
+      "en": "a confirmation message",
+      "sound": "uh(n) meh-SAHZH duh kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Je relis le message de confirmation avant de partir.",
+      "exampleEn": "I reread the confirmation message before leaving."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une demande de suivi",
+      "en": "a follow-up request",
+      "sound": "ün duh-MAH(N)d duh swee-VEE",
+      "exampleFr": "J'envoie une demande de suivi à la clinique.",
+      "exampleEn": "I send a follow-up request to the clinic."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une information confidentielle",
+      "en": "confidential information",
+      "sound": "ün a(n)-for-mah-SYOH(N) kohn-fee-dah(n)-SYEHL",
+      "exampleFr": "Je ne partage pas d'information confidentielle par courriel.",
+      "exampleEn": "I do not share confidential information by email."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un formulaire d'inscription",
+      "options": [
+        "a list of questions",
+        "an intake form",
+        "a follow-up request",
+        "a confirmation code"
+      ],
+      "answer": 1,
+      "explain": "un formulaire d'inscription means an intake form."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un code de confirmation",
+      "options": [
+        "a reminder note",
+        "confidential information",
+        "a lab result",
+        "a confirmation code"
+      ],
+      "answer": 3,
+      "explain": "un code de confirmation means a confirmation code."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un résultat de laboratoire",
+      "options": [
+        "a confirmation message",
+        "a lab result",
+        "an intake form",
+        "a list of questions"
+      ],
+      "answer": 1,
+      "explain": "un résultat de laboratoire means a lab result."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une liste de questions",
+      "options": [
+        "a follow-up request",
+        "a confirmation code",
+        "a reminder note",
+        "a list of questions"
+      ],
+      "answer": 3,
+      "explain": "une liste de questions means a list of questions."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une note de rappel",
+      "options": [
+        "confidential information",
+        "a reminder note",
+        "a lab result",
+        "a confirmation message"
+      ],
+      "answer": 1,
+      "explain": "une note de rappel means a reminder note."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un message de confirmation",
+      "options": [
+        "an intake form",
+        "a list of questions",
+        "a follow-up request",
+        "a confirmation message"
+      ],
+      "answer": 3,
+      "explain": "un message de confirmation means a confirmation message."
+    }
+  ]
+}

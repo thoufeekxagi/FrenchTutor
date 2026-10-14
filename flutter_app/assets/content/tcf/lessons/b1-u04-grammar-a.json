@@ -1,0 +1,87 @@
+{
+  "id": "b1-u04-grammar-a",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Grammar: Relative clauses: dont and lequel forms",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Relative clauses: dont and lequel forms",
+      "body": "A2 introduced qui for the subject, que for a direct object, and où for a place or time. Add dont when the missing phrase would begin with de: le service dont j'ai besoin (avoir besoin de). After a preposition, use lequel or an agreeing form such as auquel, à laquelle, duquel. Choose the form based on the role of the missing phrase, not just on the noun's English translation. If the reference is unclear, repeat the noun instead of forcing a pronoun."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Relative clauses: dont and lequel forms",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Subject",
+          "qui",
+          "Le logement qui se trouve près du métro est libre.",
+          "The home that is near the metro is available."
+        ],
+        [
+          "Verb with de",
+          "dont",
+          "Voici le service dont j'ai besoin.",
+          "Here is the service I need."
+        ],
+        [
+          "After a preposition",
+          "preposition + lequel form",
+          "Le critère auquel je pense est le trajet.",
+          "The criterion I am thinking of is the commute."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "J'ai besoin de ce service. C'est le service ___ j'ai besoin.",
+      "options": [
+        "que",
+        "qui",
+        "où",
+        "dont"
+      ],
+      "answer": 3,
+      "explain": "Avoir besoin de requires dont in the relative clause."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Je pense à ce critère. C'est le critère ___ je pense.",
+      "options": [
+        "qui",
+        "dont",
+        "auquel",
+        "où"
+      ],
+      "answer": 2,
+      "explain": "Penser à is followed by auquel for a masculine singular noun."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which form is the subject of se trouve?",
+      "options": [
+        "qui",
+        "que",
+        "auquel",
+        "dont"
+      ],
+      "answer": 0,
+      "explain": "The relative pronoun is the subject of se trouve."
+    }
+  ]
+}

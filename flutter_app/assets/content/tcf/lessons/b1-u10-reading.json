@@ -1,0 +1,52 @@
+{
+  "id": "b1-u10-reading",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is optional?",
+      "options": [
+        "Using the north entrance",
+        "The meeting time",
+        "The room number",
+        "Registration"
+      ],
+      "answer": 3,
+      "explain": "The notice says registration is optional.",
+      "promptFr": "RENCONTRE D'INFORMATION — Samedi, 10 h 30, salle 204. Entrée par la porte nord. L'inscription est facultative. Pour obtenir le document de présentation, laissez votre adresse courriel à l'accueil."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which two details does the writer want?",
+      "options": [
+        "A copy of the presentation and a refund",
+        "Elevator access and whom to contact on arrival",
+        "The organizer's name and phone number",
+        "A new date and the cost"
+      ],
+      "answer": 1,
+      "explain": "The writer asks about elevator access and the contact person.",
+      "promptFr": "Message — J'ai compris que l'atelier avait été déplacé, mais je ne sais pas si le nouveau local est accessible par ascenseur. Pourriez-vous confirmer ce point et me dire à qui m'adresser à mon arrivée ?"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should a late participant do?",
+      "options": [
+        "Call the number in the confirmation email",
+        "Return the next day",
+        "Wait by the south entrance",
+        "Send a letter after the event"
+      ],
+      "answer": 0,
+      "explain": "The FAQ says to call the number in the confirmation email.",
+      "promptFr": "FAQ — Si l'activité commence avant l'ouverture du centre, attendez près de la porte nord. Un membre de l'équipe viendra chercher le groupe. En cas de retard, appelez le numéro inscrit dans votre courriel de confirmation."
+    }
+  ]
+}

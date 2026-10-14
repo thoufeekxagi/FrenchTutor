@@ -1,0 +1,52 @@
+{
+  "id": "b2-u05-reading",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What should the reader do if a detail is unclear?",
+      "options": [
+        "Skip the meeting",
+        "Treat the practice notice as official",
+        "Assume the same rule fits every case",
+        "Ask for clarification before filling in the form"
+      ],
+      "answer": 3,
+      "explain": "The notice advises asking for clarification before completing the form.",
+      "promptFr": "Avis de pratique fictif : veuillez préparer vos questions avant la rencontre. La personne responsable pourra expliquer les étapes générales, mais elle ne pourra pas confirmer chaque cas particulier sans consulter le dossier. Si un délai ou un document vous semble ambigu, demandez une précision avant de remplir le formulaire. Cet avis sert à pratiquer la lecture; il ne décrit pas les règles d'un service réel."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is Marie's role in the example?",
+      "options": [
+        "Replace a professional",
+        "Help with language and comprehension",
+        "Confirm every current rule",
+        "Make an official decision"
+      ],
+      "answer": 1,
+      "explain": "The text limits the tutor's role to language support and comprehension.",
+      "promptFr": "Dans une conversation d'apprentissage, Marie peut aider à formuler une question polie et à vérifier la compréhension d'une réponse. Elle ne connaît pas nécessairement les règles actuelles d'un service. Pour une démarche réelle, l'apprenant doit consulter la source officielle ou un professionnel compétent."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What is the recommended follow-up?",
+      "options": [
+        "Ask for the reason and summarize the answer",
+        "Copy another person's form",
+        "Assume the first answer was wrong",
+        "Ignore the difference"
+      ],
+      "answer": 0,
+      "explain": "The reader is advised to ask why and check understanding by summarizing.",
+      "promptFr": "Il est possible que deux personnes reçoivent des consignes différentes, car leur situation n'est pas identique. Le document recommande de demander à l'agent d'expliquer la raison, puis de résumer la réponse pour confirmer qu'elle a été comprise."
+    }
+  ]
+}

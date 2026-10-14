@@ -1,0 +1,87 @@
+{
+  "id": "b1-u10-grammar-a",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Grammar: Natural questions, embedded questions and responsive follow-ups",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Natural questions, embedded questions and responsive follow-ups",
+      "body": "In an everyday information-seeking call, choose a question form that fits your relationship with the other person. Intonation questions are common with a familiar speaker; est-ce que is clear; inversion is more formal. After a frame such as pourriez-vous me dire, use statement order: pourriez-vous me dire où se trouve la salle ? Respond to the answer you hear: ask for a missing detail, reformulate, or confirm. Do not deliver a prepared list without listening."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Natural questions, embedded questions and responsive follow-ups",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Direct neutral question",
+          "question word + est-ce que",
+          "À quelle heure est-ce que la salle ferme ?",
+          "At what time does the room close?"
+        ],
+        [
+          "Polite embedded question",
+          "pourriez-vous me dire + statement order",
+          "Pourriez-vous me dire à quelle heure la salle ferme ?",
+          "Could you tell me what time the room closes?"
+        ],
+        [
+          "Confirmation",
+          "si j'ai bien compris + statement",
+          "Si j'ai bien compris, l'entrée est au nord.",
+          "If I understood correctly, the entrance is on the north side."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the natural embedded question.",
+      "options": [
+        "Pourriez-vous me dire où trouver l'entrée est ?",
+        "Pourriez-vous me dire où se trouve l'entrée ?",
+        "Pourriez-vous me dire où se trouve-t-elle l'entrée ?",
+        "Pourriez-vous me dire où est-ce que se trouve l'entrée ?"
+      ],
+      "answer": 1,
+      "explain": "The indirect question uses statement order."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "The answer is unclear. What is the best follow-up?",
+      "options": [
+        "Je sais déjà tout.",
+        "Merci, au revoir.",
+        "Je vais répéter toute ma liste.",
+        "Pourriez-vous préciser de quelle porte vous parlez ?"
+      ],
+      "answer": 3,
+      "explain": "Ask specifically for the missing detail."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does reformuler mean?",
+      "options": [
+        "To rephrase",
+        "To cancel",
+        "To register",
+        "To confirm a date"
+      ],
+      "answer": 0,
+      "explain": "Reformuler means to express something in different words."
+    }
+  ]
+}

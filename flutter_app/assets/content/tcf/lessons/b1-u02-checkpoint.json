@@ -1,0 +1,75 @@
+{
+  "id": "b1-u02-checkpoint",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "After si in a real future condition, which tense usually appears?",
+      "options": [
+        "Conditionnel passé",
+        "Imparfait",
+        "Futur simple",
+        "Present"
+      ],
+      "answer": 3,
+      "explain": "Use the present after si for this real possible condition."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which clause uses futur simple after a future quand?",
+      "options": [
+        "Quand je recevrai la réponse, je confirmerai.",
+        "Quand je recevais la réponse, je confirmerai.",
+        "Quand je recevrai la réponse, je confirmerais hier.",
+        "Quand je recevoir la réponse, je confirme."
+      ],
+      "answer": 0,
+      "explain": "Both clauses refer to future events."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does échéance mean?",
+      "options": [
+        "Commute",
+        "Deadline",
+        "Availability",
+        "Internship"
+      ],
+      "answer": 1,
+      "explain": "An échéance is a deadline."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which plan marks uncertainty honestly?",
+      "options": [
+        "Le stage aura toujours lieu en juillet.",
+        "Le stage a eu lieu demain.",
+        "Le stage pourrait avoir lieu en juillet.",
+        "Le stage a lieu en juillet, c'est certain."
+      ],
+      "answer": 2,
+      "explain": "Pourrait marks a possibility rather than a confirmed fact."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is a good transfer check?",
+      "options": [
+        "Memorize all future endings only",
+        "Translate the prompt word by word",
+        "Repeat the same schedule model",
+        "Explain a new plan with one condition, without notes"
+      ],
+      "answer": 3,
+      "explain": "A new plan checks independent use beyond the model."
+    }
+  ]
+}

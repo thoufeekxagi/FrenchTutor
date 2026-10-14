@@ -1,0 +1,75 @@
+{
+  "id": "b1-u06-checkpoint",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which connector most directly introduces a consequence?",
+      "options": [
+        "par conséquent",
+        "afin de",
+        "parce que",
+        "alors que"
+      ],
+      "answer": 0,
+      "explain": "Par conséquent signals a result."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When does afin de + infinitive fit?",
+      "options": [
+        "The subject changes",
+        "The subject stays the same",
+        "The event happened before another past event",
+        "The sentence is a question"
+      ],
+      "answer": 1,
+      "explain": "Use afin de + infinitive when the subject stays the same."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does toutefois signal?",
+      "options": [
+        "A time in the future",
+        "A person who acts",
+        "A purpose",
+        "A qualification or contrast"
+      ],
+      "answer": 3,
+      "explain": "Toutefois qualifies or contrasts with the previous point."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Why should survey evidence be qualified?",
+      "options": [
+        "A personal story proves every claim",
+        "All surveys are false",
+        "The sample may not represent everyone",
+        "Numbers never matter"
+      ],
+      "answer": 2,
+      "explain": "A limited sample supports a limited conclusion."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which wording avoids claiming an unmeasured result as certain?",
+      "options": [
+        "Le changement pourrait réduire les retards.",
+        "Le changement réduit toujours les retards.",
+        "Les retards ont disparu partout.",
+        "Le changement a été prouvé sans mesure."
+      ],
+      "answer": 0,
+      "explain": "Pourrait marks a possible result rather than an established fact."
+    }
+  ]
+}

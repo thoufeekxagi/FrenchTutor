@@ -1,0 +1,120 @@
+{
+  "id": "a2-u05-phrases",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Notice the two common ways to talk about the future. In your notes, write one real plan with aller + infinitive and one prediction with a future simple form. Close the notes and explain both aloud."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Le mois prochain, je vais suivre un cours du soir.",
+      "en": "Next month, I am going to take an evening class.",
+      "tip": "Say it: luh mwah proh-SHA(N) zhuh veh sweevr uh(n) koor dü swahr"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je préparerai les documents ce week-end.",
+      "en": "I will prepare the documents this weekend.",
+      "tip": "Say it: zhuh pray-pah-ruh-RAY lay doh-kü-MAH(N) suh week-ehnd"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Nous allons vérifier l'horaire avant de nous inscrire.",
+      "en": "We are going to check the schedule before enrolling.",
+      "tip": "Say it: noo zah-LOH(N) vay-ree-FYAY loh-REHR ah-vah(n) duh noo za(n)-skreer"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "La formation va commencer au début de novembre.",
+      "en": "The course is going to start at the beginning of November.",
+      "tip": "Say it: lah for-mah-SYOH(N) vah koh-mah(n)-SAY oh day-BÜ duh noh-VAH(N)br"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Je vais demander si le groupe est encore disponible.",
+      "en": "I am going to ask whether the group is still available.",
+      "tip": "Say it: zhuh veh duh-mah(n)-DAY see luh groop eh ah(n)-kor dee-spoh-NEEBL"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Tu auras une réponse par courriel lundi.",
+      "en": "You will get an answer by email on Monday.",
+      "tip": "Say it: tü oh-RAH ün ray-POHNS par koo-ree-EHL luh(n)-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "S'il y a un conflit, nous choisirons un autre horaire.",
+      "en": "If there is a conflict, we will choose another schedule.",
+      "tip": "Say it: seel ee ah uh(n) kohn-FLEE noo shwah-zee-ROH(N) uh(n) ohtr oh-REHR"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Je ne vais pas participer mardi, mais je vais rattraper le cours.",
+      "en": "I am not going to take part Tuesday, but I am going to catch up on the class.",
+      "tip": "Say it: zhuh nuh veh pah pahr-tee-see-PAY mahr-DEE meh zhuh veh rah-trah-PAY luh koor"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Le mois prochain, je vais suivre un cours du soir.",
+      "options": [
+        "If there is a conflict, we will choose another schedule.",
+        "Next month, I am going to take an evening class.",
+        "I will prepare the documents this weekend.",
+        "You will get an answer by email on Monday."
+      ],
+      "answer": 1,
+      "explain": "Le mois prochain, je vais suivre un cours du soir. means Next month, I am going to take an evening class.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Je vais demander si le groupe est encore disponible.",
+      "options": [
+        "You will get an answer by email on Monday.",
+        "I am going to ask whether the group is still available.",
+        "If there is a conflict, we will choose another schedule.",
+        "I will prepare the documents this weekend."
+      ],
+      "answer": 1,
+      "explain": "Je vais demander si le groupe est encore disponible. means I am going to ask whether the group is still available.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "S'il y a un conflit, nous choisirons un autre horaire.",
+      "options": [
+        "I am going to ask whether the group is still available.",
+        "If there is a conflict, we will choose another schedule.",
+        "I am not going to take part Tuesday, but I am going to catch up on the class.",
+        "Next month, I am going to take an evening class."
+      ],
+      "answer": 1,
+      "explain": "S'il y a un conflit, nous choisirons un autre horaire. means If there is a conflict, we will choose another schedule.."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b1-u06-words-3",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "pourtant",
+      "en": "yet; however",
+      "sound": "poor-TAHN",
+      "exampleFr": "Le détour est plus long; pourtant, il est plus sûr.",
+      "exampleEn": "The detour is longer; however, it is safer."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "néanmoins",
+      "en": "nevertheless",
+      "sound": "nay-ahn-mweh(n)",
+      "exampleFr": "Le service est limité; néanmoins, il reste utile.",
+      "exampleEn": "The service is limited; nevertheless, it remains useful."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "en revanche",
+      "en": "on the other hand",
+      "sound": "ahn ruh-VAHNSH",
+      "exampleFr": "Le trajet est court; en revanche, le coût est élevé.",
+      "exampleEn": "The trip is short; on the other hand, the cost is high."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "par ailleurs",
+      "en": "furthermore; besides",
+      "sound": "par ah-YUHR",
+      "exampleFr": "Par ailleurs, les travaux commenceront lundi.",
+      "exampleEn": "Furthermore, the construction will start on Monday."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "en effet",
+      "en": "indeed; in fact",
+      "sound": "ahn ay-FEH",
+      "exampleFr": "La rue est fermée; en effet, un chantier y a commencé.",
+      "exampleEn": "The street is closed; in fact, construction has started there."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "autrement dit",
+      "en": "in other words",
+      "sound": "oh-truh-mahn dee",
+      "exampleFr": "Autrement dit, le service sera offert deux jours par semaine.",
+      "exampleEn": "In other words, the service will be offered two days a week."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "pourtant",
+      "options": [
+        "furthermore; besides",
+        "yet; however",
+        "nevertheless",
+        "on the other hand"
+      ],
+      "answer": 1,
+      "explain": "pourtant means yet; however."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "néanmoins",
+      "options": [
+        "indeed; in fact",
+        "on the other hand",
+        "furthermore; besides",
+        "nevertheless"
+      ],
+      "answer": 3,
+      "explain": "néanmoins means nevertheless."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "en revanche",
+      "options": [
+        "furthermore; besides",
+        "on the other hand",
+        "indeed; in fact",
+        "yet; however"
+      ],
+      "answer": 1,
+      "explain": "en revanche means on the other hand."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "par ailleurs",
+      "options": [
+        "yet; however",
+        "indeed; in fact",
+        "in other words",
+        "furthermore; besides"
+      ],
+      "answer": 3,
+      "explain": "par ailleurs means furthermore; besides."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "en effet",
+      "options": [
+        "nevertheless",
+        "indeed; in fact",
+        "in other words",
+        "yet; however"
+      ],
+      "answer": 1,
+      "explain": "en effet means indeed; in fact."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "autrement dit",
+      "options": [
+        "yet; however",
+        "nevertheless",
+        "furthermore; besides",
+        "in other words"
+      ],
+      "answer": 3,
+      "explain": "autrement dit means in other words."
+    }
+  ]
+}

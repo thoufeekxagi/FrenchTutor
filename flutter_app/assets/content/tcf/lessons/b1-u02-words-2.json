@@ -1,0 +1,148 @@
+{
+  "id": "b1-u02-words-2",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une disponibilité",
+      "en": "availability",
+      "sound": "ün dee-spoh-nee-bee-lee-TAY",
+      "exampleFr": "Je vérifierai ma disponibilité avant de répondre.",
+      "exampleEn": "I will check my availability before replying."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un débouché",
+      "en": "a career prospect",
+      "sound": "uh(n) day-boo-SHAY",
+      "exampleFr": "Le conseiller présentera plusieurs débouchés.",
+      "exampleEn": "The advisor will present several career prospects."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "reporter",
+      "en": "to postpone",
+      "sound": "ruh-por-TAY",
+      "exampleFr": "Elle reportera l'inscription si son horaire change.",
+      "exampleEn": "She will postpone enrollment if her schedule changes."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "confirmer",
+      "en": "to confirm",
+      "sound": "kohn-feer-MAY",
+      "exampleFr": "Quand le centre confirmera la date, nous réserverons le transport.",
+      "exampleEn": "When the centre confirms the date, we will book transportation."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "prévoir",
+      "en": "to plan; expect",
+      "sound": "pray-vwahr",
+      "exampleFr": "Nous prévoyons de terminer le projet en juin.",
+      "exampleEn": "We plan to finish the project in June."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "éventuellement",
+      "en": "possibly; at some point",
+      "sound": "ay-vahn-tü-ehl-MAH(N)",
+      "exampleFr": "Elle suivra éventuellement un autre cours.",
+      "exampleEn": "She may take another course later."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une disponibilité",
+      "options": [
+        "to confirm",
+        "availability",
+        "a career prospect",
+        "to postpone"
+      ],
+      "answer": 1,
+      "explain": "une disponibilité means availability."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un débouché",
+      "options": [
+        "to plan; expect",
+        "to postpone",
+        "to confirm",
+        "a career prospect"
+      ],
+      "answer": 3,
+      "explain": "un débouché means a career prospect."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "reporter",
+      "options": [
+        "possibly; at some point",
+        "to postpone",
+        "to confirm",
+        "to plan; expect"
+      ],
+      "answer": 1,
+      "explain": "reporter means to postpone."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "confirmer",
+      "options": [
+        "availability",
+        "to plan; expect",
+        "possibly; at some point",
+        "to confirm"
+      ],
+      "answer": 3,
+      "explain": "confirmer means to confirm."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "prévoir",
+      "options": [
+        "a career prospect",
+        "to plan; expect",
+        "possibly; at some point",
+        "availability"
+      ],
+      "answer": 1,
+      "explain": "prévoir means to plan; expect."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "éventuellement",
+      "options": [
+        "to postpone",
+        "availability",
+        "a career prospect",
+        "possibly; at some point"
+      ],
+      "answer": 3,
+      "explain": "éventuellement means possibly; at some point."
+    }
+  ]
+}

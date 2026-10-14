@@ -1,0 +1,166 @@
+{
+  "id": "a2-u10-words-1",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Words: containers and packages",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une barquette de fraises",
+      "en": "a punnet of strawberries",
+      "sound": "ün bah-REHT duh frehz",
+      "exampleFr": "J'achète une barquette de fraises pour le dessert.",
+      "exampleEn": "I buy a punnet of strawberries for dessert."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un bocal en verre",
+      "en": "a glass jar",
+      "sound": "uh(n) boh-KAHL ah(n) vehR",
+      "exampleFr": "Je garde les restes dans un bocal en verre.",
+      "exampleEn": "I keep the leftovers in a glass jar."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un sachet de lentilles",
+      "en": "a packet of lentils",
+      "sound": "uh(n) sah-SHAY duh lah(n)-TEE-yuh",
+      "exampleFr": "Je prends un sachet de lentilles pour le repas.",
+      "exampleEn": "I take a packet of lentils for the meal."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un lot de yaourts",
+      "en": "a multipack of yogurts",
+      "sound": "uh(n) loh duh yah-OOR",
+      "exampleFr": "Je prends un lot de yaourts pour le groupe.",
+      "exampleEn": "I take a multipack of yogurts for the group."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une conserve de tomates",
+      "en": "a tin of tomatoes",
+      "sound": "ün kohn-SEHRV duh toh-MAHT",
+      "exampleFr": "J'ouvre une conserve de tomates pour la sauce.",
+      "exampleEn": "I open a tin of tomatoes for the sauce."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une boîte d'œufs",
+      "en": "a carton of eggs",
+      "sound": "ün bwat duh",
+      "exampleFr": "J'achète une boîte d'œufs pour le repas.",
+      "exampleEn": "I buy a carton of eggs for the meal."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une tranche épaisse",
+      "en": "a thick slice",
+      "sound": "ün trahnsh ay-PEHS",
+      "exampleFr": "Je coupe une tranche épaisse de pain.",
+      "exampleEn": "I cut a thick slice of bread."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un emballage recyclable",
+      "en": "recyclable packaging",
+      "sound": "uh(n) ah(n)-bah-LAHZH ruh-see-KLAHBL",
+      "exampleFr": "Je choisis un emballage recyclable pour emporter le repas.",
+      "exampleEn": "I choose recyclable packaging to take the meal away."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une barquette de fraises",
+      "options": [
+        "a multipack of yogurts",
+        "a punnet of strawberries",
+        "a thick slice",
+        "a glass jar"
+      ],
+      "answer": 1,
+      "explain": "une barquette de fraises means a punnet of strawberries."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un bocal en verre",
+      "options": [
+        "a tin of tomatoes",
+        "recyclable packaging",
+        "a packet of lentils",
+        "a glass jar"
+      ],
+      "answer": 3,
+      "explain": "un bocal en verre means a glass jar."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un sachet de lentilles",
+      "options": [
+        "a carton of eggs",
+        "a packet of lentils",
+        "a punnet of strawberries",
+        "a multipack of yogurts"
+      ],
+      "answer": 1,
+      "explain": "un sachet de lentilles means a packet of lentils."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un lot de yaourts",
+      "options": [
+        "a thick slice",
+        "a glass jar",
+        "a tin of tomatoes",
+        "a multipack of yogurts"
+      ],
+      "answer": 3,
+      "explain": "un lot de yaourts means a multipack of yogurts."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une conserve de tomates",
+      "options": [
+        "recyclable packaging",
+        "a tin of tomatoes",
+        "a packet of lentils",
+        "a carton of eggs"
+      ],
+      "answer": 1,
+      "explain": "une conserve de tomates means a tin of tomatoes."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une boîte d'œufs",
+      "options": [
+        "a punnet of strawberries",
+        "a multipack of yogurts",
+        "a thick slice",
+        "a carton of eggs"
+      ],
+      "answer": 3,
+      "explain": "une boîte d'œufs means a carton of eggs."
+    }
+  ]
+}

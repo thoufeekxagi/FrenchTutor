@@ -1,0 +1,88 @@
+{
+  "id": "b2-u13-dialogues",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Spontaneous response and follow-up",
+      "body": "The learner answers a broad prompt; the examiner follows up on an assumption.",
+      "examples": [
+        {
+          "fr": "Les bibliothèques devraient-elles offrir davantage d'activités ?",
+          "en": "Examinateur: Should libraries offer more activities?"
+        },
+        {
+          "fr": "À mon avis, oui, à condition que les activités répondent aux besoins du quartier.",
+          "en": "Candidat: In my view, yes, provided the activities meet neighbourhood needs."
+        },
+        {
+          "fr": "Pourquoi ?",
+          "en": "Examinateur: Why?"
+        },
+        {
+          "fr": "D'abord, elles peuvent créer des occasions d'échange. Prenons l'exemple d'un atelier de conversation.",
+          "en": "Candidat: First, they can create opportunities to interact. Take a conversation workshop."
+        },
+        {
+          "fr": "Est-ce que toutes les bibliothèques ont les mêmes ressources ?",
+          "en": "Examinateur: Do all libraries have the same resources?"
+        },
+        {
+          "fr": "Non, vous avez raison. Ce que je veux dire, c'est qu'elles pourraient choisir des activités adaptées à leurs moyens.",
+          "en": "Candidat: No, you are right. What I mean is that they could choose activities suited to their resources."
+        },
+        {
+          "fr": "Donc, votre proposition dépend des ressources locales ?",
+          "en": "Examinateur: So your proposal depends on local resources?"
+        },
+        {
+          "fr": "Exactement. En somme, il faut élargir les possibilités sans imposer le même modèle partout.",
+          "en": "Candidat: Exactly. In short, opportunities should be expanded without imposing the same model everywhere."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Clarify a point",
+      "body": "A candidate corrects a broad statement after a follow-up.",
+      "examples": [
+        {
+          "fr": "Les cours en ligne remplacent-ils les rencontres en personne ?",
+          "en": "Examinateur: Do online courses replace in-person meetings?"
+        },
+        {
+          "fr": "Ils peuvent aider certaines personnes à participer.",
+          "en": "Candidat: They can help some people participate."
+        },
+        {
+          "fr": "Vous dites donc qu'ils conviennent à tout le monde ?",
+          "en": "Examinateur: So you are saying they suit everyone?"
+        },
+        {
+          "fr": "Pas exactement. Je reformule : ils offrent une option supplémentaire, mais l'accès dépend de la situation de chacun.",
+          "en": "Candidat: Not exactly. Let me rephrase: they offer another option, but access depends on each person's situation."
+        },
+        {
+          "fr": "Quel exemple appuie cette idée ?",
+          "en": "Examinateur: What example supports that idea?"
+        },
+        {
+          "fr": "Une personne qui travaille tard peut suivre un cours enregistré, si elle a une connexion adéquate.",
+          "en": "Candidat: Someone who works late can take a recorded course if they have a suitable connection."
+        }
+      ]
+    }
+  ]
+}

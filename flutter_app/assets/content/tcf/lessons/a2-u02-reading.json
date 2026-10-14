@@ -1,0 +1,80 @@
+{
+  "id": "a2-u02-reading",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When does the visit start?",
+      "options": [
+        "At 10 a.m.",
+        "At noon",
+        "At 2 p.m.",
+        "At 6 p.m."
+      ],
+      "answer": 0,
+      "explain": "Nadia writes that the visit starts at 10 h.",
+      "promptFr": "Salut Sam, · Hier après-midi, j'ai réservé la visite guidée de samedi. Elle commence à 10 h. · Nadia"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "When can the parcel be collected?",
+      "options": [
+        "Thursday after 9 a.m.",
+        "Tuesday before 3 p.m.",
+        "Wednesday at noon",
+        "Friday after 6 p.m."
+      ],
+      "answer": 0,
+      "explain": "The notice says the service is open Thursday at 9 h.",
+      "promptFr": "AVIS DE LIVRAISON · Votre colis est au comptoir du service. Le service est ouvert jeudi à 9 h."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What has the service confirmed?",
+      "options": [
+        "The reservation",
+        "The guided tour",
+        "The parcel",
+        "The assignment"
+      ],
+      "answer": 0,
+      "explain": "The message says the service confirmed the reservation.",
+      "promptFr": "Bonjour, · Le service a confirmé votre réservation. Le remboursement arrive demain par courriel. · Awa"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What is planned for 13 h?",
+      "options": [
+        "A guided tour",
+        "An assignment",
+        "A class",
+        "A follow-up appointment"
+      ],
+      "answer": 0,
+      "explain": "The 13 h line says la visite guidée.",
+      "promptFr": "MARDI · 8 h : le devoir · 10 h : le cours · 13 h : la visite guidée · 17 h : le rendez-vous de suivi"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "How did Sam reach the station?",
+      "options": [
+        "He walked.",
+        "He took a taxi.",
+        "He borrowed a bicycle.",
+        "He took the bus."
+      ],
+      "answer": 0,
+      "explain": "Sam says j'ai marché jusqu'à la station.",
+      "promptFr": "Salut Julie, · Le bus n'est pas à l'heure. J'ai marché jusqu'à la station pendant vingt minutes. · Sam"
+    }
+  ]
+}

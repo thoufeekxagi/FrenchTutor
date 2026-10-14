@@ -1,0 +1,42 @@
+{
+  "id": "a2-u05-write-speak",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Message a classmate about your plan",
+      "body": "Write 60–90 French words to a classmate. Explain your study or work plan for next month, give one date or time, describe a schedule problem and suggest a next step. Use at least one near-future form and one futur simple form. This is a guided practice task, not the full official TCF writing task.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Salut Nadia, Le mois prochain, je vais suivre une formation du soir au centre. Le cours a lieu le mardi et le jeudi à dix-huit heures. Mon horaire de travail change le premier mardi, donc je ne suis pas libre ce jour-là. Je vais écrire à la conseillère pour demander si je peux rattraper cette séance jeudi. Elle va confirmer l'horaire par courriel. Si le groupe est complet, je choisirai un autre cours. À bientôt, Sam\n\nCheck:\n• State the plan and include a concrete date or time.\n• Use aller + infinitive for one plan and a futur simple form for another future action.\n• Explain the schedule problem and give a realistic next step.\n• Check future endings and keep present tense after si in a condition.\n• Count 60–90 words, then close your notes and write a changed plan tomorrow."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Plan a course around your week",
+      "body": "Tell Marie about a course, work or personal goal for next month. Give two schedule details, one reason for your choice and one possible change. Marie asks what you will do if the schedule conflicts with work. After feedback, make a different plan without reading your notes.\n\n• Name the goal first, then give dates, times or a schedule condition.\n• Use aller + infinitive for an intended action and a future simple form for what will happen next.\n• Say why the plan suits your week; do not list dates without explaining the choice.\n• On the retry, change the goal and schedule, and answer Marie's follow-up without notes."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Le mois prochain, je vais suivre un cours de français le soir. Le cours a lieu le mardi et le jeudi après mon travail. Je veux parler français au travail.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Si mon horaire change, je vais demander une autre séance et je ferai le travail du cours plus tard.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

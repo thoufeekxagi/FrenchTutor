@@ -1,0 +1,99 @@
+{
+  "id": "b2-u12-grammar-a",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Grammar: Synthesis and stance: attribute, paraphrase, compare, then evaluate",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Synthesis and stance: attribute, paraphrase, compare, then evaluate",
+      "body": "Task 3 asks you to compare two viewpoints and give your own position. A reliable order is: identify each source's central point, show one convergence or difference, then state your view with a reason. Use selon le premier texte / le second fait valoir to keep attribution clear. Paraphrase the idea rather than replacing a few words in a copied sentence. Contrast connectors must reflect the relationship: tandis que compares; cependant introduces a limitation; en outre adds a point. Your conclusion should answer the prompt and not introduce an unrelated claim."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Synthesis and stance: attribute, paraphrase, compare, then evaluate",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Attribute",
+          "selon / le texte fait valoir",
+          "Selon le premier texte, l'accès doit être prioritaire.",
+          "According to the first text, access should be a priority."
+        ],
+        [
+          "Converge",
+          "les deux textes s'accordent sur",
+          "Les deux textes s'accordent sur la nécessité d'évaluer le coût.",
+          "Both texts agree that cost needs to be assessed."
+        ],
+        [
+          "Contrast",
+          "tandis que / cependant",
+          "Le premier défend un essai, tandis que le second demande plus de données.",
+          "The first supports a trial, whereas the second asks for more data."
+        ],
+        [
+          "Paraphrase",
+          "restate the idea in new wording",
+          "Le texte souhaite que les résultats soient rendus accessibles.",
+          "The text wants the results to be made accessible."
+        ],
+        [
+          "Position",
+          "à mon sens + reason",
+          "À mon sens, un essai limité serait préférable.",
+          "In my view, a limited trial would be preferable."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which phrase clearly attributes an idea?",
+      "options": [
+        "Tout le monde sait que…",
+        "On ne peut jamais dire que…",
+        "Il est évident pour tous que…",
+        "Le premier document fait valoir que…"
+      ],
+      "answer": 3,
+      "explain": "This phrase identifies the source of the claim."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the purpose of paraphrasing?",
+      "options": [
+        "Copy its sentence with one word changed",
+        "Add an unrelated opinion",
+        "Restate the source's meaning in your own wording",
+        "Remove the source's point"
+      ],
+      "answer": 2,
+      "explain": "A paraphrase preserves meaning with new wording."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which connector adds a point rather than contrasts?",
+      "options": [
+        "tandis que",
+        "en outre",
+        "en revanche",
+        "cependant"
+      ],
+      "answer": 1,
+      "explain": "En outre adds information; the others often signal contrast."
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "id": "b1-u09-words-3",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une procédure",
+      "en": "a procedure",
+      "sound": "ün proh-say-DÜR",
+      "exampleFr": "La procédure comprend trois étapes simples.",
+      "exampleEn": "The procedure has three simple steps."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un outil adapté",
+      "en": "a suitable tool",
+      "sound": "uh(n) oo-TEE ah-dahp-TAY",
+      "exampleFr": "Un outil adapté facilite la réparation.",
+      "exampleEn": "A suitable tool makes the repair easier."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un équipement",
+      "en": "equipment",
+      "sound": "uh(n) ay-keep-mahn",
+      "exampleFr": "L'équipement nécessaire est fourni sur place.",
+      "exampleEn": "The necessary equipment is provided on site."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un fournisseur",
+      "en": "a supplier; provider",
+      "sound": "uh(n) foor-nee-SUHR",
+      "exampleFr": "Le fournisseur livrera les pièces vendredi.",
+      "exampleEn": "The supplier will deliver the parts on Friday."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une réparation",
+      "en": "a repair",
+      "sound": "ün ray-pah-rah-SYOH(N)",
+      "exampleFr": "La réparation de l'appareil prendra une journée.",
+      "exampleEn": "Repairing the device will take one day."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "l'entretien courant",
+      "en": "routine maintenance",
+      "sound": "lahn-truh-tyeh(n) koo-RAH(N)",
+      "exampleFr": "L'entretien courant prolonge la durée de vie du vélo.",
+      "exampleEn": "Routine maintenance extends the bicycle's life."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une procédure",
+      "options": [
+        "a supplier; provider",
+        "a procedure",
+        "a suitable tool",
+        "equipment"
+      ],
+      "answer": 1,
+      "explain": "une procédure means a procedure."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un outil adapté",
+      "options": [
+        "a repair",
+        "equipment",
+        "a supplier; provider",
+        "a suitable tool"
+      ],
+      "answer": 3,
+      "explain": "un outil adapté means a suitable tool."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un équipement",
+      "options": [
+        "routine maintenance",
+        "equipment",
+        "a supplier; provider",
+        "a repair"
+      ],
+      "answer": 1,
+      "explain": "un équipement means equipment."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un fournisseur",
+      "options": [
+        "a procedure",
+        "a repair",
+        "routine maintenance",
+        "a supplier; provider"
+      ],
+      "answer": 3,
+      "explain": "un fournisseur means a supplier; provider."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une réparation",
+      "options": [
+        "a suitable tool",
+        "a repair",
+        "routine maintenance",
+        "a procedure"
+      ],
+      "answer": 1,
+      "explain": "une réparation means a repair."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "l'entretien courant",
+      "options": [
+        "equipment",
+        "a procedure",
+        "a suitable tool",
+        "routine maintenance"
+      ],
+      "answer": 3,
+      "explain": "l'entretien courant means routine maintenance."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un équipement",
+      "question": "Which word did you hear?",
+      "options": [
+        "une réparation",
+        "un équipement",
+        "une procédure",
+        "un fournisseur"
+      ],
+      "answer": 1,
+      "explain": "You heard un équipement: equipment."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "un fournisseur",
+      "question": "Which word did you hear?",
+      "options": [
+        "l'entretien courant",
+        "un équipement",
+        "une réparation",
+        "un fournisseur"
+      ],
+      "answer": 3,
+      "explain": "You heard un fournisseur: a supplier; provider."
+    }
+  ]
+}

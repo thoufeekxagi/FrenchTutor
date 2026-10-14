@@ -1,0 +1,148 @@
+{
+  "id": "b2-u08-words-3",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une œuvre patrimoniale",
+      "en": "a heritage work",
+      "sound": "ün uvr pah-tree-moh-NYAHL",
+      "exampleFr": "L'exposition présente une œuvre patrimoniale de la région.",
+      "exampleEn": "The exhibition presents a heritage work from the region."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la médiation culturelle",
+      "en": "cultural mediation; interpretation",
+      "sound": "lah may-dyah-SYOH(N) kül-tü-REHL",
+      "exampleFr": "La médiation culturelle donne des repères aux visiteurs.",
+      "exampleEn": "Cultural interpretation gives visitors useful context."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une transmission intergénérationnelle",
+      "en": "intergenerational transmission",
+      "sound": "ün trahns-mees-SYOH(N) ehn-tehr-zhay-nay-rah-syoh-NEHL",
+      "exampleFr": "La transmission intergénérationnelle passe par les récits familiaux.",
+      "exampleEn": "Intergenerational transmission happens through family stories."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un patrimoine immatériel",
+      "en": "intangible heritage",
+      "sound": "uh(n) pah-tree-mwahn ee-mah-tay-ree-EHL",
+      "exampleFr": "La chanson fait partie du patrimoine immatériel local.",
+      "exampleEn": "The song is part of the local intangible heritage."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une pratique artistique",
+      "en": "an artistic practice",
+      "sound": "ün prah-TEEK ar-tees-TEEK",
+      "exampleFr": "La pratique artistique évolue avec les outils numériques.",
+      "exampleEn": "The artistic practice changes with digital tools."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un sentiment d'appartenance",
+      "en": "a sense of belonging",
+      "sound": "uh(n) sahn-tee-mahn dah-par-tuh-NAHNS",
+      "exampleFr": "Le groupe favorise un sentiment d'appartenance.",
+      "exampleEn": "The group fosters a sense of belonging."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une œuvre patrimoniale",
+      "options": [
+        "cultural mediation; interpretation",
+        "a heritage work",
+        "intergenerational transmission",
+        "an artistic practice"
+      ],
+      "answer": 1,
+      "explain": "une œuvre patrimoniale means a heritage work."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la médiation culturelle",
+      "options": [
+        "an artistic practice",
+        "intergenerational transmission",
+        "intangible heritage",
+        "cultural mediation; interpretation"
+      ],
+      "answer": 3,
+      "explain": "la médiation culturelle means cultural mediation; interpretation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une transmission intergénérationnelle",
+      "options": [
+        "a sense of belonging",
+        "intergenerational transmission",
+        "intangible heritage",
+        "an artistic practice"
+      ],
+      "answer": 1,
+      "explain": "une transmission intergénérationnelle means intergenerational transmission."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un patrimoine immatériel",
+      "options": [
+        "an artistic practice",
+        "a sense of belonging",
+        "cultural mediation; interpretation",
+        "intangible heritage"
+      ],
+      "answer": 3,
+      "explain": "un patrimoine immatériel means intangible heritage."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une pratique artistique",
+      "options": [
+        "cultural mediation; interpretation",
+        "an artistic practice",
+        "a sense of belonging",
+        "a heritage work"
+      ],
+      "answer": 1,
+      "explain": "une pratique artistique means an artistic practice."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un sentiment d'appartenance",
+      "options": [
+        "intergenerational transmission",
+        "a heritage work",
+        "cultural mediation; interpretation",
+        "a sense of belonging"
+      ],
+      "answer": 3,
+      "explain": "un sentiment d'appartenance means a sense of belonging."
+    }
+  ]
+}

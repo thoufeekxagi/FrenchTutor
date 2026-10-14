@@ -1,0 +1,72 @@
+{
+  "id": "b1-u08-dialogues",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Calling a training centre",
+      "body": "A learner asks about a fictional registration process.",
+      "examples": [
+        {
+          "fr": "Bonjour, je voudrais savoir si l'inscription est encore ouverte.",
+          "en": "Awa: Hello, I would like to know whether registration is still open."
+        },
+        {
+          "fr": "Oui, jusqu'au 15 août.",
+          "en": "Agent: Yes, until August 15."
+        },
+        {
+          "fr": "Pourriez-vous me dire quels documents il faut envoyer ?",
+          "en": "Awa: Could you tell me which documents need to be sent?"
+        },
+        {
+          "fr": "Le formulaire et une preuve d'adresse.",
+          "en": "Agent: The form and proof of address."
+        },
+        {
+          "fr": "Si j'ai bien compris, je peux les envoyer par courriel ?",
+          "en": "Awa: If I understood correctly, I can send them by email?"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Following up about a service",
+      "body": "A caller confirms where and when to get help.",
+      "examples": [
+        {
+          "fr": "À qui dois-je m'adresser pour faire un suivi ?",
+          "en": "Sam: Whom should I contact to follow up?"
+        },
+        {
+          "fr": "Vous pouvez joindre le bureau entre neuf et seize heures.",
+          "en": "Agent: You can reach the office between nine and four."
+        },
+        {
+          "fr": "Pourriez-vous préciser le délai de réponse ?",
+          "en": "Sam: Could you specify the response time?"
+        },
+        {
+          "fr": "Il est normalement de cinq jours ouvrables.",
+          "en": "Agent: It is usually five business days."
+        },
+        {
+          "fr": "Merci. Je retournerai au centre si je n'ai pas reçu de réponse.",
+          "en": "Sam: Thank you. I will go back to the centre if I have not received a response."
+        }
+      ]
+    }
+  ]
+}

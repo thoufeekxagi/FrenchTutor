@@ -1,0 +1,194 @@
+{
+  "id": "a2-u08-words-4",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Words: actions on a shared document",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "corriger",
+      "en": "to correct",
+      "sound": "koh-ree-ZHAY",
+      "exampleFr": "Je vais corriger la version finale.",
+      "exampleEn": "I am going to correct the final version."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "joindre",
+      "en": "to attach",
+      "sound": "zhWA(N)DR",
+      "exampleFr": "Je vais joindre la liste au dossier.",
+      "exampleEn": "I am going to attach the list to the file."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "imprimer",
+      "en": "to print",
+      "sound": "a(n)-pree-MAY",
+      "exampleFr": "Nous allons imprimer le plan de présentation.",
+      "exampleEn": "We are going to print the presentation outline."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "présenter",
+      "en": "to present",
+      "sound": "pray-zah(n)-TAY",
+      "exampleFr": "L'équipe va présenter le sujet de recherche.",
+      "exampleEn": "The team is going to present the research topic."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "archiver",
+      "en": "to archive",
+      "sound": "ahr-shee-VAY",
+      "exampleFr": "Je vais archiver la copie de travail.",
+      "exampleEn": "I am going to archive the working copy."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "classer",
+      "en": "to file; sort",
+      "sound": "klah-SAY",
+      "exampleFr": "Je vais classer les fichiers par date.",
+      "exampleEn": "I am going to sort the files by date."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "enregistrer",
+      "en": "to save; record",
+      "sound": "ah(n)-ruh-zhee-STRAY",
+      "exampleFr": "Nous allons enregistrer la version finale.",
+      "exampleEn": "We are going to save the final version."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "remettre",
+      "en": "to hand in",
+      "sound": "ruh-MEHTR",
+      "exampleFr": "Sam va remettre le compte rendu vendredi.",
+      "exampleEn": "Sam is going to hand in the report Friday."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "corriger",
+      "options": [
+        "to present",
+        "to correct",
+        "to save; record",
+        "to attach"
+      ],
+      "answer": 1,
+      "explain": "corriger means to correct."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "joindre",
+      "options": [
+        "to archive",
+        "to hand in",
+        "to print",
+        "to attach"
+      ],
+      "answer": 3,
+      "explain": "joindre means to attach."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "imprimer",
+      "options": [
+        "to file; sort",
+        "to print",
+        "to correct",
+        "to present"
+      ],
+      "answer": 1,
+      "explain": "imprimer means to print."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "présenter",
+      "options": [
+        "to save; record",
+        "to attach",
+        "to archive",
+        "to present"
+      ],
+      "answer": 3,
+      "explain": "présenter means to present."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "archiver",
+      "options": [
+        "to hand in",
+        "to archive",
+        "to print",
+        "to file; sort"
+      ],
+      "answer": 1,
+      "explain": "archiver means to archive."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "classer",
+      "options": [
+        "to correct",
+        "to present",
+        "to save; record",
+        "to file; sort"
+      ],
+      "answer": 3,
+      "explain": "classer means to file; sort."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "joindre",
+      "question": "Which word did you hear?",
+      "options": [
+        "présenter",
+        "joindre",
+        "classer",
+        "remettre"
+      ],
+      "answer": 1,
+      "explain": "You heard joindre: to attach."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "présenter",
+      "question": "Which word did you hear?",
+      "options": [
+        "présenter",
+        "classer",
+        "remettre",
+        "joindre"
+      ],
+      "answer": 0,
+      "explain": "You heard présenter: to present."
+    }
+  ]
+}

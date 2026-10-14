@@ -1,0 +1,152 @@
+{
+  "id": "a2-u02-words-1",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Words: place an event in time",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "avant-hier",
+      "en": "the day before yesterday",
+      "sound": "ah-vah(n)-TYEHR",
+      "exampleFr": "Avant-hier, j'ai étudié à la bibliothèque.",
+      "exampleEn": "The day before yesterday, I studied at the library."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "hier matin",
+      "en": "yesterday morning",
+      "sound": "yehr mah-TA(N)",
+      "exampleFr": "Hier matin, j'ai préparé mon exposé.",
+      "exampleEn": "Yesterday morning, I prepared my presentation."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "hier après-midi",
+      "en": "yesterday afternoon",
+      "sound": "yehr ah-preh-mee-DEE",
+      "exampleFr": "Hier après-midi, j'ai visité le centre.",
+      "exampleEn": "Yesterday afternoon, I visited the centre."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "hier soir",
+      "en": "yesterday evening",
+      "sound": "yehr swahr",
+      "exampleFr": "Hier soir, j'ai révisé mes notes.",
+      "exampleEn": "Yesterday evening, I reviewed my notes."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "la semaine dernière",
+      "en": "last week",
+      "sound": "lah suh-MEN dehr-NYEHR",
+      "exampleFr": "La semaine dernière, j'ai participé à un atelier.",
+      "exampleEn": "Last week, I took part in a workshop."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "le lendemain",
+      "en": "the next day",
+      "sound": "luh lah(n)-duh-MA(N)",
+      "exampleFr": "Le lendemain, j'ai terminé le devoir.",
+      "exampleEn": "The next day, I finished the assignment."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "plus tard",
+      "en": "later",
+      "sound": "plü tahr",
+      "exampleFr": "J'ai téléphoné plus tard.",
+      "exampleEn": "I called later."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "pendant la journée",
+      "en": "during the day",
+      "sound": "pah(n)-DAH(N) lah zhoor-NAY",
+      "exampleFr": "J'ai travaillé pendant la journée.",
+      "exampleEn": "I worked during the day."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "hier matin",
+      "options": [
+        "last week",
+        "during the day",
+        "the next day",
+        "yesterday morning"
+      ],
+      "answer": 3,
+      "explain": "hier matin means yesterday morning."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "hier après-midi",
+      "options": [
+        "the next day",
+        "yesterday afternoon",
+        "later",
+        "last week"
+      ],
+      "answer": 1,
+      "explain": "hier après-midi means yesterday afternoon."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "hier soir",
+      "options": [
+        "later",
+        "last week",
+        "during the day",
+        "yesterday evening"
+      ],
+      "answer": 3,
+      "explain": "hier soir means yesterday evening."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la semaine dernière",
+      "options": [
+        "during the day",
+        "last week",
+        "yesterday afternoon",
+        "the next day"
+      ],
+      "answer": 1,
+      "explain": "la semaine dernière means last week."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "le lendemain",
+      "options": [
+        "yesterday evening",
+        "later",
+        "yesterday morning",
+        "the next day"
+      ],
+      "answer": 3,
+      "explain": "le lendemain means the next day."
+    }
+  ]
+}

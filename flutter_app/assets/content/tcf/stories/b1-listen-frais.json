@@ -1,0 +1,597 @@
+{
+  "id": "b1-listen-frais",
+  "title": "Le frais contesté",
+  "titleEn": "The disputed fee",
+  "level": "B1",
+  "mode": "listening",
+  "minutes": 5,
+  "summary": "A tenant questions an unexpected building fee, gathers the relevant documents, and gets a written explanation before deciding what to do.",
+  "unit": "b1-u08",
+  "sentences": [
+    {
+      "fr": "En ouvrant son relevé, Nadia a remarqué des frais d'entretien qui n'apparaissaient pas le mois précédent.",
+      "en": "While opening her statement, Nadia noticed a maintenance fee that had not appeared the previous month."
+    },
+    {
+      "fr": "Elle n'a pas immédiatement supposé qu'il s'agissait d'une erreur; elle a d'abord relu son bail.",
+      "en": "She did not immediately assume it was a mistake; she reread her lease first."
+    },
+    {
+      "fr": "Le document précisait que les frais exceptionnels devaient être expliqués séparément.",
+      "en": "The document stated that exceptional fees had to be explained separately."
+    },
+    {
+      "fr": "Elle a envoyé un message au gestionnaire en joignant le relevé et la page concernée.",
+      "en": "She sent the manager a message attaching the statement and the relevant page."
+    },
+    {
+      "fr": "Le gestionnaire a répondu que le montant correspondait à une réparation commune, mais que l'avis avait été oublié.",
+      "en": "The manager replied that the amount corresponded to a shared repair, but the notice had been omitted."
+    },
+    {
+      "fr": "Nadia a demandé une facture détaillée et la règle qui autorisait ce partage.",
+      "en": "Nadia requested an itemized invoice and the rule that allowed this cost to be shared."
+    },
+    {
+      "fr": "Après vérification, le gestionnaire a transmis les pièces et corrigé la description du relevé.",
+      "en": "After checking, the manager sent the documents and corrected the statement description."
+    },
+    {
+      "fr": "Nadia a conservé les échanges pour pouvoir les consulter si le même frais revenait.",
+      "en": "Nadia kept the messages so she could consult them if the same fee appeared again."
+    },
+    {
+      "fr": "La discussion est restée calme parce que chacun s'est appuyé sur des documents précis.",
+      "en": "The discussion stayed calm because both sides relied on specific documents."
+    }
+  ],
+  "words": {
+    "en": {
+      "en": "on, during"
+    },
+    "ouvrant": {
+      "en": "opening",
+      "pos": "verb",
+      "lemma": "ouvrir",
+      "note": "Present participle of ouvrir."
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "relevé": {
+      "en": "statement",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "relevé"
+    },
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "proper name"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "remarqué": {
+      "en": "noticed",
+      "pos": "verb",
+      "lemma": "remarquer",
+      "note": "Past participle of remarquer."
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "frais": {
+      "en": "fee; charge",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "frais",
+      "note": "Usually used in the plural."
+    },
+    "d'entretien": {
+      "en": "of maintenance",
+      "pos": "expression",
+      "note": "Elided de before a vowel."
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "n'apparaissaient": {
+      "en": "did not appear",
+      "pos": "verb",
+      "lemma": "apparaître",
+      "note": "Imperfect negative form of apparaître."
+    },
+    "pas": {
+      "en": "not"
+    },
+    "le": {
+      "en": "the"
+    },
+    "mois": {
+      "en": "month",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "mois",
+      "note": "The written form is the same in the plural."
+    },
+    "précédent": {
+      "en": "previous",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "précédent",
+      "note": "Masculine singular form."
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "n'a": {
+      "en": "does not have (ne...a)",
+      "pos": "verb"
+    },
+    "immédiatement": {
+      "en": "immediately",
+      "pos": "adverb"
+    },
+    "supposé": {
+      "en": "assumed; supposed",
+      "pos": "verb",
+      "lemma": "supposer",
+      "note": "Past participle of supposer."
+    },
+    "qu'il": {
+      "en": "that he; than he",
+      "pos": "conjunction + pronoun",
+      "note": "Elided que + il."
+    },
+    "s'agissait": {
+      "en": "was about; concerned",
+      "pos": "verb",
+      "lemma": "s'agir",
+      "note": "Imperfect impersonal form; il s'agissait de = it was a matter of."
+    },
+    "d'une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "erreur": {
+      "en": "error; mistake",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "d'abord": {
+      "en": "first; to begin with",
+      "pos": "adverbial phrase"
+    },
+    "relu": {
+      "en": "reread",
+      "pos": "verb",
+      "lemma": "relire",
+      "note": "Past participle of relire."
+    },
+    "bail": {
+      "en": "lease",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "bail"
+    },
+    "document": {
+      "en": "document",
+      "sound": "luh doh-kü-MAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "document"
+    },
+    "précisait": {
+      "en": "specified; stated",
+      "pos": "verb",
+      "lemma": "préciser",
+      "note": "Imperfect form of préciser."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "exceptionnels": {
+      "en": "exceptional; unusual",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "exceptionnel",
+      "note": "Masculine plural form of exceptionnel."
+    },
+    "devaient": {
+      "en": "had to; were supposed to",
+      "pos": "verb",
+      "lemma": "devoir",
+      "note": "Imperfect form of devoir."
+    },
+    "être": {
+      "en": "to be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Infinitive."
+    },
+    "expliqués": {
+      "en": "explained",
+      "pos": "verb",
+      "lemma": "expliquer",
+      "note": "Masculine plural form of the past participle expliqué."
+    },
+    "séparément": {
+      "en": "separately",
+      "pos": "adverb"
+    },
+    "envoyé": {
+      "en": "sent",
+      "pos": "verb",
+      "lemma": "envoyer",
+      "note": "Past participle of envoyer."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "message": {
+      "en": "message",
+      "sound": "luh meh-SAHZH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "message"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "gestionnaire": {
+      "en": "manager",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "gestionnaire",
+      "note": "Same noun form for all genders."
+    },
+    "joignant": {
+      "en": "attaching",
+      "pos": "verb",
+      "lemma": "joindre",
+      "note": "Present participle of joindre."
+    },
+    "et": {
+      "en": "and"
+    },
+    "la": {
+      "en": "the"
+    },
+    "page": {
+      "en": "page",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "concernée": {
+      "en": "concerned; relevant",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "concerné",
+      "note": "Feminine form of concerné."
+    },
+    "répondu": {
+      "en": "replied; answered",
+      "pos": "verb",
+      "lemma": "répondre",
+      "note": "Past participle of répondre."
+    },
+    "montant": {
+      "en": "amount",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "correspondait": {
+      "en": "corresponded; matched",
+      "pos": "verb",
+      "lemma": "correspondre",
+      "note": "Imperfect form of correspondre."
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "réparation": {
+      "en": "repair",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "commune": {
+      "en": "shared; common",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "commun",
+      "note": "Feminine form of commun."
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "l'avis": {
+      "en": "notice",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "avis",
+      "note": "Elided le before a vowel."
+    },
+    "avait": {
+      "en": "had",
+      "pos": "verb",
+      "lemma": "avoir",
+      "note": "Imperfect form of avoir."
+    },
+    "été": {
+      "en": "been",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Past participle of être; this form does not agree."
+    },
+    "oublié": {
+      "en": "forgotten; left behind",
+      "pos": "verb",
+      "lemma": "oublier",
+      "note": "Past participle of oublier."
+    },
+    "demandé": {
+      "en": "asked; requested",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Past participle of demander."
+    },
+    "facture": {
+      "en": "bill; invoice",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "facture"
+    },
+    "détaillée": {
+      "en": "detailed",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "détaillé",
+      "note": "Feminine form of détaillé."
+    },
+    "règle": {
+      "en": "rule",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "autorisait": {
+      "en": "allowed",
+      "pos": "verb",
+      "lemma": "autoriser",
+      "note": "Imperfect form of autoriser."
+    },
+    "ce": {
+      "en": "this; it",
+      "pos": "determiner / pronoun",
+      "note": "Meaning depends on the sentence."
+    },
+    "partage": {
+      "en": "sharing; allocation",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "vérification": {
+      "en": "check; verification",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "transmis": {
+      "en": "sent; passed along",
+      "pos": "verb",
+      "lemma": "transmettre",
+      "note": "Past participle of transmettre."
+    },
+    "pièces": {
+      "en": "documents; pieces",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "pièce",
+      "note": "Plural of pièce."
+    },
+    "corrigé": {
+      "en": "corrected",
+      "pos": "verb",
+      "lemma": "corriger",
+      "note": "Past participle of corriger."
+    },
+    "description": {
+      "en": "description",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "conservé": {
+      "en": "kept; retained",
+      "pos": "verb",
+      "lemma": "conserver",
+      "note": "Past participle of conserver."
+    },
+    "échanges": {
+      "en": "exchange; swaps",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "échange",
+      "note": "Plural of échange."
+    },
+    "pour": {
+      "en": "for"
+    },
+    "pouvoir": {
+      "en": "to be able to; can",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Infinitive."
+    },
+    "consulter": {
+      "en": "to consult; check",
+      "pos": "verb",
+      "lemma": "consulter",
+      "note": "Infinitive."
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "même": {
+      "en": "same; even",
+      "pos": "adjective",
+      "lemma": "même"
+    },
+    "revenait": {
+      "en": "was returning",
+      "pos": "verb",
+      "lemma": "revenir",
+      "note": "Imperfect form of revenir."
+    },
+    "discussion": {
+      "en": "discussion",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "restée": {
+      "en": "stayed; remained",
+      "pos": "verb",
+      "lemma": "rester",
+      "note": "Feminine form of the past participle resté."
+    },
+    "calme": {
+      "en": "calm",
+      "pos": "adjective",
+      "lemma": "calme"
+    },
+    "parce": {
+      "en": "because (part of parce que)",
+      "pos": "connector"
+    },
+    "chacun": {
+      "en": "each person; everyone",
+      "pos": "pronoun",
+      "note": "Masculine singular form."
+    },
+    "s'est": {
+      "en": "has (reflexive past auxiliary)",
+      "pos": "verb"
+    },
+    "appuyé": {
+      "en": "relied on",
+      "pos": "verb",
+      "lemma": "s'appuyer",
+      "note": "Past participle in s'appuyer sur: rely on."
+    },
+    "sur": {
+      "en": "on"
+    },
+    "documents": {
+      "en": "document",
+      "sound": "luh doh-kü-MAH(N)",
+      "lemma": "document",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "précis": {
+      "en": "specific; precise",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "précis",
+      "note": "Masculine singular form."
+    }
+  },
+  "keywords": [
+    "frais",
+    "bail",
+    "document",
+    "erreur",
+    "expliqués"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does Nadia do before contacting the manager?",
+      "options": [
+        "Rereads her lease",
+        "Pays the fee immediately",
+        "Calls the repair company",
+        "Asks a neighbour to move"
+      ],
+      "answer": 0,
+      "explain": "She rereads the lease before deciding the fee is wrong."
+    },
+    {
+      "prompt": "What does Nadia request?",
+      "options": [
+        "An itemized invoice and the applicable rule",
+        "A rent reduction for the year",
+        "A new lease",
+        "A meeting with every tenant"
+      ],
+      "answer": 0,
+      "explain": "She asks for a detailed invoice and the rule behind the shared cost."
+    },
+    {
+      "prompt": "Why does the discussion remain calm?",
+      "options": [
+        "Both people use specific documents.",
+        "The fee is removed without discussion.",
+        "A neighbour speaks for them.",
+        "The repair is cancelled."
+      ],
+      "answer": 0,
+      "explain": "The explanation says both rely on specific documents."
+    }
+  ]
+}

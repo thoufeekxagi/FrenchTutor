@@ -1,0 +1,140 @@
+{
+  "id": "a2-u12-checkpoint",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the sentence that connects a background and a completed event.",
+      "options": [
+        "Il pleuvait quand le bus est arrivé.",
+        "Il a pleuvoir quand le bus arrivait demain.",
+        "Il pleut quand le bus est arrivé demain.",
+        "Il pleuvra quand le bus arrivait."
+      ],
+      "answer": 0,
+      "explain": "The background is in the imparfait; the completed arrival is in the passé composé."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the correct near-future plan.",
+      "options": [
+        "Je vais demander l'heure.",
+        "Je demander vais l'heure.",
+        "Je vais demandé l'heure.",
+        "Je l'heure vais demander."
+      ],
+      "answer": 0,
+      "explain": "Use aller plus an infinitive for the near future."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the correct comparison.",
+      "options": [
+        "La deuxième option est plus simple que la première.",
+        "La deuxième option plus simple la première.",
+        "La deuxième option est que plus simple la première.",
+        "La deuxième option est plus simple à la première."
+      ],
+      "answer": 0,
+      "explain": "Use plus + adjective + que to compare the two options."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Choose the correct direct object pronoun for le message: Je ___ lis.",
+      "options": [
+        "le",
+        "la",
+        "lui",
+        "y"
+      ],
+      "answer": 0,
+      "explain": "Message is masculine singular; use le."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Choose the correct indirect pronoun for à Nadia: Je ___ demande l'heure.",
+      "options": [
+        "lui",
+        "la",
+        "en",
+        "y"
+      ],
+      "answer": 0,
+      "explain": "Lui replaces one person after demander à."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "Replace au centre in Je vais au centre; je ___ vais après le cours.",
+      "options": [
+        "y",
+        "lui",
+        "leur",
+        "en"
+      ],
+      "answer": 0,
+      "explain": "Use y to refer to the previously named place."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Replace des pommes and keep the amount: J'___ prends quatre.",
+      "options": [
+        "en",
+        "y",
+        "les",
+        "leur"
+      ],
+      "answer": 0,
+      "explain": "Use en and keep the quantity quatre."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Choose the correct polite request.",
+      "options": [
+        "Pourriez-vous confirmer l'horaire ?",
+        "Pourriez-vous confirmez l'horaire ?",
+        "Confirme l'horaire !",
+        "Vous confirmer l'horaire ?"
+      ],
+      "answer": 0,
+      "explain": "Use pourriez-vous followed by an infinitive."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Choose the correct negative instruction.",
+      "options": [
+        "Ne changez pas le point de départ.",
+        "Ne changez le point de départ pas.",
+        "Ne changez-vous pas le point de départ.",
+        "Ne pas changez le point de départ."
+      ],
+      "answer": 0,
+      "explain": "In this negative imperative, ne...pas goes around the verb."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which response gives the clearest next step after a schedule changes?",
+      "options": [
+        "Je vais confirmer l'heure et prévenir le groupe.",
+        "Oui, la semaine est très longue.",
+        "Je n'aime pas les messages.",
+        "C'est à gauche, mais je ne sais pas."
+      ],
+      "answer": 0,
+      "explain": "It states a concrete action and who will be informed."
+    }
+  ]
+}

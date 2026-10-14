@@ -1,0 +1,148 @@
+{
+  "id": "b1-u08-words-5",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "remplir le formulaire",
+      "en": "to fill in the form",
+      "sound": "rahn-pleer luh for-mü-LEHR",
+      "exampleFr": "Remplissez le formulaire en lettres lisibles.",
+      "exampleEn": "Fill in the form in legible writing."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "joindre une copie",
+      "en": "to attach a copy",
+      "sound": "zhwahn-dr ün koh-PEE",
+      "exampleFr": "Il faut joindre une copie de la lettre.",
+      "exampleEn": "A copy of the letter must be attached."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "envoyer par courriel",
+      "en": "to send by email",
+      "sound": "ahn-vwah-yay par koo-ree-EHL",
+      "exampleFr": "Vous pouvez envoyer les pièces par courriel.",
+      "exampleEn": "You can send the documents by email."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "accéder à son compte",
+      "en": "to access one's account",
+      "sound": "ahk-say-DAY ah sohn koh(n)t",
+      "exampleFr": "Elle n'arrive pas à accéder à son compte.",
+      "exampleEn": "She cannot access her account."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "se présenter au guichet",
+      "en": "to go to the service counter",
+      "sound": "suh pray-zahn-TAY oh gee-SHEH",
+      "exampleFr": "Il doit se présenter au guichet avec une pièce d'identité.",
+      "exampleEn": "He must go to the service counter with identification."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un délai de traitement",
+      "en": "processing time",
+      "sound": "uh(n) day-leh duh treht-MAH(N)",
+      "exampleFr": "Le délai de traitement est d'environ dix jours ouvrables.",
+      "exampleEn": "The processing time is about ten business days."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "remplir le formulaire",
+      "options": [
+        "to access one's account",
+        "to fill in the form",
+        "to attach a copy",
+        "to send by email"
+      ],
+      "answer": 1,
+      "explain": "remplir le formulaire means to fill in the form."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "joindre une copie",
+      "options": [
+        "to go to the service counter",
+        "to send by email",
+        "to access one's account",
+        "to attach a copy"
+      ],
+      "answer": 3,
+      "explain": "joindre une copie means to attach a copy."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "envoyer par courriel",
+      "options": [
+        "processing time",
+        "to send by email",
+        "to access one's account",
+        "to go to the service counter"
+      ],
+      "answer": 1,
+      "explain": "envoyer par courriel means to send by email."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "accéder à son compte",
+      "options": [
+        "to fill in the form",
+        "to go to the service counter",
+        "processing time",
+        "to access one's account"
+      ],
+      "answer": 3,
+      "explain": "accéder à son compte means to access one's account."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "se présenter au guichet",
+      "options": [
+        "to attach a copy",
+        "to go to the service counter",
+        "processing time",
+        "to fill in the form"
+      ],
+      "answer": 1,
+      "explain": "se présenter au guichet means to go to the service counter."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un délai de traitement",
+      "options": [
+        "to send by email",
+        "to fill in the form",
+        "to attach a copy",
+        "processing time"
+      ],
+      "answer": 3,
+      "explain": "un délai de traitement means processing time."
+    }
+  ]
+}

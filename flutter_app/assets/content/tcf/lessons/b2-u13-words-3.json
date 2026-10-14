@@ -1,0 +1,148 @@
+{
+  "id": "b2-u13-words-3",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "développer une idée",
+      "en": "to develop an idea",
+      "sound": "day-vuh-loh-PAY ün ee-DAY",
+      "exampleFr": "Elle développe une idée avant de passer au contrepoint.",
+      "exampleEn": "She develops an idea before moving to the counterpoint."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un propos structuré",
+      "en": "a structured statement",
+      "sound": "uh(n) proh-poh strük-tü-RAY",
+      "exampleFr": "Un propos structuré reste facile à suivre.",
+      "exampleEn": "A structured statement remains easy to follow."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un exemple concret",
+      "en": "a concrete example",
+      "sound": "uh(n) ehk-ZAH(N)pl kohn-KREH",
+      "exampleFr": "Un exemple concret clarifie son raisonnement.",
+      "exampleEn": "A concrete example clarifies her reasoning."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une objection anticipée",
+      "en": "an anticipated objection",
+      "sound": "ün ohb-zhehk-SYOH(N) ahn-tee-see-PAY",
+      "exampleFr": "Il répond à une objection anticipée avec calme.",
+      "exampleEn": "He calmly answers an anticipated objection."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "argumenter",
+      "en": "to argue; make a case",
+      "sound": "ar-gü-mahn-TAY",
+      "exampleFr": "Elle apprend à argumenter sans répéter le même point.",
+      "exampleEn": "She is learning to make her case without repeating the same point."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "assurer une transition",
+      "en": "to provide a transition",
+      "sound": "ah-sü-RAY ün trahn-zee-SYOH(N)",
+      "exampleFr": "Un connecteur peut assurer une transition claire.",
+      "exampleEn": "A connector can provide a clear transition."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "développer une idée",
+      "options": [
+        "an anticipated objection",
+        "to develop an idea",
+        "a structured statement",
+        "a concrete example"
+      ],
+      "answer": 1,
+      "explain": "développer une idée means to develop an idea."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un propos structuré",
+      "options": [
+        "to argue; make a case",
+        "a concrete example",
+        "an anticipated objection",
+        "a structured statement"
+      ],
+      "answer": 3,
+      "explain": "un propos structuré means a structured statement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un exemple concret",
+      "options": [
+        "to provide a transition",
+        "a concrete example",
+        "an anticipated objection",
+        "to argue; make a case"
+      ],
+      "answer": 1,
+      "explain": "un exemple concret means a concrete example."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une objection anticipée",
+      "options": [
+        "to develop an idea",
+        "to argue; make a case",
+        "to provide a transition",
+        "an anticipated objection"
+      ],
+      "answer": 3,
+      "explain": "une objection anticipée means an anticipated objection."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "argumenter",
+      "options": [
+        "a structured statement",
+        "to argue; make a case",
+        "to provide a transition",
+        "to develop an idea"
+      ],
+      "answer": 1,
+      "explain": "argumenter means to argue; make a case."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "assurer une transition",
+      "options": [
+        "a concrete example",
+        "to develop an idea",
+        "a structured statement",
+        "to provide a transition"
+      ],
+      "answer": 3,
+      "explain": "assurer une transition means to provide a transition."
+    }
+  ]
+}

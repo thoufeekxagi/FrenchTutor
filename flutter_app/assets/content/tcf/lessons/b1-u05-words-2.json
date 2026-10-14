@@ -1,0 +1,148 @@
+{
+  "id": "b1-u05-words-2",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un commentaire",
+      "en": "a comment; feedback",
+      "sound": "uh(n) koh-mahn-TEHR",
+      "exampleFr": "La responsable souhaite que les membres laissent un commentaire.",
+      "exampleEn": "The coordinator wants members to leave feedback."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un obstacle",
+      "en": "an obstacle",
+      "sound": "uh(n) ob-stahkl",
+      "exampleFr": "Le transport reste un obstacle pour certains.",
+      "exampleEn": "Transportation remains an obstacle for some people."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "souhaiter",
+      "en": "to wish; hope",
+      "sound": "soo-eh-TAY",
+      "exampleFr": "Nous souhaitons que le centre prolonge ses heures.",
+      "exampleEn": "We hope the centre extends its hours."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "participer",
+      "en": "to participate",
+      "sound": "par-tee-see-PAY",
+      "exampleFr": "Elle veut participer à la rencontre.",
+      "exampleEn": "She wants to participate in the meeting."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "être disponible",
+      "en": "to be available",
+      "sound": "ehtr dee-spoh-nee-bl",
+      "exampleFr": "Il faut que le personnel soit disponible.",
+      "exampleEn": "The staff needs to be available."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "rassurant",
+      "en": "reassuring",
+      "sound": "rah-sü-RAH(N)",
+      "exampleFr": "Il est rassurant que la responsable réponde aux questions.",
+      "exampleEn": "It is reassuring that the coordinator answers questions."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un commentaire",
+      "options": [
+        "to participate",
+        "a comment; feedback",
+        "an obstacle",
+        "to wish; hope"
+      ],
+      "answer": 1,
+      "explain": "un commentaire means a comment; feedback."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un obstacle",
+      "options": [
+        "to be available",
+        "to wish; hope",
+        "to participate",
+        "an obstacle"
+      ],
+      "answer": 3,
+      "explain": "un obstacle means an obstacle."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "souhaiter",
+      "options": [
+        "reassuring",
+        "to wish; hope",
+        "to participate",
+        "to be available"
+      ],
+      "answer": 1,
+      "explain": "souhaiter means to wish; hope."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "participer",
+      "options": [
+        "a comment; feedback",
+        "to be available",
+        "reassuring",
+        "to participate"
+      ],
+      "answer": 3,
+      "explain": "participer means to participate."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "être disponible",
+      "options": [
+        "an obstacle",
+        "to be available",
+        "reassuring",
+        "a comment; feedback"
+      ],
+      "answer": 1,
+      "explain": "être disponible means to be available."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "rassurant",
+      "options": [
+        "to wish; hope",
+        "a comment; feedback",
+        "an obstacle",
+        "reassuring"
+      ],
+      "answer": 3,
+      "explain": "rassurant means reassuring."
+    }
+  ]
+}

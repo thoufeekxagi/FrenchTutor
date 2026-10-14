@@ -1,0 +1,58 @@
+{
+  "id": "b1-u08-listening",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Pourriez-vous me dire si le formulaire peut être envoyé en ligne ? Oui, mais la preuve d'adresse doit être lisible. Le délai de réponse est de cinq jours ouvrables.",
+      "question": "What must be readable?",
+      "options": [
+        "Proof of address",
+        "The course schedule",
+        "The email subject",
+        "The appointment calendar"
+      ],
+      "answer": 0,
+      "explain": "The proof of address must be readable."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je voudrais savoir où déposer le document original. On m'a dit que je pouvais l'apporter à l'accueil, du lundi au jeudi.",
+      "question": "Where can the original document be left?",
+      "options": [
+        "By phone",
+        "At the library",
+        "At a bus terminal",
+        "At reception"
+      ],
+      "answer": 3,
+      "explain": "The speaker was told to bring it to reception."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le bureau ferme à seize heures, mais les appels sont acceptés jusqu'à quinze heures trente. Si vous arrivez après, vous pourrez envoyer un courriel.",
+      "question": "Until what time are calls accepted?",
+      "options": [
+        "17:00",
+        "16:00",
+        "15:30",
+        "14:30"
+      ],
+      "answer": 2,
+      "explain": "The recording says calls are accepted until 15:30."
+    }
+  ]
+}

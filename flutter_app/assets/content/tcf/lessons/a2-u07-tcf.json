@@ -1,0 +1,100 @@
+{
+  "id": "a2-u07-tcf",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le rendez-vous en personne est jeudi à 10 h. L'adresse se trouve dans le message que le service a envoyé.",
+      "question": "Where is the address?",
+      "options": [
+        "In the message sent by the service",
+        "On the medical result",
+        "On a rental listing",
+        "In the work schedule"
+      ],
+      "answer": 0,
+      "explain": "The recording says the address is in the service's message."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Le service va appeler la personne qui demande un suivi. L'appel va arriver avant midi.",
+      "question": "When will the person receive a call?",
+      "options": [
+        "Before noon",
+        "After 5 p.m.",
+        "Tomorrow morning",
+        "Next week"
+      ],
+      "answer": 0,
+      "explain": "The recording says the call will come before noon."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le formulaire demande le début de la gêne et l'heure où elle commence.",
+      "question": "What two details does the form ask for?",
+      "options": [
+        "Start time and when it begins",
+        "Price and address",
+        "Medication name and dose",
+        "Clinic hours and bus route"
+      ],
+      "answer": 0,
+      "explain": "The speaker names the beginning and the time it starts; no medication information is requested."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What document should the patient bring?",
+      "options": [
+        "The lab result",
+        "A lease",
+        "A course form",
+        "A bus pass"
+      ],
+      "answer": 0,
+      "explain": "The notice asks for the lab result.",
+      "promptFr": "CONSULTATION — Lundi, 15 h. Document à apporter : le résultat de laboratoire. Adresse dans le message de confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "By when should the caller expect the call?",
+      "options": [
+        "Before 4 p.m.",
+        "After 6 p.m.",
+        "Tomorrow",
+        "Next month"
+      ],
+      "answer": 0,
+      "explain": "The notice says the call is before sixteen hundred hours.",
+      "promptFr": "RAPPEL — Une personne du service va appeler la personne qui a téléphoné. L'appel est avant 16 h."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should the patient do on the form?",
+      "options": [
+        "Give the symptom, start time and duration",
+        "Choose a diagnosis",
+        "Ask for a specific medicine",
+        "Change the appointment time"
+      ],
+      "answer": 0,
+      "explain": "The form asks for the symptom, start time and duration; the professional reads it at the consultation.",
+      "promptFr": "FORMULAIRE — Symptôme, heure de début et durée. Le professionnel lit le formulaire pendant la consultation."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b1-u12-words-5",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "solliciter de l'aide",
+      "en": "to seek help",
+      "sound": "soh-lee-see-TAY duh leh",
+      "exampleFr": "Il ne faut pas hésiter à solliciter de l'aide.",
+      "exampleEn": "Do not hesitate to seek help."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "évaluer les options",
+      "en": "to assess the options",
+      "sound": "ay-vah-lü-AY lay-zohp-SYOH(N)",
+      "exampleFr": "Le groupe va évaluer les options après avoir recueilli les avis.",
+      "exampleEn": "The group will assess the options after gathering opinions."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "signaler une limite",
+      "en": "to point out a limitation",
+      "sound": "seen-yah-lay ün lee-MEET",
+      "exampleFr": "Il est utile de signaler une limite de la proposition.",
+      "exampleEn": "It is useful to point out a limitation of the proposal."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "proposer une suite",
+      "en": "to suggest a next step",
+      "sound": "proh-poh-ZAY ün sü-eet",
+      "exampleFr": "La participante a proposé une suite simple au projet.",
+      "exampleEn": "The participant suggested a simple next step for the project."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un progrès durable",
+      "en": "lasting progress",
+      "sound": "uh(n) proh-gray dü-RAH-bl",
+      "exampleFr": "Une pratique régulière permet un progrès durable.",
+      "exampleEn": "Regular practice allows for lasting progress."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un résultat observable",
+      "en": "an observable result",
+      "sound": "uh(n) ray-zül-TAH ohb-zehr-VAH-bl",
+      "exampleFr": "Le groupe cherchera un résultat observable après un mois.",
+      "exampleEn": "The group will look for an observable result after one month."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "solliciter de l'aide",
+      "options": [
+        "to suggest a next step",
+        "to seek help",
+        "to assess the options",
+        "to point out a limitation"
+      ],
+      "answer": 1,
+      "explain": "solliciter de l'aide means to seek help."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "évaluer les options",
+      "options": [
+        "lasting progress",
+        "to point out a limitation",
+        "to suggest a next step",
+        "to assess the options"
+      ],
+      "answer": 3,
+      "explain": "évaluer les options means to assess the options."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "signaler une limite",
+      "options": [
+        "an observable result",
+        "to point out a limitation",
+        "to suggest a next step",
+        "lasting progress"
+      ],
+      "answer": 1,
+      "explain": "signaler une limite means to point out a limitation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "proposer une suite",
+      "options": [
+        "to seek help",
+        "lasting progress",
+        "an observable result",
+        "to suggest a next step"
+      ],
+      "answer": 3,
+      "explain": "proposer une suite means to suggest a next step."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un progrès durable",
+      "options": [
+        "to assess the options",
+        "lasting progress",
+        "an observable result",
+        "to seek help"
+      ],
+      "answer": 1,
+      "explain": "un progrès durable means lasting progress."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un résultat observable",
+      "options": [
+        "to point out a limitation",
+        "to seek help",
+        "to assess the options",
+        "an observable result"
+      ],
+      "answer": 3,
+      "explain": "un résultat observable means an observable result."
+    }
+  ]
+}

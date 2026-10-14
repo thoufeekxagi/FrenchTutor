@@ -1,0 +1,100 @@
+{
+  "id": "a2-u01-tcf",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Je travaille le matin, mais je suis libre après quinze heures. Je peux réviser avec toi jeudi.",
+      "question": "When can the speaker study with the other person?",
+      "options": [
+        "Thursday after 15:00",
+        "Wednesday morning",
+        "Friday at noon",
+        "Sunday evening"
+      ],
+      "answer": 0,
+      "explain": "The speaker is free after 15:00 and says Thursday works."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "D'abord, je vérifie l'échéance. Ensuite, je termine la présentation. Je prends une pause après.",
+      "question": "What does the speaker do second?",
+      "options": [
+        "Checks the deadline",
+        "Finishes the presentation",
+        "Takes a break",
+        "Changes the schedule"
+      ],
+      "answer": 1,
+      "explain": "Ensuite introduces the second action: finish the presentation."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je reporte le cours parce que j'ai un imprévu au travail.",
+      "question": "Why is the class postponed?",
+      "options": [
+        "The speaker has an unexpected work issue.",
+        "The teacher is sick.",
+        "The room is closed.",
+        "The speaker forgot the time."
+      ],
+      "answer": 0,
+      "explain": "The reason is un imprévu au travail."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When can Awa attend?",
+      "options": [
+        "Tuesday before work",
+        "Wednesday at 18 h",
+        "Thursday at 18 h",
+        "Friday after work"
+      ],
+      "answer": 2,
+      "explain": "Awa says she can go to the session Thursday at 18 h.",
+      "promptFr": "Bonjour, · Je suis libre mardi après le travail, mais pas mercredi. En revanche, je peux aller à la séance jeudi à 18 h. Merci de confirmer avant demain. · Awa"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should the learner do after each session?",
+      "options": [
+        "Call a classmate",
+        "Write an example from memory",
+        "Study for two hours",
+        "Prepare a presentation"
+      ],
+      "answer": 1,
+      "explain": "The notice says to write an example without looking at notes.",
+      "promptFr": "SEMAINE DE FRANÇAIS · Objectif de la semaine : réviser trois fois. · Lundi : 20 minutes · Mercredi : 20 minutes · Samedi : 30 minutes · Après chaque séance : écrire un exemple sans regarder les notes."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What changed?",
+      "options": [
+        "The day",
+        "The start time",
+        "The room",
+        "The teacher"
+      ],
+      "answer": 2,
+      "explain": "The message gives the new room: 204.",
+      "promptFr": "Salut Nadia, · La séance commence à 18 h. Nouvelle salle : salle 204. Apporte tes notes. · Sam"
+    }
+  ]
+}

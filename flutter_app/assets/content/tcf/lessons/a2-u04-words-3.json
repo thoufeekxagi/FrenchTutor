@@ -1,0 +1,166 @@
+{
+  "id": "a2-u04-words-3",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Words: a place and its surroundings",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un immeuble ancien",
+      "en": "an older building",
+      "sound": "uh(n) ee-MUHBL ah(n)-SYAH(N)",
+      "exampleFr": "Dans mon ancien quartier, il y avait un immeuble ancien.",
+      "exampleEn": "In my old neighbourhood, there was an older building."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une cour intérieure",
+      "en": "an inner courtyard",
+      "sound": "ün koor a(n)-tay-ree-UHR",
+      "exampleFr": "Dans mon ancien quartier, il y avait une cour intérieure.",
+      "exampleEn": "In my old neighbourhood, there was an inner courtyard."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une cage d'escalier",
+      "en": "a stairwell",
+      "sound": "ün kahzh dehs-kah-LYAY",
+      "exampleFr": "Dans mon ancien quartier, il y avait une cage d'escalier.",
+      "exampleEn": "In my old neighbourhood, there was a stairwell."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un sous-sol",
+      "en": "a basement",
+      "sound": "uh(n) soo-SOHL",
+      "exampleFr": "Dans mon ancien quartier, il y avait un sous-sol.",
+      "exampleEn": "In my old neighbourhood, there was a basement."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un collège",
+      "en": "a secondary school; college",
+      "sound": "uh(n) koh-LEHZH",
+      "exampleFr": "Dans mon ancien quartier, il y avait un collège.",
+      "exampleEn": "In my old neighbourhood, there was a secondary school; college."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une entrée arrière",
+      "en": "a back entrance",
+      "sound": "ün ah(n)-TRAY ah-RYEHR",
+      "exampleFr": "Dans mon ancien quartier, il y avait une entrée arrière.",
+      "exampleEn": "In my old neighbourhood, there was a back entrance."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un terrain de jeu",
+      "en": "a playground",
+      "sound": "uh(n) teh-RA(N) duh zhuh",
+      "exampleFr": "Dans mon ancien quartier, il y avait un terrain de jeu.",
+      "exampleEn": "In my old neighbourhood, there was a playground."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un passage piéton",
+      "en": "a pedestrian crossing",
+      "sound": "uh(n) pah-SAHZH pee-ay-TOH(N)",
+      "exampleFr": "Dans mon ancien quartier, il y avait un passage piéton.",
+      "exampleEn": "In my old neighbourhood, there was a pedestrian crossing."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un immeuble ancien",
+      "options": [
+        "a basement",
+        "an older building",
+        "a playground",
+        "an inner courtyard"
+      ],
+      "answer": 1,
+      "explain": "un immeuble ancien means an older building."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une cour intérieure",
+      "options": [
+        "a secondary school; college",
+        "a pedestrian crossing",
+        "a stairwell",
+        "an inner courtyard"
+      ],
+      "answer": 3,
+      "explain": "une cour intérieure means an inner courtyard."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une cage d'escalier",
+      "options": [
+        "a back entrance",
+        "a stairwell",
+        "an older building",
+        "a basement"
+      ],
+      "answer": 1,
+      "explain": "une cage d'escalier means a stairwell."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un sous-sol",
+      "options": [
+        "a playground",
+        "an inner courtyard",
+        "a secondary school; college",
+        "a basement"
+      ],
+      "answer": 3,
+      "explain": "un sous-sol means a basement."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un collège",
+      "options": [
+        "a pedestrian crossing",
+        "a secondary school; college",
+        "a stairwell",
+        "a back entrance"
+      ],
+      "answer": 1,
+      "explain": "un collège means a secondary school; college."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une entrée arrière",
+      "options": [
+        "an older building",
+        "a basement",
+        "a playground",
+        "a back entrance"
+      ],
+      "answer": 3,
+      "explain": "une entrée arrière means a back entrance."
+    }
+  ]
+}

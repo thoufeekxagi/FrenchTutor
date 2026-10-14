@@ -1,0 +1,56 @@
+{
+  "id": "b2-u01-write-speak",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two short original viewpoints address whether employers should allow flexible work locations. View A emphasizes reduced commuting and autonomy; View B emphasizes coordination and access to shared equipment. Compare the two views and state your own position in 130–160 words. Do not copy either source sentence.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux textes examinent la possibilité de travailler à distance, mais ils mettent l'accent sur des besoins différents. Le premier insiste sur la réduction des déplacements et sur l'autonomie, tandis que le second rappelle que certaines tâches nécessitent une coordination immédiate ou du matériel partagé. À mon avis, une règle identique pour tous les postes serait difficile à justifier. Un essai limité, défini avec les équipes, permettrait d'observer les effets concrets. Il faudrait toutefois publier les critères avant le début et tenir compte des fonctions qui exigent une présence sur place. Ainsi, la décision reposerait sur des éléments comparables plutôt que sur une préférence générale. La souplesse peut être utile, à condition de ne pas rendre l'accès aux échanges plus inégal.\n\nCheck:\n• Official Task 3 range: 120–180 words; this practice target is 130–160.\n• Represent both viewpoints fairly before giving your own position.\n• Paraphrase; do not copy full source phrases.\n• Use one concession and explain what evidence would help."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF Task 3 practice. With no preparation, discuss this prompt: Le travail flexible améliore-t-il toujours la qualité de vie ? Give a clear position, two reasons, one example, a limitation and a conclusion. Marie should ask one follow-up that challenges an assumption. Make an independent first attempt before asking for a hint.\n\n• In the real Task 3 there is no preparation; practise without notes.\n• Use the model after your first attempt to notice one useful move, not to memorize it.\n• Ask Marie for one hint only if needed; retry after she changes a condition."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je ne pense pas que le travail flexible améliore toujours la qualité de vie. Il peut réduire les déplacements et donner plus de contrôle sur l'organisation de la journée.",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Cela dit, ses effets dépendent du poste et des conditions à la maison. Une personne qui manque d'espace ou d'équipement peut y trouver moins d'avantages.",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "À mon avis, il faut donc proposer plusieurs options et vérifier si les échanges restent accessibles à tous. Un essai avec des objectifs clairs serait plus convaincant qu'une règle générale.",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "En conclusion, la flexibilité peut améliorer la qualité de vie, à condition qu'elle soit adaptée aux besoins réels.",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

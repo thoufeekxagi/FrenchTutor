@@ -1,0 +1,52 @@
+{
+  "id": "b1-u06-reading",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why was the temporary ramp installed?",
+      "options": [
+        "So the station can move",
+        "So people with reduced mobility can reach the platform",
+        "To close the north entrance",
+        "To shorten the construction period"
+      ],
+      "answer": 1,
+      "explain": "The notice states the ramp allows access to the platform.",
+      "promptFr": "AVIS DE TRAVAUX — La passerelle sera fermée du 4 au 18 juin. Afin de rejoindre la station, suivez les panneaux vers l'entrée nord. Ce trajet prend environ six minutes de plus. Une rampe temporaire est installée pour que les personnes à mobilité réduite puissent accéder au quai."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What has not yet been calculated?",
+      "options": [
+        "Staffing cost",
+        "Number of workers",
+        "The current closing time",
+        "The centre's address"
+      ],
+      "answer": 0,
+      "explain": "The report says staffing cost has not been calculated.",
+      "promptFr": "Le comité souhaite prolonger les heures d'ouverture parce que des travailleurs terminent tard. Toutefois, le rapport précise que le coût du personnel n'a pas encore été calculé. Une période d'essai permettrait de mesurer la fréquentation avant de prendre une décision permanente."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does the text do?",
+      "options": [
+        "It announces construction has finished",
+        "It describes a permanent route",
+        "It claims the detour helps everyone equally",
+        "It gives a benefit and a limitation of the detour"
+      ],
+      "answer": 3,
+      "explain": "The text describes both a benefit and a limitation.",
+      "promptFr": "Le détour a augmenté le temps de marche, mais l'arrêt temporaire se trouve devant une entrée accessible. Cette solution facilite l'accès à certaines personnes; elle peut néanmoins être difficile pour celles qui transportent des sacs lourds."
+    }
+  ]
+}

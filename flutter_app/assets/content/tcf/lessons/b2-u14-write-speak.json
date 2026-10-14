@@ -1,0 +1,155 @@
+{
+  "id": "b2-u14-write-speak",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 10,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word account for a community newsletter about a discussion or learning event you attended. Recount what happened, include one viewpoint you heard, add your comment and explain what should happen next. Use a clear beginning, sequence and conclusion.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "La semaine dernière, j'ai participé à une rencontre organisée par un groupe de quartier. Les participants ont discuté de la façon de rendre les activités plus accessibles. Une personne a expliqué qu'elle préférait les rencontres en personne, car elle pouvait poser des questions immédiatement. Une autre a dit qu'un format hybride lui permettrait de participer après le travail. J'ai trouvé ces deux expériences utiles, même si elles ne représentent pas nécessairement tous les résidents. À mon avis, le groupe devrait essayer les deux formats pendant une période limitée et demander des commentaires après chaque rencontre. Il faudrait aussi veiller à ce que les personnes en ligne puissent prendre la parole. Le compte rendu devrait ensuite présenter les résultats et les limites de l'essai. Cette démarche permettrait de choisir selon les besoins observés.\n\nCheck:\n• Task 2 range: 120–150 words.\n• Recount an experience and include a comment or argument.\n• Attribute the other person's view accurately.\n• Include a next step without promising a particular outcome."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Writing: TCF Task 1 practice",
+      "body": "Write a 60–90-word message to a classmate suggesting a time to prepare for a community discussion. Explain your availability, propose an alternative and ask one follow-up question.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Model answer",
+      "body": "Salut Mina, Je peux préparer la discussion jeudi après 18 h. Je travaille plus tard mercredi, donc je ne pourrai pas me libérer à temps. Est-ce que jeudi te conviendrait ? Si tu préfères, nous pouvons aussi nous retrouver samedi matin à la bibliothèque. J'aimerais relire les deux documents avant de choisir nos exemples. Peux-tu m'envoyer le lien du second texte ? À bientôt, Awa\n\nCheck:\n• Task 1 range: 60–120 words.\n• Describe availability, propose an option and ask for information.\n• Use a suitable greeting and closing."
+    },
+    {
+      "type": "explain",
+      "id": "e5",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two source viewpoints appear in the last reading item. Compare their preference for in-person and hybrid community meetings, then state your position in 130–160 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e6",
+      "title": "Model answer",
+      "body": "Les deux documents souhaitent que davantage de résidents puissent participer, mais ils proposent des formats différents. Le premier privilégie les rencontres en personne, car les échanges directs faciliteraient les questions et la compréhension des besoins locaux. Le second fait valoir qu'un format hybride permettrait à des personnes qui travaillent tard ou habitent loin de participer. Il souligne toutefois que la prise de parole doit rester équitable. À mon avis, un essai hybride serait utile si les organisateurs prévoyaient des règles claires pour les interventions en ligne et en salle. Il faudrait ensuite recueillir les commentaires des participants, y compris ceux qui n'ont pas pu venir. Ainsi, la décision pourrait tenir compte des effets observés. Un format unique ne conviendra peut-être pas à chaque activité, mais les deux textes montrent que l'accès doit guider le choix.\n\nCheck:\n• Task 3 range: 120–180 words; this practice target is 130–160.\n• Compare both source views, then give your own position.\n• Paraphrase and attribute the claims.\n• Check agreement, reference and word count."
+    },
+    {
+      "type": "explain",
+      "id": "e7",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Official TCF oral Task 3: with no preparation, discuss Les collectivités devraient-elles proposer leurs activités uniquement en personne ? Give a clear position, two reasons, an example, one limitation and a conclusion. Marie should change one access constraint and ask a follow-up.\n\n• Task 3 is a spontaneous opinion response, not source comparison.\n• No preparation is provided for the official Task 3; do not read notes.\n• Adapt when Marie changes one access condition and answers a follow-up."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je ne pense pas que les activités devraient être proposées uniquement en personne.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Les rencontres directes facilitent les échanges spontanés, mais elles ne sont pas accessibles à tous au même moment.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Un format en ligne ou hybride pourrait aider certaines personnes à participer. Cela dit, il faut prévoir une manière claire de poser des questions et de prendre la parole.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "À mon avis, les organisateurs devraient choisir le format selon l'activité et consulter les participants. Un essai limité permettrait de vérifier les besoins avant de décider.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "En conclusion, la participation devrait guider le choix, plutôt qu'une règle identique pour chaque activité.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "explain",
+      "id": "e8",
+      "title": "Speaking: TCF oral Task 1: directed interview",
+      "body": "Official Task 1 practice: answer Marie's questions about your learning routine, a recent project, a useful experience and a future goal. Keep the exchange natural and directed; this task lasts two minutes in the TCF format.\n\n• Answer the examiner's question; do not deliver a prepared speech unrelated to it.\n• Add a detail or reason, then let the examiner continue.\n• The official Task 1 exchange lasts two minutes."
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "J'étudie le français plusieurs fois par semaine. Je préfère les séances courtes, car je peux réviser régulièrement.",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Récemment, j'ai participé à une discussion où j'ai dû expliquer mon point de vue. Au début, je cherchais mes mots, mais j'ai réussi à reformuler une idée.",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Mon objectif est de mieux comprendre les opinions dans les émissions et de répondre avec plus de précision.",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p9",
+      "fr": "Pour y parvenir, je vais écouter des extraits variés et noter les expressions que je peux réutiliser.",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "explain",
+      "id": "e9",
+      "title": "Speaking: TCF oral Task 2: information-seeking interaction",
+      "body": "Use a fictional notice for a community discussion evening. Prepare for two minutes, then ask the organizer about date, format, accessibility, registration and how to submit a question. Interact for three minutes thirty. Marie should give information in stages and change one detail so you must follow up.\n\n• Task 2 is an interaction, not a monologue.\n• The official format includes two minutes of preparation and three minutes thirty of interaction.\n• Use the answer you hear to form the next question."
+    },
+    {
+      "type": "phrase",
+      "id": "p10",
+      "fr": "Bonjour, je vous appelle au sujet de la discussion annoncée. Pourriez-vous me confirmer la date et l'heure ?",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p11",
+      "fr": "Le document indique que la rencontre peut être hybride; pourriez-vous préciser comment les personnes en ligne peuvent poser une question ? Faut-il s'inscrire à l'avance ?",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p12",
+      "fr": "J'aimerais aussi savoir s'il y a une autre façon de participer si je ne peux pas assister à toute la rencontre. Si j'ai bien compris, les questions peuvent être envoyées avant l'événement.",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p13",
+      "fr": "Est-ce exact ? Merci de me préciser où trouver les informations mises à jour.",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "id": "a2-u09-words-5",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Words: ask, answer and give information",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "s'orienter",
+      "en": "to find one's way",
+      "sound": "soh-ree-ah(n)-TAY",
+      "exampleFr": "Je peux m'orienter avec le plan du réseau.",
+      "exampleEn": "I can find my way with the network map."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "embarquer",
+      "en": "to get on board",
+      "sound": "ah(n)-bahr-KAY",
+      "exampleFr": "Je peux embarquer dans la navette.",
+      "exampleEn": "I can get on board the shuttle."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "débarquer",
+      "en": "to get off; disembark",
+      "sound": "day-bahr-KAY",
+      "exampleFr": "Je peux débarquer au terminus.",
+      "exampleEn": "I can get off at the final stop."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "contourner",
+      "en": "to go around",
+      "sound": "kohn-toor-NAY",
+      "exampleFr": "Je peux contourner le carrefour.",
+      "exampleEn": "I can go around the intersection."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "signaler",
+      "en": "to report; signal",
+      "sound": "see-nyah-LAY",
+      "exampleFr": "Je peux signaler le retard au personnel.",
+      "exampleEn": "I can report the delay to the staff."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "annoncer",
+      "en": "to announce",
+      "sound": "ah-nohn-SAY",
+      "exampleFr": "Je peux annoncer le changement de trajet.",
+      "exampleEn": "I can announce the route change."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "manquer",
+      "en": "to miss",
+      "sound": "mahn-KAY",
+      "exampleFr": "Je peux manquer la correspondance.",
+      "exampleEn": "I can miss the connection."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "rejoindre",
+      "en": "to meet; join",
+      "sound": "ruh-ZHWA(N)DR",
+      "exampleFr": "Je peux rejoindre Nadia au terminus.",
+      "exampleEn": "I can meet Nadia at the final stop."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "s'orienter",
+      "options": [
+        "to go around",
+        "to find one's way",
+        "to miss",
+        "to get on board"
+      ],
+      "answer": 1,
+      "explain": "s'orienter means to find one's way."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "embarquer",
+      "options": [
+        "to report; signal",
+        "to meet; join",
+        "to announce",
+        "to get on board"
+      ],
+      "answer": 3,
+      "explain": "embarquer means to get on board."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "débarquer",
+      "options": [
+        "to announce",
+        "to get off; disembark",
+        "to find one's way",
+        "to go around"
+      ],
+      "answer": 1,
+      "explain": "débarquer means to get off; disembark."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "contourner",
+      "options": [
+        "to miss",
+        "to get on board",
+        "to report; signal",
+        "to go around"
+      ],
+      "answer": 3,
+      "explain": "contourner means to go around."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "signaler",
+      "options": [
+        "to meet; join",
+        "to report; signal",
+        "to get off; disembark",
+        "to announce"
+      ],
+      "answer": 1,
+      "explain": "signaler means to report; signal."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "annoncer",
+      "options": [
+        "to find one's way",
+        "to go around",
+        "to miss",
+        "to announce"
+      ],
+      "answer": 3,
+      "explain": "annoncer means to announce."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "embarquer",
+      "question": "Which word did you hear?",
+      "options": [
+        "contourner",
+        "embarquer",
+        "annoncer",
+        "rejoindre"
+      ],
+      "answer": 1,
+      "explain": "You heard embarquer: to get on board."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "contourner",
+      "question": "Which word did you hear?",
+      "options": [
+        "contourner",
+        "annoncer",
+        "rejoindre",
+        "embarquer"
+      ],
+      "answer": 0,
+      "explain": "You heard contourner: to go around."
+    }
+  ]
+}

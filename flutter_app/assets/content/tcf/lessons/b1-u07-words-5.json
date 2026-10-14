@@ -1,0 +1,148 @@
+{
+  "id": "b1-u07-words-5",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le discours rapporté",
+      "en": "reported speech",
+      "sound": "luh dees-KOOR rah-poh-RAY",
+      "exampleFr": "Le discours rapporté conserve le sens du message initial.",
+      "exampleEn": "Reported speech preserves the meaning of the original message."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un message ambigu",
+      "en": "an ambiguous message",
+      "sound": "uh(n) meh-sahzh ahn-bee-GÜ",
+      "exampleFr": "Le message ambigu a créé deux interprétations.",
+      "exampleEn": "The ambiguous message created two interpretations."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "être informé",
+      "en": "to be informed",
+      "sound": "ehtr ahn-for-MAY",
+      "exampleFr": "Les résidents ont été informés du changement hier.",
+      "exampleEn": "Residents were informed of the change yesterday."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "signaler une erreur",
+      "en": "to report an error",
+      "sound": "seen-yah-lay ün eh-RUHR",
+      "exampleFr": "Il a signalé une erreur dans le compte rendu.",
+      "exampleEn": "He reported an error in the report."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une déclaration publique",
+      "en": "a public statement",
+      "sound": "ün day-klah-rah-SYOH(N) pü-BLEEK",
+      "exampleFr": "La ville a publié une déclaration publique mardi.",
+      "exampleEn": "The city published a public statement on Tuesday."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "préciser les circonstances",
+      "en": "to clarify the circumstances",
+      "sound": "pray-see-ZAY lay sehr-kohn-stahns",
+      "exampleFr": "La journaliste a demandé de préciser les circonstances.",
+      "exampleEn": "The journalist asked for the circumstances to be clarified."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le discours rapporté",
+      "options": [
+        "to report an error",
+        "reported speech",
+        "an ambiguous message",
+        "to be informed"
+      ],
+      "answer": 1,
+      "explain": "le discours rapporté means reported speech."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un message ambigu",
+      "options": [
+        "a public statement",
+        "to be informed",
+        "to report an error",
+        "an ambiguous message"
+      ],
+      "answer": 3,
+      "explain": "un message ambigu means an ambiguous message."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "être informé",
+      "options": [
+        "to clarify the circumstances",
+        "to be informed",
+        "to report an error",
+        "a public statement"
+      ],
+      "answer": 1,
+      "explain": "être informé means to be informed."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "signaler une erreur",
+      "options": [
+        "reported speech",
+        "a public statement",
+        "to clarify the circumstances",
+        "to report an error"
+      ],
+      "answer": 3,
+      "explain": "signaler une erreur means to report an error."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une déclaration publique",
+      "options": [
+        "an ambiguous message",
+        "a public statement",
+        "to clarify the circumstances",
+        "reported speech"
+      ],
+      "answer": 1,
+      "explain": "une déclaration publique means a public statement."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "préciser les circonstances",
+      "options": [
+        "to be informed",
+        "reported speech",
+        "an ambiguous message",
+        "to clarify the circumstances"
+      ],
+      "answer": 3,
+      "explain": "préciser les circonstances means to clarify the circumstances."
+    }
+  ]
+}

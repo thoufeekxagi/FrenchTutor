@@ -1,0 +1,99 @@
+{
+  "id": "b2-u13-grammar-a",
+  "unit": "b2-u13",
+  "unitTitle": "B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "title": "Grammar: Spoken argument structure: signpost ideas and repair without losing your line",
+  "subtitle": "B2 · Unit 13: B2 · TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Spoken argument structure: signpost ideas and repair without losing your line",
+      "body": "Task 3 speaking gives no preparation time. Your goal is not a perfect essay read aloud; it is a clear response that develops relevant ideas and stays responsive. Use a short thesis, two signposted reasons, a relevant example, a fair limitation and a conclusion. Use connectors to show the relationship, not to decorate every sentence. If you lose a word, paraphrase (ce que je veux dire, c'est…) and continue. A self-correction is useful when it clarifies meaning; repeatedly restarting can make the line harder to follow."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Spoken argument structure: signpost ideas and repair without losing your line",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Position",
+          "à mon avis + claim",
+          "À mon avis, les bibliothèques doivent rester accessibles en personne.",
+          "In my view, libraries should remain accessible in person."
+        ],
+        [
+          "Reason",
+          "d'abord / ensuite",
+          "D'abord, elles offrent un espace de travail; ensuite, elles donnent accès à des ressources.",
+          "First, they provide a place to work; then, they offer access to resources."
+        ],
+        [
+          "Example",
+          "prenons l'exemple de…",
+          "Prenons l'exemple d'une personne qui n'a pas d'espace calme chez elle.",
+          "Take the example of someone who does not have a quiet space at home."
+        ],
+        [
+          "Qualification",
+          "cela dit / à condition que",
+          "Cela dit, les horaires doivent répondre aux besoins du quartier.",
+          "That said, the hours must meet the neighbourhood's needs."
+        ],
+        [
+          "Repair",
+          "ce que je veux dire, c'est…",
+          "Ce que je veux dire, c'est que l'accès doit être simple.",
+          "What I mean is that access should be simple."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which order creates a clear short argument?",
+      "options": [
+        "Conclusion before the prompt is understood",
+        "Example, unrelated story, greeting, conclusion",
+        "Three connectors without claims",
+        "Position, reasons, example, limit, conclusion"
+      ],
+      "answer": 3,
+      "explain": "This order keeps the answer relevant and developed."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does ce que je veux dire, c'est… do?",
+      "options": [
+        "Introduces a past cause",
+        "Attributes a source",
+        "Reformulates an idea",
+        "Requests a date"
+      ],
+      "answer": 2,
+      "explain": "It helps clarify or repair what the speaker means."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How should a personal example be framed?",
+      "options": [
+        "As one illustration, not proof about everyone",
+        "As an official result",
+        "As a replacement for a position",
+        "As a universal rule"
+      ],
+      "answer": 0,
+      "explain": "One example illustrates a point but does not establish a universal claim."
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "id": "a2-u07-dialogues",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "The receptionist does not diagnose. Listen for the duration, the kind of appointment offered and the information the learner needs to prepare."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Call the clinic",
+      "body": "Awa calls a fictional community clinic about a new concern.",
+      "examples": [
+        {
+          "fr": "Bonjour. Je téléphone au sujet d'un symptôme nouveau.",
+          "en": "Awa: Hello. I am calling about a new symptom."
+        },
+        {
+          "fr": "Depuis quand ?",
+          "en": "Réceptionniste: Since when?"
+        },
+        {
+          "fr": "Depuis deux jours. J'ai aussi une légère sensation de brûlure après le repas.",
+          "en": "Awa: For two days. I also have a mild burning sensation after a meal."
+        },
+        {
+          "fr": "Je peux noter l'information. Un professionnel va consulter votre dossier.",
+          "en": "Réceptionniste: I can write down the information. A health professional is going to consult your file."
+        },
+        {
+          "fr": "Est-ce qu'il y a une consultation téléphonique ?",
+          "en": "Awa: Is there a phone consultation?"
+        },
+        {
+          "fr": "Oui. Le service de triage va vous rappeler aujourd'hui.",
+          "en": "Réceptionniste: Yes. The triage service is going to call you back today."
+        },
+        {
+          "fr": "Quel document dois-je préparer ?",
+          "en": "Awa: Which document should I prepare?"
+        },
+        {
+          "fr": "Votre numéro de dossier et la liste de vos questions.",
+          "en": "Réceptionniste: Your file number and your list of questions."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Confirm the appointment",
+      "body": "Karim confirms details for a follow-up appointment.",
+      "examples": [
+        {
+          "fr": "J'ai un rendez-vous de suivi à la clinique demain.",
+          "en": "Karim: I have a follow-up appointment at the clinic tomorrow."
+        },
+        {
+          "fr": "C'est une consultation en personne ?",
+          "en": "Réceptionniste: Is it an in-person appointment?"
+        },
+        {
+          "fr": "Oui, à dix heures. Est-ce que je dois apporter le résultat de laboratoire ?",
+          "en": "Karim: Yes, at ten. Should I bring the lab result?"
+        },
+        {
+          "fr": "Vous pouvez apporter le résultat de laboratoire.",
+          "en": "Réceptionniste: You can bring the lab result."
+        },
+        {
+          "fr": "Je vais noter les consignes. La clinique est près du centre communautaire, c'est bien ça ?",
+          "en": "Karim: I will write down the instructions. The clinic is near the community centre, is that right?"
+        },
+        {
+          "fr": "Oui. Le message de confirmation indique l'adresse et l'heure.",
+          "en": "Réceptionniste: Yes. The confirmation message gives the address and time."
+        },
+        {
+          "fr": "Merci. Je vais relire le message avant de partir.",
+          "en": "Karim: Thank you. I will reread the message before leaving."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How long has Awa noticed the concern?",
+      "options": [
+        "Two days",
+        "One week",
+        "Since this morning",
+        "Several months"
+      ],
+      "answer": 0,
+      "explain": "Awa says depuis deux jours."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What will the triage service do?",
+      "options": [
+        "Call Awa back today",
+        "Send a prescription",
+        "Change her file number",
+        "Diagnose the symptom"
+      ],
+      "answer": 0,
+      "explain": "The receptionist says the service will call her back today."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What document does Karim ask about?",
+      "options": [
+        "A lab result",
+        "A lease",
+        "A course schedule",
+        "An electricity bill"
+      ],
+      "answer": 0,
+      "explain": "Karim asks whether he should bring the lab result."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Where can Karim find the clinic address and time?",
+      "options": [
+        "In the confirmation message",
+        "On a rent notice",
+        "In the lab result",
+        "In the class schedule"
+      ],
+      "answer": 0,
+      "explain": "The receptionist says the confirmation message includes the address and time."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b2-u06-words-3",
+  "unit": "b2-u06",
+  "unitTitle": "B2 · Technology and privacy: reason through possibilities",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 6: B2 · Technology and privacy: reason through possibilities",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "le chiffrement",
+      "en": "encryption",
+      "sound": "luh sheefr-MAH(N)",
+      "exampleFr": "Le chiffrement protège le contenu pendant son transfert.",
+      "exampleEn": "Encryption protects the content while it is being transferred."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une collecte de données",
+      "en": "data collection",
+      "sound": "ün koh-lehkt duh doh-NAY",
+      "exampleFr": "La page décrit la collecte de données avant l'inscription.",
+      "exampleEn": "The page describes data collection before registration."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une faille de sécurité",
+      "en": "a security vulnerability",
+      "sound": "ün fahy duh say-kü-ree-TAY",
+      "exampleFr": "Une faille de sécurité a exposé certaines informations.",
+      "exampleEn": "A security vulnerability exposed some information."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une authentification",
+      "en": "authentication",
+      "sound": "ün oh-tahn-tee-fee-kah-SYOH(N)",
+      "exampleFr": "Une authentification supplémentaire protège le compte.",
+      "exampleEn": "Additional authentication protects the account."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une donnée sensible",
+      "en": "sensitive data",
+      "sound": "ün doh-NAY sahn-SEEBL",
+      "exampleFr": "Une donnée sensible ne devrait pas être partagée sans raison.",
+      "exampleEn": "Sensitive data should not be shared without a reason."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une politique de confidentialité",
+      "en": "a privacy policy",
+      "sound": "ün poh-lee-TEEK duh kohn-fee-dahn-syah-lee-TAY",
+      "exampleFr": "La politique de confidentialité précise les usages autorisés.",
+      "exampleEn": "The privacy policy specifies permitted uses."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "le chiffrement",
+      "options": [
+        "authentication",
+        "encryption",
+        "data collection",
+        "a security vulnerability"
+      ],
+      "answer": 1,
+      "explain": "le chiffrement means encryption."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une collecte de données",
+      "options": [
+        "a security vulnerability",
+        "authentication",
+        "a privacy policy",
+        "data collection"
+      ],
+      "answer": 3,
+      "explain": "une collecte de données means data collection."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une faille de sécurité",
+      "options": [
+        "a privacy policy",
+        "a security vulnerability",
+        "authentication",
+        "sensitive data"
+      ],
+      "answer": 1,
+      "explain": "une faille de sécurité means a security vulnerability."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une authentification",
+      "options": [
+        "encryption",
+        "sensitive data",
+        "a privacy policy",
+        "authentication"
+      ],
+      "answer": 3,
+      "explain": "une authentification means authentication."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une donnée sensible",
+      "options": [
+        "a privacy policy",
+        "sensitive data",
+        "encryption",
+        "a security vulnerability"
+      ],
+      "answer": 1,
+      "explain": "une donnée sensible means sensitive data."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une politique de confidentialité",
+      "options": [
+        "a security vulnerability",
+        "encryption",
+        "data collection",
+        "a privacy policy"
+      ],
+      "answer": 3,
+      "explain": "une politique de confidentialité means a privacy policy."
+    }
+  ]
+}

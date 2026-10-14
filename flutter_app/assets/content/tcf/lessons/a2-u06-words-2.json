@@ -1,0 +1,166 @@
+{
+  "id": "a2-u06-words-2",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Words: features and shared facilities",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une buanderie",
+      "en": "a laundry room",
+      "sound": "ün bü-ahn-dree",
+      "exampleFr": "L'immeuble comprend une buanderie.",
+      "exampleEn": "The building includes a laundry room."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un accès sécurisé",
+      "en": "secure access",
+      "sound": "uh(n) ahk-SEH say-kü-ree-ZAY",
+      "exampleFr": "L'immeuble comprend un accès sécurisé.",
+      "exampleEn": "The building includes secure access."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un interphone",
+      "en": "an intercom",
+      "sound": "uh(n) a(n)-tehr-FOHN",
+      "exampleFr": "L'immeuble comprend un interphone.",
+      "exampleEn": "The building includes an intercom."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un espace de rangement",
+      "en": "a storage space",
+      "sound": "uh(n) eh-SPAHS duh rah(n)-zhuh-MAH(N)",
+      "exampleFr": "L'immeuble comprend un espace de rangement.",
+      "exampleEn": "The building includes a storage space."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un stationnement intérieur",
+      "en": "indoor parking",
+      "sound": "uh(n) stah-syohn-MAH(N) a(n)-tay-ree-UHR",
+      "exampleFr": "L'immeuble comprend un stationnement intérieur.",
+      "exampleEn": "The building includes indoor parking."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un balcon privé",
+      "en": "a private balcony",
+      "sound": "uh(n) bahl-KOH(N) pree-VAY",
+      "exampleFr": "L'immeuble comprend un balcon privé.",
+      "exampleEn": "The building includes a private balcony."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un stationnement extérieur",
+      "en": "outdoor parking",
+      "sound": "uh(n) stah-syohn-MAH(N) ehk-stay-ree-UHR",
+      "exampleFr": "L'immeuble comprend un stationnement extérieur.",
+      "exampleEn": "The building includes outdoor parking."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un système de chauffage central",
+      "en": "a central heating system",
+      "sound": "uh(n) sehs-TEHM duh shoh-FAHZ sah(n)-TRAHL",
+      "exampleFr": "L'immeuble comprend un système de chauffage central.",
+      "exampleEn": "The building includes a central heating system."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une buanderie",
+      "options": [
+        "a storage space",
+        "a laundry room",
+        "outdoor parking",
+        "secure access"
+      ],
+      "answer": 1,
+      "explain": "une buanderie means a laundry room."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès sécurisé",
+      "options": [
+        "indoor parking",
+        "a central heating system",
+        "an intercom",
+        "secure access"
+      ],
+      "answer": 3,
+      "explain": "un accès sécurisé means secure access."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un interphone",
+      "options": [
+        "a private balcony",
+        "an intercom",
+        "a laundry room",
+        "a storage space"
+      ],
+      "answer": 1,
+      "explain": "un interphone means an intercom."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un espace de rangement",
+      "options": [
+        "outdoor parking",
+        "secure access",
+        "indoor parking",
+        "a storage space"
+      ],
+      "answer": 3,
+      "explain": "un espace de rangement means a storage space."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un stationnement intérieur",
+      "options": [
+        "a central heating system",
+        "indoor parking",
+        "an intercom",
+        "a private balcony"
+      ],
+      "answer": 1,
+      "explain": "un stationnement intérieur means indoor parking."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un balcon privé",
+      "options": [
+        "a laundry room",
+        "a storage space",
+        "outdoor parking",
+        "a private balcony"
+      ],
+      "answer": 3,
+      "explain": "un balcon privé means a private balcony."
+    }
+  ]
+}

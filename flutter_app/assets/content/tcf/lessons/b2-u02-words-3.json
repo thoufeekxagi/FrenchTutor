@@ -1,0 +1,148 @@
+{
+  "id": "b2-u02-words-3",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un fait établi",
+      "en": "an established fact",
+      "sound": "uh(n) feh ay-tah-BLEE",
+      "exampleFr": "Le journaliste distingue un fait établi d'une hypothèse.",
+      "exampleEn": "The journalist distinguishes an established fact from a hypothesis."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une source primaire",
+      "en": "a primary source",
+      "sound": "ün soors pree-MEHR",
+      "exampleFr": "Le document original constitue une source primaire.",
+      "exampleEn": "The original document is a primary source."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un titre accrocheur",
+      "en": "a sensational; attention-grabbing headline",
+      "sound": "uh(n) teetr ah-kroh-SHUHR",
+      "exampleFr": "Un titre accrocheur ne résume pas toujours le contenu.",
+      "exampleEn": "An attention-grabbing headline does not always summarize the content."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une donnée vérifiée",
+      "en": "a verified data point",
+      "sound": "ün doh-NAY vay-ree-fee-YAY",
+      "exampleFr": "L'article cite une donnée vérifiée par l'organisme.",
+      "exampleEn": "The article cites a data point verified by the organization."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "recouper les sources",
+      "en": "to cross-check sources",
+      "sound": "ruh-koo-PAY lay soors",
+      "exampleFr": "Avant de partager l'information, elle recoupe les sources.",
+      "exampleEn": "Before sharing the information, she cross-checks sources."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "confirmer indépendamment",
+      "en": "to confirm independently",
+      "sound": "kohn-feer-MAY ehn-day-pahn-dah-MAH(N)",
+      "exampleFr": "Une autre équipe doit confirmer le résultat indépendamment.",
+      "exampleEn": "Another team must confirm the result independently."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un fait établi",
+      "options": [
+        "a verified data point",
+        "an established fact",
+        "a primary source",
+        "a sensational; attention-grabbing headline"
+      ],
+      "answer": 1,
+      "explain": "un fait établi means an established fact."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une source primaire",
+      "options": [
+        "to cross-check sources",
+        "a sensational; attention-grabbing headline",
+        "a verified data point",
+        "a primary source"
+      ],
+      "answer": 3,
+      "explain": "une source primaire means a primary source."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un titre accrocheur",
+      "options": [
+        "to confirm independently",
+        "a sensational; attention-grabbing headline",
+        "a verified data point",
+        "to cross-check sources"
+      ],
+      "answer": 1,
+      "explain": "un titre accrocheur means a sensational; attention-grabbing headline."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une donnée vérifiée",
+      "options": [
+        "an established fact",
+        "to cross-check sources",
+        "to confirm independently",
+        "a verified data point"
+      ],
+      "answer": 3,
+      "explain": "une donnée vérifiée means a verified data point."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "recouper les sources",
+      "options": [
+        "a primary source",
+        "to cross-check sources",
+        "to confirm independently",
+        "an established fact"
+      ],
+      "answer": 1,
+      "explain": "recouper les sources means to cross-check sources."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "confirmer indépendamment",
+      "options": [
+        "a sensational; attention-grabbing headline",
+        "an established fact",
+        "a primary source",
+        "to confirm independently"
+      ],
+      "answer": 3,
+      "explain": "confirmer indépendamment means to confirm independently."
+    }
+  ]
+}

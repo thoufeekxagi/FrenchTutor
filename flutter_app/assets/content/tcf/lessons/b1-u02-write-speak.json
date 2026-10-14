@@ -1,0 +1,49 @@
+{
+  "id": "b1-u02-write-speak",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word message to a classmate about a training or work plan. Explain what you intend to do, what information you are waiting for, one condition that could change your plan and what you will do next.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Je prévois de suivre une formation en gestion de projet cet automne. Le programme du soir m'intéresse parce que je pourrai garder mon emploi pendant la journée. Le centre doit encore confirmer les dates et les prérequis. Quand je recevrai sa réponse, je vérifierai si les cours se terminent avant mon dernier autobus. Si l'horaire convient, je soumettrai ma candidature avant la fin du mois. Sinon, je demanderai s'il existe un groupe le samedi. J'ai aussi écrit à une ancienne participante pour connaître la charge de travail. Elle m'a expliqué que les premières semaines demandent une organisation régulière. Je vais donc réserver trois périodes d'étude dans mon calendrier. Cette formation pourrait m'aider à prendre davantage de responsabilités, mais je préfère attendre les renseignements officiels avant de décider. Je te tiendrai au courant dès que le centre répondra.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Use present after si for a real condition and future in the result.\n• Use a clear future plan and distinguish confirmed information from expectation.\n• Answer every part of the prompt and check the audience."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. You are calling a fictional training centre. Prepare for two minutes, then ask about the start date, prerequisites, schedule, application deadline and whether a different group is available. Interact for 3 minutes 30; Marie will answer in stages and give one uncertain detail that you should clarify.\n\n• Use the notice to prepare five information gaps, not complete sentences.\n• If an answer is uncertain, ask when or how it will be confirmed.\n• Use si accurately when asking about a real condition."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de la formation du soir. Pourriez-vous me dire quand le prochain groupe commencera ? Est-ce que vous connaissez déjà l'horaire ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je voudrais aussi savoir quels sont les prérequis. Si je ne peux pas assister le mardi, y a-t-il un groupe le samedi ? À quelle date faudra-t-il envoyer la candidature ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si j'ai bien compris, la date exacte sera confirmée la semaine prochaine. Est-ce que je peux vérifier ces renseignements sur votre site ?",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

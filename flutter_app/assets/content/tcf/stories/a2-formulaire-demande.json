@@ -1,0 +1,297 @@
+{
+  "id": "a2-formulaire-demande",
+  "title": "Le formulaire à compléter",
+  "titleEn": "The form to complete",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Sam corrects a fictional form, submits it and asks customer service for a processing time.",
+  "unit": "a2-u11",
+  "sentences": [
+    {
+      "fr": "Sam reçoit un formulaire incomplet pour une demande de paiement.",
+      "en": "Sam receives an incomplete form for a payment request."
+    },
+    {
+      "fr": "La signature manque. Il faut joindre une copie recto verso.",
+      "en": "The signature is missing. A double-sided copy must be attached."
+    },
+    {
+      "fr": "Sam signe le formulaire et attache une copie recto verso du justificatif de domicile.",
+      "en": "Sam signs the form and attaches a double-sided copy of his proof of address."
+    },
+    {
+      "fr": "Il vérifie le formulaire et appuie sur le bouton de validation.",
+      "en": "He presses the submit button after checking the information."
+    },
+    {
+      "fr": "La page de confirmation donne un numéro de confirmation.",
+      "en": "The confirmation page gives a confirmation number."
+    },
+    {
+      "fr": "Sam va au service à la clientèle et demande un délai de traitement.",
+      "en": "Sam goes to customer service and asks about processing time."
+    },
+    {
+      "fr": "L'employée lui annonce un délai de deux jours.",
+      "en": "The employee tells him that the processing time is two days."
+    },
+    {
+      "fr": "Sam demande une réponse écrite à la fin.",
+      "en": "Sam asks for a written reply at the end."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a man's name)",
+      "pos": "name"
+    },
+    "reçoit": {
+      "en": "receives",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article"
+    },
+    "formulaire": {
+      "en": "form",
+      "pos": "noun, masculine"
+    },
+    "incomplet": {
+      "en": "incomplete",
+      "pos": "adjective"
+    },
+    "pour": {
+      "en": "for",
+      "pos": "preposition"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article"
+    },
+    "demande": {
+      "en": "asks for",
+      "pos": "verb"
+    },
+    "de": {
+      "en": "of",
+      "pos": "preposition"
+    },
+    "paiement": {
+      "en": "payment",
+      "pos": "noun, masculine"
+    },
+    "la": {
+      "en": "the",
+      "pos": "article"
+    },
+    "signature": {
+      "en": "signature",
+      "pos": "noun, feminine"
+    },
+    "manque": {
+      "en": "is missing",
+      "pos": "verb"
+    },
+    "il": {
+      "en": "he",
+      "pos": "pronoun"
+    },
+    "faut": {
+      "en": "must; need to (falloir)",
+      "pos": "verb"
+    },
+    "joindre": {
+      "en": "to attach",
+      "sound": "zhWA(N)DR"
+    },
+    "copie": {
+      "en": "copy",
+      "pos": "noun, feminine"
+    },
+    "recto": {
+      "en": "front side",
+      "pos": "noun, masculine"
+    },
+    "verso": {
+      "en": "back side",
+      "pos": "noun, masculine"
+    },
+    "signe": {
+      "en": "signs (signer); sign",
+      "pos": "verb / noun"
+    },
+    "le": {
+      "en": "the",
+      "pos": "article"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "attache": {
+      "en": "attaches",
+      "pos": "verb"
+    },
+    "du": {
+      "en": "of the",
+      "pos": "contraction"
+    },
+    "justificatif": {
+      "en": "proof; supporting document",
+      "pos": "noun, masculine"
+    },
+    "domicile": {
+      "en": "address; residence",
+      "pos": "noun, masculine"
+    },
+    "vérifie": {
+      "en": "checks (vérifier)",
+      "pos": "verb"
+    },
+    "appuie": {
+      "en": "presses",
+      "pos": "verb"
+    },
+    "sur": {
+      "en": "on",
+      "pos": "preposition"
+    },
+    "bouton": {
+      "en": "button",
+      "pos": "noun, masculine"
+    },
+    "validation": {
+      "en": "submission",
+      "pos": "noun, feminine"
+    },
+    "page": {
+      "en": "page",
+      "pos": "noun, feminine"
+    },
+    "confirmation": {
+      "en": "confirmation",
+      "pos": "noun, feminine"
+    },
+    "donne": {
+      "en": "gives (donner)",
+      "pos": "verb"
+    },
+    "numéro": {
+      "en": "number",
+      "pos": "noun, masculine"
+    },
+    "va": {
+      "en": "goes; is going to (aller)",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "to the",
+      "pos": "contraction"
+    },
+    "service": {
+      "en": "service",
+      "pos": "noun, masculine"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "clientèle": {
+      "en": "customers",
+      "pos": "noun, feminine"
+    },
+    "délai": {
+      "en": "time limit; waiting period",
+      "pos": "noun, masculine"
+    },
+    "traitement": {
+      "en": "processing",
+      "pos": "noun, masculine"
+    },
+    "l'employée": {
+      "en": "the employee (woman)",
+      "pos": "noun, feminine"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "annonce": {
+      "en": "announcement; notice; announces (annoncer)",
+      "pos": "noun / verb"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "jours": {
+      "en": "days",
+      "pos": "noun, masculine plural"
+    },
+    "réponse": {
+      "en": "reply",
+      "pos": "noun, feminine"
+    },
+    "écrite": {
+      "en": "written",
+      "pos": "adjective"
+    },
+    "fin": {
+      "en": "end"
+    }
+  },
+  "keywords": [
+    "formulaire",
+    "signature",
+    "confirmation",
+    "délai",
+    "réponse"
+  ],
+  "quiz": [
+    {
+      "prompt": "What is incomplete?",
+      "options": [
+        "The form",
+        "The delivery",
+        "The repair appointment",
+        "The receipt"
+      ],
+      "answer": 0,
+      "explain": "The first sentence says Sam receives an incomplete form."
+    },
+    {
+      "prompt": "What is missing from the form?",
+      "options": [
+        "A signature",
+        "A tracking number",
+        "A payment option",
+        "A delivery time slot"
+      ],
+      "answer": 0,
+      "explain": "The second sentence says a signature is missing."
+    },
+    {
+      "prompt": "What does Sam receive after pressing the submit button?",
+      "options": [
+        "A confirmation number",
+        "A repair appointment",
+        "A refund",
+        "A new form by mail"
+      ],
+      "answer": 0,
+      "explain": "The page of confirmation gives a confirmation number."
+    },
+    {
+      "prompt": "What is the processing time?",
+      "options": [
+        "Two days",
+        "One week",
+        "One month",
+        "Until the next delivery"
+      ],
+      "answer": 0,
+      "explain": "The employee tells Sam that the processing time is two days."
+    }
+  ]
+}

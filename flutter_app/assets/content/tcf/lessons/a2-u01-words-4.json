@@ -1,0 +1,205 @@
+{
+  "id": "a2-u01-words-4",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Words: energy and changes",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 8,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "être débordé / débordée",
+      "en": "to be overwhelmed; swamped",
+      "say": "être débordé, débordée",
+      "sound": "eh-tr duh-bor-DAY",
+      "exampleFr": "Je suis débordée au travail.",
+      "exampleEn": "I am swamped at work."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "avancer",
+      "en": "to make progress; move forward",
+      "sound": "ah-vah(n)-SAY",
+      "exampleFr": "J'avance dans mon travail.",
+      "exampleEn": "I am making progress on my work."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "à temps",
+      "en": "on time",
+      "sound": "ah tah(n)",
+      "exampleFr": "Je termine le rapport à temps.",
+      "exampleEn": "I finish the report on time."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "en forme",
+      "en": "feeling well; in good shape",
+      "sound": "ah(n) form",
+      "exampleFr": "Après une pause, je suis en forme.",
+      "exampleEn": "After a break, I feel well."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "se concentrer",
+      "en": "to concentrate",
+      "sound": "suh kohn-sah(n)-TRAY",
+      "exampleFr": "Je me concentre pendant vingt minutes.",
+      "exampleEn": "I concentrate for twenty minutes."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "distrait / distraite",
+      "en": "distracted",
+      "say": "distrait, distraite",
+      "sound": "dees-TRAY",
+      "exampleFr": "Je suis distraite par mon téléphone.",
+      "exampleEn": "I am distracted by my phone."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un imprévu",
+      "en": "an unexpected event",
+      "sound": "uh(n) a(n)-pray-VÜ",
+      "exampleFr": "Un imprévu change mon horaire.",
+      "exampleEn": "An unexpected event changes my schedule."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "reporter",
+      "en": "to postpone; reschedule",
+      "sound": "ruh-por-TAY",
+      "exampleFr": "Je reporte la séance à jeudi.",
+      "exampleEn": "I postpone the session until Thursday."
+    },
+    {
+      "type": "word",
+      "id": "w9",
+      "fr": "se reposer",
+      "en": "to rest",
+      "sound": "suh ruh-poh-ZAY",
+      "exampleFr": "Je me repose après le travail.",
+      "exampleEn": "I rest after work."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "être débordé / débordée",
+      "options": [
+        "feeling well; in good shape",
+        "to be overwhelmed; swamped",
+        "an unexpected event",
+        "to make progress; move forward"
+      ],
+      "answer": 1,
+      "explain": "être débordé / débordée means to be overwhelmed; swamped."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "avancer",
+      "options": [
+        "to concentrate",
+        "to postpone; reschedule",
+        "on time",
+        "to make progress; move forward"
+      ],
+      "answer": 3,
+      "explain": "avancer means to make progress; move forward."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "à temps",
+      "options": [
+        "distracted",
+        "on time",
+        "to rest",
+        "feeling well; in good shape"
+      ],
+      "answer": 1,
+      "explain": "à temps means on time."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "en forme",
+      "options": [
+        "an unexpected event",
+        "to be overwhelmed; swamped",
+        "to concentrate",
+        "feeling well; in good shape"
+      ],
+      "answer": 3,
+      "explain": "en forme means feeling well; in good shape."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "se concentrer",
+      "options": [
+        "to postpone; reschedule",
+        "to concentrate",
+        "to make progress; move forward",
+        "distracted"
+      ],
+      "answer": 1,
+      "explain": "se concentrer means to concentrate."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "distrait / distraite",
+      "options": [
+        "to rest",
+        "on time",
+        "an unexpected event",
+        "distracted"
+      ],
+      "answer": 3,
+      "explain": "distrait / distraite means distracted."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "à temps",
+      "question": "Which word did you hear?",
+      "options": [
+        "se concentrer",
+        "à temps",
+        "reporter",
+        "avancer"
+      ],
+      "answer": 1,
+      "explain": "You heard à temps: on time."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "se concentrer",
+      "question": "Which word did you hear?",
+      "options": [
+        "se concentrer",
+        "reporter",
+        "avancer",
+        "en forme"
+      ],
+      "answer": 0,
+      "explain": "You heard se concentrer: to concentrate."
+    }
+  ]
+}

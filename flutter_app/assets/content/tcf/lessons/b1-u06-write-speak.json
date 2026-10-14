@@ -1,0 +1,49 @@
+{
+  "id": "b1-u06-write-speak",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 2 practice",
+      "body": "Write a 120–150-word post for neighbours about a fictional local service change. Explain one reason for the change, describe a likely benefit and a possible limitation, then suggest what information the group should check.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Depuis lundi, l'autobus de notre quartier suit un détour en raison des travaux près de la station. La ville a déplacé l'arrêt afin de maintenir l'accès au centre communautaire. Pour plusieurs résidents, le nouvel emplacement est pratique parce qu'il se trouve devant une entrée avec une rampe. Toutefois, le trajet à pied est plus long pour les personnes qui viennent de l'est. Cette modification pourrait aussi entraîner des retards aux heures de pointe. À mon avis, il faudrait afficher la durée prévue des travaux et préciser la fréquence du service temporaire. Le comité pourrait recueillir les commentaires des usagers pour que la ville sache quels problèmes reviennent le plus souvent. Il serait utile de vérifier ces renseignements après deux semaines. La solution aide certains voyageurs, mais ses effets doivent être évalués avec plusieurs expériences, pas seulement avec un avis isolé.\n\nCheck:\n• Official Task 2 range: 120–150 words.\n• Separate the cause, a likely result and a limitation.\n• Choose connectors that match the relationship; avoid overstating the evidence.\n• Give a practical check or next step."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. Call a fictional transit information desk about a service detour. Prepare for two minutes; ask why the route changed, how long it will last, where the temporary stop is, whether the route is accessible and how to get updates. Interact for 3 minutes 30 and ask a follow-up when an answer is incomplete.\n\n• Listen for the reason and the practical result, not every word.\n• Ask for a precise location or date when the answer is general.\n• Use pour que only when the following clause has a different subject."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, j'appelle au sujet du détour près de la station. Pourriez-vous me dire pourquoi la ligne a changé ? Jusqu'à quelle date le service temporaire sera-t-il en place ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Où se trouve exactement le nouvel arrêt ? Est-ce qu'il y a une entrée accessible près de cet arrêt ? Je voudrais aussi savoir où consulter les mises à jour.",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si j'ai bien compris, le trajet est plus long, mais l'entrée nord reste ouverte. Est-ce exact ? Merci; je vais vérifier l'avis avant de partir.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

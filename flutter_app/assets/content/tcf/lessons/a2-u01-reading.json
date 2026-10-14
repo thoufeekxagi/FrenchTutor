@@ -1,0 +1,80 @@
+{
+  "id": "a2-u01-reading",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Reading practice",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When is Sam available this week?",
+      "options": [
+        "Tuesday morning",
+        "Wednesday evening",
+        "Thursday after 18 h",
+        "Sunday afternoon"
+      ],
+      "answer": 2,
+      "explain": "Sam says he is free Thursday after 18 h.",
+      "promptFr": "Salut Awa, · D'habitude, je révise le mercredi soir. Cette semaine, je suis débordé mardi et mercredi, mais je suis libre jeudi après 18 h. Tu es libre ? · Sam"
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should a learner bring?",
+      "options": [
+        "A to-do list",
+        "Their notes",
+        "A work schedule",
+        "A presentation"
+      ],
+      "answer": 1,
+      "explain": "The notice says Apporter ses notes.",
+      "promptFr": "SÉANCE DE FRANÇAIS · Mardi : de dix-huit heures à dix-neuf heures · Jeudi : de dix-huit heures à dix-neuf heures · Apporter ses notes. · Confirmer avant lundi."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why can't Nadia attend on Tuesday?",
+      "options": [
+        "She is working.",
+        "She is travelling.",
+        "She has an exam.",
+        "She is sick."
+      ],
+      "answer": 0,
+      "explain": "Nadia writes parce que je travaille.",
+      "promptFr": "Bonjour Julie, · Je ne peux pas aller à l'atelier mardi parce que je travaille. Est-ce que je peux reporter ma séance à jeudi ? Je suis disponible après dix-sept heures. · Merci, · Nadia"
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does the person plan to do last?",
+      "options": [
+        "Check the schedule",
+        "Prepare the presentation",
+        "Take a break",
+        "Start a class"
+      ],
+      "answer": 2,
+      "explain": "Pour finir introduces the last item: prendre une pause.",
+      "promptFr": "MA SEMAINE · D'abord : vérifier l'horaire · Ensuite : préparer la présentation · Pour finir : prendre une pause · Objectif : finir avant seize heures"
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What information does Awa still need?",
+      "options": [
+        "The presentation date",
+        "The room",
+        "The start time",
+        "The speaker's name"
+      ],
+      "answer": 1,
+      "explain": "Awa asks Peux-tu préciser la salle ?",
+      "promptFr": "Salut Sam, · Si j'ai bien compris, la présentation commence à 9 h, pas à 10 h. Je vais arriver à 8 h 45 pour préparer mes notes. Peux-tu préciser la salle ? · Awa"
+    }
+  ]
+}

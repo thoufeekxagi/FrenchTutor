@@ -1,0 +1,148 @@
+{
+  "id": "b2-u10-words-1",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une concertation",
+      "en": "consultation; joint discussion",
+      "sound": "ün kohn-sehr-tah-SYOH(N)",
+      "exampleFr": "La concertation réunit plusieurs groupes.",
+      "exampleEn": "The consultation brings several groups together."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une priorité",
+      "en": "a priority",
+      "sound": "ün pree-oh-ree-TAY",
+      "exampleFr": "Chaque groupe présente une priorité différente.",
+      "exampleEn": "Each group presents a different priority."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un accès équitable",
+      "en": "equitable access",
+      "sound": "uh(n) ak-SEH ay-kee-TAHBL",
+      "exampleFr": "L'accès équitable reste au centre du débat.",
+      "exampleEn": "Equitable access remains central to the debate."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une proposition",
+      "en": "a proposal",
+      "sound": "ün proh-poh-zee-SYOH(N)",
+      "exampleFr": "La proposition sera révisée après la rencontre.",
+      "exampleEn": "The proposal will be revised after the meeting."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un désaccord",
+      "en": "a disagreement",
+      "sound": "uh(n) day-zah-KOR",
+      "exampleFr": "Le désaccord porte sur les heures d'ouverture.",
+      "exampleEn": "The disagreement concerns opening hours."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un point de convergence",
+      "en": "a point of agreement",
+      "sound": "uh(n) pwa duh kohn-vehr-ZHAH(N)S",
+      "exampleFr": "Le transport constitue un point de convergence.",
+      "exampleEn": "Transportation is a point of agreement."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une concertation",
+      "options": [
+        "a proposal",
+        "consultation; joint discussion",
+        "a priority",
+        "equitable access"
+      ],
+      "answer": 1,
+      "explain": "une concertation means consultation; joint discussion."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une priorité",
+      "options": [
+        "a disagreement",
+        "equitable access",
+        "a proposal",
+        "a priority"
+      ],
+      "answer": 3,
+      "explain": "une priorité means a priority."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès équitable",
+      "options": [
+        "a point of agreement",
+        "equitable access",
+        "a proposal",
+        "a disagreement"
+      ],
+      "answer": 1,
+      "explain": "un accès équitable means equitable access."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une proposition",
+      "options": [
+        "consultation; joint discussion",
+        "a disagreement",
+        "a point of agreement",
+        "a proposal"
+      ],
+      "answer": 3,
+      "explain": "une proposition means a proposal."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un désaccord",
+      "options": [
+        "a priority",
+        "a disagreement",
+        "a point of agreement",
+        "consultation; joint discussion"
+      ],
+      "answer": 1,
+      "explain": "un désaccord means a disagreement."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de convergence",
+      "options": [
+        "equitable access",
+        "consultation; joint discussion",
+        "a priority",
+        "a point of agreement"
+      ],
+      "answer": 3,
+      "explain": "un point de convergence means a point of agreement."
+    }
+  ]
+}

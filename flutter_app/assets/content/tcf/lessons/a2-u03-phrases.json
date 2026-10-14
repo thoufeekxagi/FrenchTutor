@@ -1,0 +1,134 @@
+{
+  "id": "a2-u03-phrases",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Listen once and try to rebuild each chunk from meaning. Write one model in your notes, close them, and retell your own first experience without copying the sample."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "La semaine dernière, j'ai pris le train pour la première fois.",
+      "en": "Last week, I took the train for the first time.",
+      "tip": "Say it: lah suh-MEN dehr-NYEHR zhay pree luh tra(n) poor lah pruh-MYEHR fwah"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'ai lu le message avant de partir.",
+      "en": "I read the message before leaving.",
+      "tip": "Say it: zhay lü luh meh-SAHZH ah-vah(n) duh pahr-TEER"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Ensuite, j'ai pris une correspondance au centre-ville.",
+      "en": "Then I took a connection downtown.",
+      "tip": "Say it: ah(n)-SWHEET zhay pree ün koh-rehs-poh(n)-DAH(N)S oh sah(n)tr-VEEL"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "J'ai vu le numéro sur le billet.",
+      "en": "I saw the number on the ticket.",
+      "tip": "Say it: zhay vü luh nü-may-ROH sür luh bee-YAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "J'ai fait une demande à l'accueil.",
+      "en": "I made a request at the welcome desk.",
+      "tip": "Say it: zhay feh ün duh-MAH(N)d ah lah-KUHY"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "À la fin, j'ai eu une réponse claire.",
+      "en": "In the end, I got a clear answer.",
+      "tip": "Say it: ah lah fa(n) zhay ü ün ray-POHNS klehr"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "J'ai essayé une nouvelle activité et j'ai beaucoup appris.",
+      "en": "I tried a new activity and learned a lot.",
+      "tip": "Say it: zhay eh-seh-YAY ün noo-VEL ak-tee-vee-TAY eh zhay boh-KOO ah-PREE"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Je garde le reçu et je note le numéro du dossier.",
+      "en": "I keep the receipt and write down the file number.",
+      "tip": "Say it: zhuh gard luh ruh-SÜ eh zhuh noht luh nü-may-ROH dü doh-SYAY"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "La semaine dernière, j'ai pris le train pour la première fois.",
+      "options": [
+        "I saw the number on the ticket.",
+        "Last week, I took the train for the first time.",
+        "I tried a new activity and learned a lot.",
+        "I read the message before leaving."
+      ],
+      "answer": 1,
+      "explain": "La semaine dernière, j'ai pris le train pour la première fois. means Last week, I took the train for the first time.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Ensuite, j'ai pris une correspondance au centre-ville.",
+      "options": [
+        "In the end, I got a clear answer.",
+        "Then I took a connection downtown.",
+        "I saw the number on the ticket.",
+        "I tried a new activity and learned a lot."
+      ],
+      "answer": 1,
+      "explain": "Ensuite, j'ai pris une correspondance au centre-ville. means Then I took a connection downtown.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai fait une demande à l'accueil.",
+      "options": [
+        "I keep the receipt and write down the file number.",
+        "I made a request at the welcome desk.",
+        "Then I took a connection downtown.",
+        "In the end, I got a clear answer."
+      ],
+      "answer": 1,
+      "explain": "J'ai fait une demande à l'accueil. means I made a request at the welcome desk.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai essayé une nouvelle activité et j'ai beaucoup appris.",
+      "options": [
+        "I read the message before leaving.",
+        "I tried a new activity and learned a lot.",
+        "I made a request at the welcome desk.",
+        "I keep the receipt and write down the file number."
+      ],
+      "answer": 1,
+      "explain": "J'ai essayé une nouvelle activité et j'ai beaucoup appris. means I tried a new activity and learned a lot.."
+    }
+  ]
+}

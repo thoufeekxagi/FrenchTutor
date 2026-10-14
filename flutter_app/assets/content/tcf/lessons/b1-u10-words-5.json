@@ -1,0 +1,148 @@
+{
+  "id": "b1-u10-words-5",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un lieu de rendez-vous",
+      "en": "a meeting place",
+      "sound": "uh(n) lyuh duh rah(n)-day-voo",
+      "exampleFr": "Le lieu de rendez-vous est près de la sortie nord.",
+      "exampleEn": "The meeting place is near the north exit."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "au moyen de",
+      "en": "by means of",
+      "sound": "oh mwah-YEH(N) duh",
+      "exampleFr": "Vous pouvez confirmer votre place au moyen du formulaire.",
+      "exampleEn": "You can confirm your place by means of the form."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "contacter l'organisme",
+      "en": "to contact the organization",
+      "sound": "kohn-tahk-TAY lor-gah-neezm",
+      "exampleFr": "Il faut contacter l'organisme pour modifier la réservation.",
+      "exampleEn": "You need to contact the organization to change the booking."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une confirmation automatique",
+      "en": "an automatic confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N) oh-toh-mah-TEEK",
+      "exampleFr": "Une confirmation automatique sera envoyée après le paiement.",
+      "exampleEn": "An automatic confirmation will be sent after payment."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une pièce d'identité",
+      "en": "an identity document",
+      "sound": "ün pyehs dee-dahn-tee-TAY",
+      "exampleFr": "Une pièce d'identité est requise à l'accueil.",
+      "exampleEn": "Identification is required at reception."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "rendre un service accessible",
+      "en": "to make a service accessible",
+      "sound": "rahn-dr uh(n) sehr-vees ahk-seh-SEE-bl",
+      "exampleFr": "Le centre cherche à rendre le service accessible à tous.",
+      "exampleEn": "The centre is working to make the service accessible to everyone."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un lieu de rendez-vous",
+      "options": [
+        "an automatic confirmation",
+        "a meeting place",
+        "by means of",
+        "to contact the organization"
+      ],
+      "answer": 1,
+      "explain": "un lieu de rendez-vous means a meeting place."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "au moyen de",
+      "options": [
+        "an identity document",
+        "to contact the organization",
+        "an automatic confirmation",
+        "by means of"
+      ],
+      "answer": 3,
+      "explain": "au moyen de means by means of."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "contacter l'organisme",
+      "options": [
+        "to make a service accessible",
+        "to contact the organization",
+        "an automatic confirmation",
+        "an identity document"
+      ],
+      "answer": 1,
+      "explain": "contacter l'organisme means to contact the organization."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation automatique",
+      "options": [
+        "a meeting place",
+        "an identity document",
+        "to make a service accessible",
+        "an automatic confirmation"
+      ],
+      "answer": 3,
+      "explain": "une confirmation automatique means an automatic confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une pièce d'identité",
+      "options": [
+        "by means of",
+        "an identity document",
+        "to make a service accessible",
+        "a meeting place"
+      ],
+      "answer": 1,
+      "explain": "une pièce d'identité means an identity document."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "rendre un service accessible",
+      "options": [
+        "to contact the organization",
+        "a meeting place",
+        "by means of",
+        "to make a service accessible"
+      ],
+      "answer": 3,
+      "explain": "rendre un service accessible means to make a service accessible."
+    }
+  ]
+}

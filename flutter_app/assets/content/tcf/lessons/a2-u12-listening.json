@@ -1,0 +1,86 @@
+{
+  "id": "a2-u12-listening",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Nouvel horaire : la réunion est jeudi. Le groupe est au centre après le cours.",
+      "question": "When will the group meet?",
+      "options": [
+        "Thursday after class",
+        "Tuesday before work",
+        "Wednesday at the library",
+        "Friday at the station"
+      ],
+      "answer": 0,
+      "explain": "The meeting is moved to Thursday; the group meets after class."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il pleuvait quand le bus est arrivé. J'ai pris le nouvel itinéraire et j'ai lu l'avis.",
+      "question": "What did the speaker do after the bus arrived?",
+      "options": [
+        "Took a new route and read the notice",
+        "Cancelled the French class",
+        "Called to change the meeting",
+        "Bought a different ticket"
+      ],
+      "answer": 0,
+      "explain": "The recording says the speaker took a new route and read the notice."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La deuxième option est plus simple, mais elle est plus longue. Je vais y aller après le cours.",
+      "question": "What is true about the second option?",
+      "options": [
+        "It is simpler but longer",
+        "It is shorter but more difficult",
+        "It is cancelled",
+        "It costs less"
+      ],
+      "answer": 0,
+      "explain": "The speaker says it is simpler but longer."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Pourriez-vous confirmer le point de départ ? Je voudrais le noter avant de partir.",
+      "question": "What does the speaker want to confirm?",
+      "options": [
+        "The starting point",
+        "The test result",
+        "The service price",
+        "The course level"
+      ],
+      "answer": 0,
+      "explain": "The request is to confirm the starting point."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Après le test blanc, j'ai une erreur fréquente dans mes notes. Je vais la revoir demain.",
+      "question": "When will the speaker review the error?",
+      "options": [
+        "Tomorrow",
+        "Before the test",
+        "In one month",
+        "After the meeting"
+      ],
+      "answer": 0,
+      "explain": "The speaker says they will review it tomorrow."
+    }
+  ]
+}

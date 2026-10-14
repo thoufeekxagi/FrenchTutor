@@ -1,0 +1,58 @@
+{
+  "id": "b2-u03-listening",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le programme auquel elle s'est inscrite comprend un stage. C'est ce volet qui lui permettra d'appliquer les compétences qu'elle a développées.",
+      "question": "What will the placement allow her to do?",
+      "options": [
+        "Apply the skills she developed",
+        "Choose a different mentor",
+        "Change the application deadline",
+        "Skip every prerequisite"
+      ],
+      "answer": 0,
+      "explain": "The placement lets her apply the skills she has developed."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Le dossier dont nous parlons doit être remis avant la fin du mois. La personne à qui vous pouvez écrire se trouve sur la page de contact.",
+      "question": "Who can the learner contact?",
+      "options": [
+        "The person who wrote the file",
+        "The internship supervisor",
+        "A course participant",
+        "The person listed on the contact page"
+      ],
+      "answer": 3,
+      "explain": "The speaker directs the learner to the contact person on the page."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Ce qui m'intéresse, c'est le programme qui propose des cours le soir. Je dois toutefois vérifier les frais dont le site ne donne pas encore le détail.",
+      "question": "What information is still missing?",
+      "options": [
+        "The evening schedule",
+        "The detailed fees",
+        "The program title",
+        "The course location"
+      ],
+      "answer": 1,
+      "explain": "The speaker needs details about fees not yet given on the site."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b1-u01-words-5",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 1: B1 · Tell the story clearly: before, during and after",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "tenir quelqu'un au courant",
+      "en": "to keep someone updated",
+      "sound": "tuh-neer kel-kuh(n) oh koo-RAH(N)",
+      "exampleFr": "Je tiendrai ma collègue au courant de la décision.",
+      "exampleEn": "I will keep my colleague updated about the decision."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "se dérouler",
+      "en": "to take place; unfold",
+      "sound": "suh day-roo-LAY",
+      "exampleFr": "La rencontre s'est déroulée dans une autre salle.",
+      "exampleEn": "The meeting took place in another room."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "prendre du retard",
+      "en": "to fall behind; be delayed",
+      "sound": "prahn-dr dü ruh-TAR",
+      "exampleFr": "Le projet a pris du retard après la panne.",
+      "exampleEn": "The project was delayed after the outage."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "à la suite de",
+      "en": "following; as a result of",
+      "sound": "ah lah sü-eet duh",
+      "exampleFr": "À la suite de l'annulation, le groupe a choisi une autre date.",
+      "exampleEn": "Following the cancellation, the group chose another date."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un point de rencontre",
+      "en": "a meeting point",
+      "sound": "uh(n) pwa(n) duh rah(n)-kohntr",
+      "exampleFr": "Le nouveau point de rencontre est devant la bibliothèque.",
+      "exampleEn": "The new meeting point is in front of the library."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "dès que possible",
+      "en": "as soon as possible",
+      "sound": "deh kuh poh-SEE-bl",
+      "exampleFr": "Veuillez confirmer votre présence dès que possible.",
+      "exampleEn": "Please confirm your attendance as soon as possible."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "tenir quelqu'un au courant",
+      "options": [
+        "following; as a result of",
+        "to keep someone updated",
+        "to take place; unfold",
+        "to fall behind; be delayed"
+      ],
+      "answer": 1,
+      "explain": "tenir quelqu'un au courant means to keep someone updated."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "se dérouler",
+      "options": [
+        "a meeting point",
+        "to fall behind; be delayed",
+        "following; as a result of",
+        "to take place; unfold"
+      ],
+      "answer": 3,
+      "explain": "se dérouler means to take place; unfold."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "prendre du retard",
+      "options": [
+        "as soon as possible",
+        "to fall behind; be delayed",
+        "following; as a result of",
+        "a meeting point"
+      ],
+      "answer": 1,
+      "explain": "prendre du retard means to fall behind; be delayed."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "à la suite de",
+      "options": [
+        "to keep someone updated",
+        "a meeting point",
+        "as soon as possible",
+        "following; as a result of"
+      ],
+      "answer": 3,
+      "explain": "à la suite de means following; as a result of."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de rencontre",
+      "options": [
+        "to take place; unfold",
+        "a meeting point",
+        "as soon as possible",
+        "to keep someone updated"
+      ],
+      "answer": 1,
+      "explain": "un point de rencontre means a meeting point."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "dès que possible",
+      "options": [
+        "to fall behind; be delayed",
+        "to keep someone updated",
+        "to take place; unfold",
+        "as soon as possible"
+      ],
+      "answer": 3,
+      "explain": "dès que possible means as soon as possible."
+    }
+  ]
+}

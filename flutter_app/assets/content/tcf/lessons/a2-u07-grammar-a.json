@@ -1,0 +1,111 @@
+{
+  "id": "a2-u07-grammar-a",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Grammar: Choose the pronoun by its job in the second clause",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Choose the pronoun by its job in the second clause",
+      "body": "A relative pronoun joins information about a person, thing, place or time. It replaces a repeated noun and links the extra detail to the first part of the sentence."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "After qui, a verb follows. After que / qu', a subject usually follows. Où refers to a place or time.",
+      "headers": [
+        "Pronoun",
+        "Job in its clause",
+        "Two ideas → one sentence"
+      ],
+      "rows": [
+        [
+          "qui",
+          "Subject: it does the verb",
+          "C'est le service. Le service répond. → C'est le service qui répond."
+        ],
+        [
+          "que / qu'",
+          "Direct object: the verb acts on it",
+          "Voici le formulaire. La clinique demande le formulaire. → Voici le formulaire que la clinique demande."
+        ],
+        [
+          "où",
+          "Place or time: there / when",
+          "C'est la clinique. J'ai mon rendez-vous là. → C'est la clinique où j'ai mon rendez-vous."
+        ],
+        [
+          "qui",
+          "Person as subject",
+          "Je parle au professionnel. Le professionnel suit mon dossier. → Je parle au professionnel qui suit mon dossier."
+        ],
+        [
+          "que / qu'",
+          "Thing as direct object",
+          "Je garde le message. Le service a envoyé le message. → Je garde le message que le service a envoyé."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Choose the pronoun by its job in the second clause",
+      "body": "• Use qui when the missing noun is the subject of the next verb: le service répond → le service qui répond.\n• Use que when the next clause already has a subject and the missing noun receives the action: la clinique demande le formulaire → le formulaire que la clinique demande.\n• Before a vowel sound, que shortens to qu': la question qu'elle pose. The role stays the same.\n• Use où for a place or time: la clinique où je consulte; le jour où le service rappelle.\n• Ask what follows the blank: does the noun do the verb (qui), receive it (que), or name a place/time (où)? Use that test in your notes with a clinic, a form and a date."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "C'est le formulaire ___ la clinique demande.",
+      "options": [
+        "que",
+        "qui",
+        "où",
+        "quand"
+      ],
+      "answer": 0,
+      "explain": "The clinic asks for the form; the form receives the action, so use que."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "C'est le professionnel ___ explique l'étape.",
+      "options": [
+        "qui",
+        "que",
+        "où",
+        "qu'"
+      ],
+      "answer": 0,
+      "explain": "The professional explains; the missing noun is the subject, so use qui."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "C'est le centre ___ j'ai mon rendez-vous.",
+      "options": [
+        "où",
+        "qui",
+        "que",
+        "qu'"
+      ],
+      "answer": 0,
+      "explain": "The missing information is a place, so use où."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Je lis la note ___ elle a envoyée.",
+      "options": [
+        "qu'",
+        "qui",
+        "où",
+        "dont"
+      ],
+      "answer": 0,
+      "explain": "The note receives the action of sending; before elle, que becomes qu'."
+    }
+  ]
+}

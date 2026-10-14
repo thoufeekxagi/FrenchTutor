@@ -1,0 +1,58 @@
+{
+  "id": "b2-u07-listening",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le dispositif a été créé afin que les bénévoles puissent trier les matières plus facilement. Le premier bilan aura lieu après trois événements.",
+      "question": "When will the first assessment happen?",
+      "options": [
+        "After three events",
+        "Only if the budget changes",
+        "Before the first event",
+        "After one year"
+      ],
+      "answer": 0,
+      "explain": "The first assessment is planned after three events."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "En raison d'un manque de bacs, une partie des matières a été triée plus tard. Cela ne signifie pas que le projet a échoué; l'équipe doit d'abord mesurer l'incidence.",
+      "question": "What does the speaker say about the project's result?",
+      "options": [
+        "It will not be assessed",
+        "It has already met every target",
+        "It is too early to conclude that it failed",
+        "It has no relation to the missing bins"
+      ],
+      "answer": 2,
+      "explain": "The speaker says the effect still needs to be measured."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La collecte pourrait être modifiée à moins que les organisateurs trouvent une solution de rechange avant l'été.",
+      "question": "What must happen for the collection plan to remain unchanged?",
+      "options": [
+        "The assessment must be cancelled",
+        "The current plan is already final",
+        "The event must use more materials",
+        "Organizers need to find an alternative before summer"
+      ],
+      "answer": 3,
+      "explain": "The plan may change unless organizers find an alternative in time."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "id": "b1-u02-dialogues",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Choosing a course",
+      "body": "Two classmates compare a fictional evening program and a weekend program.",
+      "examples": [
+        {
+          "fr": "La formation du soir commencera en septembre.",
+          "en": "Mina: The evening program will start in September."
+        },
+        {
+          "fr": "Quand le centre confirmera l'horaire, tu pourras décider ?",
+          "en": "Luc: When the centre confirms the schedule, will you be able to decide?"
+        },
+        {
+          "fr": "Oui. Si les cours finissent avant vingt heures, je prendrai le bus.",
+          "en": "Mina: Yes. If classes finish before eight p.m., I will take the bus."
+        },
+        {
+          "fr": "Et si l'horaire ne convient pas ?",
+          "en": "Luc: And if the schedule does not work?"
+        },
+        {
+          "fr": "Je reporterai ma candidature au prochain trimestre.",
+          "en": "Mina: I will postpone my application until the next term."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A deadline to confirm",
+      "body": "A learner calls a training office about a fictional application.",
+      "examples": [
+        {
+          "fr": "Bonjour, je voudrais confirmer la date limite.",
+          "en": "Awa: Hello, I would like to confirm the deadline."
+        },
+        {
+          "fr": "Vous recevrez un courriel demain.",
+          "en": "Agent: You will receive an email tomorrow."
+        },
+        {
+          "fr": "Quand je recevrai le message, je vérifierai les prérequis.",
+          "en": "Awa: When I receive the message, I will check the prerequisites."
+        },
+        {
+          "fr": "Si vous avez une question, vous pourrez nous écrire.",
+          "en": "Agent: If you have a question, you can write to us."
+        },
+        {
+          "fr": "Merci. Je vous tiendrai au courant après avoir comparé les horaires.",
+          "en": "Awa: Thank you. I will keep you updated after comparing the schedules."
+        }
+      ]
+    }
+  ]
+}

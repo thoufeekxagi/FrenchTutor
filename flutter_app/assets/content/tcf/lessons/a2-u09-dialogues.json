@@ -1,0 +1,148 @@
+{
+  "id": "a2-u09-dialogues",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the place, the person who has the information and the action to take next. Notice that lui/leur points to a person and y points to the named destination."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A changed service notice",
+      "body": "Nadia and Karim read a fictional notice at a station.",
+      "examples": [
+        {
+          "fr": "Il y a une interruption de service sur la ligne bleue.",
+          "en": "Nadia: There is a service interruption on the blue line."
+        },
+        {
+          "fr": "Je vais demander l'itinéraire à l'employée.",
+          "en": "Karim: I am going to ask the staff member for the route."
+        },
+        {
+          "fr": "Tu lui demandes si l'arrêt provisoire est près d'ici ?",
+          "en": "Nadia: Will you ask her whether the temporary stop is near here?"
+        },
+        {
+          "fr": "Oui. Je lui demande aussi l'heure de départ.",
+          "en": "Karim: Yes. I will also ask her for the departure time."
+        },
+        {
+          "fr": "Nous allons au centre communautaire.",
+          "en": "Nadia: We are going to the community centre."
+        },
+        {
+          "fr": "Nous y allons par la ligne express.",
+          "en": "Karim: Then we are going there by the express line."
+        },
+        {
+          "fr": "Et si nous manquons la correspondance ?",
+          "en": "Nadia: And if we miss the connection?"
+        },
+        {
+          "fr": "Je vais demander une mise à jour à l'employée de la gare.",
+          "en": "Karim: I will ask the station employee for an update."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Confirm the meeting point",
+      "body": "Karim confirms a landmark with Nadia before leaving.",
+      "examples": [
+        {
+          "fr": "La bibliothèque municipale est près du carrefour ?",
+          "en": "Karim: Is the public library near the intersection?"
+        },
+        {
+          "fr": "Oui, elle y est, en face de l'édifice public.",
+          "en": "Nadia: Yes, it is there, across from the public building."
+        },
+        {
+          "fr": "Je vais donner l'adresse à Sam.",
+          "en": "Karim: I am going to give the address to Sam."
+        },
+        {
+          "fr": "Tu lui donnes aussi le point de rencontre ?",
+          "en": "Nadia: Will you also give him the meeting point?"
+        },
+        {
+          "fr": "Oui. Je vais lui envoyer le plan.",
+          "en": "Karim: Yes. I am going to send him the map."
+        },
+        {
+          "fr": "Nous allons au terminus, puis nous y prenons la ligne express.",
+          "en": "Nadia: We are going to the final stop, then we take the express line there."
+        },
+        {
+          "fr": "Je vais expliquer le changement aux voyageurs.",
+          "en": "Karim: I am going to explain the change to the other travellers."
+        },
+        {
+          "fr": "D'accord. Je leur indique l'entrée principale.",
+          "en": "Nadia: All right. I will point out the main entrance to them."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does Karim ask the staff member for?",
+      "options": [
+        "The route and departure time",
+        "A reduced-fare ticket",
+        "A public library card",
+        "A reserved seat"
+      ],
+      "answer": 0,
+      "explain": "He says he will ask about the route and departure time."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Where are Nadia and Karim going?",
+      "options": [
+        "The community centre",
+        "The public library",
+        "The train station",
+        "The city airport"
+      ],
+      "answer": 0,
+      "explain": "Nadia names the community centre as their destination."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What will Karim ask the staff for if they miss the connection?",
+      "options": [
+        "An update",
+        "A new address",
+        "A seat reservation",
+        "A library card"
+      ],
+      "answer": 0,
+      "explain": "He says he will ask them for an update at the station."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What will Nadia point out to the other travellers?",
+      "options": [
+        "The main entrance",
+        "The departure time",
+        "The temporary stop",
+        "The public building"
+      ],
+      "answer": 0,
+      "explain": "She says she will indicate the main entrance."
+    }
+  ]
+}

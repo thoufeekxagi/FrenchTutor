@@ -1,0 +1,148 @@
+{
+  "id": "b2-u10-words-4",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "faire consensus",
+      "en": "to build consensus",
+      "sound": "fehr kohn-sahn-SÜS",
+      "exampleFr": "Les membres cherchent à faire consensus sur la prochaine étape.",
+      "exampleEn": "Members are trying to build consensus on the next step."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "consigner les décisions",
+      "en": "to record the decisions",
+      "sound": "kohn-see-NYAY lay day-see-ZYOH(N)",
+      "exampleFr": "La secrétaire va consigner les décisions au procès-verbal.",
+      "exampleEn": "The secretary will record the decisions in the minutes."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un mécanisme de recours",
+      "en": "an appeal mechanism",
+      "sound": "uh(n) may-kah-neezm duh ruh-KOOR",
+      "exampleFr": "Le règlement prévoit un mécanisme de recours.",
+      "exampleEn": "The policy provides an appeal mechanism."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la représentativité",
+      "en": "representativeness",
+      "sound": "lah ruh-pray-zahn-tah-tee-vee-TAY",
+      "exampleFr": "Le groupe discute de la représentativité de l'échantillon.",
+      "exampleEn": "The group is discussing how representative the sample is."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un compromis durable",
+      "en": "a lasting compromise",
+      "sound": "uh(n) kohn-proh-MEE dü-RAHBL",
+      "exampleFr": "Un compromis durable doit tenir compte de plusieurs besoins.",
+      "exampleEn": "A lasting compromise needs to account for several needs."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une opposition de principe",
+      "en": "principled opposition",
+      "sound": "ün oh-poh-zee-SYOH(N) duh prehn-SEEP",
+      "exampleFr": "L'opposition de principe porte sur la méthode, pas sur l'objectif.",
+      "exampleEn": "The principled opposition concerns the method, not the goal."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "faire consensus",
+      "options": [
+        "representativeness",
+        "to build consensus",
+        "to record the decisions",
+        "an appeal mechanism"
+      ],
+      "answer": 1,
+      "explain": "faire consensus means to build consensus."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "consigner les décisions",
+      "options": [
+        "a lasting compromise",
+        "an appeal mechanism",
+        "representativeness",
+        "to record the decisions"
+      ],
+      "answer": 3,
+      "explain": "consigner les décisions means to record the decisions."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un mécanisme de recours",
+      "options": [
+        "principled opposition",
+        "an appeal mechanism",
+        "representativeness",
+        "a lasting compromise"
+      ],
+      "answer": 1,
+      "explain": "un mécanisme de recours means an appeal mechanism."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la représentativité",
+      "options": [
+        "to build consensus",
+        "a lasting compromise",
+        "principled opposition",
+        "representativeness"
+      ],
+      "answer": 3,
+      "explain": "la représentativité means representativeness."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un compromis durable",
+      "options": [
+        "to record the decisions",
+        "a lasting compromise",
+        "principled opposition",
+        "to build consensus"
+      ],
+      "answer": 1,
+      "explain": "un compromis durable means a lasting compromise."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une opposition de principe",
+      "options": [
+        "an appeal mechanism",
+        "to build consensus",
+        "to record the decisions",
+        "principled opposition"
+      ],
+      "answer": 3,
+      "explain": "une opposition de principe means principled opposition."
+    }
+  ]
+}

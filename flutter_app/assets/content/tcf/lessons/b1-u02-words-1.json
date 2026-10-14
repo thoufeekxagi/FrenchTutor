@@ -1,0 +1,148 @@
+{
+  "id": "b1-u02-words-1",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une formation",
+      "en": "a training program",
+      "sound": "ün for-mah-SYOH(N)",
+      "exampleFr": "La formation commencera en septembre.",
+      "exampleEn": "The training program will begin in September."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un prérequis",
+      "en": "a prerequisite",
+      "sound": "uh(n) pray-ruh-KEE",
+      "exampleFr": "Le prérequis sera indiqué sur la page du cours.",
+      "exampleEn": "The prerequisite will be listed on the course page."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une candidature",
+      "en": "an application",
+      "sound": "ün kohn-dee-dah-TÜR",
+      "exampleFr": "Elle enverra sa candidature avant la date limite.",
+      "exampleEn": "She will send her application before the deadline."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une échéance",
+      "en": "a deadline",
+      "sound": "ün ay-shay-AH(N)S",
+      "exampleFr": "L'échéance sera confirmée par le bureau.",
+      "exampleEn": "The deadline will be confirmed by the office."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un horaire",
+      "en": "a schedule",
+      "sound": "uh(n) oh-REHR",
+      "exampleFr": "Nous comparerons l'horaire et la durée du trajet.",
+      "exampleEn": "We will compare the schedule and commute length."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un stage",
+      "en": "an internship; placement",
+      "sound": "uh(n) STAHZH",
+      "exampleFr": "Le stage commencera après la formation.",
+      "exampleEn": "The placement will begin after the training program."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une formation",
+      "options": [
+        "a deadline",
+        "a training program",
+        "a prerequisite",
+        "an application"
+      ],
+      "answer": 1,
+      "explain": "une formation means a training program."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un prérequis",
+      "options": [
+        "a schedule",
+        "an application",
+        "a deadline",
+        "a prerequisite"
+      ],
+      "answer": 3,
+      "explain": "un prérequis means a prerequisite."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une candidature",
+      "options": [
+        "an internship; placement",
+        "an application",
+        "a deadline",
+        "a schedule"
+      ],
+      "answer": 1,
+      "explain": "une candidature means an application."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une échéance",
+      "options": [
+        "a training program",
+        "a schedule",
+        "an internship; placement",
+        "a deadline"
+      ],
+      "answer": 3,
+      "explain": "une échéance means a deadline."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un horaire",
+      "options": [
+        "a prerequisite",
+        "a schedule",
+        "an internship; placement",
+        "a training program"
+      ],
+      "answer": 1,
+      "explain": "un horaire means a schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un stage",
+      "options": [
+        "an application",
+        "a training program",
+        "a prerequisite",
+        "an internship; placement"
+      ],
+      "answer": 3,
+      "explain": "un stage means an internship; placement."
+    }
+  ]
+}

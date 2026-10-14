@@ -1,0 +1,148 @@
+{
+  "id": "b1-u03-words-3",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un sondage",
+      "en": "a survey; poll",
+      "sound": "uh(n) sohn-DAHZH",
+      "exampleFr": "Le comité a préparé un sondage sur les horaires.",
+      "exampleEn": "The committee prepared a survey about the schedules."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "recueillir les avis",
+      "en": "to gather opinions",
+      "sound": "ruh-kuy-EER lay-zah-VEE",
+      "exampleFr": "La responsable veut recueillir les avis avant de choisir.",
+      "exampleEn": "The coordinator wants to gather opinions before choosing."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une majorité",
+      "en": "a majority",
+      "sound": "ün mah-zhoh-ree-TAY",
+      "exampleFr": "Une majorité de membres préfère l'option du samedi.",
+      "exampleEn": "A majority of members prefers the Saturday option."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une minorité",
+      "en": "a minority",
+      "sound": "ün mee-noh-ree-TAY",
+      "exampleFr": "Une minorité de participants a besoin d'un autre horaire.",
+      "exampleEn": "A minority of participants needs a different schedule."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un budget disponible",
+      "en": "an available budget",
+      "sound": "uh(n) büzh-eh dee-spoh-NEE-bl",
+      "exampleFr": "Le budget disponible limite le nombre de séances.",
+      "exampleEn": "The available budget limits the number of sessions."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un coût supplémentaire",
+      "en": "an additional cost",
+      "sound": "uh(n) koo sü-play-mahn-TEHR",
+      "exampleFr": "L'option en ligne entraîne un coût supplémentaire.",
+      "exampleEn": "The online option involves an additional cost."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un sondage",
+      "options": [
+        "a minority",
+        "a survey; poll",
+        "to gather opinions",
+        "a majority"
+      ],
+      "answer": 1,
+      "explain": "un sondage means a survey; poll."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "recueillir les avis",
+      "options": [
+        "an available budget",
+        "a majority",
+        "a minority",
+        "to gather opinions"
+      ],
+      "answer": 3,
+      "explain": "recueillir les avis means to gather opinions."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une majorité",
+      "options": [
+        "an additional cost",
+        "a majority",
+        "a minority",
+        "an available budget"
+      ],
+      "answer": 1,
+      "explain": "une majorité means a majority."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une minorité",
+      "options": [
+        "a survey; poll",
+        "an available budget",
+        "an additional cost",
+        "a minority"
+      ],
+      "answer": 3,
+      "explain": "une minorité means a minority."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un budget disponible",
+      "options": [
+        "to gather opinions",
+        "an available budget",
+        "an additional cost",
+        "a survey; poll"
+      ],
+      "answer": 1,
+      "explain": "un budget disponible means an available budget."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un coût supplémentaire",
+      "options": [
+        "a majority",
+        "a survey; poll",
+        "to gather opinions",
+        "an additional cost"
+      ],
+      "answer": 3,
+      "explain": "un coût supplémentaire means an additional cost."
+    }
+  ]
+}

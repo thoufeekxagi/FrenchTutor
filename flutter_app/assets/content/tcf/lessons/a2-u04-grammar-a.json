@@ -1,0 +1,201 @@
+{
+  "id": "a2-u04-grammar-a",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Grammar: Build the imparfait for past habits and descriptions",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Build the imparfait for past habits and descriptions",
+      "body": "A clear past account often needs two jobs: describe the background or a repeated habit, then report a completed event. Use the imparfait for the first job and the passé composé forms already learned in Units 2 and 3 for the second."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Use the nous present stem without -ons, then add -ais, -ais, -ait, -ions, -iez, -aient. Être uses ét-.",
+      "headers": [
+        "Subject or verb",
+        "Imparfait form",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "parler: je",
+          "parlais",
+          "I used to speak"
+        ],
+        [
+          "parler: nous",
+          "parlions",
+          "we used to speak"
+        ],
+        [
+          "habiter: j' / elle",
+          "habitais / habitait",
+          "I / she used to live"
+        ],
+        [
+          "habiter: nous",
+          "habitions",
+          "we used to live"
+        ],
+        [
+          "prendre: je / elle / nous",
+          "prenais / prenait / prenions",
+          "I / she / we used to take"
+        ],
+        [
+          "étudier: tu",
+          "étudiais",
+          "you used to study"
+        ],
+        [
+          "rentrer: je / nous",
+          "rentrais / rentrions",
+          "I / we used to go home"
+        ],
+        [
+          "aller: tu",
+          "allais",
+          "you used to go"
+        ],
+        [
+          "se rendre: tu",
+          "te rendais",
+          "you used to go"
+        ],
+        [
+          "se retrouver: je / elle",
+          "me retrouvais / se retrouvait",
+          "I / she used to meet up"
+        ],
+        [
+          "lire: je / elle",
+          "lisais / lisait",
+          "I / she used to read"
+        ],
+        [
+          "écrire: je / elle",
+          "écrivais / écrivait",
+          "I / she used to write"
+        ],
+        [
+          "ouvrir: le commerce / les commerces",
+          "ouvrait / ouvraient",
+          "the shop(s) used to open"
+        ],
+        [
+          "fermer: il / ils",
+          "fermait / fermaient",
+          "it / they used to close"
+        ],
+        [
+          "rester: la pièce",
+          "restait",
+          "the room stayed"
+        ],
+        [
+          "préparer: ma tante",
+          "préparait",
+          "my aunt used to prepare"
+        ],
+        [
+          "déjeuner: je",
+          "déjeunais",
+          "I used to have lunch"
+        ],
+        [
+          "jouer: les enfants",
+          "jouaient",
+          "the children used to play"
+        ],
+        [
+          "se promener: je",
+          "me promenais",
+          "I used to walk"
+        ],
+        [
+          "réviser: je",
+          "révisais",
+          "I used to review"
+        ],
+        [
+          "être: je / tu / elle",
+          "étais / était",
+          "I / you / she was"
+        ],
+        [
+          "être: nous / ils",
+          "étions / étaient",
+          "we / they were"
+        ],
+        [
+          "avoir: elle / il y",
+          "avait",
+          "she had; there was"
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Build the imparfait for past habits and descriptions",
+      "body": "• Most imparfait forms start from the present nous form: nous parlons → parl-, then add the ending.\n• Être is the main exception: its stem is ét- (j'étais, nous étions).\n• Use it for a repeated past habit (chaque matin, je prenais le bus) or a description (la salle était calme).\n• The endings -ais, -ait, and -aient usually sound alike; use the subject to choose the spelling.\n• In your notes, write the stem and ending separately, then close the notes and rebuild one sentence from memory."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Quand j'étais jeune, nous ___ près du centre.",
+      "options": [
+        "habitions",
+        "habitons",
+        "avons habité",
+        "habiter"
+      ],
+      "answer": 0,
+      "explain": "A repeated past living situation uses the imparfait: nous habitions."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Chaque hiver, il ___ froid le matin.",
+      "options": [
+        "faisait",
+        "fait",
+        "a fait",
+        "faire"
+      ],
+      "answer": 0,
+      "explain": "A repeated past weather condition uses il faisait."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the imparfait form of avoir with elle.",
+      "options": [
+        "avait",
+        "a",
+        "a eu",
+        "avoir"
+      ],
+      "answer": 0,
+      "explain": "The imparfait form is elle avait."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Complete: La pièce ___ une grande fenêtre.",
+      "options": [
+        "avait",
+        "a",
+        "a eu",
+        "avoir"
+      ],
+      "answer": 0,
+      "explain": "A past description uses avait."
+    }
+  ]
+}

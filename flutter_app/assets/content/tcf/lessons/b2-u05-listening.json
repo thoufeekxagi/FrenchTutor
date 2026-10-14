@@ -1,0 +1,58 @@
+{
+  "id": "b2-u05-listening",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Il faut que vous confirmiez l'heure directement auprès du service. Le message d'exercice ne précise pas si les horaires ont changé.",
+      "question": "What should the learner confirm?",
+      "options": [
+        "A fictional fee",
+        "A diagnosis from the tutor",
+        "The identity of another learner",
+        "The time directly with the service"
+      ],
+      "answer": 3,
+      "explain": "The speaker says to confirm the time with the service."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je sais que le formulaire demande une date de contact. En revanche, je ne suis pas certain que le délai indiqué s'applique à chaque cas.",
+      "question": "What is the speaker uncertain about?",
+      "options": [
+        "Who filled out the form",
+        "Whether the meeting happened",
+        "Whether the stated time limit applies to every case",
+        "Whether the form asks for a date"
+      ],
+      "answer": 2,
+      "explain": "The speaker knows the form asks for a date but is unsure about the deadline's scope."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Bien que la consigne semble simple, l'agent doit vérifier les détails avant de répondre.",
+      "question": "Why must the agent check the details?",
+      "options": [
+        "The instruction may not cover every situation",
+        "The learner refuses to ask",
+        "The agent has already confirmed everything",
+        "The form has no instructions"
+      ],
+      "answer": 0,
+      "explain": "The contrast signals that a simple-looking instruction may need case-specific checking."
+    }
+  ]
+}

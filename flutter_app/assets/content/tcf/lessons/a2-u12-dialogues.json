@@ -1,0 +1,148 @@
+{
+  "id": "a2-u12-dialogues",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "First listen for why the week changed and what Nadia will do next. Then retell the exchange using one past event, one future plan, one comparison and one polite request."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Move a study meeting",
+      "body": "Nadia and Sam arrange a new time for their French study group.",
+      "examples": [
+        {
+          "fr": "La réunion est jeudi, pas mardi. Mardi, je travaille jusqu'à 17 h.",
+          "en": "Nadia: The meeting has been rescheduled. On Tuesday, I work until 5 p.m."
+        },
+        {
+          "fr": "Je comprends. Est-ce que jeudi est possible ?",
+          "en": "Sam: I understand. Is Thursday possible?"
+        },
+        {
+          "fr": "Oui. La deuxième option est plus pratique que mardi.",
+          "en": "Nadia: Yes. The second option is more practical than Tuesday."
+        },
+        {
+          "fr": "Je vais prévenir les membres du groupe et leur donner le nouvel horaire.",
+          "en": "Sam: I am going to tell the group members and give them the new schedule."
+        },
+        {
+          "fr": "Pourriez-vous aussi confirmer le point de départ ?",
+          "en": "Nadia: Could you also confirm the starting point?"
+        },
+        {
+          "fr": "Bien sûr. Le groupe part du centre après le cours.",
+          "en": "Sam: Of course. The group leaves from the centre after class."
+        },
+        {
+          "fr": "Je vais en parler à Marie et je vais lui envoyer un message.",
+          "en": "Nadia: I will tell Marie about it and send her a message."
+        },
+        {
+          "fr": "Parfait. Ensuite, nous faisons un essai sans aide.",
+          "en": "Sam: Perfect. Then we will do an attempt without help."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Handle an unexpected route change",
+      "body": "Karim describes a bus delay and confirms the new route with a classmate.",
+      "examples": [
+        {
+          "fr": "Il pleuvait quand le bus est arrivé, et j'ai pris un nouvel itinéraire.",
+          "en": "Karim: It was raining when the bus arrived, and I took a new route."
+        },
+        {
+          "fr": "Tu as lu l'avis de service ?",
+          "en": "Nadia: Did you read the service notice?"
+        },
+        {
+          "fr": "Oui. Le nouvel horaire indique un départ près du centre.",
+          "en": "Karim: Yes. The departure point is moved near the centre."
+        },
+        {
+          "fr": "Je vais demander le point de départ à l'employée.",
+          "en": "Nadia: I am going to ask the staff member for the starting point."
+        },
+        {
+          "fr": "Tu lui demandes aussi l'heure ?",
+          "en": "Karim: Will you also ask her for the time?"
+        },
+        {
+          "fr": "Oui. Je vais y aller après le cours et y noter l'heure.",
+          "en": "Nadia: Yes. I am going there after class and note the time there."
+        },
+        {
+          "fr": "Merci. Pourriez-vous me dire si l'arrêt est près de l'entrée ?",
+          "en": "Karim: Thanks. Could you tell me whether the stop is near the entrance?"
+        },
+        {
+          "fr": "Je ne sais pas encore. Je confirme le lieu avant de partir.",
+          "en": "Nadia: I do not know yet. I will confirm the place before leaving."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why does Nadia need to move the study meeting?",
+      "options": [
+        "She works until 5 p.m. on Tuesday",
+        "She has a repair appointment",
+        "The study group has no room",
+        "Her bus arrives at 5 p.m."
+      ],
+      "answer": 0,
+      "explain": "Nadia says she works until 17 h on Tuesday."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does Sam agree to tell the group?",
+      "options": [
+        "The new schedule",
+        "The new exam result",
+        "The library price",
+        "The repair procedure"
+      ],
+      "answer": 0,
+      "explain": "He says he will tell the group the new schedule."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What happened while Karim was waiting for the bus?",
+      "options": [
+        "It was raining when the bus arrived",
+        "The study meeting was cancelled",
+        "The class changed its location",
+        "The service gave a refund"
+      ],
+      "answer": 0,
+      "explain": "Karim says it was raining when the bus arrived."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Nadia plan to ask the staff member?",
+      "options": [
+        "The address and time",
+        "The payment option and receipt",
+        "The course level and test score",
+        "The repair date and contact"
+      ],
+      "answer": 0,
+      "explain": "Nadia says she will ask for the address, and Karim asks whether she will ask for the time too."
+    }
+  ]
+}

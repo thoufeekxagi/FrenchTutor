@@ -1,0 +1,172 @@
+{
+  "id": "a2-u06-words-6",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Words: questions and decisions",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 7,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "comparer",
+      "en": "to compare",
+      "sound": "kohn-pah-RAY",
+      "exampleFr": "Je vais comparer les deux annonces.",
+      "exampleEn": "I am going to compare the two listings."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "mesurer",
+      "en": "to measure",
+      "sound": "muh-zü-RAY",
+      "exampleFr": "Je vais mesurer la chambre avant de choisir.",
+      "exampleEn": "I am going to measure the bedroom before choosing."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "se renseigner sur",
+      "en": "to find out about",
+      "sound": "suh rah(n)-say-NYAY sür",
+      "exampleFr": "Je vais me renseigner sur les frais mensuels.",
+      "exampleEn": "I am going to find out about the monthly costs."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "calculer",
+      "en": "to calculate",
+      "sound": "kahl-kü-LAY",
+      "exampleFr": "Je vais calculer le coût mensuel.",
+      "exampleEn": "I am going to calculate the monthly cost."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "demander une précision",
+      "en": "to ask for clarification",
+      "sound": "duh-mah(n)-DAY ün pray-see-ZYOH(N)",
+      "exampleFr": "Je vais demander une précision sur le chauffage.",
+      "exampleEn": "I am going to ask for clarification about the heating."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "faire un choix",
+      "en": "to make a choice",
+      "sound": "fehr uh(n) shwah",
+      "exampleFr": "Je vais faire un choix après la visite.",
+      "exampleEn": "I am going to make a choice after the visit."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "signer un bail",
+      "en": "to sign a lease",
+      "sound": "see-NYAY uh(n) bahy",
+      "exampleFr": "Je vais signer un bail après avoir lu les conditions.",
+      "exampleEn": "I am going to sign a lease after reading the conditions."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "s'installer",
+      "en": "to move in; settle",
+      "sound": "sa(n)-stah-LAY",
+      "exampleFr": "Nous allons nous installer au début du mois.",
+      "exampleEn": "We are going to move in at the beginning of the month."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "comparer",
+      "options": [
+        "to calculate",
+        "to compare",
+        "to sign a lease",
+        "to measure"
+      ],
+      "answer": 1,
+      "explain": "comparer means to compare."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "mesurer",
+      "options": [
+        "to ask for clarification",
+        "to move in; settle",
+        "to find out about",
+        "to measure"
+      ],
+      "answer": 3,
+      "explain": "mesurer means to measure."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "se renseigner sur",
+      "options": [
+        "to make a choice",
+        "to find out about",
+        "to compare",
+        "to calculate"
+      ],
+      "answer": 1,
+      "explain": "se renseigner sur means to find out about."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "calculer",
+      "options": [
+        "to sign a lease",
+        "to measure",
+        "to ask for clarification",
+        "to calculate"
+      ],
+      "answer": 3,
+      "explain": "calculer means to calculate."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "demander une précision",
+      "options": [
+        "to move in; settle",
+        "to ask for clarification",
+        "to find out about",
+        "to make a choice"
+      ],
+      "answer": 1,
+      "explain": "demander une précision means to ask for clarification."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "faire un choix",
+      "options": [
+        "to compare",
+        "to calculate",
+        "to sign a lease",
+        "to make a choice"
+      ],
+      "answer": 3,
+      "explain": "faire un choix means to make a choice."
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Words: questions and decisions",
+      "body": "Rental terms and what utilities include vary by province, landlord and listing. The two notices in this lesson are fictional; do not treat them as current offers or legal advice. A fluent Canadian French reviewer should confirm laveuse, sécheuse, stationnement and bail in context."
+    }
+  ]
+}

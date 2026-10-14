@@ -1,0 +1,80 @@
+{
+  "id": "b2-u04-dialogues",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Neighbourhood consultation",
+      "body": "Residents discuss an invented redesign after a short construction period.",
+      "examples": [
+        {
+          "fr": "Avant les travaux, la place était surtout utilisée le soir.",
+          "en": "Mina: Before construction, the square was mostly used in the evening."
+        },
+        {
+          "fr": "Oui, mais plusieurs résidents avaient signalé le manque d'ombre.",
+          "en": "Louis: Yes, but several residents had reported the lack of shade."
+        },
+        {
+          "fr": "La voie a été fermée pendant trois semaines.",
+          "en": "Mina: The lane was closed for three weeks."
+        },
+        {
+          "fr": "On aurait dû annoncer plus tôt l'accès temporaire.",
+          "en": "Louis: The temporary access should have been announced earlier."
+        },
+        {
+          "fr": "C'est vrai. La consultation suivante pourrait inclure les personnes à mobilité réduite.",
+          "en": "Mina: That's true. The next consultation could include people with reduced mobility."
+        },
+        {
+          "fr": "Il faut aussi tenir compte des commerces qui dépendent des livraisons.",
+          "en": "Louis: We also need to consider shops that depend on deliveries."
+        },
+        {
+          "fr": "Le compromis dépendra donc des besoins de plusieurs groupes.",
+          "en": "Mina: So the compromise will depend on several groups' needs."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Comparing two locations",
+      "body": "A couple compares two fictional rental neighbourhoods before deciding what to visit.",
+      "examples": [
+        {
+          "fr": "Le premier logement est plus près du métro, alors que le second est plus calme.",
+          "en": "Awa: The first home is closer to the metro, whereas the second is quieter."
+        },
+        {
+          "fr": "Lequel offre un accès plus simple aux services ?",
+          "en": "Sam: Which one offers easier access to services?"
+        },
+        {
+          "fr": "Le premier, mais le loyer dépasse notre budget.",
+          "en": "Awa: The first one, but the rent exceeds our budget."
+        },
+        {
+          "fr": "Dans ce cas, il faut comparer le coût total et les déplacements.",
+          "en": "Sam: In that case, we need to compare total cost and commutes."
+        },
+        {
+          "fr": "D'accord. On visitera les deux avant de choisir.",
+          "en": "Awa: Agreed. We will visit both before choosing."
+        }
+      ]
+    }
+  ]
+}

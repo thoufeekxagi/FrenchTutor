@@ -1,0 +1,99 @@
+{
+  "id": "b2-u05-grammar-a",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Grammar: Subjunctive for stance: identify the trigger and the subject change",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Subjunctive for stance: identify the trigger and the subject change",
+      "body": "In B2, learn the subjunctive as a meaning choice. It often follows necessity, emotion, doubt or evaluation: il faut que, il est possible que, je doute que, bien que. The subjunctive is usually needed when the trigger expresses a stance and the next clause has its own subject. After certainty or an established fact, the indicative is generally used (je sais que…). When the same person does both actions, an infinitive is often more natural (il faut vérifier). Memorize common irregular forms in useful chunks, then test the whole sentence—not just the verb ending."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Subjunctive for stance: identify the trigger and the subject change",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Necessity",
+          "il faut que + subjunctive",
+          "Il faut que l'agent confirme la démarche.",
+          "The agent needs to confirm the process."
+        ],
+        [
+          "Possibility",
+          "il est possible que + subjunctive",
+          "Il est possible que le délai change.",
+          "It is possible that the time limit will change."
+        ],
+        [
+          "Doubt",
+          "douter que + subjunctive",
+          "Je doute que cette consigne soit complète.",
+          "I doubt that this instruction is complete."
+        ],
+        [
+          "Certainty",
+          "savoir que + indicative",
+          "Je sais que le formulaire demande une date.",
+          "I know that the form asks for a date."
+        ],
+        [
+          "Same subject",
+          "verb + infinitive",
+          "Il vaut mieux vérifier l'information.",
+          "It is better to verify the information."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Choose the standard pattern after il est possible que.",
+      "options": [
+        "past participle only",
+        "subjunctive",
+        "imperative",
+        "infinitive only"
+      ],
+      "answer": 1,
+      "explain": "Possibility expressed with il est possible que generally takes the subjunctive."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the sentence expressing certainty.",
+      "options": [
+        "Bien que le formulaire demande une date.",
+        "Je doute que le formulaire demande une date.",
+        "Je sais que le formulaire demande une date.",
+        "Il est possible que le formulaire demande une date."
+      ],
+      "answer": 2,
+      "explain": "Savoir que expresses certainty and is followed by the indicative."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When is an infinitive often natural?",
+      "options": [
+        "When the same person performs both actions",
+        "To report an unconfirmed claim",
+        "Only after a question mark",
+        "Whenever there are two different subjects"
+      ],
+      "answer": 0,
+      "explain": "With the same subject, a verb plus infinitive is often natural."
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "b1-u08-write-speak",
+  "unit": "b1-u08",
+  "unitTitle": "B1 · Ask precise questions and clarify the answer",
+  "title": "Write and speak",
+  "subtitle": "B1 · Unit 8: B1 · Ask precise questions and clarify the answer",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 1 practice",
+      "body": "Write a 60–120-word message to a fictional service office. Explain what you need, ask two clear questions about the process and use a polite closing. Aim for 80–100 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour, Je souhaite m'inscrire à l'atelier de septembre et je voudrais vérifier les démarches à suivre. Pourriez-vous me dire si le formulaire peut être envoyé par courriel ? J'aimerais aussi savoir s'il faut joindre une preuve d'adresse. Si le document original est nécessaire, pourriez-vous préciser où je peux le déposer et à quel moment ? Je n'ai pas trouvé ces renseignements dans l'avis. Merci de m'indiquer le délai de réponse. Cordialement, Amina\n\nCheck:\n• Official Task 1 range: 60–120 words.\n• State your purpose in the first lines.\n• Ask questions with statement order after pourriez-vous me dire.\n• Use a suitable greeting and closing for the recipient."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "TCF oral Task 2 role-play. You are contacting a fictional service office to ask how to complete a process. Prepare for two minutes; ask whether registration is open, which documents are required, how to submit them, the expected response time and whom to contact for follow-up. Interact for 3 minutes 30; confirm one answer in your own words.\n\n• Use indirect questions for polite information requests.\n• Follow the answer with a question that fills a real information gap.\n• Repeat one key detail to confirm you understood correctly."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je voudrais savoir si les inscriptions sont encore ouvertes. Pourriez-vous me dire quels documents il faut envoyer ? Est-ce que je peux transmettre le formulaire par courriel ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Si j'ai bien compris, la preuve d'adresse doit être lisible. Quel est le délai de réponse ? À qui dois-je m'adresser si je n'ai pas de nouvelles ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Merci, je vais noter ces informations et faire un suivi la semaine prochaine.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

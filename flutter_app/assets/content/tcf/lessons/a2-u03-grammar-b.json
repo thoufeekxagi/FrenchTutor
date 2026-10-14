@@ -1,0 +1,93 @@
+{
+  "id": "a2-u03-grammar-b",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Grammar: A starter set of common verbs with être",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "A few common completed actions with être",
+      "headers": [
+        "Infinitive",
+        "Past participle",
+        "Example"
+      ],
+      "rows": [
+        [
+          "aller",
+          "allé(e)(s)",
+          "Sam est allé au cours. / Lina est allée au cours."
+        ],
+        [
+          "arriver",
+          "arrivé(e)(s)",
+          "Le bus est arrivé à l'heure."
+        ],
+        [
+          "partir",
+          "parti(e)(s)",
+          "Nadia et Awa sont parties à huit heures."
+        ],
+        [
+          "venir",
+          "venu(e)(s)",
+          "Awa est venue au centre."
+        ],
+        [
+          "rentrer",
+          "rentré(e)(s)",
+          "Karim est rentré chez lui."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "A starter set of common verbs with être",
+      "body": "• These common intransitive verbs use être in the passé composé: aller, arriver, partir, venir, and rentrer. Learn the auxiliary with each verb.\n• In writing, the past participle agrees with the subject in these examples: il est arrivé; elle est arrivée; ils sont arrivés; elles sont arrivées.\n• Compare the two patterns: Sam est arrivé au centre; Sam a lu le message. The verb tells you which auxiliary to use.\n• This is a starter set of common verbs, not a rule that every verb about movement takes être. Check the auxiliary when you learn a new past-tense verb."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Hier, Lina ___ au centre.",
+      "options": [
+        "est arrivée",
+        "a arrivé",
+        "est arriver",
+        "arrive hier"
+      ],
+      "answer": 0,
+      "explain": "Arriver uses être here, and the participle agrees with Lina: elle est arrivée."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Nadia et Awa sont ___ à huit heures.",
+      "options": [
+        "parties",
+        "parti",
+        "partie",
+        "partir"
+      ],
+      "answer": 0,
+      "explain": "The subject is feminine plural, so the written participle is parties."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Which sentence uses the correct auxiliary?",
+      "options": [
+        "Sam est arrivé à l'heure.",
+        "Sam a arrivé à l'heure.",
+        "Sam est arriver à l'heure.",
+        "Sam arrive hier à l'heure."
+      ],
+      "answer": 0,
+      "explain": "Use être with arriver in this completed action, then use the past participle arrivé."
+    }
+  ]
+}

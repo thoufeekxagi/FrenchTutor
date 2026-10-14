@@ -1,0 +1,72 @@
+{
+  "id": "b1-u11-tcf",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le journal du cours invite les participants à relater une expérience en 120 à 150 mots. Le texte doit inclure un commentaire personnel et une raison, mais pas une longue présentation de l'organisme.",
+      "question": "What should the text include?",
+      "options": [
+        "A personal comment and a reason",
+        "A list of grammar rules",
+        "Three unrelated stories",
+        "A full history of the organization"
+      ],
+      "answer": 0,
+      "explain": "The instructions request a personal comment and a reason."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "J'ai reçu plusieurs messages après la rencontre. La remarque qui m'a aidée était celle d'une participante; je vais l'ajouter à mon compte rendu sans reprendre tout son texte.",
+      "question": "How will the speaker use the participant's comment?",
+      "options": [
+        "Copy the entire message",
+        "Include its idea without copying the whole text",
+        "Remove all comments",
+        "Publish it as confirmed policy"
+      ],
+      "answer": 1,
+      "explain": "The speaker will use the relevant idea without copying the full message."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Who is the intended audience?",
+      "options": [
+        "Other participants",
+        "A private employer",
+        "Only the event organizers",
+        "A government office"
+      ],
+      "answer": 0,
+      "explain": "The prompt tells the writer to address other participants.",
+      "promptFr": "BLOG DU GROUPE — Racontez une expérience vécue pendant une activité récente. Ajoutez votre réaction ou une raison qui explique votre avis. Longueur attendue : 120 à 150 mots. Adressez-vous aux autres participants."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should be checked first?",
+      "options": [
+        "The title length",
+        "Whether every part of the prompt is answered",
+        "Past-participle agreement",
+        "The number of paragraphs"
+      ],
+      "answer": 1,
+      "explain": "Task completion comes before detailed editing.",
+      "promptFr": "Conseil de révision — Vérifiez d'abord que chaque partie de la consigne est traitée. Ensuite, vérifiez l'ordre des événements et les références. Terminez par les accords fréquents et le compte de mots."
+    }
+  ]
+}

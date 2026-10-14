@@ -1,0 +1,176 @@
+{
+  "id": "b2-u12-words-1",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un point de vue",
+      "en": "a viewpoint",
+      "sound": "uh(n) pwa duh VÜ",
+      "exampleFr": "Le premier point de vue insiste sur l'accès.",
+      "exampleEn": "The first viewpoint emphasizes access."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un argument",
+      "en": "an argument",
+      "sound": "uh(n) ar-gü-MAH(N)",
+      "exampleFr": "Chaque argument mérite d'être présenté fidèlement.",
+      "exampleEn": "Each argument deserves to be presented faithfully."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une source",
+      "en": "a source",
+      "sound": "ün soors",
+      "exampleFr": "La source donne un exemple concret.",
+      "exampleEn": "The source gives a concrete example."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une convergence",
+      "en": "a convergence; an area of agreement",
+      "sound": "ün kohn-vehr-ZHAH(N)S",
+      "exampleFr": "Les textes montrent une convergence sur le coût.",
+      "exampleEn": "The texts show agreement on cost."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une divergence",
+      "en": "a difference; divergence",
+      "sound": "ün dee-vehr-ZHAH(N)S",
+      "exampleFr": "La divergence concerne la façon de financer le projet.",
+      "exampleEn": "The difference concerns how to fund the project."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une reformulation",
+      "en": "a paraphrase; reformulation",
+      "sound": "ün ruh-for-mü-lah-SYOH(N)",
+      "exampleFr": "Une reformulation fidèle évite la copie.",
+      "exampleEn": "A faithful paraphrase avoids copying."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de vue",
+      "options": [
+        "a convergence; an area of agreement",
+        "a viewpoint",
+        "an argument",
+        "a source"
+      ],
+      "answer": 1,
+      "explain": "un point de vue means a viewpoint."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un argument",
+      "options": [
+        "a difference; divergence",
+        "a source",
+        "a convergence; an area of agreement",
+        "an argument"
+      ],
+      "answer": 3,
+      "explain": "un argument means an argument."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une source",
+      "options": [
+        "a paraphrase; reformulation",
+        "a source",
+        "a convergence; an area of agreement",
+        "a difference; divergence"
+      ],
+      "answer": 1,
+      "explain": "une source means a source."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une convergence",
+      "options": [
+        "a viewpoint",
+        "a difference; divergence",
+        "a paraphrase; reformulation",
+        "a convergence; an area of agreement"
+      ],
+      "answer": 3,
+      "explain": "une convergence means a convergence; an area of agreement."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une divergence",
+      "options": [
+        "an argument",
+        "a difference; divergence",
+        "a paraphrase; reformulation",
+        "a viewpoint"
+      ],
+      "answer": 1,
+      "explain": "une divergence means a difference; divergence."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une reformulation",
+      "options": [
+        "a source",
+        "a viewpoint",
+        "an argument",
+        "a paraphrase; reformulation"
+      ],
+      "answer": 3,
+      "explain": "une reformulation means a paraphrase; reformulation."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une source",
+      "question": "Which word did you hear?",
+      "options": [
+        "une divergence",
+        "une source",
+        "un argument",
+        "une convergence"
+      ],
+      "answer": 1,
+      "explain": "You heard une source: a source."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une convergence",
+      "question": "Which word did you hear?",
+      "options": [
+        "une reformulation",
+        "une source",
+        "une divergence",
+        "une convergence"
+      ],
+      "answer": 3,
+      "explain": "You heard une convergence: a convergence; an area of agreement."
+    }
+  ]
+}

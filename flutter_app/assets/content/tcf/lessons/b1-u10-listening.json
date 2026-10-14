@@ -1,0 +1,58 @@
+{
+  "id": "b1-u10-listening",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La rencontre commence à dix heures trente au lieu de dix heures. Les participants doivent entrer par la porte nord. Si vous arrivez après le début, demandez l'organisateur à l'accueil.",
+      "question": "Where should late arrivals ask for the organizer?",
+      "options": [
+        "At reception",
+        "At the bus terminal",
+        "In the parking lot",
+        "At the south entrance"
+      ],
+      "answer": 0,
+      "explain": "Late arrivals should ask at reception."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "L'inscription est facultative, mais les personnes qui souhaitent recevoir le document doivent donner leur adresse courriel. La salle se trouve au deuxième étage.",
+      "question": "What should someone provide to receive the document?",
+      "options": [
+        "A bus pass",
+        "An email address",
+        "A phone number",
+        "A paper form"
+      ],
+      "answer": 1,
+      "explain": "The speaker says an email address is needed to receive the document."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La porte principale sera fermée après dix-huit heures. Utilisez l'entrée près du stationnement; une affiche indiquera le chemin. La rampe est située derrière le bâtiment.",
+      "question": "Where is the ramp?",
+      "options": [
+        "Across from the station",
+        "On the second floor",
+        "Behind the building",
+        "At the main entrance"
+      ],
+      "answer": 2,
+      "explain": "The ramp is behind the building."
+    }
+  ]
+}

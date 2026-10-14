@@ -1,0 +1,140 @@
+{
+  "id": "a2-u05-checkpoint",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which phrase forms the near future?",
+      "options": [
+        "Nous allons vérifier",
+        "Nous vérifierons allons",
+        "Nous vérifions aller",
+        "Nous allons vérifié"
+      ],
+      "answer": 0,
+      "explain": "Present aller plus an infinitive: allons vérifier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the future simple form: Je ___ disponible mardi.",
+      "options": [
+        "serai",
+        "seras",
+        "suis",
+        "vais serai"
+      ],
+      "answer": 0,
+      "explain": "Être has the future stem ser- and the je ending -ai."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Complete: Elle ___ son formulaire vendredi. (soumettre)",
+      "options": [
+        "soumettra",
+        "va soumettra",
+        "soumet",
+        "soumettre"
+      ],
+      "answer": 0,
+      "explain": "Use the infinitive stem with the elle ending -a."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What is the future simple form of avoir with tu?",
+      "options": [
+        "tu auras",
+        "tu avoiras",
+        "tu as",
+        "tu vas auras"
+      ],
+      "answer": 0,
+      "explain": "The irregular future stem is aur-; with tu, add -as."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Choose the correct conditional pattern: If the group is full, I will choose another time.",
+      "options": [
+        "Si le groupe est complet, je choisirai un autre horaire.",
+        "Si le groupe sera complet, je choisirai un autre horaire.",
+        "Si le groupe complet, je choisirai un autre horaire.",
+        "Si le groupe est complet, je choisir un autre horaire."
+      ],
+      "answer": 0,
+      "explain": "Use present after si, then the future in the result."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does La formation commencera en janvier mean?",
+      "options": [
+        "The course will start in January.",
+        "The course started in January.",
+        "The course starts every January.",
+        "The course could start in January."
+      ],
+      "answer": 0,
+      "explain": "Commencera is the future simple form of commencer."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Choose the natural futur simple form of répondre with nous.",
+      "options": [
+        "nous répondrons",
+        "nous répondrons pas",
+        "nous répondons demain",
+        "nous répondra"
+      ],
+      "answer": 0,
+      "explain": "Drop the final e from répondre, then add -ons: répondrons."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "Which sentence gives an intention using the near future?",
+      "options": [
+        "Je vais demander une autre date.",
+        "Je demandais une autre date.",
+        "J'ai demandé une autre date.",
+        "Je demander une autre date."
+      ],
+      "answer": 0,
+      "explain": "Je vais plus the infinitive demander expresses an intention."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "A notice says the group is pending confirmation. What can you conclude?",
+      "options": [
+        "The schedule is not confirmed yet.",
+        "The application is accepted.",
+        "The class is cancelled.",
+        "The interview is finished."
+      ],
+      "answer": 0,
+      "explain": "Pending confirmation means the schedule has not been confirmed."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which sentence uses the future form that matches aller → ir-?",
+      "options": [
+        "Nous irons au centre lundi.",
+        "Nous allons irons au centre.",
+        "Nous iront au centre.",
+        "Nous aller au centre lundi."
+      ],
+      "answer": 0,
+      "explain": "The future stem is ir-; nous takes -ons: irons."
+    }
+  ]
+}

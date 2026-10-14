@@ -1,0 +1,140 @@
+{
+  "id": "a2-u04-dialogues",
+  "unit": "a2-u04",
+  "unitTitle": "Tell a clear story",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 4: Tell a clear story",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for a repeated habit and a description. The speakers are describing what was usual, not listing a series of finished events."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A familiar route",
+      "body": "Two classmates talk about their old neighbourhoods.",
+      "examples": [
+        {
+          "fr": "Quand j'habitais à Gatineau, je prenais le bus chaque matin.",
+          "en": "Awa: When I lived in Gatineau, I used to take the bus every morning."
+        },
+        {
+          "fr": "Le trajet était long ?",
+          "en": "Sam: Was the trip long?"
+        },
+        {
+          "fr": "Oui, mais le quartier était paisible et le bus était silencieux.",
+          "en": "Awa: Yes, but the neighbourhood was peaceful and the bus was quiet."
+        },
+        {
+          "fr": "Tu prenais ce bus chaque matin ?",
+          "en": "Sam: Did you take this bus every morning?"
+        },
+        {
+          "fr": "Oui. Il y avait un petit café près de l'arrêt.",
+          "en": "Awa: Yes. There was a small café near the stop."
+        },
+        {
+          "fr": "Tu y allais après le travail ?",
+          "en": "Sam: Did you go there after work?"
+        },
+        {
+          "fr": "Parfois. Je retrouvais une amie et nous parlions de nos cours.",
+          "en": "Awa: Sometimes. I met up with a friend and we talked about our classes."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "The old study room",
+      "body": "Nadia describes the room where she used to study.",
+      "examples": [
+        {
+          "fr": "La salle de lecture était au sous-sol.",
+          "en": "Nadia: The reading room was in the basement."
+        },
+        {
+          "fr": "Elle était calme ?",
+          "en": "Julie: Was it quiet?"
+        },
+        {
+          "fr": "Oui, mais il y avait parfois du bruit dans le couloir.",
+          "en": "Nadia: Yes, but sometimes there was noise in the hallway."
+        },
+        {
+          "fr": "Tu étudiais là chaque soir ?",
+          "en": "Julie: Did you study there every evening?"
+        },
+        {
+          "fr": "Non, je révisais le matin. La lumière était douce près de la fenêtre.",
+          "en": "Nadia: No, I used to review in the morning. The light was soft near the window."
+        },
+        {
+          "fr": "Et tu rentrais à quelle heure ?",
+          "en": "Julie: And what time did you go home?"
+        },
+        {
+          "fr": "Je rentrais à midi et je déjeunais avec ma sœur.",
+          "en": "Nadia: I used to go home at noon and have lunch with my sister."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How did Awa get to work or class in Gatineau?",
+      "options": [
+        "She took the bus each morning.",
+        "She walked every evening.",
+        "She drove downtown.",
+        "She took a train at noon."
+      ],
+      "answer": 0,
+      "explain": "Awa says she used to take the bus every morning."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What was near the stop?",
+      "options": [
+        "A small café",
+        "A library",
+        "A playground",
+        "A train station"
+      ],
+      "answer": 0,
+      "explain": "Awa remembers a small café near the stop."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where was Nadia's reading room?",
+      "options": [
+        "In the basement",
+        "On a balcony",
+        "Near the station",
+        "In a courtyard"
+      ],
+      "answer": 0,
+      "explain": "Nadia says it was in the basement."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Why did Nadia review in the morning?",
+      "options": [
+        "The light near the window was soft.",
+        "The hallway was busier.",
+        "The bus was more frequent.",
+        "Her sister worked there."
+      ],
+      "answer": 0,
+      "explain": "She says the light was soft near the window."
+    }
+  ]
+}

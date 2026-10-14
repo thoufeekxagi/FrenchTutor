@@ -1,0 +1,148 @@
+{
+  "id": "b1-u10-words-3",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un tarif réduit",
+      "en": "a reduced rate",
+      "sound": "uh(n) tah-reef ray-dü-ee",
+      "exampleFr": "Un tarif réduit est offert aux étudiants.",
+      "exampleEn": "A reduced rate is available to students."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une inscription préalable",
+      "en": "advance registration",
+      "sound": "ün ehn-skree-psyoh(n) pray-ah-LAHBL",
+      "exampleFr": "Une inscription préalable est nécessaire pour participer.",
+      "exampleEn": "Advance registration is required to participate."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une place réservée",
+      "en": "a reserved place",
+      "sound": "ün plahs ray-zehr-VAY",
+      "exampleFr": "Une place réservée sera gardée jusqu'à dix heures.",
+      "exampleEn": "A reserved place will be held until ten o'clock."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une liste d'attente",
+      "en": "a waiting list",
+      "sound": "ün leest dah-tahnt",
+      "exampleFr": "Les personnes sans place peuvent rejoindre la liste d'attente.",
+      "exampleEn": "People without a spot can join the waiting list."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "des frais supplémentaires",
+      "en": "additional fees",
+      "sound": "day freh sü-play-mahn-TEHR",
+      "exampleFr": "Le matériel entraîne des frais supplémentaires.",
+      "exampleEn": "The equipment involves additional fees."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "les modalités de paiement",
+      "en": "payment terms; methods",
+      "sound": "lay moh-dah-lee-TAY duh peh-MAH(N)",
+      "exampleFr": "Les modalités de paiement sont précisées dans le courriel.",
+      "exampleEn": "The payment terms are specified in the email."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un tarif réduit",
+      "options": [
+        "a waiting list",
+        "a reduced rate",
+        "advance registration",
+        "a reserved place"
+      ],
+      "answer": 1,
+      "explain": "un tarif réduit means a reduced rate."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une inscription préalable",
+      "options": [
+        "additional fees",
+        "a reserved place",
+        "a waiting list",
+        "advance registration"
+      ],
+      "answer": 3,
+      "explain": "une inscription préalable means advance registration."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une place réservée",
+      "options": [
+        "payment terms; methods",
+        "a reserved place",
+        "a waiting list",
+        "additional fees"
+      ],
+      "answer": 1,
+      "explain": "une place réservée means a reserved place."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une liste d'attente",
+      "options": [
+        "a reduced rate",
+        "additional fees",
+        "payment terms; methods",
+        "a waiting list"
+      ],
+      "answer": 3,
+      "explain": "une liste d'attente means a waiting list."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "des frais supplémentaires",
+      "options": [
+        "advance registration",
+        "additional fees",
+        "payment terms; methods",
+        "a reduced rate"
+      ],
+      "answer": 1,
+      "explain": "des frais supplémentaires means additional fees."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "les modalités de paiement",
+      "options": [
+        "a reserved place",
+        "a reduced rate",
+        "advance registration",
+        "payment terms; methods"
+      ],
+      "answer": 3,
+      "explain": "les modalités de paiement means payment terms; methods."
+    }
+  ]
+}

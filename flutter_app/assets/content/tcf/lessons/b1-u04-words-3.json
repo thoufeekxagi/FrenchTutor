@@ -1,0 +1,148 @@
+{
+  "id": "b1-u04-words-3",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un bail",
+      "en": "a lease",
+      "sound": "uh(n) bai",
+      "exampleFr": "Le bail précise la date de début de la location.",
+      "exampleEn": "The lease states the start date of the rental."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "les charges",
+      "en": "utilities and extra housing costs",
+      "sound": "lay sharzh",
+      "exampleFr": "Les charges sont comprises dans le loyer mensuel.",
+      "exampleEn": "Utilities and extra costs are included in the monthly rent."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une buanderie",
+      "en": "a laundry room",
+      "sound": "ün bü-ahn-dree",
+      "exampleFr": "La buanderie se trouve au sous-sol de l'immeuble.",
+      "exampleEn": "The laundry room is in the building's basement."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "le voisinage",
+      "en": "the neighbourhood; neighbours",
+      "sound": "luh vwah-zee-NAHZH",
+      "exampleFr": "Le voisinage est calme en soirée.",
+      "exampleEn": "The neighbourhood is quiet in the evening."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un accès sans marche",
+      "en": "step-free access",
+      "sound": "uh(n) ahk-SEH sahn marsh",
+      "exampleFr": "L'entrée offre un accès sans marche.",
+      "exampleEn": "The entrance offers step-free access."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un logement meublé",
+      "en": "a furnished home",
+      "sound": "uh(n) lozh-mahn muh-blay",
+      "exampleFr": "Le logement meublé est disponible dès juillet.",
+      "exampleEn": "The furnished home is available starting in July."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un bail",
+      "options": [
+        "the neighbourhood; neighbours",
+        "a lease",
+        "utilities and extra housing costs",
+        "a laundry room"
+      ],
+      "answer": 1,
+      "explain": "un bail means a lease."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "les charges",
+      "options": [
+        "step-free access",
+        "a laundry room",
+        "the neighbourhood; neighbours",
+        "utilities and extra housing costs"
+      ],
+      "answer": 3,
+      "explain": "les charges means utilities and extra housing costs."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une buanderie",
+      "options": [
+        "a furnished home",
+        "a laundry room",
+        "the neighbourhood; neighbours",
+        "step-free access"
+      ],
+      "answer": 1,
+      "explain": "une buanderie means a laundry room."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "le voisinage",
+      "options": [
+        "a lease",
+        "step-free access",
+        "a furnished home",
+        "the neighbourhood; neighbours"
+      ],
+      "answer": 3,
+      "explain": "le voisinage means the neighbourhood; neighbours."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès sans marche",
+      "options": [
+        "utilities and extra housing costs",
+        "step-free access",
+        "a furnished home",
+        "a lease"
+      ],
+      "answer": 1,
+      "explain": "un accès sans marche means step-free access."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un logement meublé",
+      "options": [
+        "a laundry room",
+        "a lease",
+        "utilities and extra housing costs",
+        "a furnished home"
+      ],
+      "answer": 3,
+      "explain": "un logement meublé means a furnished home."
+    }
+  ]
+}

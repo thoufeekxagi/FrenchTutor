@@ -1,0 +1,166 @@
+{
+  "id": "a2-u09-words-4",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Words: places and landmarks",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un bureau d'information",
+      "en": "an information office",
+      "sound": "uh(n) bü-ROH da(n)-for-mah-SYOH(N)",
+      "exampleFr": "Le bureau d'information est près de l'entrée principale.",
+      "exampleEn": "The information office is near the main entrance."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un point d'accès",
+      "en": "an access point",
+      "sound": "uh(n) pwa(n) dahk-SEH",
+      "exampleFr": "Le point d'accès est près de l'arrêt d'autobus.",
+      "exampleEn": "The access point is near the bus stop."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une entrée principale",
+      "en": "a main entrance",
+      "sound": "ün ah(n)-TRAY pree(n)-see-PAHL",
+      "exampleFr": "L'entrée principale est à gauche du stationnement.",
+      "exampleEn": "The main entrance is to the left of the parking area."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un point de repère",
+      "en": "a landmark",
+      "sound": "uh(n) pwa(n) duh ruh-PEHR",
+      "exampleFr": "Le panneau indique un point de repère près de la gare.",
+      "exampleEn": "The board shows a landmark near the station."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un carrefour",
+      "en": "an intersection",
+      "sound": "uh(n) kahr-FOOR",
+      "exampleFr": "Le carrefour est près de la station.",
+      "exampleEn": "The intersection is near the station."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une rue parallèle",
+      "en": "a parallel street",
+      "sound": "ün rü pah-rah-LEHL",
+      "exampleFr": "La rue parallèle mène au terminus.",
+      "exampleEn": "The parallel street leads to the terminus."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une destination",
+      "en": "a destination",
+      "sound": "ün dehs-tee-nah-SYOH(N)",
+      "exampleFr": "Ma destination est le centre communautaire.",
+      "exampleEn": "My destination is the community centre."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un édifice public",
+      "en": "a public building",
+      "sound": "uh(n) ay-dee-FEES pü-BLEEK",
+      "exampleFr": "L'édifice public se trouve près du carrefour.",
+      "exampleEn": "The public building is near the intersection."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un bureau d'information",
+      "options": [
+        "a landmark",
+        "an information office",
+        "a destination",
+        "an access point"
+      ],
+      "answer": 1,
+      "explain": "un bureau d'information means an information office."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un point d'accès",
+      "options": [
+        "an intersection",
+        "a public building",
+        "a main entrance",
+        "an access point"
+      ],
+      "answer": 3,
+      "explain": "un point d'accès means an access point."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une entrée principale",
+      "options": [
+        "a parallel street",
+        "a main entrance",
+        "an information office",
+        "a landmark"
+      ],
+      "answer": 1,
+      "explain": "une entrée principale means a main entrance."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de repère",
+      "options": [
+        "a destination",
+        "an access point",
+        "an intersection",
+        "a landmark"
+      ],
+      "answer": 3,
+      "explain": "un point de repère means a landmark."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un carrefour",
+      "options": [
+        "a public building",
+        "an intersection",
+        "a main entrance",
+        "a parallel street"
+      ],
+      "answer": 1,
+      "explain": "un carrefour means an intersection."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une rue parallèle",
+      "options": [
+        "an information office",
+        "a landmark",
+        "a destination",
+        "a parallel street"
+      ],
+      "answer": 3,
+      "explain": "une rue parallèle means a parallel street."
+    }
+  ]
+}

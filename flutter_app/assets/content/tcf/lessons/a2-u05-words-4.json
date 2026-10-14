@@ -1,0 +1,166 @@
+{
+  "id": "a2-u05-words-4",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Words: plans and decisions",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un plan provisoire",
+      "en": "a tentative plan",
+      "sound": "uh(n) plah(n) proh-vee-ZWAHR",
+      "exampleFr": "J'explique un plan provisoire à ma conseillère.",
+      "exampleEn": "I explain a tentative plan to my adviser."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un plan de secours",
+      "en": "a backup plan",
+      "sound": "uh(n) plah(n) duh suh-KOOR",
+      "exampleFr": "J'explique un plan de secours à ma conseillère.",
+      "exampleEn": "I explain a backup plan to my adviser."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un choix réaliste",
+      "en": "a realistic choice",
+      "sound": "uh(n) shwah ray-ah-LEEST",
+      "exampleFr": "J'explique un choix réaliste à ma conseillère.",
+      "exampleEn": "I explain a realistic choice to my adviser."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une possibilité",
+      "en": "a possibility",
+      "sound": "ün poh-see-bee-lee-TAY",
+      "exampleFr": "J'explique une possibilité à ma conseillère.",
+      "exampleEn": "I explain a possibility to my adviser."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un objectif à court terme",
+      "en": "a short-term goal",
+      "sound": "uh(n) noh-bzhehk-teef ah koor TEHRM",
+      "exampleFr": "J'explique un objectif à court terme à ma conseillère.",
+      "exampleEn": "I explain a short-term goal to my adviser."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une estimation",
+      "en": "an estimate",
+      "sound": "ün eh-stee-mah-SYOH(N)",
+      "exampleFr": "J'explique une estimation à ma conseillère.",
+      "exampleEn": "I explain an estimate to my adviser."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une conséquence",
+      "en": "a consequence",
+      "sound": "ün kohn-say-KAH(N)S",
+      "exampleFr": "J'explique une conséquence à ma conseillère.",
+      "exampleEn": "I explain a consequence to my adviser."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un engagement",
+      "en": "a commitment",
+      "sound": "uh(n) ah(n)-gahzh-MAH(N)",
+      "exampleFr": "J'explique un engagement à ma conseillère.",
+      "exampleEn": "I explain a commitment to my adviser."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un plan provisoire",
+      "options": [
+        "a possibility",
+        "a tentative plan",
+        "a consequence",
+        "a short-term goal"
+      ],
+      "answer": 1,
+      "explain": "un plan provisoire means a tentative plan."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un plan de secours",
+      "options": [
+        "a short-term goal",
+        "a commitment",
+        "a realistic choice",
+        "a backup plan"
+      ],
+      "answer": 3,
+      "explain": "un plan de secours means a backup plan."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un choix réaliste",
+      "options": [
+        "an estimate",
+        "a realistic choice",
+        "a tentative plan",
+        "a possibility"
+      ],
+      "answer": 1,
+      "explain": "un choix réaliste means a realistic choice."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une possibilité",
+      "options": [
+        "a consequence",
+        "a backup plan",
+        "a short-term goal",
+        "a possibility"
+      ],
+      "answer": 3,
+      "explain": "une possibilité means a possibility."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un objectif à court terme",
+      "options": [
+        "a commitment",
+        "a short-term goal",
+        "a realistic choice",
+        "an estimate"
+      ],
+      "answer": 1,
+      "explain": "un objectif à court terme means a short-term goal."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une estimation",
+      "options": [
+        "a tentative plan",
+        "a possibility",
+        "a consequence",
+        "an estimate"
+      ],
+      "answer": 3,
+      "explain": "une estimation means an estimate."
+    }
+  ]
+}

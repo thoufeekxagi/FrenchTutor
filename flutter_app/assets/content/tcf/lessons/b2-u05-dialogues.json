@@ -1,0 +1,80 @@
+{
+  "id": "b2-u05-dialogues",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Clarifying a fictional appointment notice",
+      "body": "An adult learner asks an information agent what a notice actually requires. This is language practice, not medical or legal guidance.",
+      "examples": [
+        {
+          "fr": "La consigne dit qu'il faut apporter un document.",
+          "en": "Usager: The instruction says a document must be brought."
+        },
+        {
+          "fr": "Oui, mais le type de document dépend du service.",
+          "en": "Agente: Yes, but the type of document depends on the service."
+        },
+        {
+          "fr": "Il est possible que mon cas soit particulier. À qui dois-je poser la question ?",
+          "en": "Usager: It is possible that my case is particular. Whom should I ask?"
+        },
+        {
+          "fr": "Je vous conseille de vérifier auprès du professionnel concerné.",
+          "en": "Agente: I advise you to check with the relevant professional."
+        },
+        {
+          "fr": "Si j'ai bien compris, je ne dois pas supposer que le même délai s'applique à tout le monde.",
+          "en": "Usager: If I understood correctly, I should not assume the same time limit applies to everyone."
+        },
+        {
+          "fr": "Exactement. Le document ne précise pas chaque situation.",
+          "en": "Agente: Exactly. The document does not specify every situation."
+        },
+        {
+          "fr": "Merci. Je vais demander une confirmation avant de remplir la dernière partie.",
+          "en": "Usager: Thank you. I will ask for confirmation before filling out the last section."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Checking a recommendation",
+      "body": "Two classmates separate a language exercise from real professional advice.",
+      "examples": [
+        {
+          "fr": "Le modèle dit qu'il faut que la personne appelle le service.",
+          "en": "Sam: The model says the person needs to call the service."
+        },
+        {
+          "fr": "Est-ce une règle générale ou un exemple de conversation ?",
+          "en": "Awa: Is that a general rule or a conversation example?"
+        },
+        {
+          "fr": "C'est seulement un exemple fictif.",
+          "en": "Sam: It is only a fictional example."
+        },
+        {
+          "fr": "Alors, pour une vraie situation, il vaut mieux vérifier auprès de la source officielle.",
+          "en": "Awa: Then, for a real situation, it is better to check with the official source."
+        },
+        {
+          "fr": "Oui. Et je peux demander à Marie de m'aider avec la formulation, pas de décider à ma place.",
+          "en": "Sam: Yes. And I can ask Marie to help with wording, not to decide for me."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,368 @@
+{
+  "id": "b1-le-stage-qui-change-la-decision",
+  "title": "Le stage qui change la décision",
+  "titleEn": "The internship that changes the decision",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "Karim compares two training paths and checks whether an internship fits the life he already has.",
+  "unit": "b1-u02",
+  "sentences": [
+    {
+      "fr": "Karim voulait changer de secteur, mais il ne pouvait pas quitter son emploi immédiatement.",
+      "en": "Karim wanted to change fields, but he could not leave his job right away."
+    },
+    {
+      "fr": "Il a comparé deux formations : l'une avait des cours le soir, tandis que l'autre exigeait une présence le jour.",
+      "en": "He compared two programs: one had evening classes, while the other required daytime attendance."
+    },
+    {
+      "fr": "La première proposait aussi un stage, ce qui lui permettrait de mettre ses compétences en pratique.",
+      "en": "The first also offered an internship, which would let him put his skills into practice."
+    },
+    {
+      "fr": "Avant de s'inscrire, il a demandé si les heures de stage pouvaient être réparties sur plusieurs semaines.",
+      "en": "Before enrolling, he asked whether the internship hours could be spread over several weeks."
+    },
+    {
+      "fr": "La conseillère lui a répondu que cela dépendrait de l'employeur et du calendrier du programme.",
+      "en": "The adviser replied that it would depend on the employer and the program schedule."
+    },
+    {
+      "fr": "Karim a donc vérifié son budget et parlé de son projet avec sa famille.",
+      "en": "Karim therefore checked his budget and discussed his plan with his family."
+    },
+    {
+      "fr": "Il choisira cette formation si l'horaire du stage reste compatible avec son travail.",
+      "en": "He will choose this program if the internship schedule remains compatible with his job.",
+      "note": "A condition makes advice more accurate: a program can be suitable only if its schedule and requirements fit the learner's situation."
+    }
+  ],
+  "words": {
+    "karim": {
+      "en": "Karim (a man's name)",
+      "pos": "name"
+    },
+    "voulait": {
+      "en": "wanted"
+    },
+    "changer": {
+      "en": "to change"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "secteur": {
+      "en": "field; sector"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "pouvait": {
+      "en": "could"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "quitter": {
+      "en": "to leave"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "emploi": {
+      "en": "job"
+    },
+    "immédiatement": {
+      "en": "immediately"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "comparé": {
+      "en": "compared"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "formations": {
+      "en": "training programs"
+    },
+    "l'une": {
+      "en": "one; one of them"
+    },
+    "avait": {
+      "en": "had"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "cours": {
+      "en": "a course, class"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "tandis": {
+      "en": "whereas; while"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "l'autre": {
+      "en": "the other",
+      "pos": "determiner"
+    },
+    "exigeait": {
+      "en": "required"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "présence": {
+      "en": "attendance; presence"
+    },
+    "jour": {
+      "en": "day",
+      "pos": "noun, masculine"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "première": {
+      "en": "first"
+    },
+    "proposait": {
+      "en": "proposed; offered"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "stage": {
+      "en": "an internship, placement"
+    },
+    "ce": {
+      "en": "this; that (masculine)",
+      "pos": "determiner"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "permettrait": {
+      "en": "would allow"
+    },
+    "mettre": {
+      "en": "to put; to place"
+    },
+    "ses": {
+      "en": "his; her (plural noun)",
+      "pos": "possessive"
+    },
+    "compétences": {
+      "en": "skills"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "pratique": {
+      "en": "practical; useful"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "s'inscrire": {
+      "en": "to register"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "heures": {
+      "en": "hours; clock times",
+      "pos": "noun, feminine plural"
+    },
+    "pouvaient": {
+      "en": "could"
+    },
+    "être": {
+      "en": "to be",
+      "sound": "EHtr"
+    },
+    "réparties": {
+      "en": "divided; distributed"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "plusieurs": {
+      "en": "several"
+    },
+    "semaines": {
+      "en": "weeks"
+    },
+    "conseillère": {
+      "en": "adviser"
+    },
+    "répondu": {
+      "en": "answered"
+    },
+    "cela": {
+      "en": "that; this"
+    },
+    "dépendrait": {
+      "en": "would depend"
+    },
+    "l'employeur": {
+      "en": "an employer"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "calendrier": {
+      "en": "calendar"
+    },
+    "programme": {
+      "en": "a program of study"
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "vérifié": {
+      "en": "checked"
+    },
+    "budget": {
+      "en": "budget"
+    },
+    "parlé": {
+      "en": "spoke; talked"
+    },
+    "projet": {
+      "en": "a project"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "sa": {
+      "en": "his; her (feminine noun)",
+      "pos": "possessive"
+    },
+    "famille": {
+      "en": "family"
+    },
+    "choisira": {
+      "en": "will choose"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "formation": {
+      "en": "training program"
+    },
+    "l'horaire": {
+      "en": "schedule",
+      "sound": "loh-REHR"
+    },
+    "reste": {
+      "en": "remains; rest"
+    },
+    "compatible": {
+      "en": "compatible"
+    },
+    "travail": {
+      "en": "work"
+    }
+  },
+  "keywords": [
+    "secteur",
+    "formations",
+    "stage",
+    "compétences",
+    "l'horaire",
+    "budget",
+    "compatible"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why could Karim not leave his current job immediately?",
+      "options": [
+        "The internship had already ended",
+        "He needed to keep working while planning a career change",
+        "The training centre had rejected him",
+        "His family had chosen a different program"
+      ],
+      "answer": 1,
+      "explain": "The first sentence says he could not leave his job right away."
+    },
+    {
+      "prompt": "What would the internship allow Karim to do?",
+      "options": [
+        "Change the employer's calendar",
+        "Complete the program during the day",
+        "Avoid checking the schedule",
+        "Put his skills into practice"
+      ],
+      "answer": 3,
+      "explain": "The third sentence says the internship would let him practise his skills."
+    },
+    {
+      "prompt": "What condition will affect Karim's choice?",
+      "options": [
+        "Whether the program removes its internship",
+        "Whether the adviser changes the course content",
+        "Whether the internship schedule fits his job",
+        "Whether his family moves to another city"
+      ],
+      "answer": 2,
+      "explain": "The final sentence makes his choice conditional on schedule compatibility."
+    }
+  ]
+}

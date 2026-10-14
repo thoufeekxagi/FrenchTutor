@@ -1,0 +1,49 @@
+{
+  "id": "b2-u11-write-speak",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 1 practice",
+      "body": "Write a 70–100-word email to a workshop coordinator. Ask about one schedule detail, one cost or included item, an alternative date and how to cancel. Use a polite register and confirm what you understood.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour, Je vous écris au sujet de l'atelier annoncé pour samedi. Pourriez-vous me confirmer l'heure de début et me préciser si le cahier est compris dans le tarif ? Je ne suis pas disponible ce jour-là; y a-t-il une autre date prévue le mois prochain ? Pourriez-vous également m'indiquer à quelle adresse je dois écrire si je dois annuler ? Si j'ai bien compris, la réservation est facultative, mais elle permet de recevoir un rappel. Merci de me dire si cette information est exacte. Cordialement, Awa\n\nCheck:\n• Task 1 range: 60–120 words.\n• Ask questions that obtain distinct details.\n• Use polite register and an appropriate closing.\n• Paraphrase one answer or notice detail to confirm it."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Official TCF Task 2 simulation: use the fictional workshop notice to ask for the schedule, what is included, the price, another date and cancellation procedure. Prepare for two minutes and interact for three minutes thirty. Marie should answer in stages, give one incomplete answer, and change a date so you must follow up.\n\n• Task 2 is an information-seeking interaction, not a monologue.\n• Use your two minutes to plan question purposes, not full sentences.\n• Ask a follow-up that uses the answer you just heard."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Bonjour, je vous appelle au sujet de l'atelier. Pourriez-vous me confirmer l'horaire et me préciser ce qui est compris dans le tarif ? Y a-t-il des frais supplémentaires pour le matériel ?",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Je ne suis pas disponible samedi; pourriez-vous me dire à quelle date aura lieu la prochaine séance ? Si je dois annuler, quelle est la démarche à suivre et à quelle personne dois-je écrire ?",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Si j'ai bien compris, la réservation est facultative, mais elle permet de recevoir un rappel. Est-ce exact ? Merci pour ces renseignements.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

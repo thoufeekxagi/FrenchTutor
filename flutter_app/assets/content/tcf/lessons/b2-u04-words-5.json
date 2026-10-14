@@ -1,0 +1,148 @@
+{
+  "id": "b2-u04-words-5",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une répercussion",
+      "en": "a repercussion",
+      "sound": "ün ray-pehr-kü-SYOH(N)",
+      "exampleFr": "La fermeture a une répercussion sur les commerces voisins.",
+      "exampleEn": "The closure has a repercussion on nearby businesses."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "des travaux d'envergure",
+      "en": "major construction work",
+      "sound": "day trah-VOH dahn-vehr-GÜR",
+      "exampleFr": "Des travaux d'envergure commenceront au printemps.",
+      "exampleEn": "Major construction work will begin in the spring."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une accessibilité universelle",
+      "en": "universal accessibility",
+      "sound": "ün ahk-seh-see-bee-lee-TAY ü-nee-vehr-SEHL",
+      "exampleFr": "L'accessibilité universelle doit être prévue dès la conception.",
+      "exampleEn": "Universal accessibility should be planned from the design stage."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "soutenir la mobilité",
+      "en": "to support mobility",
+      "sound": "soo-tuh-NEER lah moh-bee-lee-TAY",
+      "exampleFr": "Le nouvel arrêt vise à soutenir la mobilité des résidents.",
+      "exampleEn": "The new stop aims to support residents' mobility."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "à proximité immédiate",
+      "en": "in the immediate vicinity",
+      "sound": "ah prohk-see-mee-TAY ee-may-DYAHT",
+      "exampleFr": "Les services essentiels sont à proximité immédiate du terminus.",
+      "exampleEn": "Essential services are in the immediate vicinity of the terminal."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un corridor écologique",
+      "en": "an ecological corridor",
+      "sound": "uh(n) koh-ree-dor ay-koh-loh-ZHEEK",
+      "exampleFr": "Le corridor écologique relie deux espaces naturels.",
+      "exampleEn": "The ecological corridor connects two natural areas."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une répercussion",
+      "options": [
+        "to support mobility",
+        "a repercussion",
+        "major construction work",
+        "universal accessibility"
+      ],
+      "answer": 1,
+      "explain": "une répercussion means a repercussion."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "des travaux d'envergure",
+      "options": [
+        "in the immediate vicinity",
+        "universal accessibility",
+        "to support mobility",
+        "major construction work"
+      ],
+      "answer": 3,
+      "explain": "des travaux d'envergure means major construction work."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une accessibilité universelle",
+      "options": [
+        "an ecological corridor",
+        "universal accessibility",
+        "to support mobility",
+        "in the immediate vicinity"
+      ],
+      "answer": 1,
+      "explain": "une accessibilité universelle means universal accessibility."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "soutenir la mobilité",
+      "options": [
+        "a repercussion",
+        "in the immediate vicinity",
+        "an ecological corridor",
+        "to support mobility"
+      ],
+      "answer": 3,
+      "explain": "soutenir la mobilité means to support mobility."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "à proximité immédiate",
+      "options": [
+        "major construction work",
+        "in the immediate vicinity",
+        "an ecological corridor",
+        "a repercussion"
+      ],
+      "answer": 1,
+      "explain": "à proximité immédiate means in the immediate vicinity."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un corridor écologique",
+      "options": [
+        "universal accessibility",
+        "a repercussion",
+        "major construction work",
+        "an ecological corridor"
+      ],
+      "answer": 3,
+      "explain": "un corridor écologique means an ecological corridor."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b2-u10-words-3",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une assemblée publique",
+      "en": "a public assembly",
+      "sound": "ün ah-sahn-blay pü-BLEEK",
+      "exampleFr": "L'assemblée publique commence par une période de questions.",
+      "exampleEn": "The public assembly begins with a question period."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un ordre du jour",
+      "en": "an agenda",
+      "sound": "uh(n) or-dr dü zhoor",
+      "exampleFr": "L'ordre du jour prévoit trois sujets.",
+      "exampleEn": "The agenda lists three topics."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une prise de parole",
+      "en": "a speaking turn",
+      "sound": "ün preez duh pah-ROHL",
+      "exampleFr": "Chaque prise de parole est limitée à deux minutes.",
+      "exampleEn": "Each speaking turn is limited to two minutes."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une position minoritaire",
+      "en": "a minority position",
+      "sound": "ün poh-zee-SYOH(N) mee-noh-ree-TEHR",
+      "exampleFr": "Le compte rendu résume aussi la position minoritaire.",
+      "exampleEn": "The report also summarizes the minority position."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une objection recevable",
+      "en": "a valid objection",
+      "sound": "ün ohb-zhehk-SYOH(N) ruh-suh-VAHBL",
+      "exampleFr": "La présidente répond à une objection recevable.",
+      "exampleEn": "The chair responds to a valid objection."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une proposition amendée",
+      "en": "an amended proposal",
+      "sound": "ün proh-poh-zee-SYOH(N) ah-mahn-DAY",
+      "exampleFr": "Le comité examine une proposition amendée.",
+      "exampleEn": "The committee is examining an amended proposal."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une assemblée publique",
+      "options": [
+        "a minority position",
+        "a public assembly",
+        "an agenda",
+        "a speaking turn"
+      ],
+      "answer": 1,
+      "explain": "une assemblée publique means a public assembly."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un ordre du jour",
+      "options": [
+        "a valid objection",
+        "a speaking turn",
+        "a minority position",
+        "an agenda"
+      ],
+      "answer": 3,
+      "explain": "un ordre du jour means an agenda."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une prise de parole",
+      "options": [
+        "an amended proposal",
+        "a speaking turn",
+        "a minority position",
+        "a valid objection"
+      ],
+      "answer": 1,
+      "explain": "une prise de parole means a speaking turn."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une position minoritaire",
+      "options": [
+        "a public assembly",
+        "a valid objection",
+        "an amended proposal",
+        "a minority position"
+      ],
+      "answer": 3,
+      "explain": "une position minoritaire means a minority position."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une objection recevable",
+      "options": [
+        "an agenda",
+        "a valid objection",
+        "an amended proposal",
+        "a public assembly"
+      ],
+      "answer": 1,
+      "explain": "une objection recevable means a valid objection."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une proposition amendée",
+      "options": [
+        "a speaking turn",
+        "a public assembly",
+        "an agenda",
+        "an amended proposal"
+      ],
+      "answer": 3,
+      "explain": "une proposition amendée means an amended proposal."
+    }
+  ]
+}

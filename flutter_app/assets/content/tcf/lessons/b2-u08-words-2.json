@@ -1,0 +1,148 @@
+{
+  "id": "b2-u08-words-2",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un point commun",
+      "en": "a shared point",
+      "sound": "uh(n) pwa koh-MUH(N)",
+      "exampleFr": "Les deux récits ont un point commun.",
+      "exampleEn": "The two accounts share one point."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une démarche",
+      "en": "an approach; process",
+      "sound": "ün day-MARSH",
+      "exampleFr": "Sa démarche combine lecture et échanges.",
+      "exampleEn": "Her approach combines reading and discussion."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une pratique",
+      "en": "a practice",
+      "sound": "ün prah-TEEK",
+      "exampleFr": "La pratique change selon le contexte.",
+      "exampleEn": "The practice changes according to context."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une perspective",
+      "en": "a perspective",
+      "sound": "ün pehr-spehk-TEEV",
+      "exampleFr": "Cette perspective complète celle de l'autre invitée.",
+      "exampleEn": "This perspective complements the other guest's."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un désaccord",
+      "en": "a disagreement",
+      "sound": "uh(n) day-zah-KOR",
+      "exampleFr": "Le désaccord porte sur la façon de mesurer l'accès.",
+      "exampleEn": "The disagreement concerns how to measure access."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une expérience marquante",
+      "en": "a memorable experience",
+      "sound": "ün ehk-spay-ree-AH(N)S mar-KAHNT",
+      "exampleFr": "Elle raconte une expérience marquante de ses études.",
+      "exampleEn": "She recounts a memorable study experience."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un point commun",
+      "options": [
+        "a perspective",
+        "a shared point",
+        "an approach; process",
+        "a practice"
+      ],
+      "answer": 1,
+      "explain": "un point commun means a shared point."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une démarche",
+      "options": [
+        "a disagreement",
+        "a practice",
+        "a perspective",
+        "an approach; process"
+      ],
+      "answer": 3,
+      "explain": "une démarche means an approach; process."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une pratique",
+      "options": [
+        "a memorable experience",
+        "a practice",
+        "a perspective",
+        "a disagreement"
+      ],
+      "answer": 1,
+      "explain": "une pratique means a practice."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une perspective",
+      "options": [
+        "a shared point",
+        "a disagreement",
+        "a memorable experience",
+        "a perspective"
+      ],
+      "answer": 3,
+      "explain": "une perspective means a perspective."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un désaccord",
+      "options": [
+        "an approach; process",
+        "a disagreement",
+        "a memorable experience",
+        "a shared point"
+      ],
+      "answer": 1,
+      "explain": "un désaccord means a disagreement."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une expérience marquante",
+      "options": [
+        "a practice",
+        "a shared point",
+        "an approach; process",
+        "a memorable experience"
+      ],
+      "answer": 3,
+      "explain": "une expérience marquante means a memorable experience."
+    }
+  ]
+}

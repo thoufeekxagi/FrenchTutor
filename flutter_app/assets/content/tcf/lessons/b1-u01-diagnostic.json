@@ -1,0 +1,139 @@
+{
+  "id": "b1-u01-diagnostic",
+  "unit": "b1-u01",
+  "unitTitle": "B1 · Tell the story clearly: before, during and after",
+  "title": "B1 readiness check",
+  "subtitle": "Four-skill baseline before Unit 1",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "B1 readiness check",
+      "body": "B1 assumes a completed A2 foundation. Before studying this unit, complete one short task in each skill with notes closed. Save the first attempt and one observation in your notes app. This is a learning baseline, not a placement decision or TCF score. If connecting past events, following clear short texts or managing a practical exchange is still difficult, review the corresponding A2 work before continuing."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "L'atelier devait commencer à 18 h, mais la salle était occupée. L'organisatrice a déplacé le début à 18 h 30. Les personnes qui ne pouvaient pas attendre ont reçu un lien pour une autre date.",
+      "question": "What changed, and what option was offered?",
+      "options": [
+        "The room changed but the time stayed the same",
+        "The workshop was cancelled without notice",
+        "Everyone had to leave and pay again",
+        "The session started thirty minutes later; another date was offered"
+      ],
+      "answer": 3,
+      "explain": "The start moved from 18:00 to 18:30, and another date was offered to people who could not wait."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Le centre reçoit les candidatures jusqu'au 30 juin. Le cours du soir commence le 12 septembre. Une réponse sera envoyée aux personnes retenues avant le 15 juillet.",
+      "question": "By what date should candidates apply?",
+      "options": [
+        "September 12",
+        "September 30",
+        "June 30",
+        "July 15"
+      ],
+      "answer": 2,
+      "explain": "The application deadline is June 30; July 15 is the response date."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le bus 14 ne passera pas par la rue principale vendredi en raison des travaux. Les voyageurs peuvent prendre le bus 18 à l'arrêt du marché. L'horaire habituel reprend samedi.",
+      "question": "Where can travellers take bus 18?",
+      "options": [
+        "On the main street",
+        "At the market stop",
+        "At the station on Saturday",
+        "At the library"
+      ],
+      "answer": 1,
+      "explain": "The announcement says bus 18 can be taken at the market stop."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which statement is supported by the notice?",
+      "options": [
+        "The presentation will take place outdoors",
+        "Registration is optional, and questions can be sent early or asked in person",
+        "The meeting is cancelled",
+        "Questions must be sent after Thursday"
+      ],
+      "answer": 1,
+      "explain": "The notice explicitly says registration is optional and gives two ways to ask a question.",
+      "promptFr": "AVIS — Rencontre d'information · La rencontre du jeudi est déplacée à la salle 204, au deuxième étage. L'inscription reste facultative. Les personnes qui souhaitent poser une question peuvent l'envoyer avant mercredi ou la poser sur place. L'organisatrice répondra aux questions après la présentation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What should the visitor bring?",
+      "options": [
+        "A piece of identification",
+        "A copy of the schedule",
+        "A written question",
+        "A payment receipt"
+      ],
+      "answer": 0,
+      "explain": "The message asks the visitor to bring identification.",
+      "promptFr": "MESSAGE — Le responsable confirme que la visite aura lieu mardi. Il demande d'apporter une pièce d'identité. L'heure reste la même : 9 h 30."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When is the writer available?",
+      "options": [
+        "Saturday afternoon",
+        "Friday before 10 a.m.",
+        "Friday after 2 p.m.",
+        "Thursday before noon"
+      ],
+      "answer": 2,
+      "explain": "The writer asks to move the appointment to Friday afternoon and is free after 14:00.",
+      "promptFr": "COURRIEL — Je ne peux pas assister au rendez-vous de jeudi. Serait-il possible de le déplacer à vendredi après-midi ? Je reste disponible après 14 h."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Writing: Baseline writing sample",
+      "body": "Before Unit 1, write 60–80 words about a recent change to a plan. Say what the original plan was, what changed, how you responded and what happened next. Use no notes or translation app; save this first attempt.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Model answer",
+      "body": "La semaine dernière, mon cours devait finir à dix-sept heures. La professeure a annoncé que la salle serait utilisée pour une autre activité, alors le cours a commencé plus tôt. J'avais déjà prévu de prendre l'autobus après la classe. J'ai vérifié l'horaire et j'ai appelé mon collègue pour déplacer notre rencontre. Finalement, nous nous sommes retrouvés le lendemain. Ce changement m'a appris à confirmer les détails avant de partir.\n\nCheck:\n• Write before looking at the model.\n• Check whether your timeline and response are clear.\n• Note one strength and one recurring difficulty; this is a baseline, not a level score."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Speaking: Baseline speaking sample",
+      "body": "Before Unit 1, speak for 60–90 seconds about a plan that changed. Explain what you expected, what happened, how you reacted and the result. Then answer one follow-up from Marie. Start with notes closed.\n\n• Finish your first attempt before asking Marie to correct it.\n• After the attempt, compare event order and clarity, not accent imitation.\n• Repeat with a different plan and one changed detail."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "La semaine dernière, je devais rencontrer une amie après mon cours. Quand je suis arrivé au centre, j'ai appris que la salle avait été réservée pour un autre groupe.",
+      "en": "Model answer, part 1 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'avais déjà envoyé l'adresse à mon amie, alors je l'ai appelée. Nous avons choisi un café près de la station. Le changement était un peu inattendu, mais la soirée s'est bien passée.",
+      "en": "Model answer, part 2 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "La prochaine fois, je confirmerai la réservation avant de partir.",
+      "en": "Model answer, part 3 of 3.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

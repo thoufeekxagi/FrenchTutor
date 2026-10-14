@@ -1,0 +1,52 @@
+{
+  "id": "b2-u12-reading",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "On what do the two documents agree?",
+      "options": [
+        "Processes should be clear",
+        "Offline access is unnecessary",
+        "No data should be collected",
+        "Only one digital option is needed"
+      ],
+      "answer": 0,
+      "explain": "Both documents say processes should be clear.",
+      "promptFr": "Document A — Une plateforme commune réduirait le nombre de démarches et permettrait de mettre à jour les renseignements plus rapidement. Un seul point d'accès simplifierait le suivi pour les utilisateurs qui maîtrisent déjà les outils numériques. Document B — Une plateforme unique ne convient pas à toutes les situations. Il faut maintenir une option hors ligne et expliquer quelles données sont conservées. Les auteurs des deux textes souhaitent que les démarches soient claires; ils divergent sur le nombre de voies d'accès à proposer."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What can the reader conclude from the documents?",
+      "options": [
+        "Both documents report the same result",
+        "The consequences are hypotheses, not measured outcomes",
+        "Centralization has failed",
+        "The system has already been tested"
+      ],
+      "answer": 1,
+      "explain": "The texts present possible consequences but give no results from a trial.",
+      "promptFr": "Document A — La centralisation pourrait réduire les répétitions. Document B — La centralisation pourrait aussi créer un point de défaillance unique. Les deux idées sont présentées comme des possibilités; aucun résultat d'essai n'est fourni. Le lecteur ne peut donc pas conclure que l'une de ces conséquences s'est déjà produite."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What should the candidate revise first?",
+      "options": [
+        "Delete both source views",
+        "Make the conclusion less clear",
+        "Remove the unrelated anecdote and meet the word limit",
+        "Add a third source"
+      ],
+      "answer": 2,
+      "explain": "The anecdote is off topic and the response exceeds the maximum.",
+      "promptFr": "Le candidat a résumé chaque texte, puis a consacré la moitié de sa réponse à une anecdote sans lien direct avec la question. Sa conclusion était claire, mais le nombre de mots dépassait la limite. Une meilleure planification aurait permis de garder la comparaison et de supprimer la digression."
+    }
+  ]
+}

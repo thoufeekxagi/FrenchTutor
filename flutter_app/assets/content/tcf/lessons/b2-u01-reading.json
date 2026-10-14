@@ -1,0 +1,52 @@
+{
+  "id": "b2-u01-reading",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does the committee propose?",
+      "options": [
+        "A survey without reporting its limits",
+        "A limited trial with criteria set in advance",
+        "A permanent rule based on the survey",
+        "The removal of every on-site role"
+      ],
+      "answer": 1,
+      "explain": "The committee proposes a limited trial and criteria defined before it begins.",
+      "promptFr": "Dans un sondage interne fictif, plusieurs employés disent apprécier la souplesse d'un horaire hybride. Le document ne mesure toutefois ni la qualité du travail ni la situation des postes qui exigent une présence continue. Le comité propose donc un essai limité, avec des critères définis avant le lancement. Les résultats seraient présentés avec les limites de l'enquête. Cette méthode permettrait de comparer des expériences sans transformer une préférence déclarée en preuve d'efficacité."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "On what do both groups agree?",
+      "options": [
+        "Spontaneous discussion has no value",
+        "Every meeting should be online",
+        "Meetings without a clear purpose are rarely useful",
+        "The office is always more accessible"
+      ],
+      "answer": 2,
+      "explain": "Both groups agree that meetings need a clear purpose.",
+      "promptFr": "Pour certains collègues, les échanges spontanés au bureau accélèrent la résolution de problèmes. D'autres soulignent que des réunions en ligne bien préparées peuvent être plus accessibles. Les deux groupes s'accordent sur un point : les réunions sans objectif clair sont rarement utiles. Le débat porte donc moins sur un lieu unique que sur les conditions d'un échange efficace."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why does the report advise repeating the measure?",
+      "options": [
+        "Other factors may have influenced the first result",
+        "Teams refused to answer any questions",
+        "The direction already ended the policy",
+        "The first period had no participants"
+      ],
+      "answer": 0,
+      "explain": "Season and holidays may have affected the observed reduction.",
+      "promptFr": "La direction présente les premiers chiffres comme indicatifs. Le nombre de déplacements a diminué pendant la période observée, mais la saison et les vacances ont pu jouer un rôle. Avant de modifier la politique, le rapport recommande de répéter la mesure à une autre période et d'interroger les équipes concernées."
+    }
+  ]
+}

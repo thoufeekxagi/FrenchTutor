@@ -1,0 +1,362 @@
+{
+  "id": "b2-ce-que-la-clinique-peut-confirmer",
+  "title": "Ce que le service peut confirmer",
+  "titleEn": "What the service can confirm",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "A patient prepares for an information appointment and keeps official process details separate from personal medical advice.",
+  "unit": "b2-u05",
+  "sentences": [
+    {
+      "fr": "Avant un rendez-vous d'information, Malik a préparé une liste de questions sur le fonctionnement du service.",
+      "en": "Before an information appointment, Malik prepared a list of questions about how the service worked."
+    },
+    {
+      "fr": "Il voulait savoir quels documents seraient conservés dans son dossier et qui pourrait les consulter.",
+      "en": "He wanted to know which documents would be kept in his file and who could consult them."
+    },
+    {
+      "fr": "L'employée a expliqué les règles de confidentialité du service et la façon de demander une copie de son dossier.",
+      "en": "The employee explained the service's privacy rules and how to request a copy of his file."
+    },
+    {
+      "fr": "Quand Malik a demandé si un symptôme précis exigeait une consultation urgente, elle a refusé de poser un diagnostic.",
+      "en": "When Malik asked whether a particular symptom required urgent care, she declined to make a diagnosis."
+    },
+    {
+      "fr": "Elle lui a conseillé de parler directement à un professionnel de la santé pour cette question personnelle.",
+      "en": "She advised him to speak directly with a health professional about that personal question."
+    },
+    {
+      "fr": "Malik a noté le numéro du service et a demandé où trouver les renseignements généraux sur les prochaines étapes.",
+      "en": "Malik noted the service number and asked where to find general information about the next steps."
+    },
+    {
+      "fr": "Il est reparti avec une réponse claire sur le dossier et une limite claire sur ce que l'employée pouvait confirmer.",
+      "en": "He left with a clear answer about his file and a clear boundary around what the employee could confirm.",
+      "note": "Administrative staff can explain a service process; personal medical questions belong with a qualified health professional."
+    }
+  ],
+  "words": {
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "rendez-vous": {
+      "en": "appointment"
+    },
+    "d'information": {
+      "en": "of information"
+    },
+    "malik": {
+      "en": "Malik (a man's name)"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "préparé": {
+      "en": "prepared (préparer)",
+      "pos": "verb"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "liste": {
+      "en": "list"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "questions": {
+      "en": "questions"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "fonctionnement": {
+      "en": "operation; how something works"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "service": {
+      "en": "service"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "voulait": {
+      "en": "wanted"
+    },
+    "savoir": {
+      "en": "to know"
+    },
+    "quels": {
+      "en": "which; what (masculine plural)"
+    },
+    "documents": {
+      "en": "documents"
+    },
+    "seraient": {
+      "en": "would be"
+    },
+    "conservés": {
+      "en": "kept; retained"
+    },
+    "dans": {
+      "en": "in",
+      "sound": "dah(n)"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "dossier": {
+      "en": "a file"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "pourrait": {
+      "en": "could; might"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "consulter": {
+      "en": "to consult",
+      "sound": "kohn-sül-TAY"
+    },
+    "l'employée": {
+      "en": "the employee (woman)",
+      "pos": "noun, feminine"
+    },
+    "expliqué": {
+      "en": "explained"
+    },
+    "règles": {
+      "en": "rules"
+    },
+    "confidentialité": {
+      "en": "privacy; confidentiality"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "façon": {
+      "en": "way; manner"
+    },
+    "demander": {
+      "en": "to ask",
+      "sound": "duh-mah(n)-DAY"
+    },
+    "copie": {
+      "en": "copy"
+    },
+    "quand": {
+      "en": "when",
+      "sound": "kah(n)"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "symptôme": {
+      "en": "symptom"
+    },
+    "précis": {
+      "en": "precise; specific"
+    },
+    "exigeait": {
+      "en": "required"
+    },
+    "consultation": {
+      "en": "consultation"
+    },
+    "urgente": {
+      "en": "urgent",
+      "sound": "ür-ZHAH(N)T"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "refusé": {
+      "en": "refused"
+    },
+    "poser": {
+      "en": "to ask; to put"
+    },
+    "diagnostic": {
+      "en": "diagnosis"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "conseillé": {
+      "en": "advised; recommended"
+    },
+    "parler": {
+      "en": "to speak",
+      "sound": "pahR-LAY"
+    },
+    "directement": {
+      "en": "directly"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "professionnel": {
+      "en": "a professional"
+    },
+    "santé": {
+      "en": "health"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "question": {
+      "en": "question"
+    },
+    "personnelle": {
+      "en": "personal"
+    },
+    "noté": {
+      "en": "noted"
+    },
+    "numéro": {
+      "en": "number"
+    },
+    "où": {
+      "en": "where",
+      "sound": "oo"
+    },
+    "trouver": {
+      "en": "to find",
+      "sound": "troo-VAY"
+    },
+    "renseignements": {
+      "en": "information; details"
+    },
+    "généraux": {
+      "en": "general"
+    },
+    "prochaines": {
+      "en": "next; upcoming"
+    },
+    "étapes": {
+      "en": "steps"
+    },
+    "est": {
+      "en": "is; has (être)",
+      "pos": "verb"
+    },
+    "reparti": {
+      "en": "left; departed"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "réponse": {
+      "en": "answer"
+    },
+    "claire": {
+      "en": "clear"
+    },
+    "limite": {
+      "en": "limit; deadline",
+      "pos": "noun, feminine"
+    },
+    "ce": {
+      "en": "this; that (masculine)",
+      "pos": "determiner"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "pouvait": {
+      "en": "could"
+    },
+    "confirmer": {
+      "en": "to confirm",
+      "sound": "koh(n)-feer-MAY"
+    }
+  },
+  "keywords": [
+    "rendez-vous",
+    "questions",
+    "dossier",
+    "confidentialité",
+    "diagnostic",
+    "professionnel",
+    "étapes"
+  ],
+  "quiz": [
+    {
+      "prompt": "What could the employee explain?",
+      "options": [
+        "The exact result of a future appointment",
+        "The diagnosis for Malik's symptom",
+        "The service's privacy rules and how to request a file copy",
+        "Which treatment Malik should choose"
+      ],
+      "answer": 2,
+      "explain": "The third sentence lists the administrative information she explained."
+    },
+    {
+      "prompt": "Why did the employee not answer the symptom question?",
+      "options": [
+        "The service had no privacy rules",
+        "Malik had not brought his phone number",
+        "The file had been lost",
+        "It required a health professional's assessment"
+      ],
+      "answer": 3,
+      "explain": "She declined to diagnose and directed him to a health professional."
+    },
+    {
+      "prompt": "What did Malik leave understanding?",
+      "options": [
+        "What the service could confirm and where its limits were",
+        "That he no longer needed information",
+        "That the employee had diagnosed him",
+        "That his documents were public"
+      ],
+      "answer": 0,
+      "explain": "The last sentence states he understood both the answer and its limit."
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "b2-u04-write-speak",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two fictional residents' groups evaluate a redesigned neighbourhood space. One values accessibility and safer routes; the other is concerned about construction noise, deliveries and lost shade. Compare both positions and recommend a compromise in 130–160 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux groupes soutiennent l'amélioration de l'espace, mais ils ne donnent pas la même priorité aux conséquences immédiates. Le premier insiste sur l'accessibilité et sur des trajets plus sûrs. Le second rappelle que les travaux pourraient compliquer les livraisons et réduire l'accès à l'ombre. À mon avis, le projet devrait avancer si des mesures temporaires sont prévues. Un accès de livraison clairement indiqué et un calendrier publié à l'avance répondraient à une partie des préoccupations. Il faudrait également consulter les personnes qui utilisent le lieu à différents moments de la journée. Ces ajustements ne supprimeraient pas tous les inconvénients, mais ils rendraient le compromis plus équitable. La décision finale devrait donc s'appuyer sur les besoins observés, et non sur une seule préférence.\n\nCheck:\n• Task 3 range: 120–180 words.\n• Represent both sources before giving a recommendation.\n• Use a past timeline accurately when describing what happened.\n• Do not claim a hypothetical measure would guarantee an outcome."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Task 3: Les villes devraient-elles consacrer davantage d'espace aux déplacements à pied et à vélo ? Give a clear position, explain one benefit and one cost, refer to a different group's needs and conclude with a condition. Marie should change the neighbourhood constraint after your first answer.\n\n• Use one concrete example, then name its limit.\n• Keep imparfait, passé composé and plus-que-parfait tied to the timeline.\n• When Marie changes the condition, adapt your recommendation rather than repeating it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je pense que les villes devraient améliorer les déplacements à pied et à vélo, surtout lorsque les trajets vers les services sont courts. Cela peut rendre certains déplacements plus simples.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Cependant, chaque quartier a des besoins différents.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Une modification qui convient au centre-ville peut compliquer les livraisons ou les déplacements de personnes qui ont besoin d'un véhicule.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Il faudrait donc consulter les usagers avant de décider. À mon avis, un projet pilote serait utile s'il comporte un accès clair, un calendrier et une évaluation après les travaux.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Ainsi, on pourrait ajuster le plan selon les effets observés.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

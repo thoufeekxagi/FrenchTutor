@@ -1,0 +1,148 @@
+{
+  "id": "b2-u08-words-1",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un apprentissage",
+      "en": "learning",
+      "sound": "uh(n) ah-prahn-tee-SAHZH",
+      "exampleFr": "L'apprentissage continue après la formation.",
+      "exampleEn": "Learning continues after the course."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un atelier",
+      "en": "a workshop",
+      "sound": "uh(n) ah-tuh-LYAY",
+      "exampleFr": "L'atelier réunit des personnes de plusieurs âges.",
+      "exampleEn": "The workshop brings together people of several ages."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un récit",
+      "en": "an account; a narrative",
+      "sound": "uh(n) ray-SEE",
+      "exampleFr": "Son récit présente une expérience particulière.",
+      "exampleEn": "Her account presents one particular experience."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un héritage",
+      "en": "heritage",
+      "sound": "uh(n) ay-ree-TAHZH",
+      "exampleFr": "La discussion aborde l'héritage culturel.",
+      "exampleEn": "The discussion addresses cultural heritage."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une appartenance",
+      "en": "a sense of belonging",
+      "sound": "ün ah-par-tuh-NAH(N)S",
+      "exampleFr": "La participante parle de son sentiment d'appartenance.",
+      "exampleEn": "The participant talks about her sense of belonging."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une transmission",
+      "en": "transmission; passing on",
+      "sound": "ün trahnz-mee-SYOH(N)",
+      "exampleFr": "La transmission d'une langue peut prendre plusieurs formes.",
+      "exampleEn": "Passing on a language can take several forms."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un apprentissage",
+      "options": [
+        "heritage",
+        "learning",
+        "a workshop",
+        "an account; a narrative"
+      ],
+      "answer": 1,
+      "explain": "un apprentissage means learning."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un atelier",
+      "options": [
+        "a sense of belonging",
+        "an account; a narrative",
+        "heritage",
+        "a workshop"
+      ],
+      "answer": 3,
+      "explain": "un atelier means a workshop."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un récit",
+      "options": [
+        "transmission; passing on",
+        "an account; a narrative",
+        "heritage",
+        "a sense of belonging"
+      ],
+      "answer": 1,
+      "explain": "un récit means an account; a narrative."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un héritage",
+      "options": [
+        "learning",
+        "a sense of belonging",
+        "transmission; passing on",
+        "heritage"
+      ],
+      "answer": 3,
+      "explain": "un héritage means heritage."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une appartenance",
+      "options": [
+        "a workshop",
+        "a sense of belonging",
+        "transmission; passing on",
+        "learning"
+      ],
+      "answer": 1,
+      "explain": "une appartenance means a sense of belonging."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une transmission",
+      "options": [
+        "an account; a narrative",
+        "learning",
+        "a workshop",
+        "transmission; passing on"
+      ],
+      "answer": 3,
+      "explain": "une transmission means transmission; passing on."
+    }
+  ]
+}

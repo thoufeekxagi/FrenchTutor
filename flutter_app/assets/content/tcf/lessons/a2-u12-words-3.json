@@ -1,0 +1,166 @@
+{
+  "id": "a2-u12-words-3",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Words: retrieve and review",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une révision finale",
+      "en": "a final review",
+      "sound": "ün ray-vee-ZYOH(N) fee-NAHL",
+      "exampleFr": "Je fais une révision finale avant l'évaluation.",
+      "exampleEn": "I do a final review before the assessment."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une stratégie de rappel",
+      "en": "a recall strategy",
+      "sound": "ün strah-tay-ZHEE duh rah-PEHL",
+      "exampleFr": "Cette stratégie de rappel m'aide à retrouver les mots sans mes notes.",
+      "exampleEn": "This recall strategy helps me retrieve the words without my notes."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un point à revoir",
+      "en": "a point to review",
+      "sound": "uh(n) pwa(n) ah ruh-VWAHR",
+      "exampleFr": "Je note un point à revoir après l'exercice.",
+      "exampleEn": "I note one point to review after the exercise."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une erreur fréquente",
+      "en": "a frequent error",
+      "sound": "ün eh-RUHR fray-KAH(N)T",
+      "exampleFr": "Je corrige une erreur fréquente dans ma phrase.",
+      "exampleEn": "I correct a frequent error in my sentence."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une autoévaluation",
+      "en": "a self-assessment",
+      "sound": "ün oh-toh-ay-vah-lü-ah-SYOH(N)",
+      "exampleFr": "Je fais une autoévaluation après l'activité.",
+      "exampleEn": "I do a self-assessment after the activity."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un essai sans aide",
+      "en": "an attempt without help",
+      "sound": "uh(n) eh-SEH sah(n) ehd",
+      "exampleFr": "Mon premier essai sans aide dure une minute.",
+      "exampleEn": "My first attempt without help lasts one minute."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une fiche de révision",
+      "en": "a review sheet",
+      "sound": "ün feesh duh ray-vee-ZYOH(N)",
+      "exampleFr": "J'ajoute cette règle à ma fiche de révision.",
+      "exampleEn": "I add this rule to my review sheet."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une prochaine étape",
+      "en": "a next step",
+      "sound": "ün proh-SHEHN ay-TAHP",
+      "exampleFr": "Ma prochaine étape est de réécouter le dialogue.",
+      "exampleEn": "My next step is to listen to the dialogue again."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une révision finale",
+      "options": [
+        "a frequent error",
+        "a final review",
+        "a recall strategy",
+        "a self-assessment"
+      ],
+      "answer": 1,
+      "explain": "une révision finale means a final review."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une stratégie de rappel",
+      "options": [
+        "a self-assessment",
+        "a next step",
+        "a point to review",
+        "a recall strategy"
+      ],
+      "answer": 3,
+      "explain": "une stratégie de rappel means a recall strategy."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un point à revoir",
+      "options": [
+        "an attempt without help",
+        "a point to review",
+        "a frequent error",
+        "a recall strategy"
+      ],
+      "answer": 1,
+      "explain": "un point à revoir means a point to review."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une erreur fréquente",
+      "options": [
+        "a review sheet",
+        "a recall strategy",
+        "a self-assessment",
+        "a frequent error"
+      ],
+      "answer": 3,
+      "explain": "une erreur fréquente means a frequent error."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une autoévaluation",
+      "options": [
+        "a next step",
+        "a self-assessment",
+        "a point to review",
+        "an attempt without help"
+      ],
+      "answer": 1,
+      "explain": "une autoévaluation means a self-assessment."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un essai sans aide",
+      "options": [
+        "a final review",
+        "a frequent error",
+        "a review sheet",
+        "an attempt without help"
+      ],
+      "answer": 3,
+      "explain": "un essai sans aide means an attempt without help."
+    }
+  ]
+}

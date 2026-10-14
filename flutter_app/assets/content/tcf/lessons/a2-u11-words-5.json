@@ -1,0 +1,166 @@
+{
+  "id": "a2-u11-words-5",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Words: polite requests and follow-up",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une demande de renseignement",
+      "en": "a request for information",
+      "sound": "ün duh-MAH(N)D duh rah(n)-seh-nyuh-MAH(N)",
+      "exampleFr": "Je fais une demande de renseignement sur mon dossier.",
+      "exampleEn": "I make an inquiry about my file."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un suivi de dossier",
+      "en": "a file follow-up",
+      "sound": "uh(n) sü-vee duh doh-SYAY",
+      "exampleFr": "Je téléphone pour faire le suivi de mon dossier.",
+      "exampleEn": "I call to follow up on my file."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une réponse écrite",
+      "en": "a written reply",
+      "sound": "ün ray-POHNS ay-KREET",
+      "exampleFr": "Je demande une réponse écrite par courriel.",
+      "exampleEn": "I ask for a written reply by email."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un délai supplémentaire",
+      "en": "additional time",
+      "sound": "uh(n) day-LEH sü-plah-mahn-TEHR",
+      "exampleFr": "Je voudrais un délai supplémentaire pour envoyer le document.",
+      "exampleEn": "I would like additional time to send the document."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une modification de facture",
+      "en": "a bill correction",
+      "sound": "ün moh-dee-fee-kah-SYOH(N) duh fahk-TÜR",
+      "exampleFr": "Je demande une modification de facture.",
+      "exampleEn": "I ask for a bill correction."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une demande de retour",
+      "en": "a return request",
+      "sound": "ün duh-MAH(N)D duh ruh-TOOR",
+      "exampleFr": "Je remplis une demande de retour pour l'appareil défectueux.",
+      "exampleEn": "I fill in a return request for the faulty appliance."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une option de paiement",
+      "en": "a payment option",
+      "sound": "ün ohp-SYOH(N) duh peh-MAH(N)",
+      "exampleFr": "Le site propose plusieurs options de paiement.",
+      "exampleEn": "The website offers several payment options."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un contact principal",
+      "en": "a main contact",
+      "sound": "uh(n) kohn-TAHKT pree(n)-see-PAHL",
+      "exampleFr": "Le contact principal répond à mes questions sur le dossier.",
+      "exampleEn": "The main contact answers my questions about the file."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une demande de renseignement",
+      "options": [
+        "additional time",
+        "a request for information",
+        "a payment option",
+        "a file follow-up"
+      ],
+      "answer": 1,
+      "explain": "une demande de renseignement means a request for information."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un suivi de dossier",
+      "options": [
+        "a bill correction",
+        "a main contact",
+        "a written reply",
+        "a file follow-up"
+      ],
+      "answer": 3,
+      "explain": "un suivi de dossier means a file follow-up."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une réponse écrite",
+      "options": [
+        "a return request",
+        "a written reply",
+        "a request for information",
+        "additional time"
+      ],
+      "answer": 1,
+      "explain": "une réponse écrite means a written reply."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un délai supplémentaire",
+      "options": [
+        "a payment option",
+        "a file follow-up",
+        "a bill correction",
+        "additional time"
+      ],
+      "answer": 3,
+      "explain": "un délai supplémentaire means additional time."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une modification de facture",
+      "options": [
+        "a main contact",
+        "a bill correction",
+        "a written reply",
+        "a return request"
+      ],
+      "answer": 1,
+      "explain": "une modification de facture means a bill correction."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une demande de retour",
+      "options": [
+        "additional time",
+        "a payment option",
+        "a file follow-up",
+        "a return request"
+      ],
+      "answer": 3,
+      "explain": "une demande de retour means a return request."
+    }
+  ]
+}

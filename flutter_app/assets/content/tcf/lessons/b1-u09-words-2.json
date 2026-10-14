@@ -1,0 +1,148 @@
+{
+  "id": "b1-u09-words-2",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un accueil",
+      "en": "a welcome; reception",
+      "sound": "uh(n) ah-KUHY",
+      "exampleFr": "L'accueil des nouveaux membres était chaleureux.",
+      "exampleEn": "The welcome for new members was warm."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un retour",
+      "en": "feedback; a return",
+      "sound": "uh(n) ruh-TOOR",
+      "exampleFr": "Les retours seront lus après l'activité.",
+      "exampleEn": "Feedback will be read after the activity."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "organiser",
+      "en": "to organize",
+      "sound": "or-gah-nee-ZAY",
+      "exampleFr": "On a organisé la rencontre en petits groupes.",
+      "exampleEn": "The meeting was organized in small groups."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "installer",
+      "en": "to set up",
+      "sound": "an-stah-LAY",
+      "exampleFr": "Les bénévoles installent les chaises en arrivant.",
+      "exampleEn": "The volunteers set up the chairs when they arrive."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "remplir",
+      "en": "to fill in",
+      "sound": "rah(n)-PLEER",
+      "exampleFr": "On peut remplir le formulaire à l'accueil.",
+      "exampleEn": "You can fill out the form at reception."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "en participant",
+      "en": "by participating; while taking part",
+      "sound": "ahn par-tee-see-PAH(N)",
+      "exampleFr": "En participant, j'ai rencontré des voisins.",
+      "exampleEn": "By taking part, I met neighbours."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un accueil",
+      "options": [
+        "to set up",
+        "a welcome; reception",
+        "feedback; a return",
+        "to organize"
+      ],
+      "answer": 1,
+      "explain": "un accueil means a welcome; reception."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un retour",
+      "options": [
+        "to fill in",
+        "to organize",
+        "to set up",
+        "feedback; a return"
+      ],
+      "answer": 3,
+      "explain": "un retour means feedback; a return."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "organiser",
+      "options": [
+        "by participating; while taking part",
+        "to organize",
+        "to set up",
+        "to fill in"
+      ],
+      "answer": 1,
+      "explain": "organiser means to organize."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "installer",
+      "options": [
+        "a welcome; reception",
+        "to fill in",
+        "by participating; while taking part",
+        "to set up"
+      ],
+      "answer": 3,
+      "explain": "installer means to set up."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "remplir",
+      "options": [
+        "feedback; a return",
+        "to fill in",
+        "by participating; while taking part",
+        "a welcome; reception"
+      ],
+      "answer": 1,
+      "explain": "remplir means to fill in."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "en participant",
+      "options": [
+        "to organize",
+        "a welcome; reception",
+        "feedback; a return",
+        "by participating; while taking part"
+      ],
+      "answer": 3,
+      "explain": "en participant means by participating; while taking part."
+    }
+  ]
+}

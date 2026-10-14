@@ -1,0 +1,157 @@
+{
+  "id": "a2-u12-words-4",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Words: choose and explain",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un avantage principal",
+      "en": "a main advantage",
+      "sound": "uh(n) ah-vahn-TAHZH pree(n)-see-PAHL",
+      "exampleFr": "Je présente un avantage principal et je donne une raison.",
+      "exampleEn": "I present a main advantage and give a reason."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un inconvénient possible",
+      "en": "a possible disadvantage",
+      "sound": "uh(n) a(n)-kohn-vay-NYAH(N) poh-SEEbl",
+      "exampleFr": "Je présente un inconvénient possible et je donne une raison.",
+      "exampleEn": "I present a possible disadvantage and give a reason."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un compromis raisonnable",
+      "en": "a reasonable compromise",
+      "sound": "uh(n) kohn-proh-MEE ray-zoh-NAHbl",
+      "exampleFr": "Je présente un compromis raisonnable et je donne une raison.",
+      "exampleEn": "I present a reasonable compromise and give a reason."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un résultat concret",
+      "en": "a concrete result",
+      "sound": "uh(n) ray-zül-TAH kohn-KREH",
+      "exampleFr": "Je présente un résultat concret et je donne une raison.",
+      "exampleEn": "I present a concrete result and give a reason."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une décision personnelle",
+      "en": "a personal decision",
+      "sound": "ün day-see-ZYOH(N) pehr-soh-NEHL",
+      "exampleFr": "Je présente une décision personnelle et je donne une raison.",
+      "exampleEn": "I present a personal decision and give a reason."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un objectif réaliste",
+      "en": "a realistic goal",
+      "sound": "uh(n) ohb-zhehk-TEEF ray-ah-LEEST",
+      "exampleFr": "Je présente un objectif réaliste et je donne une raison.",
+      "exampleEn": "I present a realistic goal and give a reason."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une priorité du jour",
+      "en": "a priority for the day",
+      "sound": "ün pree-oh-ree-TAY dü zhoor",
+      "exampleFr": "Je présente une priorité du jour et je donne une raison.",
+      "exampleEn": "I present a priority for the day and give a reason."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un avantage principal",
+      "options": [
+        "a concrete result",
+        "a main advantage",
+        "a priority for the day",
+        "a reasonable compromise"
+      ],
+      "answer": 1,
+      "explain": "un avantage principal means a main advantage."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un inconvénient possible",
+      "options": [
+        "a personal decision",
+        "a main advantage",
+        "a concrete result",
+        "a possible disadvantage"
+      ],
+      "answer": 3,
+      "explain": "un inconvénient possible means a possible disadvantage."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un compromis raisonnable",
+      "options": [
+        "a realistic goal",
+        "a reasonable compromise",
+        "a possible disadvantage",
+        "a personal decision"
+      ],
+      "answer": 1,
+      "explain": "un compromis raisonnable means a reasonable compromise."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un résultat concret",
+      "options": [
+        "a priority for the day",
+        "a reasonable compromise",
+        "a realistic goal",
+        "a concrete result"
+      ],
+      "answer": 3,
+      "explain": "un résultat concret means a concrete result."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une décision personnelle",
+      "options": [
+        "a main advantage",
+        "a personal decision",
+        "a concrete result",
+        "a priority for the day"
+      ],
+      "answer": 1,
+      "explain": "une décision personnelle means a personal decision."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un objectif réaliste",
+      "options": [
+        "a possible disadvantage",
+        "a personal decision",
+        "a main advantage",
+        "a realistic goal"
+      ],
+      "answer": 3,
+      "explain": "un objectif réaliste means a realistic goal."
+    }
+  ]
+}

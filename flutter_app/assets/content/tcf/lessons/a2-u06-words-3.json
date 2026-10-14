@@ -1,0 +1,166 @@
+{
+  "id": "a2-u06-words-3",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Words: services and transport nearby",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un arrêt d'autobus",
+      "en": "a bus stop",
+      "sound": "uh(n) ah-REH doh-toh-BÜS",
+      "exampleFr": "Il y a un arrêt d'autobus près du logement.",
+      "exampleEn": "There is a bus stop near the home."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une épicerie de quartier",
+      "en": "a neighbourhood grocery store",
+      "sound": "ün ay-pees-ree duh kahr-TYAY",
+      "exampleFr": "Une épicerie de quartier est à cinq minutes à pied.",
+      "exampleEn": "A neighbourhood grocery store is a five-minute walk away."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une piste cyclable",
+      "en": "a bike path",
+      "sound": "ün peest see-KLAHBL",
+      "exampleFr": "Une piste cyclable longe le quartier.",
+      "exampleEn": "A bike path runs along the neighbourhood."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un centre communautaire",
+      "en": "a community centre",
+      "sound": "uh(n) sah(n)tr koh-mü-noh-TEHR",
+      "exampleFr": "Le centre communautaire est près du logement.",
+      "exampleEn": "The community centre is near the home."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une bibliothèque de quartier",
+      "en": "a neighbourhood library",
+      "sound": "ün bee-blee-oh-TEHK duh kahr-TYAY",
+      "exampleFr": "La bibliothèque de quartier est près de l'épicerie.",
+      "exampleEn": "The neighbourhood library is near the grocery store."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une clinique de quartier",
+      "en": "a neighbourhood clinic",
+      "sound": "ün klee-NEEK duh kahr-TYAY",
+      "exampleFr": "Une clinique de quartier est accessible en autobus.",
+      "exampleEn": "A neighbourhood clinic is accessible by bus."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un accès au train",
+      "en": "access to the train",
+      "sound": "uh(n) ahk-SEH oh tra(n)",
+      "exampleFr": "Le logement offre un accès facile au train.",
+      "exampleEn": "The home offers easy access to the train."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un trajet à pied",
+      "en": "a trip on foot",
+      "sound": "uh(n) trah-ZHAY ah pyeh",
+      "exampleFr": "L'épicerie est à dix minutes à pied du logement.",
+      "exampleEn": "The grocery store is a ten-minute walk from the home."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un arrêt d'autobus",
+      "options": [
+        "a community centre",
+        "a bus stop",
+        "access to the train",
+        "a neighbourhood grocery store"
+      ],
+      "answer": 1,
+      "explain": "un arrêt d'autobus means a bus stop."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une épicerie de quartier",
+      "options": [
+        "a trip on foot",
+        "a bike path",
+        "a bus stop",
+        "a neighbourhood grocery store"
+      ],
+      "answer": 3,
+      "explain": "une épicerie de quartier means a neighbourhood grocery store."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une piste cyclable",
+      "options": [
+        "a neighbourhood clinic",
+        "a bike path",
+        "a bus stop",
+        "a community centre"
+      ],
+      "answer": 1,
+      "explain": "une piste cyclable means a bike path."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un centre communautaire",
+      "options": [
+        "access to the train",
+        "a neighbourhood grocery store",
+        "a neighbourhood library",
+        "a community centre"
+      ],
+      "answer": 3,
+      "explain": "un centre communautaire means a community centre."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une bibliothèque de quartier",
+      "options": [
+        "a trip on foot",
+        "a neighbourhood library",
+        "a bike path",
+        "a bus stop"
+      ],
+      "answer": 1,
+      "explain": "une bibliothèque de quartier means a neighbourhood library."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une clinique de quartier",
+      "options": [
+        "a bus stop",
+        "a community centre",
+        "access to the train",
+        "a neighbourhood clinic"
+      ],
+      "answer": 3,
+      "explain": "une clinique de quartier means a neighbourhood clinic."
+    }
+  ]
+}

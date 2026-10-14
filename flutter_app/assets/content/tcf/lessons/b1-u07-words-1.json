@@ -1,0 +1,176 @@
+{
+  "id": "b1-u07-words-1",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un compte rendu",
+      "en": "a report; meeting summary",
+      "sound": "uh(n) koh(n)t-ruh-DOO",
+      "exampleFr": "Le compte rendu résume les décisions de la rencontre.",
+      "exampleEn": "The meeting report summarizes the decisions."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une annonce",
+      "en": "an announcement",
+      "sound": "ün ah-nohnss",
+      "exampleFr": "L'annonce précisait que l'horaire changerait lundi.",
+      "exampleEn": "The announcement said the schedule would change Monday."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un témoignage",
+      "en": "a personal account",
+      "sound": "uh(n) tay-mwah-NYAHZH",
+      "exampleFr": "Son témoignage décrit une expérience personnelle.",
+      "exampleEn": "Her account describes a personal experience."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une précision",
+      "en": "a clarification; detail",
+      "sound": "ün pray-see-ZYOH(N)",
+      "exampleFr": "Le responsable a donné une précision sur la date.",
+      "exampleEn": "The coordinator clarified the date."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une confirmation",
+      "en": "a confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Nous attendons une confirmation écrite.",
+      "exampleEn": "We are waiting for written confirmation."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une rumeur",
+      "en": "a rumour",
+      "sound": "ün rü-MÜHR",
+      "exampleFr": "La responsable a dit que la rumeur était fausse.",
+      "exampleEn": "The coordinator said the rumour was false."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un compte rendu",
+      "options": [
+        "a clarification; detail",
+        "a report; meeting summary",
+        "an announcement",
+        "a personal account"
+      ],
+      "answer": 1,
+      "explain": "un compte rendu means a report; meeting summary."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une annonce",
+      "options": [
+        "a confirmation",
+        "a personal account",
+        "a clarification; detail",
+        "an announcement"
+      ],
+      "answer": 3,
+      "explain": "une annonce means an announcement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un témoignage",
+      "options": [
+        "a rumour",
+        "a personal account",
+        "a clarification; detail",
+        "a confirmation"
+      ],
+      "answer": 1,
+      "explain": "un témoignage means a personal account."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une précision",
+      "options": [
+        "a report; meeting summary",
+        "a confirmation",
+        "a rumour",
+        "a clarification; detail"
+      ],
+      "answer": 3,
+      "explain": "une précision means a clarification; detail."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation",
+      "options": [
+        "an announcement",
+        "a confirmation",
+        "a rumour",
+        "a report; meeting summary"
+      ],
+      "answer": 1,
+      "explain": "une confirmation means a confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une rumeur",
+      "options": [
+        "a personal account",
+        "a report; meeting summary",
+        "an announcement",
+        "a rumour"
+      ],
+      "answer": 3,
+      "explain": "une rumeur means a rumour."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un témoignage",
+      "question": "Which word did you hear?",
+      "options": [
+        "une confirmation",
+        "un témoignage",
+        "une annonce",
+        "une précision"
+      ],
+      "answer": 1,
+      "explain": "You heard un témoignage: a personal account."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une précision",
+      "question": "Which word did you hear?",
+      "options": [
+        "une rumeur",
+        "un témoignage",
+        "une confirmation",
+        "une précision"
+      ],
+      "answer": 3,
+      "explain": "You heard une précision: a clarification; detail."
+    }
+  ]
+}

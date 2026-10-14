@@ -1,0 +1,58 @@
+{
+  "id": "b1-u02-listening",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le centre confirmera la date lundi. Si l'atelier commence en septembre, Karim s'inscrira cette semaine; sinon, il attendra le prochain groupe.",
+      "question": "What will Karim do if the workshop starts in September?",
+      "options": [
+        "He will cancel his application",
+        "He will register this week",
+        "He will move to another city",
+        "He will ask to teach the course"
+      ],
+      "answer": 1,
+      "explain": "He says he will register this week if the workshop starts in September."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Quand elle recevra son horaire de travail, elle appellera le centre. Si les cours ont lieu le soir, elle pourra participer.",
+      "question": "What information is she waiting for before calling?",
+      "options": [
+        "A new address",
+        "A bus ticket",
+        "The course certificate",
+        "Her work schedule"
+      ],
+      "answer": 3,
+      "explain": "She is waiting for her work schedule."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le programme devrait se terminer en juin. Le conseiller précise toutefois que le stage pourrait avoir lieu en juillet selon les disponibilités des employeurs.",
+      "question": "Which detail is uncertain?",
+      "options": [
+        "Whether the program exists",
+        "The month the program starts",
+        "When the placement will take place",
+        "The advisor's identity"
+      ],
+      "answer": 2,
+      "explain": "The placement timing depends on employer availability."
+    }
+  ]
+}

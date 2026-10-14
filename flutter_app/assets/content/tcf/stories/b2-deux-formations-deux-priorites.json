@@ -1,0 +1,366 @@
+{
+  "id": "b2-deux-formations-deux-priorites",
+  "title": "Deux formations, deux priorités",
+  "titleEn": "Two programs, two priorities",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "A career adviser helps Léa compare course requirements, time costs and the uncertainty around an internship.",
+  "unit": "b2-u03",
+  "sentences": [
+    {
+      "fr": "Léa comparait deux formations qui menaient à des emplois similaires, mais dont les horaires différaient.",
+      "en": "Léa was comparing two programs that led to similar jobs but had different schedules."
+    },
+    {
+      "fr": "La première, à laquelle elle pouvait assister le soir, exigeait un stage de deux journées par semaine.",
+      "en": "The first, which she could attend in the evening, required an internship of two days a week."
+    },
+    {
+      "fr": "La seconde offrait davantage de cours en ligne, ce qui réduirait ses déplacements, mais elle commençait plus tôt.",
+      "en": "The second offered more online classes, which would reduce her travel, but it started earlier."
+    },
+    {
+      "fr": "Léa a demandé si les heures de stage pouvaient être regroupées; la réponse dépendait encore de l'employeur.",
+      "en": "Léa asked whether the internship hours could be grouped together; the answer still depended on the employer."
+    },
+    {
+      "fr": "Elle a comparé le temps de transport, les frais et les compétences qu'elle souhaitait développer.",
+      "en": "She compared travel time, fees and the skills she wanted to develop."
+    },
+    {
+      "fr": "À son avis, la première formation serait préférable si le stage pouvait être organisé autour de son horaire actuel.",
+      "en": "In her view, the first program would be preferable if the internship could be arranged around her current schedule."
+    },
+    {
+      "fr": "Avant de s'engager, elle a demandé une confirmation écrite plutôt que de traiter une possibilité comme une promesse.",
+      "en": "Before committing, she asked for written confirmation instead of treating a possibility as a promise.",
+      "note": "A good comparison distinguishes confirmed requirements from details that still depend on another person or organization."
+    }
+  ],
+  "words": {
+    "léa": {
+      "en": "Léa (a woman's name)"
+    },
+    "comparait": {
+      "en": "was comparing"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "formations": {
+      "en": "training programs"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "menaient": {
+      "en": "led to"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "emplois": {
+      "en": "jobs"
+    },
+    "similaires": {
+      "en": "similar"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "dont": {
+      "en": "whose; of which"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "horaires": {
+      "en": "schedules"
+    },
+    "différaient": {
+      "en": "differed"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "première": {
+      "en": "first"
+    },
+    "laquelle": {
+      "en": "which; to which"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "pouvait": {
+      "en": "could"
+    },
+    "assister": {
+      "en": "to attend"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "exigeait": {
+      "en": "required"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "stage": {
+      "en": "an internship, placement"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "journées": {
+      "en": "days"
+    },
+    "par": {
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    "semaine": {
+      "en": "week, weekday period"
+    },
+    "seconde": {
+      "en": "second; second one"
+    },
+    "offrait": {
+      "en": "offered"
+    },
+    "davantage": {
+      "en": "more"
+    },
+    "cours": {
+      "en": "a course, class"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "ligne": {
+      "en": "line, route"
+    },
+    "ce": {
+      "en": "this; that (masculine)",
+      "pos": "determiner"
+    },
+    "réduirait": {
+      "en": "would reduce"
+    },
+    "ses": {
+      "en": "his; her (plural noun)",
+      "pos": "possessive"
+    },
+    "déplacements": {
+      "en": "trips; commutes"
+    },
+    "commençait": {
+      "en": "was starting"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "tôt": {
+      "en": "early",
+      "sound": "toh"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "heures": {
+      "en": "hours; clock times",
+      "pos": "noun, feminine plural"
+    },
+    "pouvaient": {
+      "en": "could"
+    },
+    "être": {
+      "en": "to be",
+      "sound": "EHtr"
+    },
+    "regroupées": {
+      "en": "grouped together"
+    },
+    "réponse": {
+      "en": "answer"
+    },
+    "dépendait": {
+      "en": "depended"
+    },
+    "encore": {
+      "en": "again, still",
+      "sound": "ah(n)-KOHR"
+    },
+    "l'employeur": {
+      "en": "an employer"
+    },
+    "comparé": {
+      "en": "compared"
+    },
+    "temps": {
+      "en": "weather"
+    },
+    "transport": {
+      "en": "transport; transit"
+    },
+    "frais": {
+      "en": "fees; costs"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "compétences": {
+      "en": "skills"
+    },
+    "qu'elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "souhaitait": {
+      "en": "wanted; hoped"
+    },
+    "développer": {
+      "en": "to develop"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "avis": {
+      "en": "notice; opinion"
+    },
+    "formation": {
+      "en": "training program"
+    },
+    "serait": {
+      "en": "would be"
+    },
+    "préférable": {
+      "en": "preferable",
+      "sound": "pray-fay-RAH-bl"
+    },
+    "organisé": {
+      "en": "organized; arranged"
+    },
+    "autour": {
+      "en": "around"
+    },
+    "horaire": {
+      "en": "schedule",
+      "sound": "loh-REHR"
+    },
+    "actuel": {
+      "en": "current"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "s'engager": {
+      "en": "to commit"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "confirmation": {
+      "en": "confirmation"
+    },
+    "écrite": {
+      "en": "written"
+    },
+    "plutôt": {
+      "en": "rather; instead"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "traiter": {
+      "en": "to process; handle",
+      "sound": "treh-TAY"
+    },
+    "possibilité": {
+      "en": "possibility"
+    },
+    "comme": {
+      "en": "as; like; since"
+    },
+    "promesse": {
+      "en": "promise"
+    }
+  },
+  "keywords": [
+    "formations",
+    "stage",
+    "horaires",
+    "déplacements",
+    "compétences",
+    "confirmation",
+    "promesse"
+  ],
+  "quiz": [
+    {
+      "prompt": "What was a requirement of the first program?",
+      "options": [
+        "A move to another city",
+        "An internship for two days each week",
+        "An internship after graduation only",
+        "Daily online classes"
+      ],
+      "answer": 1,
+      "explain": "The second sentence gives the first program's internship requirement."
+    },
+    {
+      "prompt": "What was still uncertain?",
+      "options": [
+        "Whether the employer could group the internship hours",
+        "Whether both programs led to similar jobs",
+        "Whether Léa wanted to develop skills",
+        "Whether the second program started earlier"
+      ],
+      "answer": 0,
+      "explain": "The fourth sentence says the answer depended on the employer."
+    },
+    {
+      "prompt": "Why did Léa ask for written confirmation?",
+      "options": [
+        "The adviser had already guaranteed the schedule",
+        "She needed to change the course fees",
+        "She wanted to cancel both programs",
+        "She did not want to treat a possibility as a promise"
+      ],
+      "answer": 3,
+      "explain": "The last sentence explains her reason directly."
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "a2-u03-tcf",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "J'ai lu l'avis dans le train et j'ai vu que la correspondance est à la station centrale.",
+      "question": "Where is the connection?",
+      "options": [
+        "At Central Station",
+        "At the library",
+        "At the service counter",
+        "At the workshop"
+      ],
+      "answer": 0,
+      "explain": "The recording names the central station."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "À l'accueil, elle a fait une demande et a reçu le numéro de dossier par courriel.",
+      "question": "Where did she make the request?",
+      "options": [
+        "At the welcome desk",
+        "On the train",
+        "At the platform",
+        "In the library"
+      ],
+      "answer": 0,
+      "explain": "The first phrase is à l'accueil."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Après l'atelier, nous avons pris le bus. Nous avons eu le temps de lire le journal pendant le trajet.",
+      "question": "What did the speakers read during the trip?",
+      "options": [
+        "A newspaper",
+        "An instruction",
+        "A city map",
+        "A receipt"
+      ],
+      "answer": 0,
+      "explain": "They had time to read the newspaper during the trip."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Where is the French session?",
+      "options": [
+        "At the library",
+        "At the service counter",
+        "At the train station",
+        "At the clinic"
+      ],
+      "answer": 0,
+      "explain": "The notice places the French session at the library.",
+      "promptFr": "AVIS · Séance de français : bibliothèque, jeudi à 9 h. Entrée principale."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What changed?",
+      "options": [
+        "The platform",
+        "The workshop",
+        "The library",
+        "The ticket price"
+      ],
+      "answer": 0,
+      "explain": "Awa says the platform changed.",
+      "promptFr": "Salut Sam, · J'ai pris le train de 8 h. Le quai a changé: regarde le nouvel avis près de l'entrée. · Awa"
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When is the response expected?",
+      "options": [
+        "Friday",
+        "Tuesday",
+        "Monday",
+        "Thursday"
+      ],
+      "answer": 0,
+      "explain": "The notice gives Friday as the expected response day.",
+      "promptFr": "Demande 4816 · Document reçu : mardi · Réponse prévue : vendredi"
+    }
+  ]
+}

@@ -1,0 +1,338 @@
+{
+  "id": "a1-listen-eau",
+  "title": "Plus d'eau dans l'immeuble",
+  "titleEn": "No water in the building",
+  "level": "A1",
+  "mode": "listening",
+  "minutes": 3,
+  "summary": "When the water stops, a tenant checks the notice and reports the problem to the building manager.",
+  "unit": "a1-u10",
+  "sentences": [
+    {
+      "fr": "Julie ouvre le robinet de sa cuisine.",
+      "en": "Julie turns on the kitchen tap."
+    },
+    {
+      "fr": "Il n'y a pas d'eau.",
+      "en": "There is no water."
+    },
+    {
+      "fr": "Elle regarde l'avis dans l'entrée.",
+      "en": "She checks the notice in the entrance."
+    },
+    {
+      "fr": "L'avis annonce des travaux jusqu'à midi.",
+      "en": "The notice announces repairs until noon."
+    },
+    {
+      "fr": "À midi, le robinet ne fonctionne toujours pas.",
+      "en": "At noon, the tap still does not work."
+    },
+    {
+      "fr": "Julie téléphone au gestionnaire de l'immeuble.",
+      "en": "Julie calls the building manager."
+    },
+    {
+      "fr": "Il vérifie le sous-sol et appelle un plombier.",
+      "en": "He checks the basement and calls a plumber."
+    },
+    {
+      "fr": "L'eau revient dans l'après-midi.",
+      "en": "The water comes back in the afternoon."
+    },
+    {
+      "fr": "Le gestionnaire laisse un message pour les locataires.",
+      "en": "The manager leaves a message for the tenants."
+    }
+  ],
+  "words": {
+    "julie": {
+      "en": "Julie (a woman's name)",
+      "pos": "proper name"
+    },
+    "ouvre": {
+      "en": "opens",
+      "pos": "verb",
+      "lemma": "ouvrir",
+      "note": "Present form of ouvrir."
+    },
+    "le": {
+      "en": "the"
+    },
+    "robinet": {
+      "en": "tap; faucet",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "sa": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Feminine singular noun form."
+    },
+    "cuisine": {
+      "en": "cooking; food; kitchen",
+      "sound": "lah kwee-ZEEN",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "cuisine"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "n'y": {
+      "en": "not there; not to that place",
+      "pos": "negation and pronoun"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "pas": {
+      "en": "not"
+    },
+    "d'eau": {
+      "en": "of water",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "eau",
+      "note": "Elided de before a vowel; eau is feminine."
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "regarde": {
+      "en": "looks at (regarder)",
+      "pos": "verb",
+      "sound": "Ruh-GAHRD"
+    },
+    "l'avis": {
+      "en": "notice",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "avis",
+      "note": "Elided le before a vowel."
+    },
+    "dans": {
+      "en": "in"
+    },
+    "l'entrée": {
+      "en": "entrance",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "entrée",
+      "note": "Elided la before a vowel."
+    },
+    "annonce": {
+      "en": "rental listing",
+      "pos": "noun, feminine",
+      "sound": "ah-NOH(N)S",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "annonce"
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "travaux": {
+      "en": "construction work; repairs",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "travail",
+      "note": "Plural of travail."
+    },
+    "jusqu'à": {
+      "en": "until; up to",
+      "pos": "preposition",
+      "note": "Contraction of jusque + à."
+    },
+    "midi": {
+      "en": "noon",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "midi"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "fonctionne": {
+      "en": "works",
+      "pos": "verb",
+      "lemma": "fonctionner",
+      "note": "Present form of fonctionner."
+    },
+    "toujours": {
+      "en": "still; always",
+      "pos": "adverb"
+    },
+    "téléphone": {
+      "en": "telephone",
+      "sound": "luh tay-lay-FOHN",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "téléphone"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "gestionnaire": {
+      "en": "manager",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "gestionnaire",
+      "note": "Same noun form for all genders."
+    },
+    "l'immeuble": {
+      "en": "building",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "immeuble",
+      "note": "Elided le before a vowel."
+    },
+    "vérifie": {
+      "en": "checks",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Present form of vérifier."
+    },
+    "sous-sol": {
+      "en": "a basement",
+      "sound": "uh(n) soo-SOHL",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "sous-sol"
+    },
+    "et": {
+      "en": "and"
+    },
+    "appelle": {
+      "en": "calls",
+      "pos": "verb",
+      "lemma": "appeler",
+      "note": "Present form of appeler."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "plombier": {
+      "en": "plumber",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "plombier"
+    },
+    "l'eau": {
+      "en": "the water",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "l'eau"
+    },
+    "revient": {
+      "en": "comes back; returns",
+      "pos": "verb",
+      "lemma": "revenir",
+      "note": "Present form of revenir."
+    },
+    "l'après-midi": {
+      "en": "afternoon",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "après-midi",
+      "note": "Elided le; this noun can also be feminine in some usage."
+    },
+    "laisse": {
+      "en": "leaves",
+      "pos": "verb",
+      "lemma": "laisser",
+      "note": "Present form of laisser."
+    },
+    "message": {
+      "en": "message",
+      "sound": "luh meh-SAHZH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "message"
+    },
+    "pour": {
+      "en": "for"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "locataires": {
+      "en": "tenants",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "plural",
+      "lemma": "locataire",
+      "note": "Plural; the noun has the same form for all genders."
+    }
+  },
+  "keywords": [
+    "robinet",
+    "d'eau",
+    "l'avis",
+    "gestionnaire",
+    "plombier"
+  ],
+  "quiz": [
+    {
+      "prompt": "What problem does Julie notice?",
+      "options": [
+        "There is no water.",
+        "The kitchen light is broken.",
+        "The door is locked.",
+        "The heat is too high."
+      ],
+      "answer": 0,
+      "explain": "Julie turns on the tap, but there is no water."
+    },
+    {
+      "prompt": "What time should the announced work end?",
+      "options": [
+        "Noon",
+        "Ten o’clock",
+        "Two o’clock",
+        "Six o’clock"
+      ],
+      "answer": 0,
+      "explain": "The notice says the work continues until noon."
+    },
+    {
+      "prompt": "What happens in the afternoon?",
+      "options": [
+        "The water comes back.",
+        "The building closes.",
+        "Julie moves out.",
+        "The plumber leaves a bill."
+      ],
+      "answer": 0,
+      "explain": "The water returns later that day."
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "id": "b1-u05-grammar-a",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Grammar: A first useful set of present subjunctive patterns",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "A first useful set of present subjunctive patterns",
+      "body": "Use the subjunctive in a limited set of common patterns when the phrase expresses a need, wish, preference or reaction and the subject changes: Il faut que le centre ouvre plus tôt; je souhaite que vous répondiez. Learn whole useful frames, not a long trigger list. Common forms include soit, ait, fasse, puisse and regular forms such as parle. The infinitive is normally used when the subject stays the same: Je veux participer; compare Je veux que tu participes. This is an introduction; later B2 work develops a wider range and nuance."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "A first useful set of present subjunctive patterns",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Need; different subject",
+          "il faut que + subjunctive",
+          "Il faut que la salle soit accessible.",
+          "The room needs to be accessible."
+        ],
+        [
+          "Wish; different subject",
+          "souhaiter que + subjunctive",
+          "Je souhaite que le centre prolonge ses heures.",
+          "I hope the centre extends its hours."
+        ],
+        [
+          "Same subject",
+          "verb + infinitive",
+          "Je souhaite participer à l'atelier.",
+          "I hope to take part in the workshop."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Complete: Il faut que la salle ___ accessible.",
+      "options": [
+        "était",
+        "soit",
+        "sera",
+        "est"
+      ],
+      "answer": 1,
+      "explain": "After il faut que with a different subject, use subjunctive soit."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the natural sentence when both actions have the same subject.",
+      "options": [
+        "Je souhaite que je participe à la rencontre.",
+        "Je souhaite que participer à la rencontre.",
+        "Je souhaite participer à la rencontre.",
+        "Je souhaite participe à la rencontre."
+      ],
+      "answer": 2,
+      "explain": "With the same subject, the infinitive is the natural pattern here."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Complete: Je suis contente que vous ___ disponibles.",
+      "options": [
+        "soyez",
+        "étiez",
+        "serez",
+        "êtes"
+      ],
+      "answer": 0,
+      "explain": "The reaction phrase with a different subject takes subjunctive soyez."
+    }
+  ]
+}

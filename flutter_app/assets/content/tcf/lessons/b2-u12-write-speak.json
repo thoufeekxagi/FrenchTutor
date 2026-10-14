@@ -1,0 +1,63 @@
+{
+  "id": "b2-u12-write-speak",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Read the two original source notes in the Reading lesson. Write a 130–160-word text comparing their views on a centralized digital service and stating your own position. Use the exact Task 3 range of 120–180 words; do not copy full sentences.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux documents cherchent à simplifier les démarches, mais ils évaluent différemment les effets d'une plateforme unique. Le premier met en avant la réduction des répétitions et la rapidité des mises à jour. Le second rappelle qu'un accès numérique ne convient pas à toutes les situations et qu'il faut expliquer l'utilisation des données. Les deux textes présentent toutefois certaines conséquences comme des possibilités, sans résultats d'essai. À mon sens, une plateforme commune pourrait être utile si une option hors ligne reste disponible et si les utilisateurs savent quelles informations sont conservées. Avant de généraliser la mesure, il faudrait mener un essai et publier ses limites. Cette approche permettrait de profiter d'un accès plus simple sans supposer que les besoins sont identiques. La décision devrait donc reposer sur des résultats observés et sur un accès équitable.\n\nCheck:\n• Task 3 range: 120–180 words; this practice target is 130–160.\n• Name both source views before giving your own position.\n• Paraphrase the sources; attribute their claims.\n• Check that each conclusion is supported and count your words."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Explain the two source viewpoints from the reading aloud, then give your position in 90 seconds. Marie will ask which idea came from which source and challenge one assumption. This is transfer practice; the official TCF Task 3 speaking prompt is not a source-comparison task.\n\n• Attribute each source before combining them.\n• Do not confuse TCF writing Task 3 with oral Task 3; the formats differ.\n• Respond directly when Marie asks whose claim you summarized."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Le premier document soutient qu'une plateforme commune pourrait simplifier certaines démarches.",
+      "en": "Model answer, part 1 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Le second met l'accent sur l'accès des personnes qui ne peuvent pas utiliser les outils numériques et sur la transparence des données.",
+      "en": "Model answer, part 2 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Les deux souhaitent rendre le service plus clair, mais ils ne proposent pas le même nombre de voies d'accès.",
+      "en": "Model answer, part 3 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "À mon avis, la plateforme peut être utile à condition qu'une option hors ligne reste disponible.",
+      "en": "Model answer, part 4 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "Comme les textes ne présentent pas encore de résultats d'essai, je ne conclurais pas qu'une seule solution convient à tous. Il faudrait comparer les effets observés avant de généraliser.",
+      "en": "Model answer, part 5 of 5.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

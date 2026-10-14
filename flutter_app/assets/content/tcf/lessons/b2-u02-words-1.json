@@ -1,0 +1,148 @@
+{
+  "id": "b2-u02-words-1",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une source",
+      "en": "a source",
+      "sound": "ün soors",
+      "exampleFr": "Le journaliste précise la source de l'information.",
+      "exampleEn": "The journalist specifies the source of the information."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un témoin",
+      "en": "a witness",
+      "sound": "uh(n) tay-MWA(N)",
+      "exampleFr": "Un témoin décrit ce qu'il a observé.",
+      "exampleEn": "A witness describes what they observed."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une affirmation",
+      "en": "a claim; an assertion",
+      "sound": "ün ah-feer-mah-SYOH(N)",
+      "exampleFr": "Cette affirmation demande une vérification.",
+      "exampleEn": "This claim needs verification."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un indice",
+      "en": "a clue; an indication",
+      "sound": "uh(n) an-DEES",
+      "exampleFr": "Le document donne un indice, pas une preuve complète.",
+      "exampleEn": "The document gives a clue, not complete proof."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un témoignage",
+      "en": "a testimony; an account",
+      "sound": "uh(n) tay-mwan-YAZH",
+      "exampleFr": "Le témoignage exprime une expérience personnelle.",
+      "exampleEn": "The account expresses a personal experience."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un communiqué",
+      "en": "a statement; a press release",
+      "sound": "uh(n) koh-mü-nee-KAY",
+      "exampleFr": "Le communiqué annonce la date de la rencontre.",
+      "exampleEn": "The statement announces the meeting date."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une source",
+      "options": [
+        "a clue; an indication",
+        "a source",
+        "a witness",
+        "a claim; an assertion"
+      ],
+      "answer": 1,
+      "explain": "une source means a source."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un témoin",
+      "options": [
+        "a testimony; an account",
+        "a claim; an assertion",
+        "a clue; an indication",
+        "a witness"
+      ],
+      "answer": 3,
+      "explain": "un témoin means a witness."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une affirmation",
+      "options": [
+        "a statement; a press release",
+        "a claim; an assertion",
+        "a clue; an indication",
+        "a testimony; an account"
+      ],
+      "answer": 1,
+      "explain": "une affirmation means a claim; an assertion."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un indice",
+      "options": [
+        "a source",
+        "a testimony; an account",
+        "a statement; a press release",
+        "a clue; an indication"
+      ],
+      "answer": 3,
+      "explain": "un indice means a clue; an indication."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un témoignage",
+      "options": [
+        "a witness",
+        "a testimony; an account",
+        "a statement; a press release",
+        "a source"
+      ],
+      "answer": 1,
+      "explain": "un témoignage means a testimony; an account."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un communiqué",
+      "options": [
+        "a claim; an assertion",
+        "a source",
+        "a witness",
+        "a statement; a press release"
+      ],
+      "answer": 3,
+      "explain": "un communiqué means a statement; a press release."
+    }
+  ]
+}

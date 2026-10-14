@@ -1,0 +1,360 @@
+{
+  "id": "b1-deux-logements-un-critere",
+  "title": "Deux logements, un critère décisif",
+  "titleEn": "Two homes, one deciding factor",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "Sam compares two rental options by looking beyond the advertised price to the routines that matter to him.",
+  "unit": "b1-u04",
+  "sentences": [
+    {
+      "fr": "Sam cherchait un logement qui lui permettrait de garder son emploi et de suivre des cours du soir.",
+      "en": "Sam was looking for a home that would let him keep his job and attend evening classes."
+    },
+    {
+      "fr": "La première annonce présentait un appartement près de son travail, mais loin du centre de formation.",
+      "en": "The first listing described an apartment near his work but far from the training centre."
+    },
+    {
+      "fr": "Le second logement, qui était plus petit, se trouvait plus près du centre de formation.",
+      "en": "The second home, which was smaller, was closer to the training centre."
+    },
+    {
+      "fr": "Sam a calculé le temps de déplacement qu'il ferait chaque semaine, pas seulement la distance sur une carte.",
+      "en": "Sam calculated the travel time he would spend each week, not just the distance on a map.",
+      "note": "In this sentence, auquel s'ajoutait links an added feature to the second home; compare relationships, not just word order."
+    },
+    {
+      "fr": "Il a aussi vérifié les frais indiqués dans chaque annonce et posé une question sur les services inclus.",
+      "en": "He also checked the fees listed in each advertisement and asked which services were included."
+    },
+    {
+      "fr": "Le deuxième logement coûtait un peu plus cher, toutefois il réduisait deux déplacements quotidiens.",
+      "en": "The second home cost a little more; however, it reduced two daily trips."
+    },
+    {
+      "fr": "Sam a choisi cette option parce que le temps gagné comptait davantage pour son horaire actuel.",
+      "en": "Sam chose that option because the time saved mattered more for his current schedule."
+    }
+  ],
+  "words": {
+    "sam": {
+      "en": "Sam (a man's name)"
+    },
+    "cherchait": {
+      "en": "was looking for"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "logement": {
+      "en": "home, dwelling"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "permettrait": {
+      "en": "would allow"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "garder": {
+      "en": "to keep"
+    },
+    "son": {
+      "en": "his; her (masculine noun)",
+      "pos": "possessive"
+    },
+    "emploi": {
+      "en": "job"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "suivre": {
+      "en": "to attend; to follow"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "cours": {
+      "en": "a course, class"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "première": {
+      "en": "first"
+    },
+    "annonce": {
+      "en": "announcement; notice; announces (annoncer)",
+      "pos": "noun / verb"
+    },
+    "présentait": {
+      "en": "presented"
+    },
+    "appartement": {
+      "en": "apartment",
+      "sound": "lah-pahr-tuh-MAH(N)"
+    },
+    "près": {
+      "en": "near",
+      "pos": "preposition"
+    },
+    "travail": {
+      "en": "work"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "loin": {
+      "en": "far"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "formation": {
+      "en": "training program"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "second": {
+      "en": "second"
+    },
+    "était": {
+      "en": "was"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "petit": {
+      "en": "small, short",
+      "sound": "puh-TEE"
+    },
+    "se": {
+      "en": "oneself",
+      "pos": "pronoun"
+    },
+    "trouvait": {
+      "en": "was located; found"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "calculé": {
+      "en": "calculated"
+    },
+    "temps": {
+      "en": "weather"
+    },
+    "déplacement": {
+      "en": "trip; commute"
+    },
+    "qu'il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "ferait": {
+      "en": "would do; would make"
+    },
+    "chaque": {
+      "en": "each; every"
+    },
+    "semaine": {
+      "en": "week, weekday period"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "seulement": {
+      "en": "only"
+    },
+    "distance": {
+      "en": "distance"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "carte": {
+      "en": "card"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "vérifié": {
+      "en": "checked"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "frais": {
+      "en": "fees; costs"
+    },
+    "indiqués": {
+      "en": "listed"
+    },
+    "dans": {
+      "en": "in",
+      "sound": "dah(n)"
+    },
+    "posé": {
+      "en": "asked; put"
+    },
+    "question": {
+      "en": "question"
+    },
+    "services": {
+      "en": "services"
+    },
+    "inclus": {
+      "en": "included",
+      "sound": "a(n)-KLÜ"
+    },
+    "deuxième": {
+      "en": "second; second one"
+    },
+    "coûtait": {
+      "en": "cost"
+    },
+    "peu": {
+      "en": "a little"
+    },
+    "cher": {
+      "en": "expensive"
+    },
+    "toutefois": {
+      "en": "however"
+    },
+    "réduisait": {
+      "en": "reduced; was reducing"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "déplacements": {
+      "en": "trips; commutes"
+    },
+    "quotidiens": {
+      "en": "daily"
+    },
+    "choisi": {
+      "en": "chose"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "option": {
+      "en": "option"
+    },
+    "parce": {
+      "en": "because (part of parce que)",
+      "pos": "connector"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "gagné": {
+      "en": "saved; gained"
+    },
+    "comptait": {
+      "en": "mattered; counted"
+    },
+    "davantage": {
+      "en": "more"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "horaire": {
+      "en": "schedule",
+      "sound": "loh-REHR"
+    },
+    "actuel": {
+      "en": "current"
+    }
+  },
+  "keywords": [
+    "logement",
+    "annonce",
+    "déplacement",
+    "distance",
+    "frais",
+    "option",
+    "horaire"
+  ],
+  "quiz": [
+    {
+      "prompt": "What was Sam's main goal in finding a home?",
+      "options": [
+        "Stop travelling to work",
+        "Find the largest apartment available",
+        "Keep his job and attend evening classes",
+        "Move close to a holiday destination"
+      ],
+      "answer": 2,
+      "explain": "The first sentence gives both priorities."
+    },
+    {
+      "prompt": "What did Sam calculate besides distance?",
+      "options": [
+        "The price of a map",
+        "The weekly travel time",
+        "The landlord's work schedule",
+        "The number of rooms in the training centre"
+      ],
+      "answer": 1,
+      "explain": "He calculated how much time he would travel each week."
+    },
+    {
+      "prompt": "Why did Sam choose the more expensive option?",
+      "options": [
+        "His classes were cancelled",
+        "It was the biggest apartment",
+        "The first advertisement had no fees",
+        "It reduced two daily trips and suited his current schedule"
+      ],
+      "answer": 3,
+      "explain": "The last two sentences explain his choice and the value of the time saved."
+    }
+  ]
+}

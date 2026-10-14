@@ -1,0 +1,157 @@
+{
+  "id": "a2-u12-words-5",
+  "unit": "a2-u12",
+  "unitTitle": "A2 capstone: handle a changing week",
+  "title": "Words: practise under changing conditions",
+  "subtitle": "A2 · Unit 12: A2 capstone: handle a changing week",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un test blanc",
+      "en": "a practice test",
+      "sound": "uh(n) tehst blahn",
+      "exampleFr": "Je fais un test blanc dans les conditions prévues.",
+      "exampleEn": "I take a practice test under the planned conditions."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une pause de révision",
+      "en": "a review break",
+      "sound": "ün pohz duh ray-vee-ZYOH(N)",
+      "exampleFr": "Après le test, je prends une pause de révision.",
+      "exampleEn": "After the test, I take a review break."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un exemple personnel",
+      "en": "a personal example",
+      "sound": "ün ehk-ZAH(N)PL pehr-soh-NEHL",
+      "exampleFr": "Je donne un exemple personnel pour expliquer mon choix.",
+      "exampleEn": "I give a personal example to explain my choice."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un changement d'horaire",
+      "en": "a schedule change",
+      "sound": "uh(n) shah(n)zh-MAH(N) doh-REHR",
+      "exampleFr": "Un changement d'horaire m'oblige à modifier mon plan.",
+      "exampleEn": "A schedule change makes me change my plan."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une nouvelle contrainte",
+      "en": "a new constraint",
+      "sound": "ün noo-VEHL kohn-TRAH(N)T",
+      "exampleFr": "Une nouvelle contrainte change mon organisation.",
+      "exampleEn": "A new constraint changes how I organize things."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une date limite proche",
+      "en": "a nearby deadline",
+      "sound": "ün daht lee-MEET prohsh",
+      "exampleFr": "La date limite approche; je dois terminer le formulaire demain.",
+      "exampleEn": "The deadline is approaching; I have to finish the form tomorrow."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un retour constructif",
+      "en": "constructive feedback",
+      "sound": "uh(n) ruh-TOOR kohn-strük-TEEF",
+      "exampleFr": "Après l'activité, Marie me donne un retour constructif.",
+      "exampleEn": "After the activity, Marie gives me constructive feedback."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un test blanc",
+      "options": [
+        "a schedule change",
+        "a practice test",
+        "constructive feedback",
+        "a personal example"
+      ],
+      "answer": 1,
+      "explain": "un test blanc means a practice test."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une pause de révision",
+      "options": [
+        "a new constraint",
+        "a practice test",
+        "a schedule change",
+        "a review break"
+      ],
+      "answer": 3,
+      "explain": "une pause de révision means a review break."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un exemple personnel",
+      "options": [
+        "a nearby deadline",
+        "a personal example",
+        "a review break",
+        "a new constraint"
+      ],
+      "answer": 1,
+      "explain": "un exemple personnel means a personal example."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un changement d'horaire",
+      "options": [
+        "constructive feedback",
+        "a personal example",
+        "a nearby deadline",
+        "a schedule change"
+      ],
+      "answer": 3,
+      "explain": "un changement d'horaire means a schedule change."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une nouvelle contrainte",
+      "options": [
+        "a practice test",
+        "a new constraint",
+        "a schedule change",
+        "constructive feedback"
+      ],
+      "answer": 1,
+      "explain": "une nouvelle contrainte means a new constraint."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une date limite proche",
+      "options": [
+        "a review break",
+        "a new constraint",
+        "a practice test",
+        "a nearby deadline"
+      ],
+      "answer": 3,
+      "explain": "une date limite proche means a nearby deadline."
+    }
+  ]
+}

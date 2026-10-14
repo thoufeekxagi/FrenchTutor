@@ -1,0 +1,75 @@
+{
+  "id": "b1-u03-checkpoint",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which tense follows si in this hypothetical pattern?",
+      "options": [
+        "Imparfait",
+        "Passé composé",
+        "Conditionnel présent",
+        "Futur simple"
+      ],
+      "answer": 0,
+      "explain": "The condition uses imparfait."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the possible result: Si la salle était libre, nous ___ l'activité.",
+      "options": [
+        "pouvions déplacer hier",
+        "déplacerons hier",
+        "pourrions déplacer",
+        "avons déplacé demain"
+      ],
+      "answer": 2,
+      "explain": "Conditionnel present expresses the hypothetical result."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does un compromis mean?",
+      "options": [
+        "A cancellation",
+        "A solution balancing different needs",
+        "A deadline",
+        "An instruction"
+      ],
+      "answer": 1,
+      "explain": "A compromise accommodates differing needs."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which sentence marks a constraint?",
+      "options": [
+        "La salle est sûrement libre toute l'année.",
+        "Le changement a déjà été accepté.",
+        "Tout le monde préfère la même heure.",
+        "Il faudrait vérifier la disponibilité de la salle."
+      ],
+      "answer": 3,
+      "explain": "It identifies a practical detail that still needs verification."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "How do you test transfer?",
+      "options": [
+        "Respond when a new constraint changes the proposal",
+        "Repeat the same role-play without listening",
+        "Memorize the model",
+        "Study only the verb ending"
+      ],
+      "answer": 0,
+      "explain": "A changed constraint tests adaptive use."
+    }
+  ]
+}

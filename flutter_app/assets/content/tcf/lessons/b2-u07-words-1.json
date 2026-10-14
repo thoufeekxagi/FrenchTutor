@@ -1,0 +1,148 @@
+{
+  "id": "b2-u07-words-1",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Words: core topic language — set 1",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une consommation",
+      "en": "consumption",
+      "sound": "ün kohn-soh-mah-SYOH(N)",
+      "exampleFr": "La consommation varie selon les habitudes.",
+      "exampleEn": "Consumption varies according to habits."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un déchet",
+      "en": "waste; a piece of rubbish",
+      "sound": "uh(n) day-SHEH",
+      "exampleFr": "Le projet cherche à réduire les déchets.",
+      "exampleEn": "The project aims to reduce waste."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une collecte",
+      "en": "a collection; collection service",
+      "sound": "ün koh-lekt",
+      "exampleFr": "La collecte a lieu après l'événement.",
+      "exampleEn": "Collection takes place after the event."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une ressource",
+      "en": "a resource",
+      "sound": "ün ruh-SOORS",
+      "exampleFr": "L'eau est une ressource à préserver.",
+      "exampleEn": "Water is a resource to preserve."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une empreinte",
+      "en": "a footprint",
+      "sound": "ün ahn-PRAHNT",
+      "exampleFr": "Le rapport estime l'empreinte du déplacement.",
+      "exampleEn": "The report estimates the travel footprint."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un approvisionnement",
+      "en": "a supply; procurement",
+      "sound": "uh(n) ah-proh-vee-zyoh-nuh-MAH(N)",
+      "exampleFr": "L'approvisionnement local reste à évaluer.",
+      "exampleEn": "Local procurement remains to be evaluated."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une consommation",
+      "options": [
+        "a resource",
+        "consumption",
+        "waste; a piece of rubbish",
+        "a collection; collection service"
+      ],
+      "answer": 1,
+      "explain": "une consommation means consumption."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un déchet",
+      "options": [
+        "a footprint",
+        "a collection; collection service",
+        "a resource",
+        "waste; a piece of rubbish"
+      ],
+      "answer": 3,
+      "explain": "un déchet means waste; a piece of rubbish."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une collecte",
+      "options": [
+        "a supply; procurement",
+        "a collection; collection service",
+        "a resource",
+        "a footprint"
+      ],
+      "answer": 1,
+      "explain": "une collecte means a collection; collection service."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une ressource",
+      "options": [
+        "consumption",
+        "a footprint",
+        "a supply; procurement",
+        "a resource"
+      ],
+      "answer": 3,
+      "explain": "une ressource means a resource."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une empreinte",
+      "options": [
+        "waste; a piece of rubbish",
+        "a footprint",
+        "a supply; procurement",
+        "consumption"
+      ],
+      "answer": 1,
+      "explain": "une empreinte means a footprint."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un approvisionnement",
+      "options": [
+        "a collection; collection service",
+        "consumption",
+        "waste; a piece of rubbish",
+        "a supply; procurement"
+      ],
+      "answer": 3,
+      "explain": "un approvisionnement means a supply; procurement."
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "b2-u09-reading",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why do the authors recommend a longer observation period?",
+      "options": [
+        "The authors reject every figure",
+        "The average never changed",
+        "The table has no households",
+        "Seasonal changes may affect the comparison"
+      ],
+      "answer": 3,
+      "explain": "A longer period may reveal whether seasonal factors affected the result.",
+      "promptFr": "Un tableau fictif présente les dépenses de transport de vingt ménages sur deux mois. La moyenne augmente légèrement, mais les réponses varient beaucoup. Le document n'indique pas si les déplacements saisonniers ont changé. Les auteurs recommandent de recueillir les mêmes renseignements pendant une période plus longue avant de parler d'une tendance générale. Cette précaution ne nie pas la hausse observée; elle limite la portée de l'interprétation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the text say about the two recommendations?",
+      "options": [
+        "They have been proven for everyone",
+        "Their usefulness depends on individual circumstances",
+        "They require the same contract",
+        "They cannot be compared"
+      ],
+      "answer": 1,
+      "explain": "The text says that each recommendation depends on a person's situation.",
+      "promptFr": "Deux conseils budgétaires sont proposés. Le premier recommande de comparer les contrats; le second insiste sur la réduction des achats non essentiels. Le texte précise qu'aucun conseil n'a été évalué auprès de tous les ménages. Leur utilité dépendra donc des besoins, des obligations et des choix de chaque personne."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What could explain part of the gap?",
+      "options": [
+        "A change in the data-collection group",
+        "A confirmed change in every expense",
+        "A new recommendation",
+        "A missing budget"
+      ],
+      "answer": 0,
+      "explain": "The different sample may explain some of the difference.",
+      "promptFr": "Une hausse de 4 % est observée dans une catégorie. Le rapport rappelle que le calcul utilise un groupe différent de l'an dernier. Il est donc possible que la méthode de collecte explique une partie de l'écart. Les auteurs demandent une comparaison supplémentaire avant toute conclusion."
+    }
+  ]
+}

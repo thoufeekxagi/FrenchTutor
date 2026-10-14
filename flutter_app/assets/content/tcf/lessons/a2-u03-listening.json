@@ -1,0 +1,86 @@
+{
+  "id": "a2-u03-listening",
+  "unit": "a2-u03",
+  "unitTitle": "Everyday events: what I did",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 3: Everyday events: what I did",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Hier, j'ai pris le train pour Gatineau et j'ai lu un avis sur le quai.",
+      "question": "Where did the speaker read the notice?",
+      "options": [
+        "On the platform",
+        "At the library",
+        "At the clinic",
+        "On the bus"
+      ],
+      "answer": 0,
+      "explain": "The speaker says sur le quai, on the platform."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "J'ai fait une demande au guichet, puis j'ai pris le reçu.",
+      "question": "What did the speaker take?",
+      "options": [
+        "The receipt",
+        "The ticket",
+        "The newspaper",
+        "The map"
+      ],
+      "answer": 0,
+      "explain": "The second action is taking the receipt."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Nous avons vu le numéro de la station et pris la bonne correspondance.",
+      "question": "What helped the speakers choose the connection?",
+      "options": [
+        "The station number",
+        "A class schedule",
+        "A voice message",
+        "A library card"
+      ],
+      "answer": 0,
+      "explain": "They saw the station number before taking the connection."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "À la fin de l'atelier, j'ai eu une réponse claire à ma question.",
+      "question": "When did the speaker get a clear answer?",
+      "options": [
+        "At the end of the workshop",
+        "Before the bus arrived",
+        "At the service window",
+        "During the trip"
+      ],
+      "answer": 0,
+      "explain": "The recording begins à la fin de l'atelier."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "D'abord, j'ai lu la consigne. Ensuite, j'ai fait l'activité dans mon cahier.",
+      "question": "What did the speaker do after reading the instruction?",
+      "options": [
+        "Completed the activity in a notebook",
+        "Took a bus to the station",
+        "Asked for a refund",
+        "Wrote a voice message"
+      ],
+      "answer": 0,
+      "explain": "The next action was doing the activity in a notebook."
+    }
+  ]
+}

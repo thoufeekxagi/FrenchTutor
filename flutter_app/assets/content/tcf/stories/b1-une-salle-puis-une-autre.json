@@ -1,0 +1,348 @@
+{
+  "id": "b1-une-salle-puis-une-autre",
+  "title": "Une salle, puis une autre",
+  "titleEn": "One room, then another",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "Lina arrives for an evening workshop, discovers a last-minute room change and helps the group get started.",
+  "unit": "b1-u01",
+  "sentences": [
+    {
+      "fr": "Lina avait réservé sa soirée pour un atelier de conversation au centre communautaire.",
+      "en": "Lina had set aside her evening for a conversation workshop at the community centre."
+    },
+    {
+      "fr": "Avant de partir, elle avait lu l'ancien avis, qui indiquait la salle 204.",
+      "en": "Before leaving, she had read the old notice, which listed room 204."
+    },
+    {
+      "fr": "En arrivant, elle a vu un petit message à l'entrée : le groupe devait se réunir au troisième étage, dans la salle 308.",
+      "en": "When she arrived, she saw a short message at the entrance: the group was to meet in room 308 on the third floor."
+    },
+    {
+      "fr": "L'organisatrice avait prévenu les participants par courriel, mais Lina n'avait pas vu le message.",
+      "en": "The organizer had notified participants by email, but Lina had not seen the message."
+    },
+    {
+      "fr": "Comme plusieurs personnes attendaient devant l'ancienne salle, Lina leur a montré le nouvel avis.",
+      "en": "Since several people were waiting outside the old room, Lina showed them the new notice."
+    },
+    {
+      "fr": "Le groupe a commencé avec quinze minutes de retard, sans perdre la séance entière.",
+      "en": "The group started fifteen minutes late without losing the whole session."
+    },
+    {
+      "fr": "Après l'atelier, l'organisatrice a promis de confirmer l'heure et la salle dans un seul message.",
+      "en": "After the workshop, the organizer promised to confirm the time and room in one message.",
+      "note": "A useful confirmation puts the date, time and location together, so readers do not have to combine details from several messages."
+    }
+  ],
+  "words": {
+    "lina": {
+      "en": "Lina (a woman's name)"
+    },
+    "avait": {
+      "en": "had"
+    },
+    "réservé": {
+      "en": "reserved; booked"
+    },
+    "sa": {
+      "en": "his; her (feminine noun)",
+      "pos": "possessive"
+    },
+    "soirée": {
+      "en": "evening"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "atelier": {
+      "en": "a workshop"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "conversation": {
+      "en": "conversation"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "communautaire": {
+      "en": "community",
+      "pos": "adjective"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "partir": {
+      "en": "to leave"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "lu": {
+      "en": "read (past participle)"
+    },
+    "l'ancien": {
+      "en": "the old (masculine)"
+    },
+    "avis": {
+      "en": "notice; opinion"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "indiquait": {
+      "en": "indicated; listed"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "salle": {
+      "en": "room; hall",
+      "pos": "noun, feminine"
+    },
+    "204": {
+      "en": "number 204"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "arrivant": {
+      "en": "arriving"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "vu": {
+      "en": "seen"
+    },
+    "petit": {
+      "en": "small, short",
+      "sound": "puh-TEE"
+    },
+    "message": {
+      "en": "message"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "l'entrée": {
+      "en": "entrance, entryway",
+      "sound": "lah(n)-TRAY"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "groupe": {
+      "en": "group"
+    },
+    "devait": {
+      "en": "had to; was supposed to"
+    },
+    "se": {
+      "en": "oneself",
+      "pos": "pronoun"
+    },
+    "réunir": {
+      "en": "to meet; to gather"
+    },
+    "troisième": {
+      "en": "third",
+      "sound": "trwah-ZYEM"
+    },
+    "étage": {
+      "en": "floor, storey",
+      "sound": "lay-TAHZH"
+    },
+    "dans": {
+      "en": "in",
+      "sound": "dah(n)"
+    },
+    "308": {
+      "en": "number 308"
+    },
+    "l'organisatrice": {
+      "en": "the organizer"
+    },
+    "prévenu": {
+      "en": "notified; warned"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "participants": {
+      "en": "participants"
+    },
+    "par": {
+      "en": "by, through",
+      "sound": "pahR"
+    },
+    "courriel": {
+      "en": "email",
+      "sound": "koo-ree-EL"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "n'avait": {
+      "en": "had not"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "comme": {
+      "en": "as; like; since"
+    },
+    "plusieurs": {
+      "en": "several"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "attendaient": {
+      "en": "were waiting"
+    },
+    "devant": {
+      "en": "in front of",
+      "sound": "duh-VAH(N)"
+    },
+    "l'ancienne": {
+      "en": "the old (feminine)"
+    },
+    "leur": {
+      "en": "their",
+      "pos": "possessive"
+    },
+    "montré": {
+      "en": "showed"
+    },
+    "nouvel": {
+      "en": "new (masculine before a vowel)",
+      "pos": "adjective"
+    },
+    "commencé": {
+      "en": "started; began"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "quinze": {
+      "en": "fifteen",
+      "sound": "ka(n)z"
+    },
+    "minutes": {
+      "en": "minutes"
+    },
+    "retard": {
+      "en": "a delay"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "perdre": {
+      "en": "to lose"
+    },
+    "séance": {
+      "en": "session"
+    },
+    "entière": {
+      "en": "whole; entire"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "l'atelier": {
+      "en": "a workshop"
+    },
+    "promis": {
+      "en": "promised"
+    },
+    "confirmer": {
+      "en": "to confirm",
+      "sound": "koh(n)-feer-MAY"
+    },
+    "l'heure": {
+      "en": "hour; time on a clock",
+      "sound": "luhR"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "seul": {
+      "en": "alone; only"
+    }
+  },
+  "keywords": [
+    "salle",
+    "avis",
+    "courriel",
+    "retard",
+    "séance",
+    "confirmer",
+    "atelier"
+  ],
+  "quiz": [
+    {
+      "prompt": "What had Lina read before leaving?",
+      "options": [
+        "A list of workshop results",
+        "A message cancelling the workshop",
+        "A notice listing room 204",
+        "A notice about a new date"
+      ],
+      "answer": 2,
+      "explain": "The second sentence says the old notice listed room 204."
+    },
+    {
+      "prompt": "Why had Lina missed the update?",
+      "options": [
+        "The workshop had ended early",
+        "She had not seen the organizer's email",
+        "She had gone to the wrong centre",
+        "The organizer had sent no message"
+      ],
+      "answer": 1,
+      "explain": "The organizer had emailed the change, but Lina had not seen the message."
+    },
+    {
+      "prompt": "What improvement did the organizer promise?",
+      "options": [
+        "Confirm the time and room in one message",
+        "Move every meeting to another centre",
+        "Ask Lina to lead the next session",
+        "Cancel the next workshop"
+      ],
+      "answer": 0,
+      "explain": "The final sentence states the organizer would put the time and room in one message."
+    }
+  ]
+}

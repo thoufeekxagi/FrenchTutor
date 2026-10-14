@@ -1,0 +1,148 @@
+{
+  "id": "b1-u06-words-1",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une conséquence",
+      "en": "a consequence",
+      "sound": "ün kohn-say-KAH(N)S",
+      "exampleFr": "La conséquence du détour est un trajet plus long.",
+      "exampleEn": "The consequence of the detour is a longer trip."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une cause",
+      "en": "a cause",
+      "sound": "ün kohz",
+      "exampleFr": "Le rapport décrit une cause possible du retard.",
+      "exampleEn": "The report describes a possible cause of the delay."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un détour",
+      "en": "a detour",
+      "sound": "uh(n) day-TOOR",
+      "exampleFr": "Le détour évite les travaux près de la station.",
+      "exampleEn": "The detour avoids construction near the station."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un chantier",
+      "en": "a construction site",
+      "sound": "uh(n) shah(n)-TYAY",
+      "exampleFr": "Le chantier restera ouvert pendant deux semaines.",
+      "exampleEn": "The construction site will remain open for two weeks."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un accès",
+      "en": "access",
+      "sound": "uh(n) ahk-SEH",
+      "exampleFr": "Le changement améliore l'accès au centre.",
+      "exampleEn": "The change improves access to the centre."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une mesure",
+      "en": "a measure; a step",
+      "sound": "ün muh-ZÜR",
+      "exampleFr": "La mesure vise à réduire les retards.",
+      "exampleEn": "The measure aims to reduce delays."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une conséquence",
+      "options": [
+        "a construction site",
+        "a consequence",
+        "a cause",
+        "a detour"
+      ],
+      "answer": 1,
+      "explain": "une conséquence means a consequence."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une cause",
+      "options": [
+        "access",
+        "a detour",
+        "a construction site",
+        "a cause"
+      ],
+      "answer": 3,
+      "explain": "une cause means a cause."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un détour",
+      "options": [
+        "a measure; a step",
+        "a detour",
+        "a construction site",
+        "access"
+      ],
+      "answer": 1,
+      "explain": "un détour means a detour."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un chantier",
+      "options": [
+        "a consequence",
+        "access",
+        "a measure; a step",
+        "a construction site"
+      ],
+      "answer": 3,
+      "explain": "un chantier means a construction site."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès",
+      "options": [
+        "a cause",
+        "access",
+        "a measure; a step",
+        "a consequence"
+      ],
+      "answer": 1,
+      "explain": "un accès means access."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une mesure",
+      "options": [
+        "a detour",
+        "a consequence",
+        "a cause",
+        "a measure; a step"
+      ],
+      "answer": 3,
+      "explain": "une mesure means a measure; a step."
+    }
+  ]
+}

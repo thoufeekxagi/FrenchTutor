@@ -1,0 +1,148 @@
+{
+  "id": "b1-u09-words-5",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "réutiliser",
+      "en": "to reuse",
+      "sound": "ray-ü-tee-lee-ZAY",
+      "exampleFr": "On peut réutiliser les boîtes pour ranger le matériel.",
+      "exampleEn": "The boxes can be reused to store the supplies."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "recycler",
+      "en": "to recycle",
+      "sound": "ruh-see-KLAY",
+      "exampleFr": "Le centre recycle le papier et le carton.",
+      "exampleEn": "The centre recycles paper and cardboard."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "remplacer une pièce",
+      "en": "to replace a part",
+      "sound": "rahn-plah-SAY ün pyehs",
+      "exampleFr": "Le technicien doit remplacer une pièce usée.",
+      "exampleEn": "The technician needs to replace a worn part."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "installer un appareil",
+      "en": "to install a device",
+      "sound": "ahn-stah-LAY uh(n) ah-pah-rehy",
+      "exampleFr": "Un membre de l'équipe viendra installer l'appareil.",
+      "exampleEn": "A team member will come to install the device."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une consigne de sécurité",
+      "en": "a safety instruction",
+      "sound": "ün kohn-seeny duh say-kü-ree-TAY",
+      "exampleFr": "Il faut suivre chaque consigne de sécurité.",
+      "exampleEn": "Every safety instruction must be followed."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "par l'intermédiaire de",
+      "en": "through; by way of",
+      "sound": "par lehn-tehr-may-dyehr duh",
+      "exampleFr": "La réservation se fait par l'intermédiaire du bureau.",
+      "exampleEn": "The booking is made through the office."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "réutiliser",
+      "options": [
+        "to install a device",
+        "to reuse",
+        "to recycle",
+        "to replace a part"
+      ],
+      "answer": 1,
+      "explain": "réutiliser means to reuse."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "recycler",
+      "options": [
+        "a safety instruction",
+        "to replace a part",
+        "to install a device",
+        "to recycle"
+      ],
+      "answer": 3,
+      "explain": "recycler means to recycle."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "remplacer une pièce",
+      "options": [
+        "through; by way of",
+        "to replace a part",
+        "to install a device",
+        "a safety instruction"
+      ],
+      "answer": 1,
+      "explain": "remplacer une pièce means to replace a part."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "installer un appareil",
+      "options": [
+        "to reuse",
+        "a safety instruction",
+        "through; by way of",
+        "to install a device"
+      ],
+      "answer": 3,
+      "explain": "installer un appareil means to install a device."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une consigne de sécurité",
+      "options": [
+        "to recycle",
+        "a safety instruction",
+        "through; by way of",
+        "to reuse"
+      ],
+      "answer": 1,
+      "explain": "une consigne de sécurité means a safety instruction."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "par l'intermédiaire de",
+      "options": [
+        "to replace a part",
+        "to reuse",
+        "to recycle",
+        "through; by way of"
+      ],
+      "answer": 3,
+      "explain": "par l'intermédiaire de means through; by way of."
+    }
+  ]
+}

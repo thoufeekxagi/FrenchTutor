@@ -1,0 +1,75 @@
+{
+  "id": "b1-u09-checkpoint",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Checkpoint",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does a passive sentence emphasize?",
+      "options": [
+        "The speaker's future plan",
+        "The person asking a question",
+        "A hypothetical condition",
+        "The action or result received by the subject"
+      ],
+      "answer": 3,
+      "explain": "The passive foregrounds the receiver or result of an action."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is on useful for here?",
+      "options": [
+        "A reference to a known place",
+        "A general process without naming the actor",
+        "A polite inversion",
+        "A past event before another past event"
+      ],
+      "answer": 1,
+      "explain": "On describes an unspecific or general actor."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When should you use en + present participle?",
+      "options": [
+        "Only in the passive",
+        "Only after a question word",
+        "When the subject stays the same",
+        "Whenever the subject changes"
+      ],
+      "answer": 2,
+      "explain": "The gerund normally shares its subject with the main clause."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does un bénévole mean?",
+      "options": [
+        "A volunteer",
+        "A participant badge",
+        "A time limit",
+        "A cancellation"
+      ],
+      "answer": 0,
+      "explain": "A bénévole is a volunteer."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Which sentence clearly names who did the action?",
+      "options": [
+        "Les chaises sont prêtes.",
+        "On a préparé les chaises.",
+        "Les chaises ont été préparées.",
+        "Les bénévoles ont préparé les chaises."
+      ],
+      "answer": 3,
+      "explain": "The active sentence explicitly names the volunteers."
+    }
+  ]
+}

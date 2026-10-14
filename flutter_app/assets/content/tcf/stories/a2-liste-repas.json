@@ -1,0 +1,317 @@
+{
+  "id": "a2-liste-repas",
+  "title": "La liste du repas",
+  "titleEn": "The meal list",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Nadia checks quantities, prices and a food preference while planning a meal.",
+  "unit": "a2-u10",
+  "sentences": [
+    {
+      "fr": "Nadia prépare un repas pour son groupe de français.",
+      "en": "Nadia is preparing a meal for her French group."
+    },
+    {
+      "fr": "Nadia achète des lentilles sèches, une conserve de tomates et des fraises.",
+      "en": "She adds dried lentils, a tin of tomatoes and strawberries to her list."
+    },
+    {
+      "fr": "L'étiquette de rayon indique le prix au kilo des lentilles.",
+      "en": "The shelf label shows the price per kilogram for the lentils."
+    },
+    {
+      "fr": "Nadia en prend un paquet et note la quantité sur sa liste.",
+      "en": "Nadia takes one packet of lentils and notes the quantity on her list."
+    },
+    {
+      "fr": "Elle vérifie aussi la liste d'ingrédients du plat préparé.",
+      "en": "She also checks the ingredient list for the prepared dish."
+    },
+    {
+      "fr": "L'option végétalienne plaît au groupe.",
+      "en": "The vegan option appeals to the group."
+    },
+    {
+      "fr": "Nadia en prend deux; elle n'achète pas de boisson sans sucre.",
+      "en": "Nadia takes two of them; she does not buy a sugar-free drink."
+    },
+    {
+      "fr": "À la maison, elle réchauffe le plat et tranche le pain.",
+      "en": "At home, she reheats the dish and slices the bread."
+    }
+  ],
+  "words": {
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "name"
+    },
+    "prépare": {
+      "en": "is preparing",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article"
+    },
+    "repas": {
+      "en": "meal",
+      "pos": "noun, masculine"
+    },
+    "pour": {
+      "en": "for",
+      "pos": "preposition"
+    },
+    "son": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun, masculine"
+    },
+    "de": {
+      "en": "of",
+      "pos": "preposition"
+    },
+    "français": {
+      "en": "French",
+      "pos": "noun/adjective"
+    },
+    "achète": {
+      "en": "buys",
+      "pos": "verb"
+    },
+    "des": {
+      "en": "some",
+      "pos": "article"
+    },
+    "lentilles": {
+      "en": "lentils",
+      "pos": "noun, feminine plural"
+    },
+    "sèches": {
+      "en": "dried",
+      "pos": "adjective"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article"
+    },
+    "conserve": {
+      "en": "tin",
+      "pos": "noun, feminine"
+    },
+    "tomates": {
+      "en": "tomatoes",
+      "pos": "noun, feminine plural"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "fraises": {
+      "en": "strawberries",
+      "pos": "noun, feminine plural"
+    },
+    "l'étiquette": {
+      "en": "label, price tag",
+      "sound": "lay-tee-KEHT"
+    },
+    "rayon": {
+      "en": "aisle, section of a store"
+    },
+    "indique": {
+      "en": "shows",
+      "pos": "verb"
+    },
+    "le": {
+      "en": "the",
+      "pos": "article"
+    },
+    "prix": {
+      "en": "price",
+      "pos": "noun, masculine"
+    },
+    "au": {
+      "en": "to the",
+      "pos": "contraction"
+    },
+    "kilo": {
+      "en": "kilogram",
+      "pos": "noun, masculine"
+    },
+    "en": {
+      "en": "some; of it",
+      "pos": "pronoun"
+    },
+    "prend": {
+      "en": "takes",
+      "pos": "verb"
+    },
+    "paquet": {
+      "en": "packet",
+      "pos": "noun, masculine"
+    },
+    "note": {
+      "en": "note",
+      "pos": "noun, feminine"
+    },
+    "la": {
+      "en": "the",
+      "pos": "article"
+    },
+    "quantité": {
+      "en": "amount",
+      "pos": "noun, feminine"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "sa": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "liste": {
+      "en": "list",
+      "pos": "noun, feminine"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "vérifie": {
+      "en": "checks",
+      "pos": "verb"
+    },
+    "aussi": {
+      "en": "also",
+      "pos": "adverb"
+    },
+    "d'ingrédients": {
+      "en": "of ingredients",
+      "pos": "noun phrase"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "plat": {
+      "en": "dish",
+      "pos": "noun, masculine"
+    },
+    "préparé": {
+      "en": "prepared",
+      "pos": "adjective"
+    },
+    "l'option": {
+      "en": "the option",
+      "pos": "noun, feminine"
+    },
+    "végétalienne": {
+      "en": "vegan",
+      "pos": "adjective"
+    },
+    "plaît": {
+      "en": "pleases; appeals to (plaire)",
+      "pos": "verb"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "n'achète": {
+      "en": "does not buy",
+      "pos": "verb"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "boisson": {
+      "en": "drink",
+      "pos": "noun, feminine"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "sucre": {
+      "en": "sugar",
+      "pos": "noun, masculine"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "maison": {
+      "en": "home",
+      "pos": "noun, feminine"
+    },
+    "réchauffe": {
+      "en": "reheats",
+      "pos": "verb"
+    },
+    "tranche": {
+      "en": "slices",
+      "pos": "verb"
+    },
+    "pain": {
+      "en": "bread",
+      "pos": "noun, masculine"
+    }
+  },
+  "keywords": [
+    "quantité",
+    "lentilles",
+    "prix",
+    "plat",
+    "repas"
+  ],
+  "quiz": [
+    {
+      "prompt": "Who is the meal for?",
+      "options": [
+        "Nadia's French group",
+        "A store team",
+        "A sports club",
+        "A family restaurant"
+      ],
+      "answer": 0,
+      "explain": "The first sentence says she is preparing it for her French group."
+    },
+    {
+      "prompt": "What does Nadia take one packet of?",
+      "options": [
+        "Dried lentils",
+        "Strawberries",
+        "Plant-based milk",
+        "Sugar-free drinks"
+      ],
+      "answer": 0,
+      "explain": "The story says she takes a packet of lentils."
+    },
+    {
+      "prompt": "Why does Nadia check the prepared dish's ingredient list?",
+      "options": [
+        "To see whether it suits a group preference",
+        "To calculate a return",
+        "To find the departure time",
+        "To check the price per litre"
+      ],
+      "answer": 0,
+      "explain": "The next sentence explains that a vegan option suits one group preference."
+    },
+    {
+      "prompt": "What does Nadia do at home?",
+      "options": [
+        "Reheats the dish and slices the bread",
+        "Freezes the strawberries and weighs the lentils",
+        "Returns the meal and asks for a receipt",
+        "Drains the tomatoes and buys a drink"
+      ],
+      "answer": 0,
+      "explain": "The final sentence says she reheats the dish and slices the bread."
+    }
+  ]
+}

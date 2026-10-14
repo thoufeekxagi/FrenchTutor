@@ -1,0 +1,56 @@
+{
+  "id": "b2-u07-write-speak",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Write and speak",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: TCF Task 3 practice",
+      "body": "Two fictional texts discuss a local waste-reduction measure. One emphasizes its environmental objective; the other questions whether the available comparison proves an effect. Compare their reasoning and state what should happen next in 130–160 words.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Les deux textes s'intéressent à la réduction des déchets, mais ils ne répondent pas à la même question. Le premier décrit l'objectif du dispositif et les gestes que les organisateurs souhaitent encourager. Le second examine la méthode utilisée pour comparer les résultats et souligne que les événements n'avaient pas la même taille. À mon avis, il est raisonnable de poursuivre l'essai, à condition que les prochaines données soient recueillies de façon plus uniforme. Le groupe devrait préciser ce qui est mesuré et distinguer l'intention du résultat obtenu. Une mesure utile dans un contexte peut aussi avoir des limites ailleurs. Il faudrait donc publier un bilan qui présente les résultats et les incertitudes. Cette démarche permettrait de décider si le dispositif mérite d'être élargi.\n\nCheck:\n• Task 3 range: 120–180 words.\n• Separate the proposal's purpose from its measured result.\n• Compare each source's reasoning, not only its topic.\n• Use a condition and a clear next step."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Goal-bound speaking practice",
+      "body": "Task 3: Les collectivités devraient-elles imposer des mesures écologiques même si elles coûtent plus cher ? Explain your position, distinguish a goal from evidence of an effect, give an example and name a condition. Marie will change the budget constraint.\n\n• Name cause, intended purpose and observed result separately.\n• Use afin que for a purpose with a different subject.\n• Do not turn the fictional figures into real environmental claims."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Les collectivités devraient prendre en compte les effets environnementaux, mais une mesure ne devrait pas être adoptée sans examiner ses conséquences.",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Un projet peut avoir un objectif utile sans que son efficacité soit déjà démontrée. Il faut donc préciser comment les résultats seront mesurés et qui assumera le coût.",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "À mon avis, un essai limité est préférable lorsque les données sont incertaines. Si le bilan montre un effet positif et que l'accès reste équitable, la mesure pourra être élargie.",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Dans le cas contraire, il faudra l'adapter. Le coût compte, mais il ne devrait pas être évalué sans tenir compte des bénéfices et des limites.",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

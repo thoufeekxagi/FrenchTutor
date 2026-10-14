@@ -1,0 +1,134 @@
+{
+  "id": "a2-u08-phrases",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "First say the document name; then replace it with le, la or les. In your notes, write two versions of a work or study sentence, close the notes, and say the short version without losing which document it refers to."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Le compte rendu ? Je le relis avant midi.",
+      "en": "The report? I am rereading it before noon.",
+      "tip": "Say it: luh koh(n)t ruh(n)-DÜ zhuh luh ruh-LEEZ ah-vah(n) mee-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "La version finale ? Je la corrige aujourd'hui.",
+      "en": "The final version? I am correcting it today.",
+      "tip": "Say it: lah vehr-SYOH(N) fee-NAHL zhuh lah koh-REEZH oh-zhoor-DWEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Les documents ? Nous les classons par date.",
+      "en": "The documents? We are filing them by date.",
+      "tip": "Say it: lay doh-kü-MAH(N) noo lay klah-SOH(N) par daht"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Le fichier joint ? Je vais le télécharger après le cours.",
+      "en": "The attached file? I am going to download it after class.",
+      "tip": "Say it: luh fee-SHYAY zhWA(N) zhuh veh luh day-shahr-ZHAY ah-preh luh koor"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "La présentation ? Sam va la préparer avec l'équipe.",
+      "en": "The presentation? Sam is going to prepare it with the team.",
+      "tip": "Say it: lah pray-zah(n)-tah-SYOH(N) sahm vah lah pray-pah-RAY ah-vehk lay-KEEP"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Les corrections ? Je les note dans le brouillon.",
+      "en": "The corrections? I am writing them down in the draft.",
+      "tip": "Say it: lay koh-rehk-SYOH(N) zhuh lay noht dah(n) luh broo-YOH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "Le document ? Je ne le trouve pas dans le dossier.",
+      "en": "The document? I cannot find it in the file.",
+      "tip": "Say it: luh doh-kü-MAH(N) zhuh nuh luh troov pah dah(n) luh doh-SYAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "La note ? Je vais l'envoyer au tuteur.",
+      "en": "The note? I am going to send it to the supervisor.",
+      "tip": "Say it: lah noht zhuh veh lah(n)-vwah-YAY oh tü-TUHR"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Le compte rendu ? Je le relis avant midi.",
+      "options": [
+        "The attached file? I am going to download it after class.",
+        "The report? I am rereading it before noon.",
+        "The document? I cannot find it in the file.",
+        "The final version? I am correcting it today."
+      ],
+      "answer": 1,
+      "explain": "Le compte rendu ? Je le relis avant midi. means The report? I am rereading it before noon.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "Les documents ? Nous les classons par date.",
+      "options": [
+        "The report? I am rereading it before noon.",
+        "The documents? We are filing them by date.",
+        "The attached file? I am going to download it after class.",
+        "The document? I cannot find it in the file."
+      ],
+      "answer": 1,
+      "explain": "Les documents ? Nous les classons par date. means The documents? We are filing them by date.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "La présentation ? Sam va la préparer avec l'équipe.",
+      "options": [
+        "The documents? We are filing them by date.",
+        "The presentation? Sam is going to prepare it with the team.",
+        "The corrections? I am writing them down in the draft.",
+        "The report? I am rereading it before noon."
+      ],
+      "answer": 1,
+      "explain": "La présentation ? Sam va la préparer avec l'équipe. means The presentation? Sam is going to prepare it with the team.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "Le document ? Je ne le trouve pas dans le dossier.",
+      "options": [
+        "The final version? I am correcting it today.",
+        "The document? I cannot find it in the file.",
+        "The presentation? Sam is going to prepare it with the team.",
+        "The note? I am going to send it to the supervisor."
+      ],
+      "answer": 1,
+      "explain": "Le document ? Je ne le trouve pas dans le dossier. means The document? I cannot find it in the file.."
+    }
+  ]
+}

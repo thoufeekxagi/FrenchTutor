@@ -1,0 +1,166 @@
+{
+  "id": "a2-u11-words-2",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Words: delivery and order problems",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un colis égaré",
+      "en": "a misplaced parcel",
+      "sound": "uh(n) koh-LEE ay-gah-RAY",
+      "exampleFr": "Le colis est égaré; voici mon numéro de suivi.",
+      "exampleEn": "The parcel is missing; here is my tracking number."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une confirmation de livraison",
+      "en": "a delivery confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N) duh lee-vreh-ZOH(N)",
+      "exampleFr": "Vous recevrez une confirmation de livraison par message.",
+      "exampleEn": "You will receive a delivery confirmation by text."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un créneau de livraison",
+      "en": "a delivery time slot",
+      "sound": "uh(n) kray-NOH duh lee-vreh-ZOH(N)",
+      "exampleFr": "Je choisis un créneau de livraison après 17 h.",
+      "exampleEn": "I choose a delivery time slot after 5 p.m."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une tentative de livraison",
+      "en": "a delivery attempt",
+      "sound": "ün tah(n)-tah-TEEV duh lee-vreh-ZOH(N)",
+      "exampleFr": "Le livreur a laissé un avis après une tentative de livraison.",
+      "exampleEn": "The delivery person left a notice after a delivery attempt."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un numéro de suivi",
+      "en": "a tracking number",
+      "sound": "uh(n) nü-may-ROH duh sü-vee",
+      "exampleFr": "Mon numéro de suivi ne fonctionne pas.",
+      "exampleEn": "My tracking number does not work."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un emballage abîmé",
+      "en": "damaged packaging",
+      "sound": "uh(n) ah(n)-bah-LAHZH ah-bee-MAY",
+      "exampleFr": "Le colis est arrivé avec un emballage abîmé.",
+      "exampleEn": "The parcel arrived with damaged packaging."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une livraison manquée",
+      "en": "a missed delivery",
+      "sound": "ün lee-vreh-ZOH(N) mahn-KAY",
+      "exampleFr": "J'ai manqué la livraison parce que j'étais au travail.",
+      "exampleEn": "I missed the delivery because I was at work."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une confirmation de commande",
+      "en": "an order confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N) duh koh-MAH(N)D",
+      "exampleFr": "Je cherche la confirmation de commande dans mes courriels.",
+      "exampleEn": "I am looking for the order confirmation in my emails."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un colis égaré",
+      "options": [
+        "a delivery attempt",
+        "a misplaced parcel",
+        "a missed delivery",
+        "a delivery confirmation"
+      ],
+      "answer": 1,
+      "explain": "un colis égaré means a misplaced parcel."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation de livraison",
+      "options": [
+        "a tracking number",
+        "damaged packaging",
+        "a misplaced parcel",
+        "a delivery confirmation"
+      ],
+      "answer": 3,
+      "explain": "une confirmation de livraison means a delivery confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un créneau de livraison",
+      "options": [
+        "damaged packaging",
+        "a delivery time slot",
+        "a misplaced parcel",
+        "a tracking number"
+      ],
+      "answer": 1,
+      "explain": "un créneau de livraison means a delivery time slot."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une tentative de livraison",
+      "options": [
+        "a tracking number",
+        "an order confirmation",
+        "damaged packaging",
+        "a delivery attempt"
+      ],
+      "answer": 3,
+      "explain": "une tentative de livraison means a delivery attempt."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un numéro de suivi",
+      "options": [
+        "an order confirmation",
+        "a tracking number",
+        "a delivery time slot",
+        "damaged packaging"
+      ],
+      "answer": 1,
+      "explain": "un numéro de suivi means a tracking number."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un emballage abîmé",
+      "options": [
+        "a misplaced parcel",
+        "a delivery attempt",
+        "a missed delivery",
+        "damaged packaging"
+      ],
+      "answer": 3,
+      "explain": "un emballage abîmé means damaged packaging."
+    }
+  ]
+}

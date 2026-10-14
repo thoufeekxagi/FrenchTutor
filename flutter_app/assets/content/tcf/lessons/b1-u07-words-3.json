@@ -1,0 +1,148 @@
+{
+  "id": "b1-u07-words-3",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Words: focus vocabulary — set 3",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "déclarer",
+      "en": "to state; declare",
+      "sound": "day-klah-RAY",
+      "exampleFr": "La responsable a déclaré que le service resterait ouvert.",
+      "exampleEn": "The coordinator stated that the service would remain open."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "admettre",
+      "en": "to admit",
+      "sound": "ad-MEHTR",
+      "exampleFr": "Le porte-parole a admis que l'information était incomplète.",
+      "exampleEn": "The spokesperson admitted that the information was incomplete."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "reconnaître",
+      "en": "to acknowledge; recognize",
+      "sound": "ruh-koh-NEHTR",
+      "exampleFr": "Elle a reconnu qu'une erreur s'était produite.",
+      "exampleEn": "She acknowledged that an error had occurred."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "insister sur",
+      "en": "to insist on; emphasize",
+      "sound": "ahn-sees-TAY sür",
+      "exampleFr": "Le témoin a insisté sur l'heure de son arrivée.",
+      "exampleEn": "The witness emphasized the time of their arrival."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "annoncer que",
+      "en": "to announce that",
+      "sound": "ah-nohn-SAY kuh",
+      "exampleFr": "Le centre a annoncé que les travaux commenceraient lundi.",
+      "exampleEn": "The centre announced that the work would start Monday."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "conseiller de",
+      "en": "to advise someone to",
+      "sound": "kohn-say-YAY duh",
+      "exampleFr": "L'agent a conseillé de conserver le reçu.",
+      "exampleEn": "The agent advised keeping the receipt."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "déclarer",
+      "options": [
+        "to insist on; emphasize",
+        "to state; declare",
+        "to admit",
+        "to acknowledge; recognize"
+      ],
+      "answer": 1,
+      "explain": "déclarer means to state; declare."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "admettre",
+      "options": [
+        "to announce that",
+        "to acknowledge; recognize",
+        "to insist on; emphasize",
+        "to admit"
+      ],
+      "answer": 3,
+      "explain": "admettre means to admit."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "reconnaître",
+      "options": [
+        "to advise someone to",
+        "to acknowledge; recognize",
+        "to insist on; emphasize",
+        "to announce that"
+      ],
+      "answer": 1,
+      "explain": "reconnaître means to acknowledge; recognize."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "insister sur",
+      "options": [
+        "to state; declare",
+        "to announce that",
+        "to advise someone to",
+        "to insist on; emphasize"
+      ],
+      "answer": 3,
+      "explain": "insister sur means to insist on; emphasize."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "annoncer que",
+      "options": [
+        "to admit",
+        "to announce that",
+        "to advise someone to",
+        "to state; declare"
+      ],
+      "answer": 1,
+      "explain": "annoncer que means to announce that."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "conseiller de",
+      "options": [
+        "to acknowledge; recognize",
+        "to state; declare",
+        "to admit",
+        "to advise someone to"
+      ],
+      "answer": 3,
+      "explain": "conseiller de means to advise someone to."
+    }
+  ]
+}

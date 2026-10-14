@@ -1,0 +1,148 @@
+{
+  "id": "b2-u11-words-5",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une restriction d'âge",
+      "en": "an age restriction",
+      "sound": "ün rehs-treehk-SYOH(N) dahzh",
+      "exampleFr": "La page indique une restriction d'âge pour l'atelier.",
+      "exampleEn": "The page lists an age restriction for the workshop."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une date de mise en service",
+      "en": "a service launch date",
+      "sound": "ün dat duh meez ahn sehr-VEES",
+      "exampleFr": "La date de mise en service n'est pas encore confirmée.",
+      "exampleEn": "The service launch date has not yet been confirmed."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une politique d'accès",
+      "en": "an access policy",
+      "sound": "ün poh-lee-TEEK dahk-SEH",
+      "exampleFr": "La politique d'accès est disponible avant l'inscription.",
+      "exampleEn": "The access policy is available before registration."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "vérifier la disponibilité",
+      "en": "to check availability",
+      "sound": "vay-ree-fee-YAY lah dee-spoh-nee-bee-lee-TAY",
+      "exampleFr": "Je vais vérifier la disponibilité de la salle.",
+      "exampleEn": "I will check whether the room is available."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une inscription conditionnelle",
+      "en": "conditional registration",
+      "sound": "ün ehn-skree-psyoh(n) kohn-dee-syoh-NEHL",
+      "exampleFr": "L'inscription conditionnelle dépend de la réception du document.",
+      "exampleEn": "Conditional registration depends on receiving the document."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "en cas d'empêchement",
+      "en": "if unable to attend",
+      "sound": "ahn kah dahn-pehsh-MAH(N)",
+      "exampleFr": "En cas d'empêchement, veuillez prévenir l'organisme.",
+      "exampleEn": "If you are unable to attend, please notify the organization."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une restriction d'âge",
+      "options": [
+        "to check availability",
+        "an age restriction",
+        "a service launch date",
+        "an access policy"
+      ],
+      "answer": 1,
+      "explain": "une restriction d'âge means an age restriction."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une date de mise en service",
+      "options": [
+        "conditional registration",
+        "an access policy",
+        "to check availability",
+        "a service launch date"
+      ],
+      "answer": 3,
+      "explain": "une date de mise en service means a service launch date."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une politique d'accès",
+      "options": [
+        "if unable to attend",
+        "an access policy",
+        "to check availability",
+        "conditional registration"
+      ],
+      "answer": 1,
+      "explain": "une politique d'accès means an access policy."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "vérifier la disponibilité",
+      "options": [
+        "an age restriction",
+        "conditional registration",
+        "if unable to attend",
+        "to check availability"
+      ],
+      "answer": 3,
+      "explain": "vérifier la disponibilité means to check availability."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une inscription conditionnelle",
+      "options": [
+        "a service launch date",
+        "conditional registration",
+        "if unable to attend",
+        "an age restriction"
+      ],
+      "answer": 1,
+      "explain": "une inscription conditionnelle means conditional registration."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "en cas d'empêchement",
+      "options": [
+        "an access policy",
+        "an age restriction",
+        "a service launch date",
+        "if unable to attend"
+      ],
+      "answer": 3,
+      "explain": "en cas d'empêchement means if unable to attend."
+    }
+  ]
+}

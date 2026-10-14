@@ -1,0 +1,52 @@
+{
+  "id": "b1-u05-reading",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Reading practice",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What kind of response does the form request?",
+      "options": [
+        "A list of instructors",
+        "A payment record",
+        "A general review of another centre",
+        "A concrete need to improve access"
+      ],
+      "answer": 3,
+      "explain": "It asks for a concrete need related to access.",
+      "promptFr": "Formulaire de commentaires — Nous souhaitons que les activités soient accessibles au plus grand nombre. Indiquez ce qu'il faut améliorer : inscription, transport, horaire ou format. Il est important que votre réponse décrive un besoin concret."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What information is still needed?",
+      "options": [
+        "When the message was written",
+        "Whether children can accompany their parents",
+        "Who paid for the room",
+        "Whether the centre has a name"
+      ],
+      "answer": 1,
+      "explain": "The writer needs confirmation about children attending.",
+      "promptFr": "Message — Je suis contente que le centre propose une séance d'essai. Il faut toutefois que le groupe confirme si les enfants peuvent accompagner leurs parents. Sans cette information, plusieurs personnes ne pourront pas décider."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "By when should participants send comments?",
+      "options": [
+        "Friday",
+        "The end of next month",
+        "After the next event",
+        "Monday"
+      ],
+      "answer": 0,
+      "explain": "The deadline is Friday.",
+      "promptFr": "La coordonnatrice demande que les participants envoient leurs commentaires avant vendredi. Elle souhaite que chacun donne un exemple précis plutôt qu'une réponse générale."
+    }
+  ]
+}

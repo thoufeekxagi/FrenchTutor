@@ -1,0 +1,148 @@
+{
+  "id": "b1-u04-words-2",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un avantage",
+      "en": "an advantage",
+      "sound": "uh(n) ah-vahn-TAHZH",
+      "exampleFr": "L'avantage dont elle parle est la proximité des commerces.",
+      "exampleEn": "The advantage she mentions is the proximity of shops."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un inconvénient",
+      "en": "a drawback",
+      "sound": "uh(n) an-kohn-vay-NYAH(N)",
+      "exampleFr": "Le principal inconvénient est le bruit de la rue.",
+      "exampleEn": "The main drawback is the street noise."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "comparer",
+      "en": "to compare",
+      "sound": "kohn-pah-RAY",
+      "exampleFr": "Nous comparons les options qui respectent notre budget.",
+      "exampleEn": "We are comparing the options that fit our budget."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "correspondre à",
+      "en": "to match; correspond to",
+      "sound": "koh-rehs-pohn(d)r ah",
+      "exampleFr": "Ce logement correspond à mes besoins actuels.",
+      "exampleEn": "This home matches my current needs."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "dépendre de",
+      "en": "to depend on",
+      "sound": "day-pahn(d)r duh",
+      "exampleFr": "Le choix dépend du temps de transport.",
+      "exampleEn": "The choice depends on transportation time."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "abordable",
+      "en": "affordable",
+      "sound": "ah-bohr-DAHBL",
+      "exampleFr": "L'option abordable qui est près du travail est déjà réservée.",
+      "exampleEn": "The affordable option near work is already reserved."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un avantage",
+      "options": [
+        "to match; correspond to",
+        "an advantage",
+        "a drawback",
+        "to compare"
+      ],
+      "answer": 1,
+      "explain": "un avantage means an advantage."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un inconvénient",
+      "options": [
+        "to depend on",
+        "to compare",
+        "to match; correspond to",
+        "a drawback"
+      ],
+      "answer": 3,
+      "explain": "un inconvénient means a drawback."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "comparer",
+      "options": [
+        "affordable",
+        "to compare",
+        "to match; correspond to",
+        "to depend on"
+      ],
+      "answer": 1,
+      "explain": "comparer means to compare."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "correspondre à",
+      "options": [
+        "an advantage",
+        "to depend on",
+        "affordable",
+        "to match; correspond to"
+      ],
+      "answer": 3,
+      "explain": "correspondre à means to match; correspond to."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "dépendre de",
+      "options": [
+        "a drawback",
+        "to depend on",
+        "affordable",
+        "an advantage"
+      ],
+      "answer": 1,
+      "explain": "dépendre de means to depend on."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "abordable",
+      "options": [
+        "to compare",
+        "an advantage",
+        "a drawback",
+        "affordable"
+      ],
+      "answer": 3,
+      "explain": "abordable means affordable."
+    }
+  ]
+}

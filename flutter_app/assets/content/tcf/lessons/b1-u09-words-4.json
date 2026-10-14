@@ -1,0 +1,148 @@
+{
+  "id": "b1-u09-words-4",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un appareil défectueux",
+      "en": "a faulty device",
+      "sound": "uh(n) ah-pah-rehy day-fehk-tü-EH",
+      "exampleFr": "Un appareil défectueux doit être vérifié avant usage.",
+      "exampleEn": "A faulty device must be checked before use."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une étape de préparation",
+      "en": "a preparation step",
+      "sound": "ün ay-tap duh pray-pah-rah-SYOH(N)",
+      "exampleFr": "La première étape de préparation consiste à lire la consigne.",
+      "exampleEn": "The first preparation step is to read the instruction."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un produit réutilisable",
+      "en": "a reusable product",
+      "sound": "uh(n) proh-dü-ee ray-ü-tee-lee-ZAH-bl",
+      "exampleFr": "Le groupe choisit un produit réutilisable pour réduire les déchets.",
+      "exampleEn": "The group chooses a reusable product to reduce waste."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une ressource partagée",
+      "en": "a shared resource",
+      "sound": "ün ruh-soors par-tah-ZHAY",
+      "exampleFr": "L'atelier utilise une ressource partagée par plusieurs organismes.",
+      "exampleEn": "The workshop uses a resource shared by several organizations."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un objet emprunté",
+      "en": "a borrowed item",
+      "sound": "uh(n) ohb-zhay ahn-pruh(n)-TAY",
+      "exampleFr": "Chaque objet emprunté doit être remis à sa place.",
+      "exampleEn": "Each borrowed item must be returned to its place."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "trier les déchets",
+      "en": "to sort waste",
+      "sound": "tree-YAY lay day-SHEH",
+      "exampleFr": "Les bénévoles trient les déchets après l'activité.",
+      "exampleEn": "The volunteers sort the waste after the activity."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un appareil défectueux",
+      "options": [
+        "a shared resource",
+        "a faulty device",
+        "a preparation step",
+        "a reusable product"
+      ],
+      "answer": 1,
+      "explain": "un appareil défectueux means a faulty device."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une étape de préparation",
+      "options": [
+        "a borrowed item",
+        "a reusable product",
+        "a shared resource",
+        "a preparation step"
+      ],
+      "answer": 3,
+      "explain": "une étape de préparation means a preparation step."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un produit réutilisable",
+      "options": [
+        "to sort waste",
+        "a reusable product",
+        "a shared resource",
+        "a borrowed item"
+      ],
+      "answer": 1,
+      "explain": "un produit réutilisable means a reusable product."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une ressource partagée",
+      "options": [
+        "a faulty device",
+        "a borrowed item",
+        "to sort waste",
+        "a shared resource"
+      ],
+      "answer": 3,
+      "explain": "une ressource partagée means a shared resource."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un objet emprunté",
+      "options": [
+        "a preparation step",
+        "a borrowed item",
+        "to sort waste",
+        "a faulty device"
+      ],
+      "answer": 1,
+      "explain": "un objet emprunté means a borrowed item."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "trier les déchets",
+      "options": [
+        "a reusable product",
+        "a faulty device",
+        "a preparation step",
+        "to sort waste"
+      ],
+      "answer": 3,
+      "explain": "trier les déchets means to sort waste."
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "a2-u02-write-speak",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Write a short message about yesterday",
+      "body": "Write 60–80 French words to a classmate. Say what you did yesterday, put at least three finished actions in order, and add one reaction or reason. The official TCF Canada Task 1 range is 60–120 words. Use a greeting and closing.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Salut Nadia, Hier, j'ai terminé mon devoir avant le cours. Après la classe, j'ai emprunté un livre à la bibliothèque et j'ai réservé une visite guidée pour samedi. Plus tard, j'ai trouvé un avis de livraison et j'ai appelé le service. Le problème a retardé la livraison, mais l'employée a confirmé une nouvelle date pour demain. Heureusement, j'ai terminé mon exposé le soir. Et toi, tu as étudié hier ? À bientôt, Awa\n\nCheck:\n• Count the words; practise 60–80, within the official Task 1 range of 60–120.\n• Use present avoir + a past participle for each completed action.\n• Put the events in a clear order.\n• Check the time phrase and the subject of each sentence.\n• Tomorrow, close your notes and retell the same day with different details."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Recount a real or invented day",
+      "body": "Speak for 30–45 seconds without notes. Name three things you did yesterday or last week and say when they happened. Add one reason or reaction. Ask Marie one follow-up question, then repeat the account with a different event and time.\n\n• Use a time expression before or after the action.\n• Build the past form with avoir + the participle; regular -er participles end in -é.\n• If Marie corrects one form, repeat the full sentence once.\n• Change a time or event so the second attempt is not memorized."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Hier matin, j'ai terminé un devoir avant le cours. Après la classe, j'ai emprunté un livre. Plus tard, j'ai téléphoné au service parce que l'entreprise a changé l'heure de la livraison.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Heureusement, l'employée a confirmé une nouvelle date. Le soir, j'ai préparé mes notes et j'ai téléphoné à un ami.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

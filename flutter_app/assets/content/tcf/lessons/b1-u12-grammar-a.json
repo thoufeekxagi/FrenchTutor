@@ -1,0 +1,87 @@
+{
+  "id": "b1-u12-grammar-a",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Grammar: Capstone review: choose the form that serves the message",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Capstone review: choose the form that serves the message",
+      "body": "There is no new grammar target in this capstone. Before producing a long answer, decide what the message needs: a clear timeline, a condition, a relative clause, a reported statement, an explanation or a question. Use the simplest accurate form. Keep a person's point of view separate from confirmed information; mark limits instead of inventing certainty. Use connectors to make one relationship clear at a time. In a new setting, repeat a noun when pronouns would make the reference hard to follow."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Capstone review: choose the form that serves the message",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Narrate",
+          "past forms chosen by timeline",
+          "La salle avait fermé; nous avons trouvé une autre entrée.",
+          "The room had closed; we found another entrance."
+        ],
+        [
+          "Explain a possibility",
+          "si + imparfait; conditionnel",
+          "Si le groupe changeait l'heure, je pourrais participer.",
+          "If the group changed the time, I could participate."
+        ],
+        [
+          "Report and qualify",
+          "source + reported clause + limit",
+          "La responsable a dit que l'essai était possible, sans confirmer la date.",
+          "The coordinator said the trial was possible without confirming the date."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which response keeps an unconfirmed proposal uncertain?",
+      "options": [
+        "Le comité a confirmé la date, même si personne ne l'a fait.",
+        "Tout le monde a accepté le projet.",
+        "Le changement aura lieu demain, c'est sûr.",
+        "Le comité étudie l'idée; la date n'est pas confirmée."
+      ],
+      "answer": 3,
+      "explain": "This wording reports what is known and marks the missing confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the best repair when you miss a key detail?",
+      "options": [
+        "Guess and present the guess as fact",
+        "Stay silent and continue",
+        "Ask the speaker to repeat or clarify it",
+        "Change the subject"
+      ],
+      "answer": 2,
+      "explain": "A direct repair is more reliable than guessing."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does a transfer task check?",
+      "options": [
+        "How many notes you wrote",
+        "Whether you can use learning in a changed situation",
+        "Whether every answer is immediate",
+        "Whether you can repeat one memorized model"
+      ],
+      "answer": 1,
+      "explain": "Transfer checks use beyond the practiced example."
+    }
+  ]
+}

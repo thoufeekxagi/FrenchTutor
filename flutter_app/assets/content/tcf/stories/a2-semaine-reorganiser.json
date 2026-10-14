@@ -1,0 +1,470 @@
+{
+  "id": "a2-semaine-reorganiser",
+  "title": "Une semaine à réorganiser",
+  "titleEn": "A week to reorganize",
+  "level": "A2",
+  "minutes": 5,
+  "summary": "Nadia adapts a work, study and travel week, then uses a self-review to plan what to practise next.",
+  "unit": "a2-u12",
+  "sentences": [
+    {
+      "fr": "Nadia travaille et suit un cours de français; elle prépare aussi une révision finale.",
+      "en": "Nadia works and takes a French class; she is also preparing a final review."
+    },
+    {
+      "fr": "Lundi, elle reçoit un message : la réunion est déplacée et son horaire change aussi.",
+      "en": "On Monday, she receives a message: the meeting is rescheduled, and her schedule changes too."
+    },
+    {
+      "fr": "Mardi, il pleuvait quand le bus est arrivé; elle a pris un nouvel itinéraire.",
+      "en": "On Tuesday, it was raining when the bus arrived, so she took a new route."
+    },
+    {
+      "fr": "Elle a lu l'avis et a demandé le point de départ à une employée.",
+      "en": "She read the notice and asked a staff member for the starting point."
+    },
+    {
+      "fr": "La nouvelle option est plus longue, mais elle est plus simple que l'autre.",
+      "en": "The new option is longer, but it is simpler than the other one."
+    },
+    {
+      "fr": "Nadia va au centre jeudi; son groupe y est après le cours.",
+      "en": "Nadia is going to the centre on Thursday; she meets her group there after class."
+    },
+    {
+      "fr": "Elle va expliquer le changement au groupe et donner l'horaire provisoire.",
+      "en": "She is going to explain the change to the group members and give them the temporary schedule."
+    },
+    {
+      "fr": "Ensuite, elle fait un test blanc et note une erreur fréquente dans sa fiche de révision.",
+      "en": "Then she does a practice test and notes a frequent error in her review sheet."
+    },
+    {
+      "fr": "Elle peut comprendre le message et résumer ce qui s'est passé; elle doit encore parler sans aide.",
+      "en": "She can understand messages and tell what happened; she still needs to speak without help."
+    },
+    {
+      "fr": "Son objectif réaliste : un nouvel essai après une pause, avec un nouveau problème.",
+      "en": "Her realistic goal is to repeat the attempt after a break, with a new problem."
+    }
+  ],
+  "words": {
+    "nadia": {
+      "en": "Nadia (a woman's name)",
+      "pos": "name"
+    },
+    "travaille": {
+      "en": "works",
+      "pos": "verb"
+    },
+    "et": {
+      "en": "and",
+      "pos": "connector"
+    },
+    "suit": {
+      "en": "takes; follows",
+      "pos": "verb"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article"
+    },
+    "cours": {
+      "en": "class",
+      "pos": "noun, masculine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "français": {
+      "en": "French",
+      "pos": "noun/adjective"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "prépare": {
+      "en": "prepares",
+      "pos": "verb"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article"
+    },
+    "révision": {
+      "en": "review",
+      "pos": "noun, feminine"
+    },
+    "finale": {
+      "en": "final",
+      "pos": "adjective"
+    },
+    "lundi": {
+      "en": "Monday",
+      "sound": "luh(n)-DEE"
+    },
+    "reçoit": {
+      "en": "receives",
+      "pos": "verb"
+    },
+    "message": {
+      "en": "message",
+      "pos": "noun, masculine"
+    },
+    "la": {
+      "en": "the",
+      "pos": "article"
+    },
+    "réunion": {
+      "en": "meeting",
+      "pos": "noun, feminine"
+    },
+    "est": {
+      "en": "is",
+      "pos": "verb"
+    },
+    "déplacée": {
+      "en": "rescheduled",
+      "pos": "adjective"
+    },
+    "son": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "horaire": {
+      "en": "schedule",
+      "pos": "noun, masculine"
+    },
+    "change": {
+      "en": "changes",
+      "pos": "verb"
+    },
+    "mardi": {
+      "en": "Tuesday",
+      "sound": "mahr-DEE"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "pleuvait": {
+      "en": "was raining",
+      "pos": "verb"
+    },
+    "quand": {
+      "en": "when",
+      "sound": "kah(n)"
+    },
+    "le": {
+      "en": "the",
+      "pos": "article"
+    },
+    "bus": {
+      "en": "bus",
+      "pos": "noun, masculine"
+    },
+    "arrivé": {
+      "en": "arrived",
+      "pos": "verb"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "pris": {
+      "en": "took",
+      "pos": "verb"
+    },
+    "nouvel": {
+      "en": "new (masculine before a vowel)",
+      "pos": "adjective"
+    },
+    "itinéraire": {
+      "en": "route",
+      "pos": "noun, masculine"
+    },
+    "lu": {
+      "en": "read",
+      "pos": "verb"
+    },
+    "l'avis": {
+      "en": "the notice",
+      "pos": "noun, masculine"
+    },
+    "demandé": {
+      "en": "asked",
+      "pos": "verb"
+    },
+    "point": {
+      "en": "point",
+      "pos": "noun, masculine"
+    },
+    "départ": {
+      "en": "departure",
+      "pos": "noun, masculine"
+    },
+    "à": {
+      "en": "at; to",
+      "pos": "preposition"
+    },
+    "employée": {
+      "en": "employee",
+      "pos": "noun, feminine"
+    },
+    "nouvelle": {
+      "en": "new",
+      "pos": "adjective"
+    },
+    "option": {
+      "en": "option",
+      "pos": "noun, feminine"
+    },
+    "plus": {
+      "en": "more",
+      "pos": "adverb"
+    },
+    "longue": {
+      "en": "long",
+      "pos": "adjective"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "simple": {
+      "en": "simple",
+      "pos": "adjective"
+    },
+    "que": {
+      "en": "than; that",
+      "pos": "connector/relative pronoun"
+    },
+    "l'autre": {
+      "en": "the other",
+      "pos": "determiner"
+    },
+    "va": {
+      "en": "goes; is going to (aller)",
+      "pos": "verb"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "centre": {
+      "en": "centre",
+      "pos": "noun, masculine"
+    },
+    "jeudi": {
+      "en": "Thursday",
+      "pos": "day"
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun, masculine"
+    },
+    "y": {
+      "en": "there",
+      "pos": "pronoun"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "expliquer": {
+      "en": "to explain",
+      "sound": "ehks-plee-KAY"
+    },
+    "changement": {
+      "en": "change",
+      "pos": "noun, masculine"
+    },
+    "donner": {
+      "en": "to give",
+      "pos": "verb"
+    },
+    "l'horaire": {
+      "en": "schedule",
+      "sound": "loh-REHR"
+    },
+    "provisoire": {
+      "en": "temporary",
+      "pos": "adjective"
+    },
+    "ensuite": {
+      "en": "then",
+      "pos": "connector"
+    },
+    "fait": {
+      "en": "does; makes (faire)",
+      "pos": "verb"
+    },
+    "test": {
+      "en": "test",
+      "pos": "noun, masculine"
+    },
+    "blanc": {
+      "en": "practice",
+      "pos": "adjective"
+    },
+    "note": {
+      "en": "notes",
+      "pos": "verb"
+    },
+    "erreur": {
+      "en": "error",
+      "pos": "noun, feminine"
+    },
+    "fréquente": {
+      "en": "frequent",
+      "pos": "adjective"
+    },
+    "dans": {
+      "en": "in",
+      "pos": "preposition"
+    },
+    "sa": {
+      "en": "his; her (feminine noun)",
+      "pos": "possessive"
+    },
+    "fiche": {
+      "en": "sheet",
+      "pos": "noun, feminine"
+    },
+    "peut": {
+      "en": "can (pouvoir)",
+      "pos": "verb"
+    },
+    "comprendre": {
+      "en": "to understand",
+      "pos": "verb"
+    },
+    "résumer": {
+      "en": "to summarize",
+      "sound": "ray-zü-MAY"
+    },
+    "ce": {
+      "en": "this",
+      "pos": "demonstrative"
+    },
+    "qui": {
+      "en": "that; who",
+      "pos": "relative pronoun"
+    },
+    "s'est": {
+      "en": "has (reflexive past auxiliary)",
+      "pos": "verb"
+    },
+    "passé": {
+      "en": "happened",
+      "pos": "verb/adjective"
+    },
+    "doit": {
+      "en": "must; has to (devoir)",
+      "pos": "verb"
+    },
+    "encore": {
+      "en": "still",
+      "pos": "adverb"
+    },
+    "parler": {
+      "en": "to speak",
+      "pos": "verb"
+    },
+    "sans": {
+      "en": "without",
+      "pos": "preposition"
+    },
+    "aide": {
+      "en": "help",
+      "pos": "noun, feminine"
+    },
+    "objectif": {
+      "en": "goal",
+      "pos": "noun, masculine"
+    },
+    "réaliste": {
+      "en": "realistic",
+      "pos": "adjective"
+    },
+    "essai": {
+      "en": "attempt",
+      "pos": "noun, masculine"
+    },
+    "pause": {
+      "en": "break",
+      "pos": "noun, feminine"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "nouveau": {
+      "en": "new",
+      "sound": "noo-VOH"
+    },
+    "problème": {
+      "en": "problem",
+      "pos": "noun, masculine"
+    }
+  },
+  "keywords": [
+    "horaire",
+    "itinéraire",
+    "réunion",
+    "test",
+    "objectif"
+  ],
+  "quiz": [
+    {
+      "prompt": "What changed on Monday?",
+      "options": [
+        "The meeting and Nadia's schedule",
+        "The test location and the price",
+        "The French course level",
+        "The bus route and the food order"
+      ],
+      "answer": 0,
+      "explain": "The message says the meeting is moved and her schedule changes."
+    },
+    {
+      "prompt": "What was the weather when the bus arrived?",
+      "options": [
+        "It was raining",
+        "It was snowing",
+        "It was sunny",
+        "It was windy"
+      ],
+      "answer": 0,
+      "explain": "The story says it was raining when the bus arrived."
+    },
+    {
+      "prompt": "Why does Nadia take the new option?",
+      "options": [
+        "It is simpler, even though it is longer",
+        "It is shorter and less practical",
+        "It has a lower ticket price",
+        "It goes to a different course"
+      ],
+      "answer": 0,
+      "explain": "The story says the option is longer but simpler."
+    },
+    {
+      "prompt": "What does Nadia identify as a skill she still needs to practise?",
+      "options": [
+        "Speaking without help",
+        "Reading a service notice",
+        "Understanding a message",
+        "Following a route"
+      ],
+      "answer": 0,
+      "explain": "She says she still needs to speak without help."
+    }
+  ]
+}

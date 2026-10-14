@@ -1,0 +1,148 @@
+{
+  "id": "b2-u10-words-5",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un débat contradictoire",
+      "en": "a debate with opposing views",
+      "sound": "uh(n) day-BAH kohn-trah-deek-TWAHR",
+      "exampleFr": "Un débat contradictoire permet de présenter plusieurs arguments.",
+      "exampleEn": "A debate with opposing views allows several arguments to be presented."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une règle de procédure",
+      "en": "a procedural rule",
+      "sound": "ün reh-gl duh proh-say-DÜR",
+      "exampleFr": "La règle de procédure précise quand le vote aura lieu.",
+      "exampleEn": "The procedural rule specifies when the vote will take place."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une résolution",
+      "en": "a resolution",
+      "sound": "ün ray-zoh-lü-SYOH(N)",
+      "exampleFr": "La résolution résume la décision adoptée.",
+      "exampleEn": "The resolution summarizes the decision adopted."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "répondre aux préoccupations",
+      "en": "to address concerns",
+      "sound": "ray-pohn-dr oh pray-oh-kü-pah-SYOH(N)",
+      "exampleFr": "La coordinatrice répond aux préoccupations des résidents.",
+      "exampleEn": "The coordinator addresses residents' concerns."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "passer au vote",
+      "en": "to put to a vote",
+      "sound": "pah-SAY oh voht",
+      "exampleFr": "Après la discussion, le comité passe au vote.",
+      "exampleEn": "After the discussion, the committee puts it to a vote."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "au terme de",
+      "en": "at the end of",
+      "sound": "oh tehrm duh",
+      "exampleFr": "Au terme de la consultation, le rapport sera publié.",
+      "exampleEn": "At the end of the consultation, the report will be published."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un débat contradictoire",
+      "options": [
+        "to address concerns",
+        "a debate with opposing views",
+        "a procedural rule",
+        "a resolution"
+      ],
+      "answer": 1,
+      "explain": "un débat contradictoire means a debate with opposing views."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une règle de procédure",
+      "options": [
+        "to put to a vote",
+        "a resolution",
+        "to address concerns",
+        "a procedural rule"
+      ],
+      "answer": 3,
+      "explain": "une règle de procédure means a procedural rule."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une résolution",
+      "options": [
+        "at the end of",
+        "a resolution",
+        "to address concerns",
+        "to put to a vote"
+      ],
+      "answer": 1,
+      "explain": "une résolution means a resolution."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "répondre aux préoccupations",
+      "options": [
+        "a debate with opposing views",
+        "to put to a vote",
+        "at the end of",
+        "to address concerns"
+      ],
+      "answer": 3,
+      "explain": "répondre aux préoccupations means to address concerns."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "passer au vote",
+      "options": [
+        "a procedural rule",
+        "to put to a vote",
+        "at the end of",
+        "a debate with opposing views"
+      ],
+      "answer": 1,
+      "explain": "passer au vote means to put to a vote."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "au terme de",
+      "options": [
+        "a resolution",
+        "a debate with opposing views",
+        "a procedural rule",
+        "at the end of"
+      ],
+      "answer": 3,
+      "explain": "au terme de means at the end of."
+    }
+  ]
+}

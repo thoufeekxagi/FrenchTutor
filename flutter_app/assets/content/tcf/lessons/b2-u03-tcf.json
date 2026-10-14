@@ -1,0 +1,72 @@
+{
+  "id": "b2-u03-tcf",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le programme auquel elle s'est inscrite comprend un stage. C'est ce volet qui lui permettra d'appliquer les compétences qu'elle a développées.",
+      "question": "What will the placement allow her to do?",
+      "options": [
+        "Choose a different mentor",
+        "Change the application deadline",
+        "Skip every prerequisite",
+        "Apply the skills she developed"
+      ],
+      "answer": 3,
+      "explain": "The placement lets her apply the skills she has developed."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Le dossier dont nous parlons doit être remis avant la fin du mois. La personne à qui vous pouvez écrire se trouve sur la page de contact.",
+      "question": "Who can the learner contact?",
+      "options": [
+        "The person listed on the contact page",
+        "A course participant",
+        "The person who wrote the file",
+        "The internship supervisor"
+      ],
+      "answer": 0,
+      "explain": "The speaker directs the learner to the contact person on the page."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is offered at the end of the pathway?",
+      "options": [
+        "A full-time job",
+        "A placement, subject to availability",
+        "A new language test",
+        "Automatic recognition for everyone"
+      ],
+      "answer": 1,
+      "explain": "The notice says an internship is offered at the end, subject to availability.",
+      "promptFr": "Le programme de perfectionnement s'adresse aux adultes qui souhaitent consolider leurs compétences en communication. Les cours ont lieu deux soirs par semaine. Les personnes dont l'expérience est pertinente peuvent demander une reconnaissance de leurs acquis, selon les critères publiés. Le stage auquel plusieurs participants s'intéressent est offert à la fin du parcours, sous réserve de disponibilité. La date à laquelle les demandes doivent être déposées figure dans le calendrier."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does the text recommend checking?",
+      "options": [
+        "Only the program's name",
+        "The number of available jobs",
+        "Whether everyone prefers theory",
+        "Schedules and prerequisites"
+      ],
+      "answer": 3,
+      "explain": "The learner should check schedules and prerequisites.",
+      "promptFr": "Deux programmes semblent comparables. Le premier, auquel on peut s'inscrire à l'automne, comprend davantage de travaux pratiques. Le second donne plus de temps aux notions théoriques. Ce qui importe pour une personne qui travaille déjà, c'est de vérifier les horaires et les préalables. Le document ne permet pas de dire qu'un choix convient à tous."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b1-u11-words-5",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une satisfaction",
+      "en": "satisfaction",
+      "sound": "ün sah-tees-fahk-SYOH(N)",
+      "exampleFr": "Sa satisfaction vient du travail accompli en équipe.",
+      "exampleEn": "Her satisfaction comes from the work completed as a team."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une contribution utile",
+      "en": "a useful contribution",
+      "sound": "ün kohn-tree-bü-SYOH(N) ü-TEEL",
+      "exampleFr": "Son exemple constitue une contribution utile au compte rendu.",
+      "exampleEn": "Her example is a useful contribution to the report."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "bénéficier de",
+      "en": "to benefit from",
+      "sound": "bay-nay-fee-syay duh",
+      "exampleFr": "Les nouveaux membres peuvent bénéficier d'un accompagnement.",
+      "exampleEn": "New members can benefit from guidance."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "faire preuve de",
+      "en": "to show; demonstrate",
+      "sound": "fehr pruhv duh",
+      "exampleFr": "Il faut faire preuve de patience pendant l'inscription.",
+      "exampleEn": "You need to show patience during registration."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un bilan personnel",
+      "en": "a personal reflection; review",
+      "sound": "uh(n) bee-lahn pehr-soh-NEHL",
+      "exampleFr": "Elle écrit un bilan personnel après chaque activité.",
+      "exampleEn": "She writes a personal reflection after each activity."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un souvenir marquant",
+      "en": "a memorable memory",
+      "sound": "uh(n) soo-vuh-NEER mar-KAH(N)",
+      "exampleFr": "Le spectacle est devenu un souvenir marquant de son séjour.",
+      "exampleEn": "The show became a memorable part of her stay."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une satisfaction",
+      "options": [
+        "to show; demonstrate",
+        "satisfaction",
+        "a useful contribution",
+        "to benefit from"
+      ],
+      "answer": 1,
+      "explain": "une satisfaction means satisfaction."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une contribution utile",
+      "options": [
+        "a personal reflection; review",
+        "to benefit from",
+        "to show; demonstrate",
+        "a useful contribution"
+      ],
+      "answer": 3,
+      "explain": "une contribution utile means a useful contribution."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "bénéficier de",
+      "options": [
+        "a memorable memory",
+        "to benefit from",
+        "to show; demonstrate",
+        "a personal reflection; review"
+      ],
+      "answer": 1,
+      "explain": "bénéficier de means to benefit from."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "faire preuve de",
+      "options": [
+        "satisfaction",
+        "a personal reflection; review",
+        "a memorable memory",
+        "to show; demonstrate"
+      ],
+      "answer": 3,
+      "explain": "faire preuve de means to show; demonstrate."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un bilan personnel",
+      "options": [
+        "a useful contribution",
+        "a personal reflection; review",
+        "a memorable memory",
+        "satisfaction"
+      ],
+      "answer": 1,
+      "explain": "un bilan personnel means a personal reflection; review."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un souvenir marquant",
+      "options": [
+        "to benefit from",
+        "satisfaction",
+        "a useful contribution",
+        "a memorable memory"
+      ],
+      "answer": 3,
+      "explain": "un souvenir marquant means a memorable memory."
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "id": "b2-u04-words-3",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "la cohabitation",
+      "en": "coexistence; shared use",
+      "sound": "lah koh-ah-bee-tah-SYOH(N)",
+      "exampleFr": "La cohabitation entre cyclistes et piétons exige des règles claires.",
+      "exampleEn": "Coexistence between cyclists and pedestrians requires clear rules."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un aménagement urbain",
+      "en": "an urban development; layout",
+      "sound": "uh(n) ah-may-nahzh-mahn ür-BEH(N)",
+      "exampleFr": "L'aménagement urbain tient compte des déplacements quotidiens.",
+      "exampleEn": "The urban layout accounts for daily travel."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une zone piétonne",
+      "en": "a pedestrian zone",
+      "sound": "ün zohn pee-ay-TOHN",
+      "exampleFr": "La zone piétonne réduit la circulation devant l'école.",
+      "exampleEn": "The pedestrian zone reduces traffic in front of the school."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la densification",
+      "en": "densification",
+      "sound": "lah dahn-see-fee-kah-SYOH(N)",
+      "exampleFr": "La densification peut rapprocher les services des résidents.",
+      "exampleEn": "Densification can bring services closer to residents."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un espace vert",
+      "en": "a green space",
+      "sound": "uh(n) eh-spahs vehr",
+      "exampleFr": "Le projet préserverait un espace vert au centre du quartier.",
+      "exampleEn": "The project would preserve a green space in the centre of the neighbourhood."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un réseau de transport",
+      "en": "a transportation network",
+      "sound": "uh(n) ray-ZOH duh trahn-SPOR",
+      "exampleFr": "Un réseau de transport fiable facilite les déplacements.",
+      "exampleEn": "A reliable transportation network makes travel easier."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "la cohabitation",
+      "options": [
+        "densification",
+        "coexistence; shared use",
+        "an urban development; layout",
+        "a pedestrian zone"
+      ],
+      "answer": 1,
+      "explain": "la cohabitation means coexistence; shared use."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un aménagement urbain",
+      "options": [
+        "a green space",
+        "a pedestrian zone",
+        "densification",
+        "an urban development; layout"
+      ],
+      "answer": 3,
+      "explain": "un aménagement urbain means an urban development; layout."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une zone piétonne",
+      "options": [
+        "a transportation network",
+        "a pedestrian zone",
+        "densification",
+        "a green space"
+      ],
+      "answer": 1,
+      "explain": "une zone piétonne means a pedestrian zone."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la densification",
+      "options": [
+        "coexistence; shared use",
+        "a green space",
+        "a transportation network",
+        "densification"
+      ],
+      "answer": 3,
+      "explain": "la densification means densification."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un espace vert",
+      "options": [
+        "an urban development; layout",
+        "a green space",
+        "a transportation network",
+        "coexistence; shared use"
+      ],
+      "answer": 1,
+      "explain": "un espace vert means a green space."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un réseau de transport",
+      "options": [
+        "a pedestrian zone",
+        "coexistence; shared use",
+        "an urban development; layout",
+        "a transportation network"
+      ],
+      "answer": 3,
+      "explain": "un réseau de transport means a transportation network."
+    }
+  ]
+}

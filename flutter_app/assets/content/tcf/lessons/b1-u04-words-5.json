@@ -1,0 +1,148 @@
+{
+  "id": "b1-u04-words-5",
+  "unit": "b1-u04",
+  "unitTitle": "B1 · Describe the people, places and choices that matter",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 4: B1 · Describe the people, places and choices that matter",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "répondre à un critère",
+      "en": "to meet a criterion",
+      "sound": "ray-pohn-dr ah uh(n) kree-TEHR",
+      "exampleFr": "Aucun logement ne répond à tous les critères.",
+      "exampleEn": "No home meets all the criteria."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "privilégier",
+      "en": "to prioritize; favour",
+      "sound": "pree-vee-lay-ZHYAY",
+      "exampleFr": "Elle privilégie un trajet court plutôt qu'une grande cuisine.",
+      "exampleEn": "She prioritizes a short commute over a large kitchen."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "la distance domicile-travail",
+      "en": "the home-to-work distance",
+      "sound": "lah dees-tahns doh-mee-seel trah-VAI",
+      "exampleFr": "La distance domicile-travail influence son choix.",
+      "exampleEn": "The home-to-work distance influences her choice."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une correspondance",
+      "en": "a transit connection",
+      "sound": "ün koh-reh-spohn-DAHNS",
+      "exampleFr": "Une correspondance est nécessaire pour rejoindre le campus.",
+      "exampleEn": "A transit connection is needed to reach campus."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une visite sur rendez-vous",
+      "en": "an appointment-only viewing",
+      "sound": "ün vee-zeet sür rah(n)-day-voo",
+      "exampleFr": "La visite du logement se fait sur rendez-vous.",
+      "exampleEn": "The home viewing is by appointment."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un immeuble bien entretenu",
+      "en": "a well-maintained building",
+      "sound": "uh(n) ee-muhbl byeh(n) ahn-truh-tuh-NÜ",
+      "exampleFr": "L'immeuble bien entretenu possède une entrée sécurisée.",
+      "exampleEn": "The well-maintained building has a secure entrance."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "répondre à un critère",
+      "options": [
+        "a transit connection",
+        "to meet a criterion",
+        "to prioritize; favour",
+        "the home-to-work distance"
+      ],
+      "answer": 1,
+      "explain": "répondre à un critère means to meet a criterion."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "privilégier",
+      "options": [
+        "an appointment-only viewing",
+        "the home-to-work distance",
+        "a transit connection",
+        "to prioritize; favour"
+      ],
+      "answer": 3,
+      "explain": "privilégier means to prioritize; favour."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "la distance domicile-travail",
+      "options": [
+        "a well-maintained building",
+        "the home-to-work distance",
+        "a transit connection",
+        "an appointment-only viewing"
+      ],
+      "answer": 1,
+      "explain": "la distance domicile-travail means the home-to-work distance."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une correspondance",
+      "options": [
+        "to meet a criterion",
+        "an appointment-only viewing",
+        "a well-maintained building",
+        "a transit connection"
+      ],
+      "answer": 3,
+      "explain": "une correspondance means a transit connection."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une visite sur rendez-vous",
+      "options": [
+        "to prioritize; favour",
+        "an appointment-only viewing",
+        "a well-maintained building",
+        "to meet a criterion"
+      ],
+      "answer": 1,
+      "explain": "une visite sur rendez-vous means an appointment-only viewing."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un immeuble bien entretenu",
+      "options": [
+        "the home-to-work distance",
+        "to meet a criterion",
+        "to prioritize; favour",
+        "a well-maintained building"
+      ],
+      "answer": 3,
+      "explain": "un immeuble bien entretenu means a well-maintained building."
+    }
+  ]
+}

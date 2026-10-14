@@ -1,0 +1,364 @@
+{
+  "id": "b1-un-cours-que-tout-le-monde-peut-suivre",
+  "title": "Un cours que chacun peut suivre",
+  "titleEn": "A class more people can attend",
+  "level": "B1",
+  "minutes": 6,
+  "summary": "A community centre adjusts a course after asking learners about access, timing and materials.",
+  "unit": "b1-u05",
+  "sentences": [
+    {
+      "fr": "Awa aidait à organiser un cours de français pour des adultes qui travaillaient à des heures différentes.",
+      "en": "Awa was helping organize a French class for adults who worked different hours."
+    },
+    {
+      "fr": "Avant de réserver la salle, elle a demandé aux participants quels jours leur convenaient le mieux.",
+      "en": "Before booking the room, she asked participants which days suited them best."
+    },
+    {
+      "fr": "Deux personnes préféraient une séance en ligne, tandis que d'autres voulaient pratiquer en présence du groupe.",
+      "en": "Two people preferred an online session, while others wanted to practise with the group in person."
+    },
+    {
+      "fr": "Une participante a signalé que l'entrée habituelle était difficile à utiliser avec une poussette.",
+      "en": "One participant reported that the usual entrance was difficult to use with a stroller."
+    },
+    {
+      "fr": "Awa a transmis cette remarque au centre et a demandé quelles salles étaient accessibles.",
+      "en": "Awa passed the comment to the centre and asked which rooms were accessible."
+    },
+    {
+      "fr": "Le centre a proposé une salle près de l'entrée et un lien pour les personnes qui ne pouvaient pas venir.",
+      "en": "The centre offered a room near the entrance and a link for people who could not attend.",
+      "note": "Ask people affected by a service about access barriers; an organizer may not notice every barrier from their own perspective."
+    },
+    {
+      "fr": "Awa a recommandé de tester les deux options, puis de revoir les inscriptions et les commentaires après un mois.",
+      "en": "Awa recommended testing both options, then reviewing registrations and comments after one month."
+    }
+  ],
+  "words": {
+    "awa": {
+      "en": "Awa (a woman's name)"
+    },
+    "aidait": {
+      "en": "was helping"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "organiser": {
+      "en": "to organize",
+      "sound": "or-gah-nee-ZAY"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "cours": {
+      "en": "a course, class"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "français": {
+      "en": "French",
+      "sound": "frah(n)-SEH"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "adultes": {
+      "en": "adults"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "travaillaient": {
+      "en": "worked"
+    },
+    "heures": {
+      "en": "hours; clock times",
+      "pos": "noun, feminine plural"
+    },
+    "différentes": {
+      "en": "different"
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "réserver": {
+      "en": "to reserve; book",
+      "sound": "ray-zehr-VAY"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "salle": {
+      "en": "room; hall",
+      "pos": "noun, feminine"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "demandé": {
+      "en": "asked"
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "participants": {
+      "en": "participants"
+    },
+    "quels": {
+      "en": "which; what (masculine plural)"
+    },
+    "jours": {
+      "en": "days"
+    },
+    "leur": {
+      "en": "their",
+      "pos": "possessive"
+    },
+    "convenaient": {
+      "en": "suited"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "mieux": {
+      "en": "better"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "personnes": {
+      "en": "people; persons"
+    },
+    "préféraient": {
+      "en": "preferred"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "séance": {
+      "en": "session"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "ligne": {
+      "en": "line, route"
+    },
+    "tandis": {
+      "en": "whereas; while"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "d'autres": {
+      "en": "others"
+    },
+    "voulaient": {
+      "en": "wanted"
+    },
+    "pratiquer": {
+      "en": "to practise"
+    },
+    "présence": {
+      "en": "attendance; presence"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "groupe": {
+      "en": "group"
+    },
+    "participante": {
+      "en": "participant"
+    },
+    "signalé": {
+      "en": "reported; pointed out"
+    },
+    "l'entrée": {
+      "en": "entrance, entryway",
+      "sound": "lah(n)-TRAY"
+    },
+    "habituelle": {
+      "en": "usual"
+    },
+    "était": {
+      "en": "was"
+    },
+    "difficile": {
+      "en": "difficult"
+    },
+    "utiliser": {
+      "en": "to use"
+    },
+    "avec": {
+      "en": "with",
+      "sound": "ah-VEK"
+    },
+    "poussette": {
+      "en": "stroller"
+    },
+    "transmis": {
+      "en": "passed on; sent"
+    },
+    "cette": {
+      "en": "this; that (feminine)",
+      "pos": "determiner"
+    },
+    "remarque": {
+      "en": "remark; comment"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "contraction"
+    },
+    "centre": {
+      "en": "centre; downtown",
+      "pos": "noun, masculine"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "quelles": {
+      "en": "which; what (feminine plural)"
+    },
+    "salles": {
+      "en": "rooms"
+    },
+    "étaient": {
+      "en": "were"
+    },
+    "accessibles": {
+      "en": "accessible"
+    },
+    "proposé": {
+      "en": "proposed"
+    },
+    "près": {
+      "en": "near",
+      "pos": "preposition"
+    },
+    "lien": {
+      "en": "link"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "pouvaient": {
+      "en": "could"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "venir": {
+      "en": "to come"
+    },
+    "recommandé": {
+      "en": "recommended"
+    },
+    "tester": {
+      "en": "to test"
+    },
+    "options": {
+      "en": "options"
+    },
+    "puis": {
+      "en": "then",
+      "sound": "pwee"
+    },
+    "revoir": {
+      "en": "to review; to see again"
+    },
+    "inscriptions": {
+      "en": "registrations"
+    },
+    "commentaires": {
+      "en": "comments"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "mois": {
+      "en": "month; months"
+    }
+  },
+  "keywords": [
+    "cours",
+    "adultes",
+    "participants",
+    "séance",
+    "accessibles",
+    "inscriptions",
+    "commentaires"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why did Awa ask participants about their preferred days?",
+      "options": [
+        "Everyone had the same schedule",
+        "The course had been cancelled",
+        "Their work schedules were different",
+        "The centre was closed for a month"
+      ],
+      "answer": 2,
+      "explain": "The first sentence explains that participants worked different hours."
+    },
+    {
+      "prompt": "What access issue did a participant report?",
+      "options": [
+        "The class materials were too expensive",
+        "The room was too close to the entrance",
+        "The online link was too short",
+        "The usual entrance was difficult with a stroller"
+      ],
+      "answer": 3,
+      "explain": "The fourth sentence describes the stroller and entrance issue."
+    },
+    {
+      "prompt": "What did Awa recommend after the change?",
+      "options": [
+        "Test both options and review feedback after a month",
+        "Move the course to another city",
+        "Keep only the online option permanently",
+        "Stop asking learners for comments"
+      ],
+      "answer": 0,
+      "explain": "The final sentence recommends a trial and later review."
+    }
+  ]
+}

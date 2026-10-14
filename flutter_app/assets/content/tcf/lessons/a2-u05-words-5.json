@@ -1,0 +1,166 @@
+{
+  "id": "a2-u05-words-5",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Words: application and meeting documents",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un entretien d'embauche",
+      "en": "a job interview",
+      "sound": "uh(n) ah(n)-treh-TYAH(N) dah(n)-BOHSH",
+      "exampleFr": "Je prépare mon entretien d'embauche avec la conseillère.",
+      "exampleEn": "I prepare for my job interview with the adviser."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un rendez-vous d'information",
+      "en": "an information appointment",
+      "sound": "uh(n) rah(n)-day-VOO da(n)-for-mah-SYOH(N)",
+      "exampleFr": "Je confirme mon rendez-vous d'information par courriel.",
+      "exampleEn": "I confirm my information appointment by email."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un formulaire en ligne",
+      "en": "an online form",
+      "sound": "uh(n) for-mü-LEHR ah(n) LEEN-yuh",
+      "exampleFr": "Je remplis le formulaire en ligne avant la date limite.",
+      "exampleEn": "I fill in the online form before the deadline."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une pièce jointe",
+      "en": "an attachment",
+      "sound": "ün pyess ZHWANT",
+      "exampleFr": "Mon relevé de notes est en pièce jointe au courriel.",
+      "exampleEn": "My transcript is attached to the email."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une lettre de motivation",
+      "en": "a cover letter",
+      "sound": "ün letr duh moh-tee-vah-SYOH(N)",
+      "exampleFr": "Je relis ma lettre de motivation avant de l'envoyer.",
+      "exampleEn": "I reread my cover letter before sending it."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un relevé de notes",
+      "en": "a transcript",
+      "sound": "uh(n) ruhl-vay duh noht",
+      "exampleFr": "Je joins mon relevé de notes à ma candidature.",
+      "exampleEn": "I attach my transcript to my application."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "un horaire de cours",
+      "en": "a class schedule",
+      "sound": "uh(n) oh-REHR duh koor",
+      "exampleFr": "Je vérifie l'horaire des cours avant de m'inscrire.",
+      "exampleEn": "I check the class schedule before enrolling."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un groupe adapté à mon niveau",
+      "en": "a group at the right level",
+      "sound": "uh(n) groop ah-dahp-TAY ah moh(n) nee-VOH",
+      "exampleFr": "Je cherche un groupe adapté à mon niveau.",
+      "exampleEn": "I am looking for a group at the right level."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un entretien d'embauche",
+      "options": [
+        "an attachment",
+        "a job interview",
+        "a class schedule",
+        "an information appointment"
+      ],
+      "answer": 1,
+      "explain": "un entretien d'embauche means a job interview."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un rendez-vous d'information",
+      "options": [
+        "a cover letter",
+        "a group at the right level",
+        "an online form",
+        "an information appointment"
+      ],
+      "answer": 3,
+      "explain": "un rendez-vous d'information means an information appointment."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un formulaire en ligne",
+      "options": [
+        "a transcript",
+        "an online form",
+        "a job interview",
+        "an attachment"
+      ],
+      "answer": 1,
+      "explain": "un formulaire en ligne means an online form."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une pièce jointe",
+      "options": [
+        "a class schedule",
+        "an information appointment",
+        "a cover letter",
+        "an attachment"
+      ],
+      "answer": 3,
+      "explain": "une pièce jointe means an attachment."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une lettre de motivation",
+      "options": [
+        "a group at the right level",
+        "a cover letter",
+        "an online form",
+        "a transcript"
+      ],
+      "answer": 1,
+      "explain": "une lettre de motivation means a cover letter."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un relevé de notes",
+      "options": [
+        "a job interview",
+        "an attachment",
+        "a class schedule",
+        "a transcript"
+      ],
+      "answer": 3,
+      "explain": "un relevé de notes means a transcript."
+    }
+  ]
+}

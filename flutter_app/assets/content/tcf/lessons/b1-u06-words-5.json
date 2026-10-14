@@ -1,0 +1,148 @@
+{
+  "id": "b1-u06-words-5",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "atténuer",
+      "en": "to reduce; lessen",
+      "sound": "ah-tay-nü-AY",
+      "exampleFr": "Une navette pourrait atténuer les effets du détour.",
+      "exampleEn": "A shuttle could lessen the effects of the detour."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "aggraver",
+      "en": "to worsen",
+      "sound": "ah-grah-VAY",
+      "exampleFr": "Le retard risque d'aggraver la situation.",
+      "exampleEn": "The delay may worsen the situation."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "provoquer",
+      "en": "to cause; provoke",
+      "sound": "proh-voh-KAY",
+      "exampleFr": "La fermeture peut provoquer de longues files.",
+      "exampleEn": "The closure can cause long lines."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "aboutir à",
+      "en": "to lead to; result in",
+      "sound": "ah-boo-TEER ah",
+      "exampleFr": "La discussion a abouti à une solution temporaire.",
+      "exampleEn": "The discussion led to a temporary solution."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "s'expliquer par",
+      "en": "to be explained by",
+      "sound": "sehk-splee-KAY par",
+      "exampleFr": "Le retard s'explique par un problème technique.",
+      "exampleEn": "The delay is explained by a technical problem."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "contribuer à",
+      "en": "to contribute to",
+      "sound": "kohn-tree-bü-AY ah",
+      "exampleFr": "Un horaire clair contribue à réduire les erreurs.",
+      "exampleEn": "A clear schedule helps reduce errors."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "atténuer",
+      "options": [
+        "to lead to; result in",
+        "to reduce; lessen",
+        "to worsen",
+        "to cause; provoke"
+      ],
+      "answer": 1,
+      "explain": "atténuer means to reduce; lessen."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "aggraver",
+      "options": [
+        "to be explained by",
+        "to cause; provoke",
+        "to lead to; result in",
+        "to worsen"
+      ],
+      "answer": 3,
+      "explain": "aggraver means to worsen."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "provoquer",
+      "options": [
+        "to contribute to",
+        "to cause; provoke",
+        "to lead to; result in",
+        "to be explained by"
+      ],
+      "answer": 1,
+      "explain": "provoquer means to cause; provoke."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "aboutir à",
+      "options": [
+        "to reduce; lessen",
+        "to be explained by",
+        "to contribute to",
+        "to lead to; result in"
+      ],
+      "answer": 3,
+      "explain": "aboutir à means to lead to; result in."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "s'expliquer par",
+      "options": [
+        "to worsen",
+        "to be explained by",
+        "to contribute to",
+        "to reduce; lessen"
+      ],
+      "answer": 1,
+      "explain": "s'expliquer par means to be explained by."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "contribuer à",
+      "options": [
+        "to cause; provoke",
+        "to reduce; lessen",
+        "to worsen",
+        "to contribute to"
+      ],
+      "answer": 3,
+      "explain": "contribuer à means to contribute to."
+    }
+  ]
+}

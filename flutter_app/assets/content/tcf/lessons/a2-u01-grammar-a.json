@@ -1,0 +1,55 @@
+{
+  "id": "a2-u01-grammar-a",
+  "unit": "a2-u01",
+  "unitTitle": "A week in my life: connect the details",
+  "title": "Grammar: add, contrast and give a reason",
+  "subtitle": "A2 · Unit 1: A week in my life: connect the details",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "add, contrast and give a reason",
+      "body": "At A1, you learned to make clear short sentences. At A2, keep the same clear word order and connect two ideas so the listener can follow your schedule, reason or choice. A connector joins ideas; it does not change the verb form."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Choose the relationship between the ideas",
+      "headers": [
+        "Connector",
+        "What it does",
+        "Example"
+      ],
+      "rows": [
+        [
+          "et",
+          "adds information",
+          "Je travaille le matin et j'étudie le soir."
+        ],
+        [
+          "mais",
+          "shows a contrast",
+          "Je suis occupé lundi, mais je suis libre mardi."
+        ],
+        [
+          "parce que",
+          "gives a reason",
+          "Je reporte le cours parce que je travaille."
+        ],
+        [
+          "donc",
+          "shows a result",
+          "Le bus est en retard, donc j'arrive plus tard."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "add, contrast and give a reason",
+      "body": "• Say the two ideas first. Then choose the connector that shows their relationship: addition, contrast, reason or result.\n• After parce que, use a subject and a verb: parce que je travaille.\n• Use donc for the result: Je travaille, donc je reporte le cours.\n• Avoid joining every sentence with et. A precise connector helps another person understand your point."
+    }
+  ]
+}

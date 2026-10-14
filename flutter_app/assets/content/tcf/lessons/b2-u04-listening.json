@@ -1,0 +1,58 @@
+{
+  "id": "b2-u04-listening",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le quartier était déjà très fréquenté le matin. Après la fermeture de la voie, les autobus ont été redirigés. Les résidents avaient toutefois reçu l'information trop tard pour modifier leurs déplacements.",
+      "question": "What problem does the speaker identify?",
+      "options": [
+        "Residents learned about the change too late",
+        "The bus service was permanently removed",
+        "No road work took place",
+        "The area was empty in the morning"
+      ],
+      "answer": 0,
+      "explain": "The information arrived too late for residents to adjust."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Il aurait fallu garder un accès de livraison. Plusieurs commerces avaient prévenu le comité, mais cette contrainte n'apparaît pas dans la première version du plan.",
+      "question": "What had the shops already done?",
+      "options": [
+        "Approved the final plan",
+        "Closed before construction",
+        "Warned the committee about a constraint",
+        "Moved to another neighbourhood"
+      ],
+      "answer": 2,
+      "explain": "The shops had alerted the committee to the delivery constraint."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La nouvelle place est plus accessible, alors que l'ancienne offrait davantage d'ombre. Le projet pourrait ajouter des arbres, si le budget le permet.",
+      "question": "What remains conditional?",
+      "options": [
+        "Removing the old place",
+        "Changing the neighbourhood",
+        "Improving access",
+        "Adding trees"
+      ],
+      "answer": 3,
+      "explain": "Trees may be added if the budget allows it."
+    }
+  ]
+}

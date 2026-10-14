@@ -1,0 +1,176 @@
+{
+  "id": "b2-u10-words-2",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une objection",
+      "en": "an objection",
+      "sound": "ün ob-zhek-SYOH(N)",
+      "exampleFr": "Elle répond à l'objection sans caricaturer l'autre position.",
+      "exampleEn": "She answers the objection without caricaturing the other position."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un suivi",
+      "en": "follow-up",
+      "sound": "uh(n) süi-VEE",
+      "exampleFr": "Un suivi est prévu dans un mois.",
+      "exampleEn": "A follow-up is planned in a month."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une implication",
+      "en": "an implication",
+      "sound": "ün an-plee-kah-SYOH(N)",
+      "exampleFr": "Cette implication doit être discutée.",
+      "exampleEn": "This implication must be discussed."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un compromis",
+      "en": "a compromise",
+      "sound": "uh(n) kohn-proh-MEE",
+      "exampleFr": "Le compromis garde une salle accessible.",
+      "exampleEn": "The compromise keeps one room accessible."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un compte rendu",
+      "en": "a summary; minutes",
+      "sound": "uh(n) kohn-tuh rah(n)-DÜ",
+      "exampleFr": "Le compte rendu distingue les propositions adoptées.",
+      "exampleEn": "The summary distinguishes the proposals that were adopted."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une échéance",
+      "en": "a deadline",
+      "sound": "ün ay-shay-AH(N)S",
+      "exampleFr": "L'échéance du suivi figure dans le compte rendu.",
+      "exampleEn": "The follow-up deadline appears in the summary."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une objection",
+      "options": [
+        "a compromise",
+        "an objection",
+        "follow-up",
+        "an implication"
+      ],
+      "answer": 1,
+      "explain": "une objection means an objection."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un suivi",
+      "options": [
+        "a summary; minutes",
+        "an implication",
+        "a compromise",
+        "follow-up"
+      ],
+      "answer": 3,
+      "explain": "un suivi means follow-up."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une implication",
+      "options": [
+        "a deadline",
+        "an implication",
+        "a compromise",
+        "a summary; minutes"
+      ],
+      "answer": 1,
+      "explain": "une implication means an implication."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un compromis",
+      "options": [
+        "an objection",
+        "a summary; minutes",
+        "a deadline",
+        "a compromise"
+      ],
+      "answer": 3,
+      "explain": "un compromis means a compromise."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un compte rendu",
+      "options": [
+        "follow-up",
+        "a summary; minutes",
+        "a deadline",
+        "an objection"
+      ],
+      "answer": 1,
+      "explain": "un compte rendu means a summary; minutes."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une échéance",
+      "options": [
+        "an implication",
+        "an objection",
+        "follow-up",
+        "a deadline"
+      ],
+      "answer": 3,
+      "explain": "une échéance means a deadline."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un suivi",
+      "question": "Which word did you hear?",
+      "options": [
+        "un compromis",
+        "un suivi",
+        "une objection",
+        "une implication"
+      ],
+      "answer": 1,
+      "explain": "You heard un suivi: follow-up."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une implication",
+      "question": "Which word did you hear?",
+      "options": [
+        "une échéance",
+        "un suivi",
+        "un compromis",
+        "une implication"
+      ],
+      "answer": 3,
+      "explain": "You heard une implication: an implication."
+    }
+  ]
+}

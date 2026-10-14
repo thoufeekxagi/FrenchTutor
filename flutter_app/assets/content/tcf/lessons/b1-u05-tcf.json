@@ -1,0 +1,72 @@
+{
+  "id": "b1-u05-tcf",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "TCF corner",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Il faut que les participants puissent réserver leur place par téléphone. La coordonnatrice souhaite aussi que les consignes soient disponibles en ligne.",
+      "question": "What two changes does the coordinator want?",
+      "options": [
+        "A later start and a longer class",
+        "Fewer activities and no registration",
+        "Phone registration and online instructions",
+        "Free meals and a new building"
+      ],
+      "answer": 2,
+      "explain": "She wants phone registration and instructions online."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je préfère suivre le cours du soir, mais il est important que la salle soit proche d'un arrêt d'autobus. Je ne veux pas que le trajet soit trop compliqué.",
+      "question": "What is the speaker's main condition?",
+      "options": [
+        "The room should be near a bus stop",
+        "The activity should be cancelled",
+        "The course should be longer",
+        "The instructor must change"
+      ],
+      "answer": 0,
+      "explain": "The speaker needs the room near a bus stop."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What kind of response does the form request?",
+      "options": [
+        "A general review of another centre",
+        "A payment record",
+        "A concrete need to improve access",
+        "A list of instructors"
+      ],
+      "answer": 2,
+      "explain": "It asks for a concrete need related to access.",
+      "promptFr": "Formulaire de commentaires — Nous souhaitons que les activités soient accessibles au plus grand nombre. Indiquez ce qu'il faut améliorer : inscription, transport, horaire ou format. Il est important que votre réponse décrive un besoin concret."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What information is still needed?",
+      "options": [
+        "Whether the centre has a name",
+        "Whether children can accompany their parents",
+        "Who paid for the room",
+        "When the message was written"
+      ],
+      "answer": 1,
+      "explain": "The writer needs confirmation about children attending.",
+      "promptFr": "Message — Je suis contente que le centre propose une séance d'essai. Il faut toutefois que le groupe confirme si les enfants peuvent accompagner leurs parents. Sans cette information, plusieurs personnes ne pourront pas décider."
+    }
+  ]
+}

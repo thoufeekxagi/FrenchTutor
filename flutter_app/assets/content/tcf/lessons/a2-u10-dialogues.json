@@ -1,0 +1,152 @@
+{
+  "id": "a2-u10-dialogues",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for what each person wants, the amount and the reason for a choice. When a food name is already clear, listen for en and the quantity that follows it."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Plan the shared meal",
+      "body": "Karim and Nadia prepare a meal for a small study group.",
+      "examples": [
+        {
+          "fr": "Combien de lentilles faut-il pour le repas ?",
+          "en": "Nadia: How many lentils are needed for the meal?"
+        },
+        {
+          "fr": "Un paquet suffit. J'en prends un.",
+          "en": "Karim: One packet is enough. I will take one."
+        },
+        {
+          "fr": "Et des tomates ?",
+          "en": "Nadia: And tomatoes?"
+        },
+        {
+          "fr": "J'en prends six, puis une conserve pour la sauce.",
+          "en": "Karim: I will take six, then a tin for the sauce."
+        },
+        {
+          "fr": "La liste indique du lait végétal.",
+          "en": "Nadia: The list says plant-based milk."
+        },
+        {
+          "fr": "D'accord, j'en prends un litre.",
+          "en": "Karim: All right, I will take a litre of it."
+        },
+        {
+          "fr": "Le reçu détaillé est dans le sac.",
+          "en": "Nadia: The itemized receipt is in the bag."
+        },
+        {
+          "fr": "Je vérifie le prix au kilo avant de choisir les fraises.",
+          "en": "Karim: I will check the price per kilogram before choosing the strawberries."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Check a food preference",
+      "body": "A student checks a product label before buying it for a class meal.",
+      "examples": [
+        {
+          "fr": "Le plat préparé convient-il à ton régime alimentaire ?",
+          "en": "Karim: Does the prepared dish suit your diet?"
+        },
+        {
+          "fr": "Je vérifie la liste d'ingrédients. Y a-t-il une option sans noix ?",
+          "en": "Nadia: I am checking the ingredient list. Is there a nut-free option?"
+        },
+        {
+          "fr": "Oui, il y en a une ici.",
+          "en": "Karim: Yes, there is one in this row."
+        },
+        {
+          "fr": "Je vais en prendre deux pour le groupe.",
+          "en": "Nadia: I am going to take two of them for the group."
+        },
+        {
+          "fr": "Tu veux aussi du pain ?",
+          "en": "Karim: Do you also want bread?"
+        },
+        {
+          "fr": "Non, je n'en prends pas aujourd'hui.",
+          "en": "Nadia: No, I am not taking any today."
+        },
+        {
+          "fr": "Le produit est en promotion. Je vérifie la date.",
+          "en": "Karim: The product is on special. I am checking the date."
+        },
+        {
+          "fr": "La date limite est dans quatorze jours.",
+          "en": "Nadia: The best-before date is in two weeks."
+        },
+        {
+          "fr": "Parfait. J'en prends un paquet.",
+          "en": "Karim: Perfect. I will take one package of it."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "How many lentils does Karim take?",
+      "options": [
+        "One packet",
+        "Six packets",
+        "A whole kilogram",
+        "Half a packet"
+      ],
+      "answer": 0,
+      "explain": "He says one packet is enough and that he will take one."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "How many tomatoes does Karim take?",
+      "options": [
+        "Six",
+        "Four",
+        "One",
+        "A dozen"
+      ],
+      "answer": 0,
+      "explain": "He says he will take six tomatoes."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does Karim check before choosing strawberries?",
+      "options": [
+        "The price per kilogram",
+        "The return policy",
+        "The store hours",
+        "The product's country"
+      ],
+      "answer": 0,
+      "explain": "He says he will check the price per kilogram."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Why does Nadia check the ingredient list?",
+      "options": [
+        "To find an option without nuts",
+        "To find a lower price per kilogram",
+        "To compare the two receipts",
+        "To choose a larger package"
+      ],
+      "answer": 0,
+      "explain": "She asks whether there is a nut-free option after saying she is checking the list."
+    }
+  ]
+}

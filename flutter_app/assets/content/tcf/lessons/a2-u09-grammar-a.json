@@ -1,0 +1,140 @@
+{
+  "id": "a2-u09-grammar-a",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Grammar: Give or ask something to a person: lui and leur",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Give or ask something to a person: lui and leur",
+      "body": "French can avoid repeating a person or a place. First identify what the verb is connected to: lui or leur refers to a person after a verb used with à; y refers to a previously named place with common location patterns."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Read these useful travel forms aloud, then reuse one in a new route. They support the role-play; the target grammar remains the person and place pronouns.",
+      "headers": [
+        "Useful form",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "La ligne est interrompue aujourd'hui.",
+          "The line is interrupted today."
+        ],
+        [
+          "Le service est interrompu aujourd'hui.",
+          "Service is interrupted today."
+        ],
+        [
+          "Tu demandes le quai à Nadia ?",
+          "Are you asking Nadia for the platform?"
+        ],
+        [
+          "Nous manquons la correspondance.",
+          "We are missing the connection."
+        ],
+        [
+          "Tu donnes l'adresse à Karim ?",
+          "Are you giving Karim the address?"
+        ],
+        [
+          "Les voyageurs lisent l'avis.",
+          "The travellers are reading the notice."
+        ],
+        [
+          "Le service habituel ne passe pas; une autre ligne le remplace.",
+          "The usual service does not run; another line replaces it."
+        ],
+        [
+          "Ils attendent au carrefour.",
+          "They are waiting at the intersection."
+        ],
+        [
+          "Ils montent dans le train et rejoignent le groupe.",
+          "They get on the train and meet the group."
+        ]
+      ]
+    },
+    {
+      "type": "table",
+      "id": "t2",
+      "title": "Lui is singular for a man or a woman. Leur is plural. Both go before the conjugated verb; with aller + infinitive, put the pronoun before the infinitive.",
+      "headers": [
+        "Full phrase",
+        "Person pronoun",
+        "Short sentence"
+      ],
+      "rows": [
+        [
+          "Je demande le quai à Nadia.",
+          "à Nadia → lui",
+          "Je lui demande le quai."
+        ],
+        [
+          "Je donne l'adresse à Karim.",
+          "à Karim → lui",
+          "Je lui donne l'adresse."
+        ],
+        [
+          "Je donne le plan aux voyageurs.",
+          "aux voyageurs → leur",
+          "Je leur donne le plan."
+        ],
+        [
+          "Je vais expliquer le trajet à Nadia.",
+          "à Nadia → lui",
+          "Je vais lui expliquer le trajet."
+        ]
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Give or ask something to a person: lui and leur",
+      "body": "• Use lui for one person and leur for more than one person when the taught verb takes à before that person: demander à, donner à, expliquer à.\n• The pronoun replaces the person, not the thing: in Je lui donne l'adresse, lui means the person and l'adresse is what is given.\n• Place it before the verb: je lui demande; je leur réponds. With a near-future verb: je vais lui demander.\n• Do not choose lui by gender. One man or one woman both use lui; a group uses leur."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Je donne le plan à Nadia. Je ___ donne le plan.",
+      "options": [
+        "lui",
+        "leur",
+        "y",
+        "les"
+      ],
+      "answer": 0,
+      "explain": "Nadia is one person; use lui."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Je vais expliquer la route aux voyageurs. Je vais ___ expliquer la route.",
+      "options": [
+        "leur",
+        "lui",
+        "y",
+        "la"
+      ],
+      "answer": 0,
+      "explain": "Aux voyageurs is plural, so use leur before expliquer."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does lui replace in Je lui demande le quai?",
+      "options": [
+        "The person being asked",
+        "The platform",
+        "The station",
+        "The route"
+      ],
+      "answer": 0,
+      "explain": "Le quai is the information; lui is the person receiving the question."
+    }
+  ]
+}

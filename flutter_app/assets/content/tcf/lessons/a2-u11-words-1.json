@@ -1,0 +1,166 @@
+{
+  "id": "a2-u11-words-1",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Words: forms and documents",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un formulaire incomplet",
+      "en": "an incomplete form",
+      "sound": "uh(n) for-mü-LEHR a(n)-kohn-PLEH",
+      "exampleFr": "Le formulaire est incomplet.",
+      "exampleEn": "The form is incomplete."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une case obligatoire",
+      "en": "a required box",
+      "sound": "ün kahz oh-blee-gah-TWAHR",
+      "exampleFr": "Je coche la case obligatoire.",
+      "exampleEn": "I check the required box."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un champ à remplir",
+      "en": "a field to fill in",
+      "sound": "uh(n) shah(n) ah rah(n)-PLEER",
+      "exampleFr": "Je remplis le champ d'adresse avant d'envoyer le formulaire.",
+      "exampleEn": "I fill in the address field before sending the form."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une copie recto verso",
+      "en": "a double-sided copy",
+      "sound": "ün koh-PEE rehk-TOH vehr-SOH",
+      "exampleFr": "Joignez une copie recto verso à votre demande.",
+      "exampleEn": "Attach a double-sided copy to your request."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un justificatif de domicile",
+      "en": "proof of address",
+      "sound": "uh(n) zhüs-tee-fee-kah-TEEF duh doh-mee-SEEL",
+      "exampleFr": "J'envoie un justificatif de domicile avec ma demande.",
+      "exampleEn": "I send proof of address with my request."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une signature manquante",
+      "en": "a missing signature",
+      "sound": "ün see-nyah-TÜR mahn-KAH(N)T",
+      "exampleFr": "La signature manque au bas du formulaire.",
+      "exampleEn": "The signature is missing at the bottom of the form."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une preuve d'achat",
+      "en": "proof of purchase",
+      "sound": "ün pruhv dah-SHAH",
+      "exampleFr": "Le magasin demande une preuve d'achat pour traiter le retour.",
+      "exampleEn": "The store asks for proof of purchase to process the return."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "un numéro de confirmation",
+      "en": "a confirmation number",
+      "sound": "uh(n) nü-may-ROH duh kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Je garde le numéro de confirmation.",
+      "exampleEn": "I keep the confirmation number."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un formulaire incomplet",
+      "options": [
+        "a double-sided copy",
+        "an incomplete form",
+        "proof of purchase",
+        "a required box"
+      ],
+      "answer": 1,
+      "explain": "un formulaire incomplet means an incomplete form."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une case obligatoire",
+      "options": [
+        "proof of address",
+        "a confirmation number",
+        "a field to fill in",
+        "a required box"
+      ],
+      "answer": 3,
+      "explain": "une case obligatoire means a required box."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un champ à remplir",
+      "options": [
+        "a missing signature",
+        "a field to fill in",
+        "an incomplete form",
+        "a double-sided copy"
+      ],
+      "answer": 1,
+      "explain": "un champ à remplir means a field to fill in."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une copie recto verso",
+      "options": [
+        "proof of purchase",
+        "a required box",
+        "proof of address",
+        "a double-sided copy"
+      ],
+      "answer": 3,
+      "explain": "une copie recto verso means a double-sided copy."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un justificatif de domicile",
+      "options": [
+        "a confirmation number",
+        "proof of address",
+        "a field to fill in",
+        "a missing signature"
+      ],
+      "answer": 1,
+      "explain": "un justificatif de domicile means proof of address."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une signature manquante",
+      "options": [
+        "an incomplete form",
+        "a double-sided copy",
+        "proof of purchase",
+        "a missing signature"
+      ],
+      "answer": 3,
+      "explain": "une signature manquante means a missing signature."
+    }
+  ]
+}

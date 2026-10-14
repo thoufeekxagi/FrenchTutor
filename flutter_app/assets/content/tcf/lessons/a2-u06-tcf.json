@@ -1,0 +1,100 @@
+{
+  "id": "a2-u06-tcf",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "TCF corner",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le studio est moins cher que l'appartement d'une chambre. Le stationnement intérieur coûte soixante-quinze dollars de plus chaque mois.",
+      "question": "What costs an extra $75 per month?",
+      "options": [
+        "Indoor parking",
+        "Electricity",
+        "The laundry room",
+        "The private balcony"
+      ],
+      "answer": 0,
+      "explain": "The speaker names indoor parking as the extra monthly cost."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La bibliothèque est plus près du logement A. L'épicerie est à trois minutes du logement B.",
+      "question": "Which home is closer to the grocery store?",
+      "options": [
+        "Home B",
+        "Home A",
+        "They are equally close",
+        "Neither home has a grocery store"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the grocery store is three minutes from home B."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le bail est d'un an. Les frais d'électricité ne sont pas compris dans le loyer.",
+      "question": "Which statement is correct?",
+      "options": [
+        "The lease is one year and electricity is extra.",
+        "The lease is six months and electricity is included.",
+        "The lease is one year and parking is included.",
+        "The lease is two years and heat is extra."
+      ],
+      "answer": 0,
+      "explain": "Both details are stated in the recording."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is included in the monthly rent?",
+      "options": [
+        "Outdoor parking",
+        "Indoor parking",
+        "Electricity",
+        "A private washer"
+      ],
+      "answer": 0,
+      "explain": "The notice says outdoor parking is included.",
+      "promptFr": "STUDIO À LOUER — 1 300 $ par mois. Meublé. Stationnement extérieur compris. Buanderie au sous-sol. Visite sur rendez-vous."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which statement is true?",
+      "options": [
+        "The home is five minutes from the train.",
+        "Electricity is included.",
+        "It is a studio.",
+        "The rent is $1,300."
+      ],
+      "answer": 0,
+      "explain": "The notice places the apartment five minutes from the train.",
+      "promptFr": "APPARTEMENT À LOUER — Une chambre, 1 500 $ par mois. Chauffage central compris. À 5 minutes du train. Frais d'électricité en plus."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What must the reader do?",
+      "options": [
+        "Confirm the visit time by email",
+        "Pay the first month's rent",
+        "Sign the lease before the visit",
+        "Call the bus service"
+      ],
+      "answer": 0,
+      "explain": "The notice asks the reader to confirm the visit time by email.",
+      "promptFr": "VISITE — Samedi à 11 h. Merci de confirmer votre heure par courriel. Adresse : près de la bibliothèque de quartier."
+    }
+  ]
+}

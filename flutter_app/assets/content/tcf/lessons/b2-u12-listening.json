@@ -1,0 +1,58 @@
+{
+  "id": "b2-u12-listening",
+  "unit": "b2-u12",
+  "unitTitle": "B2 · TCF writing Task 3: compare two sources and take a position",
+  "title": "Listening practice",
+  "subtitle": "B2 · Unit 12: B2 · TCF writing Task 3: compare two sources and take a position",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le premier document propose de rendre les horaires plus souples. Le second craint que les changements fréquents compliquent l'organisation des équipes.",
+      "question": "What is the difference between the viewpoints?",
+      "options": [
+        "Evening classes versus daytime exams",
+        "Online access versus printed material",
+        "Flexibility versus predictability for teams",
+        "Cost versus environmental impact"
+      ],
+      "answer": 2,
+      "explain": "The first values flexibility; the second worries about organization."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Les deux intervenants souhaitent que l'information soit plus claire. Ils ne s'entendent pas sur la meilleure façon de la diffuser.",
+      "question": "What do both speakers agree on?",
+      "options": [
+        "The topic should be removed",
+        "Information should be clearer",
+        "Only one channel should be used",
+        "The current notice is final"
+      ],
+      "answer": 1,
+      "explain": "Both want clearer information."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le rapport présente l'option comme prometteuse, mais précise que les données sont encore limitées. L'auteur recommande une comparaison plus longue.",
+      "question": "How does the report characterize the evidence?",
+      "options": [
+        "Promising but limited",
+        "Based only on a personal preference",
+        "Irrelevant to the issue",
+        "Final and conclusive"
+      ],
+      "answer": 0,
+      "explain": "The report calls the option promising while noting the data are limited."
+    }
+  ]
+}

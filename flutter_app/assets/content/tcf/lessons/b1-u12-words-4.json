@@ -1,0 +1,148 @@
+{
+  "id": "b1-u12-words-4",
+  "unit": "b1-u12",
+  "unitTitle": "B1 · B1 capstone: communicate independently across familiar situations",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 12: B1 · B1 capstone: communicate independently across familiar situations",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une conséquence à long terme",
+      "en": "a long-term consequence",
+      "sound": "ün kohn-say-kahns ah lohn tehrm",
+      "exampleFr": "Il faut considérer une conséquence à long terme avant de décider.",
+      "exampleEn": "A long-term consequence should be considered before deciding."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un compromis acceptable",
+      "en": "an acceptable compromise",
+      "sound": "uh(n) kohn-proh-MEE ahk-sehp-TAH-bl",
+      "exampleFr": "Le groupe a trouvé un compromis acceptable pour tous.",
+      "exampleEn": "The group found an acceptable compromise for everyone."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un bilan collectif",
+      "en": "a group review; collective assessment",
+      "sound": "uh(n) bee-lahn koh-lehk-TEEF",
+      "exampleFr": "Un bilan collectif aura lieu après la période d'essai.",
+      "exampleEn": "A group review will take place after the trial."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une action réalisable",
+      "en": "a feasible action",
+      "sound": "ün ahk-SYOH(N) ray-ah-lee-ZAH-bl",
+      "exampleFr": "Le comité cherche une action réalisable avant l'été.",
+      "exampleEn": "The committee is looking for a feasible action before summer."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "tenir compte de",
+      "en": "to take into account",
+      "sound": "tuh-neer koh(n)t duh",
+      "exampleFr": "La décision doit tenir compte des besoins exprimés.",
+      "exampleEn": "The decision must take the stated needs into account."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "se débrouiller",
+      "en": "to manage; get by",
+      "sound": "suh day-broo-YAY",
+      "exampleFr": "Elle a appris à se débrouiller dans une situation nouvelle.",
+      "exampleEn": "She learned to manage in a new situation."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une conséquence à long terme",
+      "options": [
+        "a feasible action",
+        "a long-term consequence",
+        "an acceptable compromise",
+        "a group review; collective assessment"
+      ],
+      "answer": 1,
+      "explain": "une conséquence à long terme means a long-term consequence."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un compromis acceptable",
+      "options": [
+        "to take into account",
+        "a group review; collective assessment",
+        "a feasible action",
+        "an acceptable compromise"
+      ],
+      "answer": 3,
+      "explain": "un compromis acceptable means an acceptable compromise."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un bilan collectif",
+      "options": [
+        "to manage; get by",
+        "a group review; collective assessment",
+        "a feasible action",
+        "to take into account"
+      ],
+      "answer": 1,
+      "explain": "un bilan collectif means a group review; collective assessment."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une action réalisable",
+      "options": [
+        "a long-term consequence",
+        "to take into account",
+        "to manage; get by",
+        "a feasible action"
+      ],
+      "answer": 3,
+      "explain": "une action réalisable means a feasible action."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "tenir compte de",
+      "options": [
+        "an acceptable compromise",
+        "to take into account",
+        "to manage; get by",
+        "a long-term consequence"
+      ],
+      "answer": 1,
+      "explain": "tenir compte de means to take into account."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "se débrouiller",
+      "options": [
+        "a group review; collective assessment",
+        "a long-term consequence",
+        "an acceptable compromise",
+        "to manage; get by"
+      ],
+      "answer": 3,
+      "explain": "se débrouiller means to manage; get by."
+    }
+  ]
+}

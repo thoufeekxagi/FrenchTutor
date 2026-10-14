@@ -1,0 +1,727 @@
+{
+  "id": "b2-listen-reemploi",
+  "title": "Le projet de réemploi",
+  "titleEn": "The reuse project",
+  "level": "B2",
+  "mode": "listening",
+  "minutes": 6,
+  "summary": "A workplace reuse proposal faces cost and logistics questions, so the team narrows the pilot and defines how it will measure results.",
+  "unit": "b2-u12",
+  "sentences": [
+    {
+      "fr": "Le comité souhaitait réduire les déchets en remplaçant certains articles jetables par du matériel réutilisable.",
+      "en": "The committee wanted to reduce waste by replacing some disposable items with reusable equipment."
+    },
+    {
+      "fr": "La proposition semblait simple, mais le lavage, le stockage et le transport entraînaient des coûts que le calcul initial ne présentait pas.",
+      "en": "The proposal seemed simple, but washing, storage, and transport created costs that the initial calculation did not show."
+    },
+    {
+      "fr": "Une responsable a demandé de comparer le cycle complet plutôt que le seul prix d'achat.",
+      "en": "A manager asked the team to compare the full life cycle rather than the purchase price alone."
+    },
+    {
+      "fr": "Un autre membre a souligné que le dispositif pourrait échouer si le retour du matériel compliquait le travail quotidien.",
+      "en": "Another member pointed out that the system could fail if returning the equipment complicated daily work."
+    },
+    {
+      "fr": "Le comité a donc limité l'essai à deux articles utilisés dans une seule équipe.",
+      "en": "The committee therefore limited the pilot to two items used by one team."
+    },
+    {
+      "fr": "Il suivra le nombre de réutilisations, le temps de nettoyage, les pertes et les coûts de remplacement.",
+      "en": "It will track reuse count, cleaning time, losses, and replacement costs."
+    },
+    {
+      "fr": "Les employés pourront signaler les obstacles au lieu d'être évalués sur leur participation individuelle.",
+      "en": "Employees will be able to report obstacles instead of being evaluated on individual participation."
+    },
+    {
+      "fr": "Après deux mois, le comité décidera s'il faut élargir, modifier ou arrêter l'essai.",
+      "en": "After two months, the committee will decide whether to expand, modify, or stop the pilot."
+    },
+    {
+      "fr": "Le projet sera jugé sur ses effets mesurés, y compris les contraintes qu'il déplace vers d'autres personnes.",
+      "en": "The project will be judged by measured effects, including constraints it shifts onto other people."
+    }
+  ],
+  "words": {
+    "le": {
+      "en": "the"
+    },
+    "comité": {
+      "en": "committee",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "souhaitait": {
+      "en": "wanted; hoped",
+      "pos": "verb",
+      "lemma": "souhaiter",
+      "note": "Imperfect form of souhaiter."
+    },
+    "réduire": {
+      "en": "to reduce",
+      "pos": "verb",
+      "lemma": "réduire",
+      "note": "Infinitive."
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "déchets": {
+      "en": "waste",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "déchet",
+      "note": "Plural of déchet."
+    },
+    "en": {
+      "en": "on, during"
+    },
+    "remplaçant": {
+      "en": "replacing",
+      "pos": "verb",
+      "lemma": "remplacer",
+      "note": "Present participle of remplacer."
+    },
+    "certains": {
+      "en": "some; certain",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "certain",
+      "note": "Masculine plural form."
+    },
+    "articles": {
+      "en": "item, product",
+      "sound": "lahr-TEEKL",
+      "lemma": "article",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "jetables": {
+      "en": "disposable",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "jetable",
+      "note": "Plural form; same spelling for masculine and feminine."
+    },
+    "par": {
+      "en": "by"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "matériel": {
+      "en": "equipment",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "matériel"
+    },
+    "réutilisable": {
+      "en": "reusable",
+      "pos": "adjective",
+      "lemma": "réutilisable",
+      "note": "Same written form for masculine and feminine singular."
+    },
+    "la": {
+      "en": "the"
+    },
+    "proposition": {
+      "en": "proposal",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "semblait": {
+      "en": "seemed",
+      "pos": "verb",
+      "lemma": "sembler",
+      "note": "Imperfect form of sembler."
+    },
+    "simple": {
+      "en": "simple",
+      "pos": "adjective",
+      "lemma": "simple"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "lavage": {
+      "en": "washing",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "lavage"
+    },
+    "stockage": {
+      "en": "storage",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "stockage"
+    },
+    "et": {
+      "en": "and"
+    },
+    "transport": {
+      "en": "transport",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "transport"
+    },
+    "entraînaient": {
+      "en": "caused; brought about",
+      "pos": "verb",
+      "lemma": "entraîner",
+      "note": "Imperfect form of entraîner."
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "coûts": {
+      "en": "costs",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "coût",
+      "note": "Plural of coût."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "calcul": {
+      "en": "calculation",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "initial": {
+      "en": "initial",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "initial",
+      "note": "Masculine singular form."
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "présentait": {
+      "en": "presented; showed",
+      "pos": "verb",
+      "lemma": "présenter",
+      "note": "Imperfect form of présenter."
+    },
+    "pas": {
+      "en": "not"
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "responsable": {
+      "en": "manager; person in charge",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "responsable",
+      "note": "The noun has the same form for a man or a woman."
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "demandé": {
+      "en": "asked; requested",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Past participle of demander."
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "comparer": {
+      "en": "to compare",
+      "pos": "verb",
+      "lemma": "comparer",
+      "note": "Infinitive."
+    },
+    "cycle": {
+      "en": "cycle",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "cycle"
+    },
+    "complet": {
+      "en": "full; complete",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "complet",
+      "note": "Masculine singular form."
+    },
+    "plutôt": {
+      "en": "rather; instead",
+      "pos": "adverb"
+    },
+    "seul": {
+      "en": "only; alone",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "seul",
+      "note": "Masculine singular form."
+    },
+    "prix": {
+      "en": "prices",
+      "pos": "noun, masculine",
+      "sound": "pree",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "prix"
+    },
+    "d'achat": {
+      "en": "of purchase; purchase",
+      "pos": "expression",
+      "note": "Elided form of de + achat."
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "autre": {
+      "en": "other; another",
+      "pos": "adjective",
+      "lemma": "autre"
+    },
+    "membre": {
+      "en": "member",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "singular",
+      "lemma": "membre",
+      "note": "The noun has the same form for all genders."
+    },
+    "souligné": {
+      "en": "emphasized; pointed out",
+      "pos": "verb",
+      "lemma": "souligner",
+      "note": "Past participle of souligner."
+    },
+    "dispositif": {
+      "en": "system; arrangement",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "dispositif"
+    },
+    "pourrait": {
+      "en": "could; might",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Conditional form of pouvoir."
+    },
+    "échouer": {
+      "en": "to fail",
+      "pos": "verb",
+      "lemma": "échouer",
+      "note": "Infinitive."
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "retour": {
+      "en": "feedback; a return",
+      "sound": "uh(n) ruh-TOOR",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "retour"
+    },
+    "compliquait": {
+      "en": "complicated",
+      "pos": "verb",
+      "lemma": "compliquer",
+      "note": "Imperfect form of compliquer."
+    },
+    "travail": {
+      "en": "work",
+      "pos": "noun, masculine",
+      "sound": "tra-VAHY"
+    },
+    "quotidien": {
+      "en": "everyday life; daily routine",
+      "sound": "luh koh-tee-DYAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "quotidien"
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "limité": {
+      "en": "limited",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "limité",
+      "note": "Masculine singular form."
+    },
+    "l'essai": {
+      "en": "trial; pilot",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "essai"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "utilisés": {
+      "en": "used",
+      "pos": "verb",
+      "lemma": "utiliser",
+      "note": "Masculine plural form of the past participle utilisé."
+    },
+    "dans": {
+      "en": "in"
+    },
+    "seule": {
+      "en": "only; alone",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "seul",
+      "note": "Feminine singular form."
+    },
+    "équipe": {
+      "en": "team",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "suivra": {
+      "en": "will track; will follow",
+      "pos": "verb",
+      "lemma": "suivre",
+      "note": "Future form of suivre."
+    },
+    "nombre": {
+      "en": "number, quantity",
+      "sound": "luh NOH(N)br",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "nombre"
+    },
+    "réutilisations": {
+      "en": "reuses; instances of reuse",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "réutilisation",
+      "note": "Plural of réutilisation."
+    },
+    "temps": {
+      "en": "weather",
+      "sound": "luh tah(n)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "temps"
+    },
+    "nettoyage": {
+      "en": "cleaning",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "pertes": {
+      "en": "losses",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "perte",
+      "note": "Plural of perte."
+    },
+    "remplacement": {
+      "en": "a replacement",
+      "sound": "uh(n) rah(n)-plahs-MAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "remplacement"
+    },
+    "employés": {
+      "en": "an employee",
+      "sound": "uh(n) ah(n)-plwah-YAY",
+      "lemma": "employé",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "pourront": {
+      "en": "will be able to",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Future form of pouvoir."
+    },
+    "signaler": {
+      "en": "to report; point out",
+      "pos": "verb",
+      "lemma": "signaler",
+      "note": "Infinitive."
+    },
+    "obstacles": {
+      "en": "an obstacle",
+      "sound": "uh(n) ob-stahkl",
+      "lemma": "obstacle",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "lieu": {
+      "en": "place; location",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "d'être": {
+      "en": "to be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Infinitive preceded by de."
+    },
+    "évalués": {
+      "en": "evaluated",
+      "pos": "verb",
+      "lemma": "évaluer",
+      "note": "Masculine plural form of the past participle évalué."
+    },
+    "sur": {
+      "en": "on"
+    },
+    "leur": {
+      "en": "their; to them",
+      "pos": "determiner / pronoun",
+      "note": "Meaning depends on its place in the sentence."
+    },
+    "participation": {
+      "en": "participation",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "individuelle": {
+      "en": "individual",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "individuel",
+      "note": "Feminine form of individuel."
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "mois": {
+      "en": "month",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "mois",
+      "note": "The written form is the same in the plural."
+    },
+    "décidera": {
+      "en": "will decide",
+      "pos": "verb",
+      "lemma": "décider",
+      "note": "Future form of décider."
+    },
+    "s'il": {
+      "en": "if he; if it",
+      "pos": "conjunction + pronoun",
+      "note": "Elided si + il."
+    },
+    "faut": {
+      "en": "must; need to (falloir)",
+      "pos": "verb"
+    },
+    "élargir": {
+      "en": "to expand",
+      "pos": "verb",
+      "lemma": "élargir",
+      "note": "Infinitive."
+    },
+    "modifier": {
+      "en": "to change; modify",
+      "pos": "verb",
+      "lemma": "modifier",
+      "note": "Infinitive."
+    },
+    "ou": {
+      "en": "or",
+      "pos": "connector"
+    },
+    "arrêter": {
+      "en": "to stop",
+      "pos": "verb",
+      "lemma": "arrêter",
+      "note": "Infinitive."
+    },
+    "projet": {
+      "en": "a project",
+      "sound": "uh(n) proh-ZHEH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "projet"
+    },
+    "sera": {
+      "en": "will be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Future form of être."
+    },
+    "jugé": {
+      "en": "judged",
+      "pos": "verb",
+      "lemma": "juger",
+      "note": "Past participle of juger."
+    },
+    "ses": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Plural noun form."
+    },
+    "effets": {
+      "en": "effects",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "effet",
+      "note": "Plural of effet."
+    },
+    "mesurés": {
+      "en": "measured",
+      "pos": "verb",
+      "lemma": "mesurer",
+      "note": "Masculine plural form of the past participle mesuré."
+    },
+    "y": {
+      "en": "there (in il y a)"
+    },
+    "compris": {
+      "en": "understood; included",
+      "pos": "verb",
+      "lemma": "comprendre",
+      "note": "Past participle of comprendre."
+    },
+    "contraintes": {
+      "en": "constraints",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "contrainte",
+      "note": "Plural of contrainte."
+    },
+    "qu'il": {
+      "en": "that he; than he",
+      "pos": "conjunction + pronoun",
+      "note": "Elided que + il."
+    },
+    "déplace": {
+      "en": "moves; relocates",
+      "pos": "verb",
+      "lemma": "déplacer",
+      "note": "Present form of déplacer."
+    },
+    "vers": {
+      "en": "toward; around",
+      "pos": "preposition"
+    },
+    "d'autres": {
+      "en": "of others; other",
+      "pos": "expression",
+      "note": "Elided de + autres."
+    },
+    "personnes": {
+      "en": "person",
+      "sound": "lah pehR-SUN",
+      "lemma": "personne",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural"
+    }
+  },
+  "keywords": [
+    "projet",
+    "déchets",
+    "coûts",
+    "matériel",
+    "réutilisable"
+  ],
+  "quiz": [
+    {
+      "prompt": "What was missing from the initial cost calculation?",
+      "options": [
+        "Washing, storage, and transport costs",
+        "The purchase price",
+        "The number of employees",
+        "The cost of the committee meeting"
+      ],
+      "answer": 0,
+      "explain": "The full process had costs absent from the initial calculation."
+    },
+    {
+      "prompt": "Why does the committee start with a narrow pilot?",
+      "options": [
+        "To track effects and practical obstacles",
+        "To avoid collecting any data",
+        "To guarantee immediate expansion",
+        "To evaluate individual employees"
+      ],
+      "answer": 0,
+      "explain": "A limited pilot makes the cost and logistics measurable."
+    },
+    {
+      "prompt": "What will determine whether the pilot continues?",
+      "options": [
+        "Measured effects and shifted constraints",
+        "The first purchase price alone",
+        "The number of positive comments",
+        "Whether every employee participates"
+      ],
+      "answer": 0,
+      "explain": "The final decision will consider measured effects, including burdens shifted elsewhere."
+    }
+  ]
+}

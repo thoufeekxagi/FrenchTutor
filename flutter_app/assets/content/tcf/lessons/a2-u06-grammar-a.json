@@ -1,0 +1,112 @@
+{
+  "id": "a2-u06-grammar-a",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Grammar: Comparatives and superlatives",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Comparatives and superlatives",
+      "body": "Use comparison forms to show how two things differ or match. An adjective describes a noun; a quantity phrase counts a resource. The comparison word goes before the adjective or quantity phrase."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Que means 'than / as ... as'. Match the adjective ending to the noun: une pièce plus grande; des fenêtres plus grandes.",
+      "headers": [
+        "Job",
+        "Pattern",
+        "Example"
+      ],
+      "rows": [
+        [
+          "More / less",
+          "plus / moins + adjective + que",
+          "Le studio est moins cher que l'appartement d'une chambre."
+        ],
+        [
+          "Equal",
+          "aussi + adjective + que",
+          "Le logement A est aussi lumineux que le logement B."
+        ],
+        [
+          "More / fewer",
+          "plus / moins de + noun + que",
+          "Le logement B a plus de rangement que le studio."
+        ],
+        [
+          "The most / least",
+          "le / la / les plus / moins + adjective",
+          "C'est le quartier le plus calme."
+        ],
+        [
+          "Better / the best",
+          "un meilleur + noun / le, la, les meilleur(e)(s) + noun",
+          "Le logement B offre un meilleur accès au train. / C'est le meilleur choix."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Comparatives and superlatives",
+      "body": "• To compare two things, use plus ... que (more than), moins ... que (less than) or aussi ... que (as ... as).\n• With a noun quantity, use plus de / moins de + noun: plus de rangement; moins de bruit. Do not add un after de in this pattern.\n• For a superlative, add the correct article before plus or moins: le plus calme; la moins chère; les plus grands. The adjective agrees with its noun.\n• Meilleur(e)(s) is the irregular comparative of bon: un meilleur accès means 'better access'. For 'the best', add the matching article: le meilleur accès; la meilleure option; les meilleurs choix. Use mieux with a verb; that distinction is for recognition here.\n• Compare like with like and state the criterion. In your notes, write one real comparison for price, one for location and one for a feature; then make a recommendation without reading."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Complete: Le studio A est ___ cher que le logement B.",
+      "options": [
+        "moins",
+        "aussi de",
+        "le moins de",
+        "meilleur"
+      ],
+      "answer": 0,
+      "explain": "Use moins + adjective + que to say it costs less."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the correct quantity comparison.",
+      "options": [
+        "Le logement B a plus de rangement que le studio.",
+        "Le logement B a plus rangement que le studio.",
+        "Le logement B a plus du rangement que le studio.",
+        "Le logement B a plus de rangements que le studio est."
+      ],
+      "answer": 0,
+      "explain": "The pattern is plus de + noun + que."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Choose the natural superlative: Which room is the brightest?",
+      "options": [
+        "C'est la pièce la plus lumineuse.",
+        "C'est le pièce le plus lumineux.",
+        "C'est la pièce plus lumineuse que.",
+        "C'est la plus pièce lumineuse."
+      ],
+      "answer": 0,
+      "explain": "Use la for feminine pièce and lumineuse agrees with it."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Complete: This apartment has better access to the train. Cet appartement offre un ___ accès au train.",
+      "options": [
+        "meilleur",
+        "mieux",
+        "plus bon",
+        "meilleure"
+      ],
+      "answer": 0,
+      "explain": "Use masculine meilleur before the masculine noun accès."
+    }
+  ]
+}

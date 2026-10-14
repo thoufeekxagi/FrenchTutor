@@ -1,0 +1,166 @@
+{
+  "id": "a2-u10-words-5",
+  "unit": "a2-u10",
+  "unitTitle": "Food, shopping and quantities",
+  "title": "Words: preferences and food restrictions",
+  "subtitle": "A2 · Unit 10: Food, shopping and quantities",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un régime alimentaire",
+      "en": "a diet",
+      "sound": "uh(n) ray-ZHEEM ah-lee-mahn-TEHR",
+      "exampleFr": "Je respecte un régime alimentaire particulier.",
+      "exampleEn": "I follow a particular diet."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un choix végétarien",
+      "en": "a vegetarian choice",
+      "sound": "uh(n) shwah vay-zhay-tah-RYAH(N)",
+      "exampleFr": "Je cherche un choix végétarien au menu.",
+      "exampleEn": "I look for a vegetarian choice on the menu."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une option végétalienne",
+      "en": "a vegan option",
+      "sound": "ün ohp-SYOH(N) vay-zhay-tah-LYEHN",
+      "exampleFr": "Je vérifie si une option végétalienne est disponible.",
+      "exampleEn": "I check whether a vegan option is available."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une option sans noix",
+      "en": "a nut-free option",
+      "sound": "ün ohp-SYOH(N) sah(n) nwah",
+      "exampleFr": "Je choisis une option sans noix pour le groupe.",
+      "exampleEn": "I choose a nut-free option for the group."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une préférence personnelle",
+      "en": "a personal preference",
+      "sound": "ün pray-fay-RAH(N)S pehr-soh-NEHL",
+      "exampleFr": "J'ai une préférence personnelle pour les pommes.",
+      "exampleEn": "I have a personal preference for apples."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une liste d'ingrédients",
+      "en": "an ingredient list",
+      "sound": "ün leest da(n)-gray-DYAH(N)",
+      "exampleFr": "Je lis la liste d'ingrédients avant d'acheter.",
+      "exampleEn": "I read the ingredient list before buying."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une portion individuelle",
+      "en": "an individual serving",
+      "sound": "ün pohr-SYOH(N) a(n)-dee-vee-dü-EHL",
+      "exampleFr": "Je prends une portion individuelle pour le déjeuner.",
+      "exampleEn": "I take an individual serving for lunch."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une allergie connue",
+      "en": "a known allergy",
+      "sound": "ün ah-lehr-ZHEE koh-NÜ",
+      "exampleFr": "Je signale une allergie connue au personnel du magasin.",
+      "exampleEn": "I tell the store staff about a known allergy."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un régime alimentaire",
+      "options": [
+        "a nut-free option",
+        "a diet",
+        "an individual serving",
+        "a vegetarian choice"
+      ],
+      "answer": 1,
+      "explain": "un régime alimentaire means a diet."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un choix végétarien",
+      "options": [
+        "a personal preference",
+        "a known allergy",
+        "a vegan option",
+        "a vegetarian choice"
+      ],
+      "answer": 3,
+      "explain": "un choix végétarien means a vegetarian choice."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une option végétalienne",
+      "options": [
+        "an ingredient list",
+        "a vegan option",
+        "a diet",
+        "an individual serving"
+      ],
+      "answer": 1,
+      "explain": "une option végétalienne means a vegan option."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une option sans noix",
+      "options": [
+        "an individual serving",
+        "a vegetarian choice",
+        "a personal preference",
+        "a nut-free option"
+      ],
+      "answer": 3,
+      "explain": "une option sans noix means a nut-free option."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une préférence personnelle",
+      "options": [
+        "a known allergy",
+        "a personal preference",
+        "a vegan option",
+        "an ingredient list"
+      ],
+      "answer": 1,
+      "explain": "une préférence personnelle means a personal preference."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une liste d'ingrédients",
+      "options": [
+        "a diet",
+        "a nut-free option",
+        "an individual serving",
+        "an ingredient list"
+      ],
+      "answer": 3,
+      "explain": "une liste d'ingrédients means an ingredient list."
+    }
+  ]
+}

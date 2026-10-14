@@ -1,0 +1,148 @@
+{
+  "id": "a2-u06-dialogues",
+  "unit": "a2-u06",
+  "unitTitle": "Choose a home and describe a neighbourhood",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 6: Choose a home and describe a neighbourhood",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the learner's needs, the details in each listing and the question that remains unanswered. A good comparison uses evidence from the notice instead of guessing about a home."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Two rental options",
+      "body": "Lina asks her classmate Karim to help compare two fictional listings.",
+      "examples": [
+        {
+          "fr": "J'ai deux annonces. Le studio est moins cher, mais l'appartement d'une chambre est plus près du train.",
+          "en": "Lina: I have two listings. The studio is less expensive, but the one-bedroom is closer to the train."
+        },
+        {
+          "fr": "Quel est ton budget maximal ?",
+          "en": "Karim: What is your maximum budget?"
+        },
+        {
+          "fr": "Mille quatre cents dollars par mois, avec les frais d'électricité.",
+          "en": "Lina: One thousand four hundred dollars a month, including electricity costs."
+        },
+        {
+          "fr": "Le studio coûte mille trois cent cinquante dollars. Les charges sont comprises.",
+          "en": "Karim: The studio costs thirteen hundred and fifty dollars. Utilities are included."
+        },
+        {
+          "fr": "Et l'appartement d'une chambre ?",
+          "en": "Lina: And the one-bedroom?"
+        },
+        {
+          "fr": "Il coûte mille quatre cent cinquante dollars. Il a un balcon privé et plus d'espace de rangement.",
+          "en": "Karim: It costs fourteen hundred and fifty dollars. It has a private balcony and more storage space."
+        },
+        {
+          "fr": "Je préfère un quartier paisible et un trajet court. Le studio est aussi près de la bibliothèque.",
+          "en": "Lina: I prefer a peaceful neighbourhood and a short trip. The studio is also close to the library."
+        },
+        {
+          "fr": "Donc, visite les deux et vérifie le coût mensuel avant de choisir.",
+          "en": "Karim: So visit both and check the monthly cost before choosing."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Ask before you sign",
+      "body": "Nadia phones a housing contact to clarify a listing.",
+      "examples": [
+        {
+          "fr": "Bonjour. Je téléphone au sujet du logement meublé près du centre communautaire.",
+          "en": "Nadia: Hello. I am calling about the furnished home near the community centre."
+        },
+        {
+          "fr": "Oui. Quelle est votre question ?",
+          "en": "Contact: Yes. What is your question?"
+        },
+        {
+          "fr": "La buanderie est-elle dans l'immeuble ?",
+          "en": "Nadia: Is the laundry room in the building?"
+        },
+        {
+          "fr": "Oui, elle est au sous-sol. La laveuse et la sécheuse sont dans la buanderie.",
+          "en": "Contact: Yes, it is in the basement. The washer and dryer are in the laundry room."
+        },
+        {
+          "fr": "Le stationnement intérieur est-il compris dans le loyer ?",
+          "en": "Nadia: Is indoor parking included in the rent?"
+        },
+        {
+          "fr": "Non. Il y a un coût mensuel en plus.",
+          "en": "Contact: No. There is an extra monthly cost."
+        },
+        {
+          "fr": "Merci. Je vais visiter le logement samedi et lire les conditions avant de signer un bail.",
+          "en": "Nadia: Thank you. I am going to visit the home Saturday and read the conditions before signing a lease."
+        },
+        {
+          "fr": "Très bien. Le logement est moins bruyant le matin que le soir.",
+          "en": "Contact: Very good. The home is less noisy in the morning than in the evening."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Which home costs less?",
+      "options": [
+        "The studio",
+        "The one-bedroom",
+        "They cost the same",
+        "The notices do not give a price"
+      ],
+      "answer": 0,
+      "explain": "Karim says the studio costs $1,350, while the one-bedroom costs $1,450."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What matters to Lina besides the monthly budget?",
+      "options": [
+        "A peaceful neighbourhood and a short trip",
+        "A private garage and a large garden",
+        "A furnished room near work",
+        "A one-year lease only"
+      ],
+      "answer": 0,
+      "explain": "Lina says she prefers a peaceful neighbourhood and a short trip."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Where are the washer and dryer?",
+      "options": [
+        "In a shared room in the basement",
+        "Inside the apartment",
+        "In the parking area",
+        "At the community centre"
+      ],
+      "answer": 0,
+      "explain": "The contact says they are in a shared room in the basement."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What extra cost is not included in Nadia's rent?",
+      "options": [
+        "Indoor parking",
+        "Electricity",
+        "The laundry room",
+        "The lease"
+      ],
+      "answer": 0,
+      "explain": "The contact says indoor parking costs extra each month."
+    }
+  ]
+}

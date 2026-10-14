@@ -1,0 +1,134 @@
+{
+  "id": "a2-u02-phrases",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Phrases",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Phrases",
+      "body": "Say what happened first, then add a reason or result. Keep each sentence short enough to say comfortably."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Say the whole block",
+      "body": "Learn these as blocks, exactly as you hear them. Say each one out loud. Tap the speaker to hear it."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Hier matin, j'ai terminé mon devoir avant le cours.",
+      "en": "Yesterday morning, I finished my assignment before class.",
+      "tip": "Say it: yehr mah-TA(N) zhay tehr-mee-NAY moh(n) duh-VWAHR ah-vah(n) luh koor"
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "La semaine dernière, j'ai réservé une visite guidée.",
+      "en": "Last week, I booked a guided tour.",
+      "tip": "Say it: lah suh-MEN dehr-NYEHR zhay ray-zehr-VAY ün vee-ZEET gee-DAY"
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "J'ai travaillé pendant une heure, puis j'ai trouvé un avis.",
+      "en": "I worked for an hour, then I found a notice.",
+      "tip": "Say it: zhay trah-vah-YAY pah(n)-DAH(N) ün uhr püi zhay troo-VAY uh(n) ah-VEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "La livraison a changé d'heure.",
+      "en": "The delivery time changed.",
+      "tip": "Say it: lah lee-vray-ZOH(N) ah shahn-ZHAY duhr"
+    },
+    {
+      "type": "phrase",
+      "id": "p5",
+      "fr": "J'ai réclamé un remboursement parce que le problème a retardé la livraison.",
+      "en": "I requested a refund because the problem delayed the delivery.",
+      "tip": "Say it: zhay ray-klah-MAY uh(n) rah(n)-boors-MAH(N) parsk luh proh-BLEHM ah ruh-tahr-DAY lah lee-vray-ZOH(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p6",
+      "fr": "Heureusement, le service a réglé le problème le lendemain.",
+      "en": "Fortunately, the service resolved the problem the next day.",
+      "tip": "Say it: uh-ruh-ZMÄ(N) luh sehr-VEES ah ray-GLAY luh proh-BLEHM luh lah(n)-duh-MA(N)"
+    },
+    {
+      "type": "phrase",
+      "id": "p7",
+      "fr": "J'ai emprunté un livre et j'ai terminé un chapitre vendredi.",
+      "en": "I borrowed a book and finished a chapter on Friday.",
+      "tip": "Say it: zhay ah(n)-pruh(n)-TAY uh(n) leevr eh zhay tehr-mee-NAY uh(n) shah-PEETR vahn-druh-DEE"
+    },
+    {
+      "type": "phrase",
+      "id": "p8",
+      "fr": "Finalement, j'ai terminé mon travail et j'ai envoyé le courriel.",
+      "en": "In the end, I finished my work and sent the email.",
+      "tip": "Say it: fee-nahl-MAH(N) zhay tehr-mee-NAY moh(n) trah-VAHY eh zhay ah(n)-vwah-YAY luh koo-RYEL"
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "Hier matin, j'ai terminé mon devoir avant le cours.",
+      "options": [
+        "The delivery time changed.",
+        "Yesterday morning, I finished my assignment before class.",
+        "Last week, I booked a guided tour.",
+        "I requested a refund because the problem delayed the delivery."
+      ],
+      "answer": 1,
+      "explain": "Hier matin, j'ai terminé mon devoir avant le cours. means Yesterday morning, I finished my assignment before class.."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai travaillé pendant une heure, puis j'ai trouvé un avis.",
+      "options": [
+        "Fortunately, the service resolved the problem the next day.",
+        "I worked for an hour, then I found a notice.",
+        "Yesterday morning, I finished my assignment before class.",
+        "The delivery time changed."
+      ],
+      "answer": 1,
+      "explain": "J'ai travaillé pendant une heure, puis j'ai trouvé un avis. means I worked for an hour, then I found a notice.."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai réclamé un remboursement parce que le problème a retardé la livraison.",
+      "options": [
+        "In the end, I finished my work and sent the email.",
+        "I requested a refund because the problem delayed the delivery.",
+        "I worked for an hour, then I found a notice.",
+        "Yesterday morning, I finished my assignment before class."
+      ],
+      "answer": 1,
+      "explain": "J'ai réclamé un remboursement parce que le problème a retardé la livraison. means I requested a refund because the problem delayed the delivery.."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "J'ai emprunté un livre et j'ai terminé un chapitre vendredi.",
+      "options": [
+        "Last week, I booked a guided tour.",
+        "I borrowed a book and finished a chapter on Friday.",
+        "I requested a refund because the problem delayed the delivery.",
+        "I worked for an hour, then I found a notice."
+      ],
+      "answer": 1,
+      "explain": "J'ai emprunté un livre et j'ai terminé un chapitre vendredi. means I borrowed a book and finished a chapter on Friday.."
+    }
+  ]
+}

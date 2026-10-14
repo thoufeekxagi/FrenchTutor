@@ -1,0 +1,72 @@
+{
+  "id": "b1-u06-dialogues",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A route change",
+      "body": "Two neighbours discuss an invented construction detour.",
+      "examples": [
+        {
+          "fr": "Le trajet prend plus de temps parce que la ligne est détournée.",
+          "en": "Karim: The trip takes longer because the route is diverted."
+        },
+        {
+          "fr": "Toutefois, l'arrêt temporaire est plus près du centre.",
+          "en": "Lina: However, the temporary stop is closer to the centre."
+        },
+        {
+          "fr": "La ville a affiché un avis afin d'informer les voyageurs.",
+          "en": "Karim: The city posted a notice in order to inform travellers."
+        },
+        {
+          "fr": "Est-ce que l'avis explique le détour ?",
+          "en": "Lina: Does the notice explain the detour?"
+        },
+        {
+          "fr": "Oui, mais il faut qu'il précise aussi la durée des travaux.",
+          "en": "Karim: Yes, but it also needs to state how long the construction will last."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "A class participation plan",
+      "body": "Two classmates compare an in-person and online format.",
+      "examples": [
+        {
+          "fr": "Le groupe a ajouté une option en ligne pour que les personnes éloignées puissent participer.",
+          "en": "Mina: The group added an online option so people who live far away can participate."
+        },
+        {
+          "fr": "C'est utile, même si la connexion peut parfois couper.",
+          "en": "Sam: That's useful, even if the connection may sometimes drop."
+        },
+        {
+          "fr": "Par conséquent, la responsable enverra aussi les notes après le cours.",
+          "en": "Mina: As a result, the coordinator will also send notes after class."
+        },
+        {
+          "fr": "Le groupe pourrait enregistrer les consignes afin de réduire les oublis.",
+          "en": "Sam: The group could record the instructions in order to reduce missed details."
+        },
+        {
+          "fr": "Oui, à condition que les participants soient d'accord.",
+          "en": "Mina: Yes, provided that participants agree."
+        }
+      ]
+    }
+  ]
+}

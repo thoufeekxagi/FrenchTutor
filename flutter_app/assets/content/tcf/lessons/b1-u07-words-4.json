@@ -1,0 +1,148 @@
+{
+  "id": "b1-u07-words-4",
+  "unit": "b1-u07",
+  "unitTitle": "B1 · Report what someone said and asked",
+  "title": "Words: focus vocabulary — set 4",
+  "subtitle": "B1 · Unit 7: B1 · Report what someone said and asked",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "nier",
+      "en": "to deny",
+      "sound": "nyeh",
+      "exampleFr": "Le service nie avoir modifié la date.",
+      "exampleEn": "The service denies having changed the date."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une source fiable",
+      "en": "a reliable source",
+      "sound": "ün soors fee-AH-bl",
+      "exampleFr": "Vérifie l'heure auprès d'une source fiable.",
+      "exampleEn": "Check the time with a reliable source."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un témoin",
+      "en": "a witness",
+      "sound": "uh(n) tay-mweh(n)",
+      "exampleFr": "Un témoin a décrit la scène au journaliste.",
+      "exampleEn": "A witness described the scene to the journalist."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "d'après le témoin",
+      "en": "according to the witness",
+      "sound": "dah-preh luh tay-mweh(n)",
+      "exampleFr": "D'après le témoin, la réunion a fini à six heures.",
+      "exampleEn": "According to the witness, the meeting ended at six."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une version des faits",
+      "en": "an account of what happened",
+      "sound": "ün vehr-SYOH(N) day feh",
+      "exampleFr": "Les deux personnes présentent une version différente des faits.",
+      "exampleEn": "The two people give different accounts of what happened."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "confirmer par écrit",
+      "en": "to confirm in writing",
+      "sound": "kohn-feer-MAY par ay-KREE",
+      "exampleFr": "L'organisme va confirmer par écrit la nouvelle procédure.",
+      "exampleEn": "The organization will confirm the new procedure in writing."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "nier",
+      "options": [
+        "according to the witness",
+        "to deny",
+        "a reliable source",
+        "a witness"
+      ],
+      "answer": 1,
+      "explain": "nier means to deny."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une source fiable",
+      "options": [
+        "an account of what happened",
+        "a witness",
+        "according to the witness",
+        "a reliable source"
+      ],
+      "answer": 3,
+      "explain": "une source fiable means a reliable source."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un témoin",
+      "options": [
+        "to confirm in writing",
+        "a witness",
+        "an account of what happened",
+        "to deny"
+      ],
+      "answer": 1,
+      "explain": "un témoin means a witness."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "d'après le témoin",
+      "options": [
+        "to deny",
+        "an account of what happened",
+        "to confirm in writing",
+        "according to the witness"
+      ],
+      "answer": 3,
+      "explain": "d'après le témoin means according to the witness."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une version des faits",
+      "options": [
+        "a reliable source",
+        "an account of what happened",
+        "to confirm in writing",
+        "to deny"
+      ],
+      "answer": 1,
+      "explain": "une version des faits means an account of what happened."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "confirmer par écrit",
+      "options": [
+        "a witness",
+        "to deny",
+        "a reliable source",
+        "to confirm in writing"
+      ],
+      "answer": 3,
+      "explain": "confirmer par écrit means to confirm in writing."
+    }
+  ]
+}

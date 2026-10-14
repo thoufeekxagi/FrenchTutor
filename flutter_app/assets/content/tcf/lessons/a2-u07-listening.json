@@ -1,0 +1,86 @@
+{
+  "id": "a2-u07-listening",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Depuis hier soir, j'ai une gêne légère. Je voudrais une consultation téléphonique pour poser une question.",
+      "question": "What kind of consultation does the speaker request?",
+      "options": [
+        "A phone consultation",
+        "A follow-up by email",
+        "An in-person workshop",
+        "A lab result"
+      ],
+      "answer": 0,
+      "explain": "The speaker asks for a consultation téléphonique."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Votre rendez-vous de suivi est mardi à 14 h. Vous pouvez apporter le résultat de laboratoire.",
+      "question": "What should the listener bring?",
+      "options": [
+        "The lab result",
+        "A rental form",
+        "A bus pass",
+        "A course certificate"
+      ],
+      "answer": 0,
+      "explain": "The message says the listener can bring the lab result."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Le service va rappeler la personne qui demande un suivi. L'appel va arriver avant la fin de la journée.",
+      "question": "When will the service call back?",
+      "options": [
+        "Before the end of the day",
+        "Next week",
+        "After the appointment",
+        "At the weekend"
+      ],
+      "answer": 0,
+      "explain": "The recording says the call will happen before the end of the day."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "La clinique où j'ai mon rendez-vous est près de la bibliothèque. L'entrée est sur la rue principale.",
+      "question": "Where is the clinic?",
+      "options": [
+        "Near the library",
+        "Beside the airport",
+        "Inside a school",
+        "Behind the station"
+      ],
+      "answer": 0,
+      "explain": "The speaker says the clinic is near the library."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Je vais noter l'heure et la durée. Le professionnel va lire cette information.",
+      "question": "What will the speaker record?",
+      "options": [
+        "The time and duration",
+        "The monthly rent",
+        "The clinic's opening cost",
+        "The bus schedule"
+      ],
+      "answer": 0,
+      "explain": "The recording names the time and duration."
+    }
+  ]
+}

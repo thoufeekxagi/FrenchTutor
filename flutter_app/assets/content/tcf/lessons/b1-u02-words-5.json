@@ -1,0 +1,148 @@
+{
+  "id": "b1-u02-words-5",
+  "unit": "b1-u02",
+  "unitTitle": "B1 · Work and study paths: explain plans and outcomes",
+  "title": "Words: focus vocabulary — set 5",
+  "subtitle": "B1 · Unit 2: B1 · Work and study paths: explain plans and outcomes",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "mener un projet",
+      "en": "to lead a project",
+      "sound": "muh-nay uh(n) proh-zhay",
+      "exampleFr": "Elle a appris à mener un projet avec une petite équipe.",
+      "exampleEn": "She learned to lead a project with a small team."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une responsabilité",
+      "en": "a responsibility",
+      "sound": "ün reh-spohn-sah-bee-lee-TAY",
+      "exampleFr": "Cette responsabilité demande de la précision.",
+      "exampleEn": "This responsibility requires precision."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une étape supplémentaire",
+      "en": "an additional step",
+      "sound": "ün ay-tap sü-play-mahn-TEHR",
+      "exampleFr": "Une entrevue constitue une étape supplémentaire.",
+      "exampleEn": "An interview is an additional step."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "à long terme",
+      "en": "in the long term",
+      "sound": "ah lohn tehrm",
+      "exampleFr": "À long terme, cette compétence pourrait ouvrir des possibilités.",
+      "exampleEn": "In the long term, this skill could open up opportunities."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un secteur d'activité",
+      "en": "an industry; a field of activity",
+      "sound": "uh(n) sehrk-tuhr dahk-tee-vee-TAY",
+      "exampleFr": "Le secteur d'activité change rapidement.",
+      "exampleEn": "The industry is changing quickly."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "être retenu",
+      "en": "to be selected",
+      "sound": "ehtr ruh-tuh-NÜ",
+      "exampleFr": "Sa candidature a été retenue pour la deuxième étape.",
+      "exampleEn": "Her application was selected for the second stage."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "mener un projet",
+      "options": [
+        "in the long term",
+        "to lead a project",
+        "a responsibility",
+        "an additional step"
+      ],
+      "answer": 1,
+      "explain": "mener un projet means to lead a project."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une responsabilité",
+      "options": [
+        "an industry; a field of activity",
+        "an additional step",
+        "in the long term",
+        "a responsibility"
+      ],
+      "answer": 3,
+      "explain": "une responsabilité means a responsibility."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une étape supplémentaire",
+      "options": [
+        "to be selected",
+        "an additional step",
+        "in the long term",
+        "an industry; a field of activity"
+      ],
+      "answer": 1,
+      "explain": "une étape supplémentaire means an additional step."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "à long terme",
+      "options": [
+        "to lead a project",
+        "an industry; a field of activity",
+        "to be selected",
+        "in the long term"
+      ],
+      "answer": 3,
+      "explain": "à long terme means in the long term."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un secteur d'activité",
+      "options": [
+        "a responsibility",
+        "an industry; a field of activity",
+        "to be selected",
+        "to lead a project"
+      ],
+      "answer": 1,
+      "explain": "un secteur d'activité means an industry; a field of activity."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "être retenu",
+      "options": [
+        "an additional step",
+        "to lead a project",
+        "a responsibility",
+        "to be selected"
+      ],
+      "answer": 3,
+      "explain": "être retenu means to be selected."
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "id": "a2-u02-checkpoint",
+  "unit": "a2-u02",
+  "unitTitle": "What happened this week?",
+  "title": "Checkpoint",
+  "subtitle": "A2 · Unit 2: What happened this week?",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does avant-hier mean?",
+      "options": [
+        "The day before yesterday",
+        "Yesterday evening",
+        "The next day",
+        "Last month"
+      ],
+      "answer": 0,
+      "explain": "Avant-hier means the day before yesterday."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Choose the regular past participle of réserver.",
+      "options": [
+        "réservé",
+        "réserver",
+        "réserve",
+        "réservait"
+      ],
+      "answer": 0,
+      "explain": "For a regular -er verb, remove -er and add -é."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Complete: Nous ___ le devoir.",
+      "options": [
+        "avons terminé",
+        "sommes terminer",
+        "avons terminer",
+        "terminons hier"
+      ],
+      "answer": 0,
+      "explain": "Use avons + the past participle terminé."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "Which phrase means 'a refund'?",
+      "options": [
+        "un remboursement",
+        "une annulation",
+        "un exposé",
+        "un colis"
+      ],
+      "answer": 0,
+      "explain": "Un remboursement means a refund."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "Why was the class changed? Le cours a changé ___ du problème.",
+      "options": [
+        "à cause",
+        "grâce",
+        "plus tard",
+        "une fois"
+      ],
+      "answer": 0,
+      "explain": "À cause de introduces a reason with a negative or neutral result."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does heureusement signal?",
+      "options": [
+        "A fortunate result",
+        "A scheduled time",
+        "A cancellation",
+        "A past date"
+      ],
+      "answer": 0,
+      "explain": "Heureusement means fortunately."
+    },
+    {
+      "type": "choose",
+      "id": "c7",
+      "prompt": "Choose the correct sentence.",
+      "options": [
+        "J'ai réservé une place.",
+        "Je suis réserver une place.",
+        "J'ai réserver une place.",
+        "Réservé j'ai une place."
+      ],
+      "answer": 0,
+      "explain": "The correct pattern is avoir + past participle."
+    },
+    {
+      "type": "choose",
+      "id": "c8",
+      "prompt": "If j'ai réservé describes one finished action, what does je réserve usually describe?",
+      "options": [
+        "A present action or habit",
+        "A completed past action",
+        "A person",
+        "A place"
+      ],
+      "answer": 0,
+      "explain": "Je réserve is present; j'ai réservé describes a completed action."
+    },
+    {
+      "type": "choose",
+      "id": "c9",
+      "prompt": "Which event happened first? 'J'ai téléphoné, puis j'ai demandé un remboursement.'",
+      "options": [
+        "The person called.",
+        "The person requested the refund.",
+        "The parcel arrived.",
+        "The appointment began."
+      ],
+      "answer": 0,
+      "explain": "Puis means then, so the call came before the refund request."
+    },
+    {
+      "type": "choose",
+      "id": "c10",
+      "prompt": "Which sentence says that the speaker borrowed a book yesterday?",
+      "options": [
+        "Hier, j'ai emprunté un livre.",
+        "Demain, je rends un livre.",
+        "Je réserve une visite guidée.",
+        "Le colis est devant la porte."
+      ],
+      "answer": 0,
+      "explain": "The first sentence says the speaker borrowed a book yesterday."
+    }
+  ]
+}

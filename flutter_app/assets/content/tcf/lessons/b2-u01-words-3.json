@@ -1,0 +1,148 @@
+{
+  "id": "b2-u01-words-3",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une prémisse",
+      "en": "a premise",
+      "sound": "ün pray-MEES",
+      "exampleFr": "Une prémisse doit être vérifiée avant d'accepter la conclusion.",
+      "exampleEn": "A premise should be checked before accepting the conclusion."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une preuve",
+      "en": "evidence; proof",
+      "sound": "ün preuv",
+      "exampleFr": "Le rapport apporte une preuve supplémentaire.",
+      "exampleEn": "The report provides additional evidence."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une concession",
+      "en": "a concession",
+      "sound": "ün kohn-seh-SYOH(N)",
+      "exampleFr": "La concession rend son argument plus nuancé.",
+      "exampleEn": "The concession makes her argument more nuanced."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la portée",
+      "en": "the scope; impact",
+      "sound": "lah por-TAY",
+      "exampleFr": "La portée de la mesure dépasse le quartier.",
+      "exampleEn": "The measure's impact extends beyond the neighbourhood."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "étayer un argument",
+      "en": "to support an argument",
+      "sound": "ay-tay-YAY uh(n) ar-gü-MAH(N)",
+      "exampleFr": "Elle étaye son argument avec des exemples vérifiables.",
+      "exampleEn": "She supports her argument with verifiable examples."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "réfuter une affirmation",
+      "en": "to refute a claim",
+      "sound": "ray-fü-TAY ün ah-feer-mah-SYOH(N)",
+      "exampleFr": "Les données ne suffisent pas à réfuter cette affirmation.",
+      "exampleEn": "The data are not enough to refute this claim."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une prémisse",
+      "options": [
+        "the scope; impact",
+        "a premise",
+        "evidence; proof",
+        "a concession"
+      ],
+      "answer": 1,
+      "explain": "une prémisse means a premise."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une preuve",
+      "options": [
+        "to support an argument",
+        "a concession",
+        "the scope; impact",
+        "evidence; proof"
+      ],
+      "answer": 3,
+      "explain": "une preuve means evidence; proof."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une concession",
+      "options": [
+        "to refute a claim",
+        "a concession",
+        "the scope; impact",
+        "to support an argument"
+      ],
+      "answer": 1,
+      "explain": "une concession means a concession."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la portée",
+      "options": [
+        "a premise",
+        "to support an argument",
+        "to refute a claim",
+        "the scope; impact"
+      ],
+      "answer": 3,
+      "explain": "la portée means the scope; impact."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "étayer un argument",
+      "options": [
+        "evidence; proof",
+        "to support an argument",
+        "to refute a claim",
+        "a premise"
+      ],
+      "answer": 1,
+      "explain": "étayer un argument means to support an argument."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "réfuter une affirmation",
+      "options": [
+        "a concession",
+        "a premise",
+        "evidence; proof",
+        "to refute a claim"
+      ],
+      "answer": 3,
+      "explain": "réfuter une affirmation means to refute a claim."
+    }
+  ]
+}

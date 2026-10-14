@@ -1,0 +1,148 @@
+{
+  "id": "b2-u11-words-4",
+  "unit": "b2-u11",
+  "unitTitle": "B2 · TCF speaking Task 2: get the information you need",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 11: B2 · TCF speaking Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une durée approximative",
+      "en": "an approximate duration",
+      "sound": "ün dü-RAY ah-prohk-see-mah-TEEV",
+      "exampleFr": "La durée approximative de la visite est de deux heures.",
+      "exampleEn": "The approximate duration of the visit is two hours."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une plage horaire",
+      "en": "a time slot; time window",
+      "sound": "ün plahzh oh-REHR",
+      "exampleFr": "Il reste une plage horaire en fin d'après-midi.",
+      "exampleEn": "A time slot remains in the late afternoon."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un délai de réponse",
+      "en": "a response time",
+      "sound": "uh(n) day-leh duh ray-POHNS",
+      "exampleFr": "Le délai de réponse est d'environ trois jours.",
+      "exampleEn": "The response time is about three days."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une procédure de remboursement",
+      "en": "a refund procedure",
+      "sound": "ün proh-say-DÜR duh rah(n)-boors-MAH(N)",
+      "exampleFr": "L'agent décrit la procédure de remboursement.",
+      "exampleEn": "The agent describes the refund procedure."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un format hybride",
+      "en": "a hybrid format",
+      "sound": "uh(n) for-MAH ee-BREED",
+      "exampleFr": "L'activité est proposée dans un format hybride.",
+      "exampleEn": "The activity is offered in a hybrid format."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "la capacité maximale",
+      "en": "maximum capacity",
+      "sound": "lah kah-pah-see-TAY mahk-see-MAHL",
+      "exampleFr": "La capacité maximale de la salle est de trente personnes.",
+      "exampleEn": "The room's maximum capacity is thirty people."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une durée approximative",
+      "options": [
+        "a refund procedure",
+        "an approximate duration",
+        "a time slot; time window",
+        "a response time"
+      ],
+      "answer": 1,
+      "explain": "une durée approximative means an approximate duration."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une plage horaire",
+      "options": [
+        "a hybrid format",
+        "a refund procedure",
+        "maximum capacity",
+        "a time slot; time window"
+      ],
+      "answer": 3,
+      "explain": "une plage horaire means a time slot; time window."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un délai de réponse",
+      "options": [
+        "maximum capacity",
+        "a response time",
+        "a refund procedure",
+        "a hybrid format"
+      ],
+      "answer": 1,
+      "explain": "un délai de réponse means a response time."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une procédure de remboursement",
+      "options": [
+        "an approximate duration",
+        "a hybrid format",
+        "maximum capacity",
+        "a refund procedure"
+      ],
+      "answer": 3,
+      "explain": "une procédure de remboursement means a refund procedure."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un format hybride",
+      "options": [
+        "a time slot; time window",
+        "a hybrid format",
+        "maximum capacity",
+        "an approximate duration"
+      ],
+      "answer": 1,
+      "explain": "un format hybride means a hybrid format."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "la capacité maximale",
+      "options": [
+        "a response time",
+        "an approximate duration",
+        "a time slot; time window",
+        "maximum capacity"
+      ],
+      "answer": 3,
+      "explain": "la capacité maximale means maximum capacity."
+    }
+  ]
+}

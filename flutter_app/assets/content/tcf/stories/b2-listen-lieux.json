@@ -1,0 +1,766 @@
+{
+  "id": "b2-listen-lieux",
+  "title": "Des salles pour plusieurs usages",
+  "titleEn": "Rooms with several purposes",
+  "level": "B2",
+  "mode": "listening",
+  "minutes": 6,
+  "summary": "A community organization must share limited rooms among competing programs and develops a transparent schedule with a review process.",
+  "unit": "b2-u08",
+  "sentences": [
+    {
+      "fr": "Une association devait répartir trois salles entre des cours de langue, un service d'aide aux devoirs et des rencontres pour les aînés.",
+      "en": "An association had to allocate three rooms among language classes, homework support, and meetings for older adults."
+    },
+    {
+      "fr": "Chaque groupe avançait un besoin légitime, mais les demandes dépassaient les plages disponibles.",
+      "en": "Each group put forward a legitimate need, but requests exceeded the available time slots."
+    },
+    {
+      "fr": "La première proposition favorisait les programmes qui accueillaient le plus de participants, sans tenir compte de leur flexibilité.",
+      "en": "The first proposal favoured programs with the most participants without considering their flexibility."
+    },
+    {
+      "fr": "Une coordinatrice a suggéré d'évaluer aussi la fréquence, l'accessibilité et la possibilité d'utiliser une autre salle.",
+      "en": "A coordinator suggested also evaluating frequency, accessibility, and whether another room could be used."
+    },
+    {
+      "fr": "Le comité a publié ces critères avant de comparer les demandes, puis a demandé aux responsables de vérifier les horaires ensemble.",
+      "en": "The committee published these criteria before comparing requests, then asked program leads to check the schedules together."
+    },
+    {
+      "fr": "Deux activités ont accepté de partager une salle, à condition que le rangement du matériel soit prévu dans le calendrier.",
+      "en": "Two activities agreed to share a room provided that equipment storage was included in the schedule."
+    },
+    {
+      "fr": "Une plage du soir est restée en réserve pour les besoins ponctuels plutôt que d'être attribuée immédiatement.",
+      "en": "One evening slot remained in reserve for occasional needs instead of being assigned immediately."
+    },
+    {
+      "fr": "Le plan sera réexaminé après un trimestre, car les inscriptions et les contraintes peuvent évoluer.",
+      "en": "The plan will be reviewed after one term because registrations and constraints may change."
+    },
+    {
+      "fr": "Cette méthode ne satisfait pas toutes les demandes, mais elle rend les arbitrages compréhensibles et révisables.",
+      "en": "This method does not satisfy every request, but makes trade-offs understandable and open to revision."
+    }
+  ],
+  "words": {
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "association": {
+      "en": "organization; association",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "devait": {
+      "en": "had to; was supposed to",
+      "pos": "verb",
+      "lemma": "devoir",
+      "note": "Imperfect form of devoir."
+    },
+    "répartir": {
+      "en": "to allocate; to distribute",
+      "pos": "verb",
+      "lemma": "répartir",
+      "note": "Infinitive."
+    },
+    "trois": {
+      "en": "three",
+      "pos": "number"
+    },
+    "salles": {
+      "en": "rooms",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "salle",
+      "note": "Plural of salle."
+    },
+    "entre": {
+      "en": "between; among",
+      "pos": "preposition"
+    },
+    "des": {
+      "en": "some; of the"
+    },
+    "cours": {
+      "en": "a course, class",
+      "sound": "uh(n) koor",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "cours"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "langue": {
+      "en": "language",
+      "sound": "lah lah(n)g",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "langue"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "service": {
+      "en": "service",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "d'aide": {
+      "en": "of help; assistance",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "aide",
+      "note": "Elided de before a vowel; aide is feminine."
+    },
+    "aux": {
+      "en": "to the; at the (plural)",
+      "pos": "contraction"
+    },
+    "devoirs": {
+      "en": "an assignment; homework",
+      "sound": "uh(n) duh-VWAHR",
+      "lemma": "devoir",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "et": {
+      "en": "and"
+    },
+    "rencontres": {
+      "en": "meetings; encounters",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "rencontre",
+      "note": "Plural of rencontre."
+    },
+    "pour": {
+      "en": "for"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "aînés": {
+      "en": "older adults",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "aîné",
+      "note": "Masculine plural; mixed groups use this form."
+    },
+    "chaque": {
+      "en": "each, every",
+      "pos": "determiner"
+    },
+    "groupe": {
+      "en": "group",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "avançait": {
+      "en": "put forward; was advancing",
+      "pos": "verb",
+      "lemma": "avancer",
+      "note": "Imperfect form of avancer."
+    },
+    "besoin": {
+      "en": "a need",
+      "sound": "uh(n) buh-ZWA(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "besoin"
+    },
+    "légitime": {
+      "en": "legitimate; reasonable",
+      "pos": "adjective",
+      "lemma": "légitime"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "demandes": {
+      "en": "requests",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "demande",
+      "note": "Plural of demande."
+    },
+    "dépassaient": {
+      "en": "exceeded",
+      "pos": "verb",
+      "lemma": "dépasser",
+      "note": "Imperfect form of dépasser."
+    },
+    "plages": {
+      "en": "time slots",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "plage",
+      "note": "Plural of plage."
+    },
+    "disponibles": {
+      "en": "available",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "disponible",
+      "note": "Plural form; same spelling for masculine and feminine."
+    },
+    "la": {
+      "en": "the"
+    },
+    "première": {
+      "en": "first",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "premier",
+      "note": "Feminine form of premier."
+    },
+    "proposition": {
+      "en": "proposal",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "favorisait": {
+      "en": "favoured",
+      "pos": "verb",
+      "lemma": "favoriser",
+      "note": "Imperfect form of favoriser."
+    },
+    "programmes": {
+      "en": "a program of study",
+      "sound": "uh(n) proh-GRAHM",
+      "lemma": "programme",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "accueillaient": {
+      "en": "were welcoming",
+      "pos": "verb",
+      "lemma": "accueillir",
+      "note": "Imperfect form of accueillir."
+    },
+    "le": {
+      "en": "the"
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "participants": {
+      "en": "a participant",
+      "sound": "uh(n) par-tee-see-PAH(N)",
+      "lemma": "participant",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "sans": {
+      "en": "without",
+      "pos": "preposition"
+    },
+    "tenir": {
+      "en": "to hold; to keep",
+      "pos": "verb",
+      "lemma": "tenir",
+      "note": "Infinitive."
+    },
+    "compte": {
+      "en": "an account; report",
+      "sound": "uh(n) koh(n)t",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "compte"
+    },
+    "leur": {
+      "en": "their; to them",
+      "pos": "determiner / pronoun",
+      "note": "Meaning depends on its place in the sentence."
+    },
+    "flexibilité": {
+      "en": "flexibility",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "coordinatrice": {
+      "en": "coordinator",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "coordinateur",
+      "note": "Feminine form of coordinateur."
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "suggéré": {
+      "en": "suggested",
+      "pos": "verb",
+      "lemma": "suggérer",
+      "note": "Past participle of suggérer."
+    },
+    "d'évaluer": {
+      "en": "to evaluate",
+      "pos": "expression",
+      "note": "Elided de + évaluer."
+    },
+    "aussi": {
+      "en": "also; too",
+      "pos": "adverb"
+    },
+    "fréquence": {
+      "en": "frequency",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "fréquence"
+    },
+    "l'accessibilité": {
+      "en": "accessibility",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "accessibilité",
+      "note": "Elided la before a vowel."
+    },
+    "possibilité": {
+      "en": "possibility",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "d'utiliser": {
+      "en": "to use",
+      "pos": "expression",
+      "note": "Elided de + utiliser."
+    },
+    "autre": {
+      "en": "other; another",
+      "pos": "adjective",
+      "lemma": "autre"
+    },
+    "salle": {
+      "en": "room",
+      "pos": "noun, feminine",
+      "sound": "sal"
+    },
+    "comité": {
+      "en": "committee",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "publié": {
+      "en": "published",
+      "pos": "verb",
+      "lemma": "publier",
+      "note": "Past participle of publier."
+    },
+    "ces": {
+      "en": "these",
+      "pos": "determiner",
+      "note": "Plural; masculine and feminine forms are the same."
+    },
+    "critères": {
+      "en": "criteria",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "critère",
+      "note": "Plural of critère."
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "comparer": {
+      "en": "to compare",
+      "pos": "verb",
+      "lemma": "comparer",
+      "note": "Infinitive."
+    },
+    "puis": {
+      "en": "then; next",
+      "pos": "adverb"
+    },
+    "demandé": {
+      "en": "asked; requested",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Past participle of demander."
+    },
+    "responsables": {
+      "en": "managers; people in charge",
+      "pos": "noun",
+      "gender": "masculine or feminine",
+      "number": "plural",
+      "lemma": "responsable",
+      "note": "Same noun form for all genders."
+    },
+    "vérifier": {
+      "en": "to check; verify",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Infinitive."
+    },
+    "horaires": {
+      "en": "schedules",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "horaire",
+      "note": "Plural of horaire."
+    },
+    "ensemble": {
+      "en": "together",
+      "pos": "adverb"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "activités": {
+      "en": "activities",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "activité",
+      "note": "Plural of activité."
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "accepté": {
+      "en": "accepted",
+      "pos": "verb",
+      "lemma": "accepter",
+      "note": "Masculine singular past participle of accepter."
+    },
+    "partager": {
+      "en": "to share",
+      "pos": "verb",
+      "lemma": "partager",
+      "note": "Infinitive."
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "condition": {
+      "en": "condition; requirement",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "rangement": {
+      "en": "putting away; storage",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "du": {
+      "en": "some (partitive form)"
+    },
+    "matériel": {
+      "en": "equipment",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "matériel"
+    },
+    "soit": {
+      "en": "either; or; be",
+      "pos": "connector / verb",
+      "note": "Here, soit... soit... presents alternatives."
+    },
+    "prévu": {
+      "en": "planned; expected",
+      "pos": "verb",
+      "lemma": "prévoir",
+      "note": "Past participle of prévoir."
+    },
+    "dans": {
+      "en": "in"
+    },
+    "calendrier": {
+      "en": "calendar",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "calendrier"
+    },
+    "plage": {
+      "en": "time slot",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "plage"
+    },
+    "soir": {
+      "en": "evening",
+      "pos": "noun, masculine",
+      "sound": "swahr",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "soir"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "restée": {
+      "en": "stayed; remained",
+      "pos": "verb",
+      "lemma": "rester",
+      "note": "Feminine form of the past participle resté."
+    },
+    "en": {
+      "en": "on, during"
+    },
+    "réserve": {
+      "en": "reserve; backup",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "besoins": {
+      "en": "a need",
+      "sound": "uh(n) buh-ZWA(N)",
+      "lemma": "besoin",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "ponctuels": {
+      "en": "occasional",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "ponctuel",
+      "note": "Masculine plural form."
+    },
+    "plutôt": {
+      "en": "rather; instead",
+      "pos": "adverb"
+    },
+    "d'être": {
+      "en": "to be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Infinitive preceded by de."
+    },
+    "attribuée": {
+      "en": "assigned",
+      "pos": "verb",
+      "lemma": "attribuer",
+      "note": "Feminine form of the past participle attribué."
+    },
+    "immédiatement": {
+      "en": "immediately",
+      "pos": "adverb"
+    },
+    "plan": {
+      "en": "plan",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "sera": {
+      "en": "will be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Future form of être."
+    },
+    "réexaminé": {
+      "en": "reviewed again",
+      "pos": "verb",
+      "lemma": "réexaminer",
+      "note": "Past participle of réexaminer."
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "trimestre": {
+      "en": "term; three-month period",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "car": {
+      "en": "because; for",
+      "pos": "connector",
+      "note": "Introduces a reason or explanation."
+    },
+    "inscriptions": {
+      "en": "registrations",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "inscription",
+      "note": "Plural of inscription."
+    },
+    "contraintes": {
+      "en": "constraints",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "contrainte",
+      "note": "Plural of contrainte."
+    },
+    "peuvent": {
+      "en": "can; are able to",
+      "pos": "verb",
+      "lemma": "pouvoir",
+      "note": "Present form of pouvoir."
+    },
+    "évoluer": {
+      "en": "to change; to evolve",
+      "pos": "verb",
+      "lemma": "évoluer",
+      "note": "Infinitive."
+    },
+    "cette": {
+      "en": "this",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "ce",
+      "note": "Feminine singular demonstrative."
+    },
+    "méthode": {
+      "en": "method",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "satisfait": {
+      "en": "satisfied",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "satisfait",
+      "note": "Masculine singular form."
+    },
+    "pas": {
+      "en": "not"
+    },
+    "toutes": {
+      "en": "all",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "tout",
+      "note": "Feminine plural form of tout."
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "rend": {
+      "en": "makes; renders",
+      "pos": "verb",
+      "lemma": "rendre",
+      "note": "Present form of rendre."
+    },
+    "arbitrages": {
+      "en": "trade-off; allocation decisions",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "arbitrage",
+      "note": "Plural of arbitrage."
+    },
+    "compréhensibles": {
+      "en": "understandable",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "compréhensible",
+      "note": "Plural adjective; same spelling for masculine and feminine."
+    },
+    "révisables": {
+      "en": "open to revision",
+      "pos": "adjective",
+      "number": "plural",
+      "lemma": "révisable",
+      "note": "Plural form; same spelling for masculine and feminine."
+    }
+  },
+  "keywords": [
+    "salles",
+    "critères",
+    "proposition",
+    "programmes",
+    "participants"
+  ],
+  "quiz": [
+    {
+      "prompt": "What flaw did the first proposal have?",
+      "options": [
+        "It counted participants but ignored flexibility.",
+        "It left all rooms empty.",
+        "It reserved every evening slot.",
+        "It gave priority to accessibility alone."
+      ],
+      "answer": 0,
+      "explain": "The first proposal favoured larger programs without considering flexibility."
+    },
+    {
+      "prompt": "Why does the calendar include equipment storage?",
+      "options": [
+        "Two activities agree to share a room.",
+        "The association has extra rooms.",
+        "The programs are being cancelled.",
+        "The evening slot is assigned permanently."
+      ],
+      "answer": 0,
+      "explain": "Sharing works only if storage time is planned too."
+    },
+    {
+      "prompt": "Why will the plan be reviewed after a term?",
+      "options": [
+        "Registrations and constraints may change.",
+        "The criteria will be deleted.",
+        "The rooms will close.",
+        "Every request is already satisfied."
+      ],
+      "answer": 0,
+      "explain": "The association expects needs and constraints to evolve."
+    }
+  ]
+}

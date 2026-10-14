@@ -1,0 +1,72 @@
+{
+  "id": "b2-u10-tcf",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Mina propose une ouverture en soirée, tandis que Louis s'inquiète des trajets tardifs. Ils s'entendent toutefois sur la nécessité de demander l'avis des usagers.",
+      "question": "What do Mina and Louis agree on?",
+      "options": [
+        "Choosing one final proposal today",
+        "Asking users for their views",
+        "Ending public transport",
+        "Opening the room every night"
+      ],
+      "answer": 1,
+      "explain": "They agree on consulting users."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Nous avons parlé des horaires. Nous en reparlerons après avoir reçu les commentaires.",
+      "question": "What does en refer to?",
+      "options": [
+        "The deadline",
+        "The comments",
+        "The room",
+        "The schedules"
+      ],
+      "answer": 3,
+      "explain": "En parler refers back to des horaires."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the agreed next step?",
+      "options": [
+        "Collect feedback after the first month",
+        "Remove transport from the discussion",
+        "End the learning space",
+        "Choose Mina's proposal immediately"
+      ],
+      "answer": 0,
+      "explain": "The group plans to gather feedback after the first month.",
+      "promptFr": "Le groupe a examiné trois propositions pour l'espace d'apprentissage. Mina souhaite des heures du soir; Louis insiste sur les correspondances de transport; Chen propose un essai limité. Les participants s'entendent sur un point : l'accès doit être évalué à différents moments. Le compte rendu ne désigne pas encore de solution finale. Il prévoit de recueillir des commentaires après le premier mois et de revenir ensuite aux options étudiées."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why might a writer repeat a noun instead of using y?",
+      "options": [
+        "To make a claim sound certain",
+        "To prevent an unclear reference",
+        "To remove a point of view",
+        "To avoid naming the proposal"
+      ],
+      "answer": 1,
+      "explain": "Repeating the noun can make the reference clear.",
+      "promptFr": "Dans le résumé, le pronom y renvoie à la proposition d'essai mentionnée dans la phrase précédente. Comme le texte présente aussi une salle, répéter le nom aurait été plus clair si les deux références avaient pu être confondues."
+    }
+  ]
+}

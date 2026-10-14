@@ -1,0 +1,72 @@
+{
+  "id": "b1-u10-dialogues",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Calling about an event",
+      "body": "A learner asks an organizer about details missing from a fictional notice.",
+      "examples": [
+        {
+          "fr": "Bonjour, je vous appelle au sujet de la rencontre de samedi.",
+          "en": "Amina: Hello, I am calling about Saturday's meeting."
+        },
+        {
+          "fr": "Oui, comment puis-je vous aider ?",
+          "en": "Organisateur: Yes, how can I help you?"
+        },
+        {
+          "fr": "Pourriez-vous me dire par quelle entrée il faut arriver ?",
+          "en": "Amina: Could you tell me which entrance we should use?"
+        },
+        {
+          "fr": "La porte nord, près de l'arrêt d'autobus.",
+          "en": "Organisateur: The north door, near the bus stop."
+        },
+        {
+          "fr": "Si j'ai bien compris, l'inscription se fait à l'accueil en arrivant ?",
+          "en": "Amina: If I understood correctly, registration takes place at reception when we arrive?"
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Responding to a changed detail",
+      "body": "The organizer gives new information that requires a follow-up.",
+      "examples": [
+        {
+          "fr": "J'ai vu que l'activité commençait à dix heures.",
+          "en": "Sam: I saw that the activity started at ten."
+        },
+        {
+          "fr": "L'heure a changé; elle commencera à dix heures trente.",
+          "en": "Organisatrice: The time changed; it will start at ten thirty."
+        },
+        {
+          "fr": "Merci de me l'avoir précisé. Le matériel nécessaire est-il le même ?",
+          "en": "Sam: Thank you for clarifying. Is the required equipment the same?"
+        },
+        {
+          "fr": "Oui, apportez votre cahier.",
+          "en": "Organisatrice: Yes, bring your notebook."
+        },
+        {
+          "fr": "D'accord. Je vais noter la nouvelle heure et prévenir mon collègue.",
+          "en": "Sam: Okay. I will note the new time and let my colleague know."
+        }
+      ]
+    }
+  ]
+}

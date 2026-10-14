@@ -1,0 +1,387 @@
+{
+  "id": "b2-un-budget-qui-resiste-aux-raccourcis",
+  "title": "Un budget qui résiste aux raccourcis",
+  "titleEn": "A budget that resists shortcuts",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "A household compares two ways to reduce monthly costs and asks whether the apparent saving shifts costs elsewhere.",
+  "unit": "b2-u09",
+  "sentences": [
+    {
+      "fr": "Dans un exemple de budget fictif, la famille de Leïla a comparé deux options de transport pour les déplacements du mois.",
+      "en": "In a fictional budget example, Leïla's family compared two transport options for the month's trips."
+    },
+    {
+      "fr": "Un abonnement coûtait quatre-vingt-dix dollars; les billets achetés séparément auraient coûté environ cent douze dollars.",
+      "en": "A pass cost ninety dollars; tickets bought separately would have cost about one hundred twelve dollars."
+    },
+    {
+      "fr": "À première vue, l'abonnement semblait donc permettre une économie de vingt-deux dollars.",
+      "en": "At first glance, the pass therefore appeared to save twenty-two dollars."
+    },
+    {
+      "fr": "Toutefois, le calcul ne comprenait pas deux déplacements exceptionnels que la famille aurait dû faire en voiture.",
+      "en": "However, the calculation did not include two unusual trips the family would have had to make by car."
+    },
+    {
+      "fr": "Leïla a ajouté le coût estimé de ces trajets et a vérifié si l'abonnement couvrait les zones nécessaires.",
+      "en": "Leïla added the estimated cost of those trips and checked whether the pass covered the required zones."
+    },
+    {
+      "fr": "L'écart devenait plus petit, mais l'abonnement restait intéressant pour les semaines où toute la famille utilisait le transport collectif.",
+      "en": "The difference became smaller, but the pass remained useful for weeks when the whole family used public transit."
+    },
+    {
+      "fr": "Ils ont choisi de revoir leurs dépenses après un mois plutôt que de traiter l'estimation initiale comme une économie certaine.",
+      "en": "They chose to review their expenses after one month rather than treat the initial estimate as a guaranteed saving.",
+      "note": "A saving estimate depends on what is included; check extra costs and usage conditions before treating a headline difference as real savings."
+    }
+  ],
+  "words": {
+    "dans": {
+      "en": "in",
+      "sound": "dah(n)"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "exemple": {
+      "en": "an example"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "budget": {
+      "en": "budget"
+    },
+    "fictif": {
+      "en": "fictional"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "famille": {
+      "en": "family"
+    },
+    "leïla": {
+      "en": "Leïla (a woman's name)"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "comparé": {
+      "en": "compared"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "options": {
+      "en": "options"
+    },
+    "transport": {
+      "en": "transport; transit"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "déplacements": {
+      "en": "trips; commutes"
+    },
+    "du": {
+      "en": "some; of the",
+      "pos": "contraction"
+    },
+    "mois": {
+      "en": "month; months"
+    },
+    "abonnement": {
+      "en": "pass; subscription"
+    },
+    "coûtait": {
+      "en": "cost"
+    },
+    "quatre-vingt-dix": {
+      "en": "ninety"
+    },
+    "dollars": {
+      "en": "dollars"
+    },
+    "billets": {
+      "en": "tickets"
+    },
+    "achetés": {
+      "en": "bought"
+    },
+    "séparément": {
+      "en": "separately"
+    },
+    "auraient": {
+      "en": "would have"
+    },
+    "coûté": {
+      "en": "cost"
+    },
+    "environ": {
+      "en": "about; approximately"
+    },
+    "cent": {
+      "en": "cent"
+    },
+    "douze": {
+      "en": "twelve"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "première": {
+      "en": "first"
+    },
+    "vue": {
+      "en": "view; glance"
+    },
+    "l'abonnement": {
+      "en": "the pass; the subscription"
+    },
+    "semblait": {
+      "en": "seemed"
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "permettre": {
+      "en": "to allow",
+      "sound": "pehr-MEHTR"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "économie": {
+      "en": "saving; economy"
+    },
+    "vingt-deux": {
+      "en": "twenty-two"
+    },
+    "toutefois": {
+      "en": "however"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "calcul": {
+      "en": "calculation"
+    },
+    "ne": {
+      "en": "not (part of ne ... pas)",
+      "pos": "adverb"
+    },
+    "comprenait": {
+      "en": "included"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "exceptionnels": {
+      "en": "unusual; exceptional"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "aurait": {
+      "en": "would have"
+    },
+    "dû": {
+      "en": "had to; owed"
+    },
+    "faire": {
+      "en": "to do; to make"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "voiture": {
+      "en": "car"
+    },
+    "ajouté": {
+      "en": "added"
+    },
+    "coût": {
+      "en": "cost"
+    },
+    "estimé": {
+      "en": "estimated"
+    },
+    "ces": {
+      "en": "these; those",
+      "pos": "determiner"
+    },
+    "trajets": {
+      "en": "trips; commutes"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "vérifié": {
+      "en": "checked"
+    },
+    "si": {
+      "en": "if",
+      "pos": "connector"
+    },
+    "couvrait": {
+      "en": "covered"
+    },
+    "zones": {
+      "en": "zones; areas"
+    },
+    "nécessaires": {
+      "en": "necessary"
+    },
+    "l'écart": {
+      "en": "a gap; a difference"
+    },
+    "devenait": {
+      "en": "was becoming"
+    },
+    "plus": {
+      "en": "more",
+      "sound": "plü"
+    },
+    "petit": {
+      "en": "small, short",
+      "sound": "puh-TEE"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "restait": {
+      "en": "remained"
+    },
+    "intéressant": {
+      "en": "interesting"
+    },
+    "semaines": {
+      "en": "weeks"
+    },
+    "où": {
+      "en": "where",
+      "sound": "oo"
+    },
+    "toute": {
+      "en": "all; whole"
+    },
+    "utilisait": {
+      "en": "used"
+    },
+    "collectif": {
+      "en": "collective; public"
+    },
+    "ils": {
+      "en": "they",
+      "sound": "eel"
+    },
+    "ont": {
+      "en": "have (avoir)",
+      "pos": "verb"
+    },
+    "choisi": {
+      "en": "chose"
+    },
+    "revoir": {
+      "en": "to review; to see again"
+    },
+    "leurs": {
+      "en": "their (plural)",
+      "pos": "possessive"
+    },
+    "dépenses": {
+      "en": "expenses"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "plutôt": {
+      "en": "rather; instead"
+    },
+    "traiter": {
+      "en": "to process; handle",
+      "sound": "treh-TAY"
+    },
+    "l'estimation": {
+      "en": "the estimate"
+    },
+    "initiale": {
+      "en": "initial"
+    },
+    "comme": {
+      "en": "as; like; since"
+    },
+    "certaine": {
+      "en": "certain; some"
+    }
+  },
+  "keywords": [
+    "budget",
+    "transport",
+    "abonnement",
+    "billets",
+    "économie",
+    "calcul",
+    "dépenses",
+    "trajets"
+  ],
+  "quiz": [
+    {
+      "prompt": "What was the apparent difference between the pass and separate tickets?",
+      "options": [
+        "One hundred twelve dollars",
+        "Ninety dollars",
+        "Twenty-two dollars",
+        "Two dollars"
+      ],
+      "answer": 2,
+      "explain": "The text compares $90 with about $112, a difference of $22."
+    },
+    {
+      "prompt": "What had the first calculation left out?",
+      "options": [
+        "The number of days in a month",
+        "Two unusual trips the family might need to make by car",
+        "The cost of the pass",
+        "The price of each separate ticket"
+      ],
+      "answer": 1,
+      "explain": "The fourth sentence names the trips missing from the calculation."
+    },
+    {
+      "prompt": "What did the family decide to do?",
+      "options": [
+        "Assume the first estimate was guaranteed",
+        "Buy a car immediately",
+        "Stop comparing transport costs",
+        "Review actual expenses after a month"
+      ],
+      "answer": 3,
+      "explain": "The final sentence describes a review after one month."
+    }
+  ]
+}

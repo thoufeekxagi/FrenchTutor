@@ -1,0 +1,148 @@
+{
+  "id": "b1-u11-words-2",
+  "unit": "b1-u11",
+  "unitTitle": "B1 · TCF writing Task 2: recount, comment and support",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 11: B1 · TCF writing Task 2: recount, comment and support",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une révision",
+      "en": "a revision",
+      "sound": "ün ray-vee-ZYOH(N)",
+      "exampleFr": "La révision a corrigé une confusion de date.",
+      "exampleEn": "The revision corrected a date confusion."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un accord",
+      "en": "agreement",
+      "sound": "uh(n) ah-KOR",
+      "exampleFr": "L'accord du participe passé se vérifie après le brouillon.",
+      "exampleEn": "Past-participle agreement is checked after the draft."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "relater",
+      "en": "to recount",
+      "sound": "ruh-lah-TAY",
+      "exampleFr": "Elle relate une expérience de bénévolat.",
+      "exampleEn": "She recounts a volunteer experience."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "justifier",
+      "en": "to justify",
+      "sound": "zhüs-tee-FYAY",
+      "exampleFr": "Il justifie sa décision par un exemple.",
+      "exampleEn": "He justifies his decision with an example."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "réviser",
+      "en": "to revise",
+      "sound": "ray-vee-ZAY",
+      "exampleFr": "Je révise mon texte après avoir vérifié les consignes.",
+      "exampleEn": "I revise my text after checking the instructions."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "cohérent",
+      "en": "coherent",
+      "sound": "koh-ay-RAH(N)",
+      "exampleFr": "Le récit reste cohérent du début à la fin.",
+      "exampleEn": "The account remains coherent from beginning to end."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une révision",
+      "options": [
+        "to justify",
+        "a revision",
+        "agreement",
+        "to recount"
+      ],
+      "answer": 1,
+      "explain": "une révision means a revision."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un accord",
+      "options": [
+        "to revise",
+        "to recount",
+        "to justify",
+        "agreement"
+      ],
+      "answer": 3,
+      "explain": "un accord means agreement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "relater",
+      "options": [
+        "coherent",
+        "to recount",
+        "to justify",
+        "to revise"
+      ],
+      "answer": 1,
+      "explain": "relater means to recount."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "justifier",
+      "options": [
+        "a revision",
+        "to revise",
+        "coherent",
+        "to justify"
+      ],
+      "answer": 3,
+      "explain": "justifier means to justify."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "réviser",
+      "options": [
+        "agreement",
+        "to revise",
+        "coherent",
+        "a revision"
+      ],
+      "answer": 1,
+      "explain": "réviser means to revise."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "cohérent",
+      "options": [
+        "to recount",
+        "a revision",
+        "agreement",
+        "coherent"
+      ],
+      "answer": 3,
+      "explain": "cohérent means coherent."
+    }
+  ]
+}

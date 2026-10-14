@@ -1,0 +1,148 @@
+{
+  "id": "b2-u04-words-4",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une voie de circulation",
+      "en": "a traffic lane; route",
+      "sound": "ün vwah duh sehr-kü-lah-SYOH(N)",
+      "exampleFr": "Une voie de circulation sera réservée aux autobus.",
+      "exampleEn": "A traffic lane will be reserved for buses."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "la capacité d'accueil",
+      "en": "capacity; ability to accommodate",
+      "sound": "lah kah-pah-see-TAY dah-KUHY",
+      "exampleFr": "La capacité d'accueil du centre reste limitée.",
+      "exampleEn": "The centre's capacity remains limited."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une nuisance sonore",
+      "en": "noise nuisance",
+      "sound": "ün nü-ee-ZAHNS soh-NOR",
+      "exampleFr": "Les résidents signalent une nuisance sonore le soir.",
+      "exampleEn": "Residents report a noise nuisance in the evening."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une réglementation municipale",
+      "en": "a municipal regulation",
+      "sound": "ün ray-gleh-mahn-tah-SYOH(N) mü-nee-see-PAHL",
+      "exampleFr": "La proposition doit respecter la réglementation municipale.",
+      "exampleEn": "The proposal must comply with municipal regulations."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une concertation publique",
+      "en": "a public consultation",
+      "sound": "ün kohn-sehr-tah-SYOH(N) pü-BLEEK",
+      "exampleFr": "Une concertation publique précède la décision finale.",
+      "exampleEn": "A public consultation precedes the final decision."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un bénéfice collectif",
+      "en": "a collective benefit",
+      "sound": "uh(n) bay-nay-fees koh-lehk-TEEF",
+      "exampleFr": "Le comité cherche un bénéfice collectif à long terme.",
+      "exampleEn": "The committee is looking for a long-term collective benefit."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une voie de circulation",
+      "options": [
+        "a municipal regulation",
+        "a traffic lane; route",
+        "capacity; ability to accommodate",
+        "noise nuisance"
+      ],
+      "answer": 1,
+      "explain": "une voie de circulation means a traffic lane; route."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "la capacité d'accueil",
+      "options": [
+        "a public consultation",
+        "noise nuisance",
+        "a municipal regulation",
+        "capacity; ability to accommodate"
+      ],
+      "answer": 3,
+      "explain": "la capacité d'accueil means capacity; ability to accommodate."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une nuisance sonore",
+      "options": [
+        "a collective benefit",
+        "noise nuisance",
+        "a municipal regulation",
+        "a public consultation"
+      ],
+      "answer": 1,
+      "explain": "une nuisance sonore means noise nuisance."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une réglementation municipale",
+      "options": [
+        "a traffic lane; route",
+        "a public consultation",
+        "a collective benefit",
+        "a municipal regulation"
+      ],
+      "answer": 3,
+      "explain": "une réglementation municipale means a municipal regulation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une concertation publique",
+      "options": [
+        "capacity; ability to accommodate",
+        "a public consultation",
+        "a collective benefit",
+        "a traffic lane; route"
+      ],
+      "answer": 1,
+      "explain": "une concertation publique means a public consultation."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un bénéfice collectif",
+      "options": [
+        "noise nuisance",
+        "a traffic lane; route",
+        "capacity; ability to accommodate",
+        "a collective benefit"
+      ],
+      "answer": 3,
+      "explain": "un bénéfice collectif means a collective benefit."
+    }
+  ]
+}

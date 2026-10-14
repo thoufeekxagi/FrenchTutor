@@ -1,0 +1,166 @@
+{
+  "id": "a2-u07-words-3",
+  "unit": "a2-u07",
+  "unitTitle": "Health appointments and getting help",
+  "title": "Words: describe a concern without diagnosing it",
+  "subtitle": "A2 · Unit 7: Health appointments and getting help",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un symptôme nouveau",
+      "en": "a new symptom",
+      "sound": "uh(n) sa(n)p-TOHM noo-VOH",
+      "exampleFr": "Je décris un symptôme nouveau au professionnel.",
+      "exampleEn": "I describe a new symptom to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une douleur persistante",
+      "en": "persistent pain",
+      "sound": "ün doo-LUHR pehr-sees-TAH(N)t",
+      "exampleFr": "Je décris une douleur persistante au professionnel.",
+      "exampleEn": "I describe persistent pain to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une sensation de brûlure",
+      "en": "a burning sensation",
+      "sound": "ün sah(n)-sah-SYOH(N) duh brü-LÜHR",
+      "exampleFr": "Je décris une sensation de brûlure au professionnel.",
+      "exampleEn": "I describe a burning sensation to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une réaction allergique",
+      "en": "an allergic reaction",
+      "sound": "ün ray-ak-SYOH(N) ah-lehr-ZHEEK",
+      "exampleFr": "Je décris une réaction allergique au professionnel.",
+      "exampleEn": "I describe an allergic reaction to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une gêne légère",
+      "en": "mild discomfort",
+      "sound": "ün zhehn lay-ZHEHR",
+      "exampleFr": "Je décris une gêne légère au professionnel.",
+      "exampleEn": "I describe mild discomfort to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un changement récent",
+      "en": "a recent change",
+      "sound": "uh(n) shahnzh-MAH(N) ray-SAH(N)",
+      "exampleFr": "Je décris un changement récent au professionnel.",
+      "exampleEn": "I describe a recent change to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w7",
+      "fr": "une amélioration",
+      "en": "an improvement",
+      "sound": "ün ah-may-lyoh-rah-SYOH(N)",
+      "exampleFr": "Je décris une amélioration au professionnel.",
+      "exampleEn": "I describe an improvement to the professional."
+    },
+    {
+      "type": "word",
+      "id": "w8",
+      "fr": "une aggravation",
+      "en": "a worsening",
+      "sound": "ün ah-grah-vah-SYOH(N)",
+      "exampleFr": "Je décris une aggravation au professionnel.",
+      "exampleEn": "I describe a worsening to the professional."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un symptôme nouveau",
+      "options": [
+        "an allergic reaction",
+        "a new symptom",
+        "an improvement",
+        "persistent pain"
+      ],
+      "answer": 1,
+      "explain": "un symptôme nouveau means a new symptom."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une douleur persistante",
+      "options": [
+        "mild discomfort",
+        "a worsening",
+        "a burning sensation",
+        "persistent pain"
+      ],
+      "answer": 3,
+      "explain": "une douleur persistante means persistent pain."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une sensation de brûlure",
+      "options": [
+        "a recent change",
+        "a burning sensation",
+        "a new symptom",
+        "an allergic reaction"
+      ],
+      "answer": 1,
+      "explain": "une sensation de brûlure means a burning sensation."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une réaction allergique",
+      "options": [
+        "an improvement",
+        "persistent pain",
+        "mild discomfort",
+        "an allergic reaction"
+      ],
+      "answer": 3,
+      "explain": "une réaction allergique means an allergic reaction."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une gêne légère",
+      "options": [
+        "a worsening",
+        "mild discomfort",
+        "a burning sensation",
+        "a recent change"
+      ],
+      "answer": 1,
+      "explain": "une gêne légère means mild discomfort."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un changement récent",
+      "options": [
+        "a new symptom",
+        "an allergic reaction",
+        "an improvement",
+        "a recent change"
+      ],
+      "answer": 3,
+      "explain": "un changement récent means a recent change."
+    }
+  ]
+}

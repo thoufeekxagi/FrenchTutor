@@ -1,0 +1,148 @@
+{
+  "id": "b2-u03-words-3",
+  "unit": "b2-u03",
+  "unitTitle": "B2 · Work and study decisions: describe relationships precisely",
+  "title": "Words: core topic language — set 3",
+  "subtitle": "B2 · Unit 3: B2 · Work and study decisions: describe relationships precisely",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une qualification",
+      "en": "a qualification; credential",
+      "sound": "ün kah-lee-fee-kah-SYOH(N)",
+      "exampleFr": "Cette qualification est reconnue dans plusieurs secteurs.",
+      "exampleEn": "This qualification is recognized in several fields."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "le marché du travail",
+      "en": "the labour market",
+      "sound": "luh mar-SHAY dü trah-VAI",
+      "exampleFr": "Le marché du travail évolue dans cette région.",
+      "exampleEn": "The labour market is changing in this region."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une promotion",
+      "en": "a promotion",
+      "sound": "ün proh-moh-SYOH(N)",
+      "exampleFr": "Une promotion dépend aussi des besoins de l'équipe.",
+      "exampleEn": "A promotion also depends on the team's needs."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un poste permanent",
+      "en": "a permanent position",
+      "sound": "uh(n) pohst pehr-mah-NAHN",
+      "exampleFr": "Le poste permanent exige une expérience pertinente.",
+      "exampleEn": "The permanent position requires relevant experience."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une période probatoire",
+      "en": "a probationary period",
+      "sound": "ün pay-ree-ohd proh-bah-TWAHR",
+      "exampleFr": "Le contrat prévoit une période probatoire de trois mois.",
+      "exampleEn": "The contract provides for a three-month probationary period."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une mobilité interne",
+      "en": "internal mobility",
+      "sound": "ün moh-bee-lee-TAY ehn-TEHRN",
+      "exampleFr": "La mobilité interne permet de changer d'équipe.",
+      "exampleEn": "Internal mobility makes it possible to change teams."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une qualification",
+      "options": [
+        "a permanent position",
+        "a qualification; credential",
+        "the labour market",
+        "a promotion"
+      ],
+      "answer": 1,
+      "explain": "une qualification means a qualification; credential."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "le marché du travail",
+      "options": [
+        "a probationary period",
+        "a promotion",
+        "a permanent position",
+        "the labour market"
+      ],
+      "answer": 3,
+      "explain": "le marché du travail means the labour market."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une promotion",
+      "options": [
+        "internal mobility",
+        "a promotion",
+        "a permanent position",
+        "a probationary period"
+      ],
+      "answer": 1,
+      "explain": "une promotion means a promotion."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un poste permanent",
+      "options": [
+        "a qualification; credential",
+        "a probationary period",
+        "internal mobility",
+        "a permanent position"
+      ],
+      "answer": 3,
+      "explain": "un poste permanent means a permanent position."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une période probatoire",
+      "options": [
+        "the labour market",
+        "a probationary period",
+        "internal mobility",
+        "a qualification; credential"
+      ],
+      "answer": 1,
+      "explain": "une période probatoire means a probationary period."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une mobilité interne",
+      "options": [
+        "a promotion",
+        "a qualification; credential",
+        "the labour market",
+        "internal mobility"
+      ],
+      "answer": 3,
+      "explain": "une mobilité interne means internal mobility."
+    }
+  ]
+}

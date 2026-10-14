@@ -1,0 +1,42 @@
+{
+  "id": "a2-u08-write-speak",
+  "unit": "a2-u08",
+  "unitTitle": "Ask, answer and follow up at work or school",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 8: Ask, answer and follow up at work or school",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Confirm who will handle each document",
+      "body": "Write 60–90 French words to a classmate or colleague. Name two project documents, say who will review or send each one and give a deadline. Use le, la or les at least three times with clear references. This is an original practice message, not an official TCF task.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour Nadia, La formatrice demande le compte rendu et la présentation de groupe. Je vais le relire avant midi, puis Sam va la corriger avec le tuteur. Les documents sont dans le dossier de projet; nous allons les classer par date. Je vais enregistrer la version finale et l'envoyer au comité vendredi. La liste de corrections est prête; Nadia va la joindre au brouillon. Merci, Karim\n\nCheck:\n• Name the noun before using a pronoun so its reference is clear.\n• Match le, la or les to the noun's gender and number.\n• Place the pronoun before the conjugated verb or before the infinitive after aller.\n• Give each person a clear action and include a deadline.\n• Count 60–90 words and rewrite the message with two different documents tomorrow."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Tell Marie who will review each item",
+      "body": "Explain a small work or class project to Marie. Name two documents, say who will review or send each one and when it is due. Use le, la and les with clear references. Marie asks which document you mean once; clarify and retry with a different project.\n\n• Say the document name first when a listener might not know what le, la or les refers to.\n• Keep each pronoun close to its verb: je la corrige; je vais la corriger.\n• Use the noun's gender and number, not the gender of the person doing the task.\n• On the retry, change the documents and the deadline and clarify one reference without reading."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "La formatrice demande le compte rendu et la présentation. Je vais le relire ce matin. Sam va la corriger cet après-midi.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Les documents sont dans le dossier, et nous allons les envoyer vendredi. La liste de corrections est prête; je vais la joindre au brouillon.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

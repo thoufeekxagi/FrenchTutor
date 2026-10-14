@@ -1,0 +1,399 @@
+{
+  "id": "b2-deux-parcours-dapprentissage",
+  "title": "Deux parcours d'apprentissage",
+  "titleEn": "Two learning paths",
+  "level": "B2",
+  "minutes": 7,
+  "summary": "Two adult learners describe different ways they built confidence, while a facilitator avoids turning either account into a universal rule.",
+  "unit": "b2-u08",
+  "sentences": [
+    {
+      "fr": "Lors d'une rencontre, Awa racontait qu'elle avait repris ses études après plusieurs années loin d'une salle de classe.",
+      "en": "At a meeting, Awa explained that she had returned to study after several years away from a classroom."
+    },
+    {
+      "fr": "Les échanges en petit groupe l'avaient aidée à poser des questions sans craindre de ralentir les autres.",
+      "en": "Small-group discussions had helped her ask questions without fearing she would slow others down."
+    },
+    {
+      "fr": "Marc, qui travaillait à temps plein, disait qu'il avait surtout progressé en lisant pendant ses déplacements.",
+      "en": "Marc, who worked full time, said he had progressed mainly by reading during his commute."
+    },
+    {
+      "fr": "Il avait ensuite rejoint un atelier afin de discuter des idées qu'il comprenait moins bien.",
+      "en": "He had later joined a workshop to discuss ideas he understood less well."
+    },
+    {
+      "fr": "La médiatrice a résumé leurs propos en précisant que leurs parcours et leurs horaires n'étaient pas les mêmes.",
+      "en": "The facilitator summarized their comments, noting that their paths and schedules were not the same."
+    },
+    {
+      "fr": "Tous deux s'accordaient toutefois sur l'importance d'avoir accès à plusieurs façons de pratiquer.",
+      "en": "They did, however, agree on the importance of having access to several ways to practise."
+    },
+    {
+      "fr": "Le compte rendu présentait leurs expériences comme deux exemples utiles, pas comme une méthode garantie pour chaque apprenant.",
+      "en": "The report presented their experiences as two useful examples, not as a guaranteed method for every learner.",
+      "note": "Personal accounts can illustrate possibilities, but they do not establish that one learning method suits every person."
+    }
+  ],
+  "words": {
+    "lors": {
+      "en": "when; during"
+    },
+    "d'une": {
+      "en": "of a; of one (feminine)",
+      "pos": "contraction"
+    },
+    "rencontre": {
+      "en": "meeting"
+    },
+    "awa": {
+      "en": "Awa (a woman's name)"
+    },
+    "racontait": {
+      "en": "was telling; recounted"
+    },
+    "qu'elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "avait": {
+      "en": "had"
+    },
+    "repris": {
+      "en": "resumed; returned to"
+    },
+    "ses": {
+      "en": "his; her (plural noun)",
+      "pos": "possessive"
+    },
+    "études": {
+      "en": "studies"
+    },
+    "après": {
+      "en": "after",
+      "pos": "preposition"
+    },
+    "plusieurs": {
+      "en": "several"
+    },
+    "années": {
+      "en": "years"
+    },
+    "loin": {
+      "en": "far"
+    },
+    "salle": {
+      "en": "room; hall",
+      "pos": "noun, feminine"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "classe": {
+      "en": "class; classroom",
+      "pos": "noun, feminine"
+    },
+    "les": {
+      "en": "the (plural); them",
+      "pos": "article / pronoun"
+    },
+    "échanges": {
+      "en": "exchanges; discussions"
+    },
+    "en": {
+      "en": "in; of it; some",
+      "pos": "preposition / pronoun"
+    },
+    "petit": {
+      "en": "small, short",
+      "sound": "puh-TEE"
+    },
+    "groupe": {
+      "en": "group"
+    },
+    "l'avaient": {
+      "en": "had it; had them"
+    },
+    "aidée": {
+      "en": "helped"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "poser": {
+      "en": "to ask; to put"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "questions": {
+      "en": "questions"
+    },
+    "sans": {
+      "en": "without",
+      "sound": "sah(n)"
+    },
+    "craindre": {
+      "en": "to fear"
+    },
+    "ralentir": {
+      "en": "to slow down"
+    },
+    "autres": {
+      "en": "others"
+    },
+    "marc": {
+      "en": "Marc (a man's name)"
+    },
+    "qui": {
+      "en": "who",
+      "sound": "kee"
+    },
+    "travaillait": {
+      "en": "worked"
+    },
+    "temps": {
+      "en": "weather"
+    },
+    "plein": {
+      "en": "full; full-time"
+    },
+    "disait": {
+      "en": "said; was saying"
+    },
+    "qu'il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "surtout": {
+      "en": "especially; above all"
+    },
+    "progressé": {
+      "en": "made progress"
+    },
+    "lisant": {
+      "en": "reading; while reading"
+    },
+    "pendant": {
+      "en": "during; while"
+    },
+    "déplacements": {
+      "en": "trips; commutes"
+    },
+    "il": {
+      "en": "he, it",
+      "sound": "eel"
+    },
+    "ensuite": {
+      "en": "then, next",
+      "sound": "ah(n)-SWEET"
+    },
+    "rejoint": {
+      "en": "joined"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "atelier": {
+      "en": "a workshop"
+    },
+    "afin": {
+      "en": "in order to; so that"
+    },
+    "discuter": {
+      "en": "to discuss"
+    },
+    "idées": {
+      "en": "ideas"
+    },
+    "comprenait": {
+      "en": "included"
+    },
+    "moins": {
+      "en": "minus, below zero",
+      "sound": "mwa(n)"
+    },
+    "bien": {
+      "en": "well",
+      "pos": "adverb"
+    },
+    "la": {
+      "en": "the",
+      "sound": "lah"
+    },
+    "médiatrice": {
+      "en": "facilitator; mediator"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "résumé": {
+      "en": "summary"
+    },
+    "leurs": {
+      "en": "their (plural)",
+      "pos": "possessive"
+    },
+    "propos": {
+      "en": "comments; remarks"
+    },
+    "précisant": {
+      "en": "noting; specifying"
+    },
+    "que": {
+      "en": "what",
+      "sound": "kuh"
+    },
+    "parcours": {
+      "en": "a pathway; a career or study route"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "horaires": {
+      "en": "schedules"
+    },
+    "n'étaient": {
+      "en": "were not"
+    },
+    "pas": {
+      "en": "not",
+      "pos": "adverb"
+    },
+    "mêmes": {
+      "en": "same"
+    },
+    "tous": {
+      "en": "all, everyone",
+      "sound": "toos"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "s'accordaient": {
+      "en": "agreed"
+    },
+    "toutefois": {
+      "en": "however"
+    },
+    "sur": {
+      "en": "on; about",
+      "pos": "preposition"
+    },
+    "l'importance": {
+      "en": "the importance"
+    },
+    "d'avoir": {
+      "en": "to have",
+      "sound": "ah-VWAHR"
+    },
+    "accès": {
+      "en": "access"
+    },
+    "façons": {
+      "en": "ways; manners"
+    },
+    "pratiquer": {
+      "en": "to practise"
+    },
+    "le": {
+      "en": "the (masculine); him; it",
+      "pos": "article / pronoun"
+    },
+    "compte": {
+      "en": "an account; report"
+    },
+    "rendu": {
+      "en": "report; made"
+    },
+    "présentait": {
+      "en": "presented"
+    },
+    "expériences": {
+      "en": "experiences"
+    },
+    "comme": {
+      "en": "as; like; since"
+    },
+    "exemples": {
+      "en": "examples"
+    },
+    "utiles": {
+      "en": "useful"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "méthode": {
+      "en": "method"
+    },
+    "garantie": {
+      "en": "guarantee"
+    },
+    "pour": {
+      "en": "for; in order to",
+      "pos": "preposition"
+    },
+    "chaque": {
+      "en": "each; every"
+    },
+    "apprenant": {
+      "en": "learner"
+    }
+  },
+  "keywords": [
+    "rencontre",
+    "études",
+    "échanges",
+    "questions",
+    "déplacements",
+    "atelier",
+    "horaires",
+    "expériences"
+  ],
+  "quiz": [
+    {
+      "prompt": "What helped Awa ask questions?",
+      "options": [
+        "A change in the workshop topic",
+        "Small-group discussions",
+        "A shorter work week",
+        "Reading during a commute"
+      ],
+      "answer": 1,
+      "explain": "The second sentence says the small-group discussions helped her."
+    },
+    {
+      "prompt": "How did Marc combine his learning activities?",
+      "options": [
+        "He read during his commute and later joined a workshop",
+        "He stopped working and studied all day",
+        "He joined two classrooms at the same time",
+        "He avoided discussing difficult ideas"
+      ],
+      "answer": 0,
+      "explain": "The third and fourth sentences explain Marc's two activities."
+    },
+    {
+      "prompt": "What did the facilitator avoid claiming?",
+      "options": [
+        "That both valued practice options",
+        "That Marc worked full time",
+        "That one method was guaranteed to work for every learner",
+        "That Awa returned to study"
+      ],
+      "answer": 2,
+      "explain": "The final sentence limits what the two experiences prove."
+    }
+  ]
+}

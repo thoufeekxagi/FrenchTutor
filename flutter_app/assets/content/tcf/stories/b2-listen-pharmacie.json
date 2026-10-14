@@ -1,0 +1,604 @@
+{
+  "id": "b2-listen-pharmacie",
+  "title": "Une consigne à clarifier",
+  "titleEn": "An instruction that needs clarification",
+  "level": "B2",
+  "mode": "listening",
+  "minutes": 6,
+  "summary": "A patient spots conflicting wording on a pharmacy label, pauses before acting, and asks the pharmacist to confirm the instruction with the prescriber.",
+  "unit": "b2-u10",
+  "sentences": [
+    {
+      "fr": "En lisant l'étiquette d'un médicament, Karim a remarqué que la fréquence indiquée ne correspondait pas au document remis pendant sa consultation.",
+      "en": "While reading a medicine label, Karim noticed that the stated frequency did not match the document given at his appointment."
+    },
+    {
+      "fr": "Il n'a pas essayé de choisir lui-même entre les deux consignes.",
+      "en": "He did not try to choose between the two instructions himself."
+    },
+    {
+      "fr": "Il a appelé la pharmacie et a décrit précisément les deux formulations.",
+      "en": "He called the pharmacy and described both wordings precisely."
+    },
+    {
+      "fr": "La pharmacienne lui a demandé de garder les documents sous les yeux pendant qu'elle vérifiait le dossier.",
+      "en": "The pharmacist asked him to keep the documents nearby while she checked the file."
+    },
+    {
+      "fr": "Comme une information devait être confirmée par le prescripteur, elle lui a expliqué qu'elle rappellerait avant de répondre.",
+      "en": "Because one detail needed confirmation from the prescriber, she explained that she would call back before answering."
+    },
+    {
+      "fr": "Karim a noté le nom de la personne à rappeler et le délai annoncé.",
+      "en": "Karim wrote down the name of the person to call back and the expected time."
+    },
+    {
+      "fr": "La pharmacie l'a rappelé plus tard avec une consigne confirmée et lui a demandé de suivre l'information validée.",
+      "en": "The pharmacy called back later with a confirmed instruction and asked him to follow the verified information."
+    },
+    {
+      "fr": "Karim a conservé la nouvelle étiquette et a demandé qu'on corrige l'ancien document.",
+      "en": "Karim kept the new label and asked for the old document to be corrected."
+    },
+    {
+      "fr": "L'incident lui a rappelé qu'une différence écrite mérite une vérification directe, pas une interprétation rapide.",
+      "en": "The incident reminded him that a written discrepancy calls for direct verification, not a quick interpretation."
+    }
+  ],
+  "words": {
+    "en": {
+      "en": "on, during"
+    },
+    "lisant": {
+      "en": "reading",
+      "pos": "verb",
+      "lemma": "lire",
+      "note": "Present participle of lire."
+    },
+    "l'étiquette": {
+      "en": "label",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "étiquette",
+      "note": "Elided la before a vowel."
+    },
+    "d'un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "médicament": {
+      "en": "medicine; medication",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "médicament"
+    },
+    "karim": {
+      "en": "Karim (a man's name)",
+      "pos": "proper name"
+    },
+    "a": {
+      "en": "has (avoir)",
+      "pos": "verb"
+    },
+    "remarqué": {
+      "en": "noticed",
+      "pos": "verb",
+      "lemma": "remarquer",
+      "note": "Past participle of remarquer."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "la": {
+      "en": "the"
+    },
+    "fréquence": {
+      "en": "frequency",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "fréquence"
+    },
+    "indiquée": {
+      "en": "stated; listed",
+      "pos": "verb",
+      "lemma": "indiquer",
+      "note": "Feminine form of the past participle indiqué."
+    },
+    "ne": {
+      "en": "not (used with pas)"
+    },
+    "correspondait": {
+      "en": "corresponded; matched",
+      "pos": "verb",
+      "lemma": "correspondre",
+      "note": "Imperfect form of correspondre."
+    },
+    "pas": {
+      "en": "not"
+    },
+    "au": {
+      "en": "to the; at the",
+      "pos": "preposition + article",
+      "note": "Contraction of à + le."
+    },
+    "document": {
+      "en": "document",
+      "sound": "luh doh-kü-MAH(N)",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "document"
+    },
+    "remis": {
+      "en": "given; handed over",
+      "pos": "verb",
+      "lemma": "remettre",
+      "note": "Past participle of remettre."
+    },
+    "pendant": {
+      "en": "during; while",
+      "pos": "preposition / connector"
+    },
+    "sa": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Feminine singular noun form."
+    },
+    "consultation": {
+      "en": "consultation; public meeting",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "n'a": {
+      "en": "does not have (ne...a)",
+      "pos": "verb"
+    },
+    "essayé": {
+      "en": "tried",
+      "pos": "verb",
+      "lemma": "essayer",
+      "note": "Past participle of essayer."
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "choisir": {
+      "en": "to choose",
+      "pos": "verb",
+      "lemma": "choisir",
+      "note": "Infinitive."
+    },
+    "lui-même": {
+      "en": "himself",
+      "pos": "reflexive expression",
+      "note": "Lui + même emphasizes the person."
+    },
+    "entre": {
+      "en": "between; among",
+      "pos": "preposition"
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "consignes": {
+      "en": "instructions",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "consigne",
+      "note": "Plural of consigne."
+    },
+    "appelé": {
+      "en": "called (appeler)",
+      "pos": "verb"
+    },
+    "pharmacie": {
+      "en": "pharmacy",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "pharmacie"
+    },
+    "et": {
+      "en": "and"
+    },
+    "décrit": {
+      "en": "describes",
+      "pos": "verb",
+      "lemma": "décrire",
+      "note": "Present form of décrire."
+    },
+    "précisément": {
+      "en": "precisely",
+      "pos": "adverb"
+    },
+    "formulations": {
+      "en": "wordings; formulations",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "plural",
+      "lemma": "formulation",
+      "note": "Plural of formulation."
+    },
+    "pharmacienne": {
+      "en": "pharmacist",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "pharmacien",
+      "note": "Feminine form of pharmacien."
+    },
+    "lui": {
+      "en": "to him; to her",
+      "pos": "pronoun"
+    },
+    "demandé": {
+      "en": "asked; requested",
+      "pos": "verb",
+      "lemma": "demander",
+      "note": "Past participle of demander."
+    },
+    "garder": {
+      "en": "to keep",
+      "pos": "verb",
+      "lemma": "garder",
+      "note": "Infinitive."
+    },
+    "documents": {
+      "en": "document",
+      "sound": "luh doh-kü-MAH(N)",
+      "lemma": "document",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "sous": {
+      "en": "under",
+      "pos": "preposition"
+    },
+    "yeux": {
+      "en": "eyes",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "œil",
+      "note": "Irregular plural of œil."
+    },
+    "qu'elle": {
+      "en": "that she; than she",
+      "pos": "conjunction + pronoun",
+      "note": "Elided que + elle."
+    },
+    "vérifiait": {
+      "en": "was checking",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Imperfect form of vérifier."
+    },
+    "le": {
+      "en": "the"
+    },
+    "dossier": {
+      "en": "file; account record",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "dossier"
+    },
+    "comme": {
+      "en": "as; like; since",
+      "pos": "connector",
+      "note": "Meaning depends on the clause."
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "information": {
+      "en": "information; detail",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "devait": {
+      "en": "had to; was supposed to",
+      "pos": "verb",
+      "lemma": "devoir",
+      "note": "Imperfect form of devoir."
+    },
+    "être": {
+      "en": "to be",
+      "pos": "verb",
+      "lemma": "être",
+      "note": "Infinitive."
+    },
+    "confirmée": {
+      "en": "confirmed",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "confirmé",
+      "note": "Feminine form of confirmé."
+    },
+    "par": {
+      "en": "by"
+    },
+    "prescripteur": {
+      "en": "prescriber",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "prescripteur"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "expliqué": {
+      "en": "explained",
+      "pos": "verb",
+      "lemma": "expliquer",
+      "note": "Past participle of expliquer."
+    },
+    "rappellerait": {
+      "en": "would call back",
+      "pos": "verb",
+      "lemma": "rappeler",
+      "note": "Conditional form of rappeler."
+    },
+    "avant": {
+      "en": "before",
+      "pos": "preposition"
+    },
+    "répondre": {
+      "en": "to answer",
+      "pos": "verb",
+      "lemma": "répondre",
+      "note": "Infinitive."
+    },
+    "noté": {
+      "en": "written down; noted",
+      "pos": "verb",
+      "lemma": "noter",
+      "note": "Past participle of noter."
+    },
+    "nom": {
+      "en": "last name",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "nom"
+    },
+    "personne": {
+      "en": "person",
+      "sound": "lah pehR-SUN",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "personne"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "rappeler": {
+      "en": "to call back; remind",
+      "pos": "verb",
+      "lemma": "rappeler",
+      "note": "Infinitive."
+    },
+    "délai": {
+      "en": "time limit; waiting period",
+      "pos": "noun, masculine",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "délai"
+    },
+    "annoncé": {
+      "en": "announced",
+      "pos": "verb",
+      "lemma": "annoncer",
+      "note": "Past participle of annoncer."
+    },
+    "l'a": {
+      "en": "has it; did it",
+      "pos": "pronoun + verb",
+      "note": "Elided object pronoun l' + third-person singular of avoir."
+    },
+    "rappelé": {
+      "en": "called back; reminded",
+      "pos": "verb",
+      "lemma": "rappeler",
+      "note": "Past participle of rappeler."
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "tard": {
+      "en": "late",
+      "pos": "adverb"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "consigne": {
+      "en": "instruction",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "consigne"
+    },
+    "suivre": {
+      "en": "to follow; to attend",
+      "pos": "verb",
+      "lemma": "suivre",
+      "note": "Infinitive."
+    },
+    "l'information": {
+      "en": "the information",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "information",
+      "note": "Elided la before a vowel."
+    },
+    "validée": {
+      "en": "verified; approved",
+      "pos": "verb",
+      "lemma": "valider",
+      "note": "Feminine form of the past participle validé."
+    },
+    "conservé": {
+      "en": "kept; retained",
+      "pos": "verb",
+      "lemma": "conserver",
+      "note": "Past participle of conserver."
+    },
+    "nouvelle": {
+      "en": "new (feminine)",
+      "pos": "adjective",
+      "sound": "noo-VEL"
+    },
+    "étiquette": {
+      "en": "label",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "étiquette"
+    },
+    "qu'on": {
+      "en": "that one; that people",
+      "pos": "conjunction + pronoun",
+      "note": "Elided que + on."
+    },
+    "corrige": {
+      "en": "corrects",
+      "pos": "verb",
+      "lemma": "corriger",
+      "note": "Present form of corriger."
+    },
+    "l'ancien": {
+      "en": "the former; the old one",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "ancien",
+      "note": "Elided le before a vowel."
+    },
+    "l'incident": {
+      "en": "the incident",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "incident",
+      "note": "Elided le before a vowel."
+    },
+    "qu'une": {
+      "en": "that a; than one",
+      "pos": "contraction",
+      "note": "Elided que + une."
+    },
+    "différence": {
+      "en": "difference; discrepancy",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "écrite": {
+      "en": "written",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "écrit",
+      "note": "Feminine form of écrit."
+    },
+    "mérite": {
+      "en": "deserves; warrants",
+      "pos": "verb",
+      "lemma": "mériter",
+      "note": "Present form of mériter."
+    },
+    "vérification": {
+      "en": "check; verification",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "directe": {
+      "en": "direct",
+      "pos": "adjective",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "direct",
+      "note": "Feminine form of direct."
+    },
+    "interprétation": {
+      "en": "interpretation",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "rapide": {
+      "en": "quick",
+      "pos": "adjective",
+      "lemma": "rapide"
+    }
+  },
+  "keywords": [
+    "étiquette",
+    "consignes",
+    "pharmacienne",
+    "documents",
+    "fréquence"
+  ],
+  "quiz": [
+    {
+      "prompt": "What does Karim notice?",
+      "options": [
+        "The label conflicts with another written instruction.",
+        "The pharmacy is closed.",
+        "The medicine is missing its name.",
+        "The appointment was cancelled."
+      ],
+      "answer": 0,
+      "explain": "He sees that the frequency on the label differs from another document."
+    },
+    {
+      "prompt": "Why does the pharmacist wait before answering?",
+      "options": [
+        "The prescriber must confirm a detail.",
+        "Karim has lost both documents.",
+        "The medicine is out of stock.",
+        "The pharmacy needs a new address."
+      ],
+      "answer": 0,
+      "explain": "She needs to verify one detail with the prescriber."
+    },
+    {
+      "prompt": "What broader lesson does the story state?",
+      "options": [
+        "Verify a written discrepancy directly.",
+        "Always choose the shorter instruction.",
+        "Ignore labels after a consultation.",
+        "Ask a neighbour to interpret medical directions."
+      ],
+      "answer": 0,
+      "explain": "Karim concludes that a written difference should be checked directly."
+    }
+  ]
+}

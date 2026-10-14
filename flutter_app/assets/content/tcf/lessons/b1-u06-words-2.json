@@ -1,0 +1,148 @@
+{
+  "id": "b1-u06-words-2",
+  "unit": "b1-u06",
+  "unitTitle": "B1 · Connect reasons, results and points of contrast",
+  "title": "Words: focus vocabulary — set 2",
+  "subtitle": "B1 · Unit 6: B1 · Connect reasons, results and points of contrast",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une limite",
+      "en": "a limit",
+      "sound": "ün lee-MEET",
+      "exampleFr": "Cette solution a une limite importante.",
+      "exampleEn": "This solution has an important limitation."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un témoignage",
+      "en": "a testimony; personal account",
+      "sound": "uh(n) tay-mwah-NYAHZH",
+      "exampleFr": "Un témoignage décrit l'expérience d'une résidente.",
+      "exampleEn": "A personal account describes a resident's experience."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "entraîner",
+      "en": "to lead to; cause",
+      "sound": "ahn-tray-NAY",
+      "exampleFr": "Le détour peut entraîner un retard.",
+      "exampleEn": "The detour may lead to a delay."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "réduire",
+      "en": "to reduce",
+      "sound": "ray-düür",
+      "exampleFr": "La nouvelle ligne pourrait réduire le temps d'attente.",
+      "exampleEn": "The new route could reduce waiting time."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "afin de",
+      "en": "in order to",
+      "sound": "ah-fah(n) duh",
+      "exampleFr": "Le centre ouvre plus tôt afin de recevoir les participants.",
+      "exampleEn": "The centre opens earlier in order to welcome participants."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "toutefois",
+      "en": "however",
+      "sound": "toot-FWAH",
+      "exampleFr": "Toutefois, le trajet reste long pour certains.",
+      "exampleEn": "However, the commute remains long for some."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une limite",
+      "options": [
+        "to reduce",
+        "a limit",
+        "a testimony; personal account",
+        "to lead to; cause"
+      ],
+      "answer": 1,
+      "explain": "une limite means a limit."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un témoignage",
+      "options": [
+        "in order to",
+        "to lead to; cause",
+        "to reduce",
+        "a testimony; personal account"
+      ],
+      "answer": 3,
+      "explain": "un témoignage means a testimony; personal account."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "entraîner",
+      "options": [
+        "however",
+        "to lead to; cause",
+        "to reduce",
+        "in order to"
+      ],
+      "answer": 1,
+      "explain": "entraîner means to lead to; cause."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "réduire",
+      "options": [
+        "a limit",
+        "in order to",
+        "however",
+        "to reduce"
+      ],
+      "answer": 3,
+      "explain": "réduire means to reduce."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "afin de",
+      "options": [
+        "a testimony; personal account",
+        "in order to",
+        "however",
+        "a limit"
+      ],
+      "answer": 1,
+      "explain": "afin de means in order to."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "toutefois",
+      "options": [
+        "to lead to; cause",
+        "a limit",
+        "a testimony; personal account",
+        "however"
+      ],
+      "answer": 3,
+      "explain": "toutefois means however."
+    }
+  ]
+}

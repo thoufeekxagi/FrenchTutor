@@ -1,0 +1,72 @@
+{
+  "id": "b1-u03-dialogues",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Dialogues",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for each speaker's goal and the detail that changes the exchange. First read for meaning; then cover the English and summarize each person's point."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A different meeting time",
+      "body": "Neighbours consider a fictional earlier meeting.",
+      "examples": [
+        {
+          "fr": "Plusieurs personnes arrivent après le travail.",
+          "en": "Nadia: Several people arrive after work."
+        },
+        {
+          "fr": "Si nous commencions à dix-huit heures, davantage de voisins pourraient venir.",
+          "en": "Omar: If we started at six, more neighbours could come."
+        },
+        {
+          "fr": "Je comprends, mais certains terminent à cette heure-là.",
+          "en": "Nadia: I understand, but some people finish at that time."
+        },
+        {
+          "fr": "On pourrait essayer un samedi matin.",
+          "en": "Omar: We could try a Saturday morning."
+        },
+        {
+          "fr": "Oui, si le centre confirme la salle.",
+          "en": "Nadia: Yes, if the centre confirms the room."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Suggesting a trial",
+      "body": "Classmates discuss a limited change to a study group.",
+      "examples": [
+        {
+          "fr": "Le groupe en ligne convient mieux à mon horaire.",
+          "en": "Lina: The online group fits my schedule better."
+        },
+        {
+          "fr": "Si nous gardions une séance en personne, tout le monde pourrait choisir.",
+          "en": "Sam: If we kept one in-person session, everyone could choose."
+        },
+        {
+          "fr": "Ce serait un bon compromis.",
+          "en": "Lina: That would be a good compromise."
+        },
+        {
+          "fr": "Il faudrait vérifier les disponibilités avant de décider.",
+          "en": "Sam: We would need to check availability before deciding."
+        },
+        {
+          "fr": "Essayons pendant quatre semaines, puis comparons les retours.",
+          "en": "Lina: Let's try for four weeks, then compare the feedback."
+        }
+      ]
+    }
+  ]
+}

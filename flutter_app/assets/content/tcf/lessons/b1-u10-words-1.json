@@ -1,0 +1,148 @@
+{
+  "id": "b1-u10-words-1",
+  "unit": "b1-u10",
+  "unitTitle": "B1 · TCF oral Task 2: get the information you need",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 10: B1 · TCF oral Task 2: get the information you need",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un organisateur",
+      "en": "an organizer",
+      "sound": "uh(n) or-gah-nee-zah-TUHR",
+      "exampleFr": "L'organisateur répondra aux questions à l'accueil.",
+      "exampleEn": "The organizer will answer questions at reception."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une inscription",
+      "en": "registration",
+      "sound": "ün an-skreep-SYOH(N)",
+      "exampleFr": "L'inscription doit être confirmée par téléphone.",
+      "exampleEn": "Registration must be confirmed by phone."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une consigne",
+      "en": "an instruction",
+      "sound": "ün kohn-SEENY",
+      "exampleFr": "Une consigne précise indique où attendre.",
+      "exampleEn": "A clear instruction says where to wait."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un renseignement",
+      "en": "information; detail",
+      "sound": "uh(n) rah(n)-sayn-MAH(N)",
+      "exampleFr": "Je voudrais un renseignement sur l'accès.",
+      "exampleEn": "I would like information about access."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un changement",
+      "en": "a change",
+      "sound": "uh(n) shah(n)zh-MAH(N)",
+      "exampleFr": "Un changement d'heure sera annoncé par courriel.",
+      "exampleEn": "A change of time will be announced by email."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un accès",
+      "en": "access",
+      "sound": "uh(n) ahk-SEH",
+      "exampleFr": "L'accès à la salle se fait par la porte nord.",
+      "exampleEn": "Access to the room is through the north door."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un organisateur",
+      "options": [
+        "information; detail",
+        "an organizer",
+        "registration",
+        "an instruction"
+      ],
+      "answer": 1,
+      "explain": "un organisateur means an organizer."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une inscription",
+      "options": [
+        "a change",
+        "an instruction",
+        "information; detail",
+        "registration"
+      ],
+      "answer": 3,
+      "explain": "une inscription means registration."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une consigne",
+      "options": [
+        "access",
+        "an instruction",
+        "information; detail",
+        "a change"
+      ],
+      "answer": 1,
+      "explain": "une consigne means an instruction."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un renseignement",
+      "options": [
+        "an organizer",
+        "a change",
+        "access",
+        "information; detail"
+      ],
+      "answer": 3,
+      "explain": "un renseignement means information; detail."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un changement",
+      "options": [
+        "registration",
+        "a change",
+        "access",
+        "an organizer"
+      ],
+      "answer": 1,
+      "explain": "un changement means a change."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès",
+      "options": [
+        "an instruction",
+        "an organizer",
+        "registration",
+        "access"
+      ],
+      "answer": 3,
+      "explain": "un accès means access."
+    }
+  ]
+}

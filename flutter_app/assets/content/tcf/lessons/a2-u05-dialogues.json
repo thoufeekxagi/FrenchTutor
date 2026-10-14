@@ -1,0 +1,148 @@
+{
+  "id": "a2-u05-dialogues",
+  "unit": "a2-u05",
+  "unitTitle": "Organise work, study and future plans",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 5: Organise work, study and future plans",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Track the current schedule, the new plan and the next action. The speakers check a real constraint before deciding; the learner must use the schedule details rather than guess."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A course after work",
+      "body": "Nadia asks a training-centre adviser about evening French classes.",
+      "examples": [
+        {
+          "fr": "Je vais suivre un cours de français le mois prochain.",
+          "en": "Nadia: I am going to take a French class next month."
+        },
+        {
+          "fr": "Vous préférez une formation du soir ou un cours intensif ?",
+          "en": "Conseillère: Do you prefer an evening course or an intensive class?"
+        },
+        {
+          "fr": "Une formation du soir. Je travaille jusqu'à dix-sept heures.",
+          "en": "Nadia: An evening course. I work until five p.m."
+        },
+        {
+          "fr": "Le groupe commence mardi à dix-huit heures. Vous êtes libre à cette heure ?",
+          "en": "Conseillère: The group starts Tuesday at six p.m. Are you free at that time?"
+        },
+        {
+          "fr": "Oui, mais j'ai un autre rendez-vous le premier mardi.",
+          "en": "Nadia: Yes, but I have another appointment on the first Tuesday."
+        },
+        {
+          "fr": "Vous pouvez rattraper cette séance jeudi. Je vais vous envoyer le formulaire.",
+          "en": "Conseillère: You can catch up on that class Thursday. I am going to send you the form."
+        },
+        {
+          "fr": "Merci. Je vais vérifier mon horaire, puis je vais valider mon inscription.",
+          "en": "Nadia: Thank you. I am going to check my schedule, then I am going to confirm my registration."
+        },
+        {
+          "fr": "Très bien. Le groupe sera bientôt complet. La date limite est vendredi.",
+          "en": "Conseillère: Very good. The group will be full soon. The deadline is Friday."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "An interview time conflict",
+      "body": "Sam tells his classmate Nadia about a possible conflict.",
+      "examples": [
+        {
+          "fr": "L'entretien d'embauche est jeudi à quinze heures.",
+          "en": "Sam: The job interview is Thursday at three p.m."
+        },
+        {
+          "fr": "Tu vas demander une autre heure ?",
+          "en": "Nadia: Are you going to ask for another time?"
+        },
+        {
+          "fr": "Oui. J'ai un quart de jour jeudi, mais je serai libre vendredi matin.",
+          "en": "Sam: Yes. I have a day shift Thursday, but I will be free Friday morning."
+        },
+        {
+          "fr": "Tu vas envoyer un courriel aujourd'hui ?",
+          "en": "Nadia: Are you going to send an email today?"
+        },
+        {
+          "fr": "Oui, je vais expliquer le conflit d'horaire et proposer vendredi.",
+          "en": "Sam: Yes, I am going to explain the schedule conflict and suggest Friday."
+        },
+        {
+          "fr": "Et si vendredi n'est pas possible ?",
+          "en": "Nadia: And if Friday is not possible?"
+        },
+        {
+          "fr": "Je vais demander un rendez-vous la semaine prochaine.",
+          "en": "Sam: I am going to ask for an appointment next week."
+        },
+        {
+          "fr": "D'accord. Tu auras une réponse la semaine prochaine.",
+          "en": "Nadia: All right. You will get an answer next week."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "When does the evening course begin?",
+      "options": [
+        "Tuesday at 6 p.m.",
+        "Thursday at 5 p.m.",
+        "Friday at 9 a.m.",
+        "Monday at noon"
+      ],
+      "answer": 0,
+      "explain": "The adviser says the group starts Tuesday at eighteen hours."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What will Mina do before confirming her registration?",
+      "options": [
+        "Check her work schedule",
+        "Send a transcript",
+        "Cancel the course",
+        "Choose an intensive course"
+      ],
+      "answer": 0,
+      "explain": "Mina says she will check her schedule, then confirm."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "Why does Sam want to move the interview?",
+      "options": [
+        "He has a day shift at the scheduled time.",
+        "He will start a French course.",
+        "He has no internet access.",
+        "His application is incomplete."
+      ],
+      "answer": 0,
+      "explain": "Sam says he has a day shift Thursday and is free Friday morning."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "If Friday does not work, what will Sam do?",
+      "options": [
+        "Ask for an appointment next week",
+        "Cancel his application",
+        "Call his manager",
+        "Send his transcript"
+      ],
+      "answer": 0,
+      "explain": "He says he will ask for an appointment the following week."
+    }
+  ]
+}

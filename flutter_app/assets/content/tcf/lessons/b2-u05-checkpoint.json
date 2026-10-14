@@ -1,0 +1,75 @@
+{
+  "id": "b2-u05-checkpoint",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Checkpoint",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does un délai mean?",
+      "options": [
+        "A survey",
+        "A time limit or delay",
+        "A team",
+        "A prescription"
+      ],
+      "answer": 1,
+      "explain": "Un délai is a time limit or delay."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Which phrase marks doubt?",
+      "options": [
+        "C'est confirmé que…",
+        "Il est évident que…",
+        "Je ne suis pas certain que…",
+        "Je sais que…"
+      ],
+      "answer": 2,
+      "explain": "The phrase explicitly marks uncertainty."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does bien que introduce?",
+      "options": [
+        "A list",
+        "A source",
+        "A direct command",
+        "A concession"
+      ],
+      "answer": 3,
+      "explain": "Bien que introduces a concession and takes the subjunctive."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What must a learner do for a real service rule?",
+      "options": [
+        "Verify it with an appropriate current source",
+        "Ask the tutor to decide",
+        "Assume another person's case is identical",
+        "Rely on a fictional lesson notice"
+      ],
+      "answer": 0,
+      "explain": "The authored notice is practice; real rules must be checked with the source."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What is a useful way to confirm an answer?",
+      "options": [
+        "Repeat the same question louder",
+        "Summarize it and ask if you understood correctly",
+        "Ignore any missing detail",
+        "Change the subject"
+      ],
+      "answer": 1,
+      "explain": "Paraphrasing and confirming checks comprehension."
+    }
+  ]
+}

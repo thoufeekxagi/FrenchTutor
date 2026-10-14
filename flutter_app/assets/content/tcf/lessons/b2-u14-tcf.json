@@ -1,0 +1,72 @@
+{
+  "id": "b2-u14-tcf",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "TCF corner",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Exam style",
+      "body": "These questions look like the real TCF Canada: one play, four options, one answer. A wrong and a blank answer both score zero, so always choose."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Votre réponse compare les deux sources, mais la deuxième idée est attribuée au mauvais auteur. Corrigez l'attribution avant de modifier la conclusion.",
+      "question": "What should the learner correct first?",
+      "options": [
+        "The order of the title",
+        "The example's length",
+        "The conclusion's punctuation",
+        "Which author made the second point"
+      ],
+      "answer": 3,
+      "explain": "The feedback says the second idea is attributed to the wrong author."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Le candidat a bien compris l'enregistrement, mais il n'a pas répondu à la question sur la conséquence. Il doit revenir à la consigne et vérifier chaque partie.",
+      "question": "What is the main issue?",
+      "options": [
+        "The audio was too long",
+        "One requested part was not answered",
+        "The candidate used a conditional",
+        "The recording had no conclusion"
+      ],
+      "answer": 1,
+      "explain": "The candidate missed the part asking about a consequence."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "Why include a new transfer task?",
+      "options": [
+        "To guarantee an exam level",
+        "To remove the need for feedback",
+        "To check whether learning applies beyond a repeated exercise",
+        "To replace every skill result with one score"
+      ],
+      "answer": 2,
+      "explain": "A new task checks whether the skill transfers to unfamiliar content.",
+      "promptFr": "Un bilan d'apprentissage utile présente séparément la compréhension orale, la compréhension écrite, la production orale et la production écrite. Il inclut aussi une tâche de transfert avec un sujet nouveau. La répétition d'un même exercice peut montrer une amélioration sur cet exercice, mais elle ne suffit pas à démontrer une compétence générale. Le bilan doit indiquer les conditions de passation et les limites de l'évaluation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What is the advice?",
+      "options": [
+        "Keep precise vocabulary but use structures the learner controls",
+        "Make every sentence longer",
+        "Remove the main argument",
+        "Avoid checking agreement"
+      ],
+      "answer": 0,
+      "explain": "The learner should prefer clear, controlled structures over unnecessary complexity.",
+      "promptFr": "Lors d'une révision, le candidat a remplacé plusieurs mots simples par des expressions plus complexes. Certaines nouvelles phrases contenaient des erreurs d'accord et rendaient le lien logique moins clair. Le correcteur lui a conseillé de garder les mots précis, mais de rétablir des structures qu'il maîtrise. La complexité n'est utile que si le sens reste clair."
+    }
+  ]
+}

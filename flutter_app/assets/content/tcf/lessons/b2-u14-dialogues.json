@@ -1,0 +1,84 @@
+{
+  "id": "b2-u14-dialogues",
+  "unit": "b2-u14",
+  "unitTitle": "B2 · Capstone: transfer across four skills and all TCF tasks",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 14: B2 · Capstone: transfer across four skills and all TCF tasks",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "A learner reviews a practice result",
+      "body": "A tutor gives evidence-based feedback without turning it into a score promise.",
+      "examples": [
+        {
+          "fr": "Tu as bien identifié la position principale dans les deux textes.",
+          "en": "Marie: You correctly identified the main position in both texts."
+        },
+        {
+          "fr": "Mais j'ai dépassé la limite de mots.",
+          "en": "Awa: But I went over the word limit."
+        },
+        {
+          "fr": "Oui. Une phrase répétait la même raison.",
+          "en": "Marie: Yes. One sentence repeated the same reason."
+        },
+        {
+          "fr": "Je peux raccourcir cette partie sans supprimer une source.",
+          "en": "Awa: I can shorten that part without removing a source."
+        },
+        {
+          "fr": "Exactement. Vérifie aussi à qui renvoie le pronom y.",
+          "en": "Marie: Exactly. Also check what the pronoun y refers to."
+        },
+        {
+          "fr": "Il renvoie à la proposition, mais je vais répéter le nom pour plus de clarté.",
+          "en": "Awa: It refers to the proposal, but I will repeat the noun for clarity."
+        },
+        {
+          "fr": "Voilà une révision précise. Essaie ensuite avec deux nouveaux textes.",
+          "en": "Marie: That's a specific revision. Then try with two new texts."
+        },
+        {
+          "fr": "Je vais refaire la tâche sans ouvrir mes notes.",
+          "en": "Awa: I will retry the task without opening my notes."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Set a transfer goal",
+      "body": "A learner chooses a weak skill without treating completion as certification.",
+      "examples": [
+        {
+          "fr": "J'ai terminé les leçons, mais je ne sais pas si je peux gérer un sujet nouveau.",
+          "en": "Sam: I finished the lessons, but I do not know if I can handle a new topic."
+        },
+        {
+          "fr": "Quel résultat peux-tu vérifier ?",
+          "en": "Nadia: What result can you check?"
+        },
+        {
+          "fr": "Je peux écouter un extrait inédit et résumer l'argument sans le transcript.",
+          "en": "Sam: I can listen to a new excerpt and summarize the argument without the transcript."
+        },
+        {
+          "fr": "C'est une preuve plus utile qu'un score répété sur le même exercice.",
+          "en": "Nadia: That is more useful evidence than a repeated score on the same exercise."
+        },
+        {
+          "fr": "Je vais aussi écrire une réponse chronométrée et demander une révision ciblée.",
+          "en": "Sam: I will also write a timed response and request focused feedback."
+        }
+      ]
+    }
+  ]
+}

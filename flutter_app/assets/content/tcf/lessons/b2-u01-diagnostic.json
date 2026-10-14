@@ -1,0 +1,90 @@
+{
+  "id": "b2-u01-diagnostic",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "B2 readiness check",
+  "subtitle": "Four-skill baseline before Unit 1",
+  "minutes": 4,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "B2 readiness check",
+      "body": "B2 assumes a completed B1 pathway. Before learning the unit, complete one short task in each skill with no notes, translation app or model. Save the first attempts in your notes app. This is a personal baseline, not a placement decision or predicted exam score. If connected past narration, longer listening or spontaneous interaction is still difficult, finish the B1 pathway before relying on these B2 lessons."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "La bibliothèque ouvrira une heure plus tard le mardi. La direction réévaluera cet horaire après deux mois. Les retours resteront possibles dans la boîte extérieure.",
+      "question": "What is temporary, and what alternative remains available?",
+      "options": [
+        "The exterior box will be removed after two months",
+        "The library will close permanently; no returns will be accepted",
+        "The schedule has already been confirmed for every day",
+        "The later Tuesday opening will be reviewed; the exterior return box remains available"
+      ],
+      "answer": 3,
+      "explain": "The Tuesday schedule will be reviewed after two months; the return box remains."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What do the two notices share, and where do they differ?",
+      "options": [
+        "Both say staffing and cost are irrelevant",
+        "Both want better access; one proposes a limited trial and the other stresses checking resources",
+        "Both reject evening activities for the same reason",
+        "One reports a completed trial and the other confirms its results"
+      ],
+      "answer": 1,
+      "explain": "Both prioritize access; the first suggests a trial while the second highlights resource checks.",
+      "promptFr": "Deux avis sur les horaires d'un centre communautaire : ·  · Avis A — Une ouverture plus tardive faciliterait la participation des personnes qui travaillent le jour. Le centre pourrait d'abord essayer ce nouvel horaire deux soirs par semaine. ·  · Avis B — Le changement serait utile, mais il faudrait vérifier le coût et la disponibilité du personnel. Les deux avis souhaitent rendre les activités plus accessibles; ils proposent toutefois de procéder avec prudence."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Writing: Baseline writing sample",
+      "body": "Before studying this unit, write 80–100 words about a recent decision you made. Explain the situation, your reason, one relevant detail and the result. Use no dictionary or notes. Save the first draft; do not revise it yet.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Model answer",
+      "body": "J'ai récemment choisi de suivre un cours du soir parce que je voulais améliorer mon français tout en gardant mon horaire de travail. Avant de m'inscrire, j'ai vérifié la durée du cours et le temps nécessaire pour me rendre au centre. Le trajet est un peu long, mais les cours ont lieu deux fois par semaine, ce qui reste possible. Après quelques semaines, je remarque que je comprends mieux les consignes et que je parle avec moins d'hésitation. Si mon emploi du temps change, je devrai peut-être chercher une autre formule.\n\nCheck:\n• Do this before seeing the model.\n• After your first attempt, compare whether you gave a clear timeline, a reason, a specific detail and a result.\n• Record one recurring grammar or organization gap in your notes; this is a baseline, not a score."
+    },
+    {
+      "type": "explain",
+      "id": "e4",
+      "title": "Speaking: Baseline speaking sample",
+      "body": "Before Unit 1, speak for 60–90 seconds about a recent choice or change in your routine. Explain why it happened, give one specific example, describe the result and answer Marie's follow-up. Start without notes; do not ask for corrections until you finish.\n\n• Complete the first attempt before opening the model.\n• Ask Marie to record one strength and one high-impact correction, then repeat with a different routine change.\n• Compare the first and second attempts for clarity, connected ideas and response to the follow-up; do not treat this as a CEFR score."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "J'ai décidé de préparer mes repas le dimanche, car mes journées de travail sont souvent chargées. Au début, je pensais que cela prendrait trop de temps.",
+      "en": "Model answer, part 1 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "J'ai donc essayé avec seulement deux repas et j'ai choisi des recettes simples. La première semaine, cette organisation m'a permis de gagner du temps le soir.",
+      "en": "Model answer, part 2 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p3",
+      "fr": "Elle ne convient pas toujours, surtout quand mes plans changent. Je préfère donc préparer une base et garder une option rapide.",
+      "en": "Model answer, part 3 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p4",
+      "fr": "Et vous, comment organisez-vous vos repas pendant une semaine chargée ?",
+      "en": "Model answer, part 4 of 4.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

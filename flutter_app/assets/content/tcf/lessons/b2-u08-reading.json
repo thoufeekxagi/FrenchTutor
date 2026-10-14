@@ -1,0 +1,52 @@
+{
+  "id": "b2-u08-reading",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What do both participants identify as influential?",
+      "options": [
+        "A single required method",
+        "The time they had available",
+        "A public examination",
+        "The same course schedule"
+      ],
+      "answer": 1,
+      "explain": "Both guests mention the influence of available time.",
+      "promptFr": "Dans un entretien fictif, une participante explique qu'elle a repris ses études à l'âge adulte. Elle dit que le travail en petits groupes l'a aidée à poser des questions. Un autre invité raconte qu'il a surtout progressé en lisant seul, puis en discutant de ses lectures. Les deux soulignent que le temps disponible a influencé leur parcours. Le texte présente deux expériences; il ne cherche pas à établir une méthode unique."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why should the themes remain open?",
+      "options": [
+        "The mediator has no experience",
+        "Participants all prefer one theme",
+        "The activity has no topic",
+        "People's reactions and experiences vary"
+      ],
+      "answer": 3,
+      "explain": "The text says reactions vary and no one topic represents everyone.",
+      "promptFr": "Une médiatrice culturelle rapporte que certains participants se sentent plus à l'aise lorsqu'ils peuvent relier une activité à leur propre expérience. Elle ajoute que les réactions varient et que le choix des thèmes doit rester ouvert. Le document évite ainsi de supposer qu'un même sujet représente tout un groupe."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What would make the account incomplete?",
+      "options": [
+        "Mentioning work but omitting earlier study",
+        "Attributing the statement",
+        "Describing the person's sequence",
+        "Including both parts of the experience"
+      ],
+      "answer": 0,
+      "explain": "The author says earlier study is also part of the pathway.",
+      "promptFr": "L'auteur reprend le témoignage d'une personne qui a appris une langue en travaillant. Il précise que cette personne avait aussi étudié auparavant. Présenter uniquement l'expérience professionnelle donnerait donc une image incomplète de son parcours."
+    }
+  ]
+}

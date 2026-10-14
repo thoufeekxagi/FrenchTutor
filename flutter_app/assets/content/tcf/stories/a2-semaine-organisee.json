@@ -1,0 +1,307 @@
+{
+  "id": "a2-semaine-organisee",
+  "title": "Une semaine bien organisée",
+  "titleEn": "A well-organized week",
+  "level": "A2",
+  "minutes": 4,
+  "summary": "Awa organizes a busy week, adapts to an unexpected change and protects time to rest.",
+  "unit": "a2-u01",
+  "sentences": [
+    {
+      "fr": "Chaque dimanche, Awa organise sa semaine.",
+      "en": "Every Sunday, Awa organizes her week."
+    },
+    {
+      "fr": "D'habitude, elle travaille le matin et elle étudie le soir.",
+      "en": "Usually, she works in the morning and studies in the evening."
+    },
+    {
+      "fr": "Cette semaine, elle a une présentation au travail.",
+      "en": "This week, she has a presentation at work."
+    },
+    {
+      "fr": "Elle prépare une liste de tâches. Sa présentation est une priorité.",
+      "en": "She prepares a to-do list. Her presentation is a priority."
+    },
+    {
+      "fr": "Mardi, un imprévu change son horaire.",
+      "en": "On Tuesday, an unexpected event changes her schedule."
+    },
+    {
+      "fr": "Elle reporte sa séance de français à mercredi.",
+      "en": "She postpones her French session until Wednesday."
+    },
+    {
+      "fr": "Awa prend une pause, donc elle peut se concentrer ensuite.",
+      "en": "Awa takes a break, so she can concentrate afterwards."
+    },
+    {
+      "fr": "Le soir, elle révise ses notes et fait des progrès, mais elle prend aussi une pause pour se reposer.",
+      "en": "In the evening, she reviews her notes and makes progress, but she also takes a break to rest."
+    }
+  ],
+  "words": {
+    "chaque": {
+      "en": "each, every",
+      "pos": "determiner"
+    },
+    "dimanche": {
+      "en": "on Sundays"
+    },
+    "awa": {
+      "en": "Awa (a woman's name)",
+      "pos": "name"
+    },
+    "organise": {
+      "en": "organizes (organiser)",
+      "pos": "verb"
+    },
+    "sa": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "semaine": {
+      "en": "week, weekday period"
+    },
+    "d'habitude": {
+      "en": "usually",
+      "pos": "adverb"
+    },
+    "elle": {
+      "en": "she, it",
+      "sound": "el"
+    },
+    "travaille": {
+      "en": "works (travailler)",
+      "pos": "verb"
+    },
+    "le": {
+      "en": "the (masculine)",
+      "pos": "article"
+    },
+    "matin": {
+      "en": "morning"
+    },
+    "et": {
+      "en": "and",
+      "sound": "ay"
+    },
+    "étudie": {
+      "en": "studies (étudier)",
+      "pos": "verb"
+    },
+    "soir": {
+      "en": "evening"
+    },
+    "cette": {
+      "en": "this (feminine)",
+      "pos": "determiner"
+    },
+    "a": {
+      "en": "has",
+      "sound": "ah"
+    },
+    "une": {
+      "en": "a; one (feminine)",
+      "pos": "article"
+    },
+    "présentation": {
+      "en": "presentation",
+      "pos": "noun, feminine"
+    },
+    "au": {
+      "en": "at the; to the",
+      "pos": "contraction"
+    },
+    "travail": {
+      "en": "work",
+      "pos": "noun, masculine"
+    },
+    "prépare": {
+      "en": "prepares (préparer)",
+      "pos": "verb"
+    },
+    "liste": {
+      "en": "list"
+    },
+    "de": {
+      "en": "of; from",
+      "pos": "preposition"
+    },
+    "tâches": {
+      "en": "tasks",
+      "pos": "noun, feminine plural"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "priorité": {
+      "en": "priority",
+      "pos": "noun, feminine"
+    },
+    "mardi": {
+      "en": "Tuesday",
+      "sound": "mahr-DEE"
+    },
+    "un": {
+      "en": "a; one (masculine)",
+      "pos": "article"
+    },
+    "imprévu": {
+      "en": "unexpected event",
+      "pos": "noun, masculine"
+    },
+    "change": {
+      "en": "changes (changer)",
+      "pos": "verb"
+    },
+    "son": {
+      "en": "her",
+      "pos": "possessive"
+    },
+    "horaire": {
+      "en": "schedule",
+      "pos": "noun, masculine"
+    },
+    "reporte": {
+      "en": "postpones (reporter)",
+      "pos": "verb"
+    },
+    "séance": {
+      "en": "session",
+      "pos": "noun, feminine"
+    },
+    "français": {
+      "en": "French",
+      "sound": "frah(n)-SEH"
+    },
+    "à": {
+      "en": "to, at",
+      "sound": "ah"
+    },
+    "mercredi": {
+      "en": "Wednesday",
+      "sound": "mehr-kruh-DEE"
+    },
+    "prend": {
+      "en": "takes (prendre)",
+      "pos": "verb"
+    },
+    "pause": {
+      "en": "break"
+    },
+    "donc": {
+      "en": "so; therefore",
+      "pos": "connector"
+    },
+    "peut": {
+      "en": "can (pouvoir)",
+      "pos": "verb"
+    },
+    "se": {
+      "en": "oneself; reflexive pronoun",
+      "pos": "pronoun"
+    },
+    "concentrer": {
+      "en": "to concentrate",
+      "pos": "verb"
+    },
+    "ensuite": {
+      "en": "then, next",
+      "sound": "ah(n)-SWEET"
+    },
+    "révise": {
+      "en": "reviews (réviser)",
+      "pos": "verb"
+    },
+    "ses": {
+      "en": "her; his; their (plural)",
+      "pos": "possessive"
+    },
+    "notes": {
+      "en": "notes",
+      "pos": "noun, feminine plural"
+    },
+    "fait": {
+      "en": "makes; does (faire)",
+      "pos": "verb"
+    },
+    "des": {
+      "en": "some; plural article",
+      "pos": "article"
+    },
+    "progrès": {
+      "en": "progress; an improvement"
+    },
+    "mais": {
+      "en": "but",
+      "pos": "connector"
+    },
+    "aussi": {
+      "en": "also, too",
+      "sound": "oh-SEE"
+    },
+    "pour": {
+      "en": "to; in order to",
+      "pos": "preposition"
+    },
+    "reposer": {
+      "en": "to rest",
+      "pos": "verb"
+    }
+  },
+  "keywords": [
+    "organise",
+    "imprévu",
+    "horaire",
+    "priorité",
+    "progrès"
+  ],
+  "quiz": [
+    {
+      "prompt": "When does Awa usually organize her week?",
+      "options": [
+        "Every Sunday",
+        "Every Tuesday",
+        "Every morning",
+        "Every Friday"
+      ],
+      "answer": 0,
+      "explain": "The first sentence says Chaque dimanche."
+    },
+    {
+      "prompt": "What changes Awa's schedule?",
+      "options": [
+        "A French exam",
+        "An unexpected event",
+        "A new job",
+        "A family visit"
+      ],
+      "answer": 1,
+      "explain": "The story says un imprévu change son horaire."
+    },
+    {
+      "prompt": "When is the French session now?",
+      "options": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday"
+      ],
+      "answer": 2,
+      "explain": "She postpones the session until Wednesday."
+    },
+    {
+      "prompt": "What does Awa do after rereading her notes?",
+      "options": [
+        "She sees progress.",
+        "She goes to work.",
+        "She cancels the workshop.",
+        "She changes cities."
+      ],
+      "answer": 0,
+      "explain": "The story says she rereads her notes and sees progress."
+    }
+  ]
+}

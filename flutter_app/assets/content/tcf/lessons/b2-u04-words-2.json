@@ -1,0 +1,176 @@
+{
+  "id": "b2-u04-words-2",
+  "unit": "b2-u04",
+  "unitTitle": "B2 · Housing and city life: compare competing needs",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 4: B2 · Housing and city life: compare competing needs",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un espace commun",
+      "en": "a shared space",
+      "sound": "uh(n) es-PAHS koh-MUH(N)",
+      "exampleFr": "Un espace commun peut servir à plusieurs activités.",
+      "exampleEn": "A shared space can serve several activities."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un chantier",
+      "en": "a construction site; project",
+      "sound": "uh(n) shahn-TYAY",
+      "exampleFr": "Le chantier durerait plusieurs semaines.",
+      "exampleEn": "The construction project would last several weeks."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un accès",
+      "en": "access; an entrance",
+      "sound": "uh(n) ak-SEH",
+      "exampleFr": "L'accès doit rester libre pendant les travaux.",
+      "exampleEn": "Access must remain clear during construction."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une consultation",
+      "en": "a consultation; public consultation",
+      "sound": "ün kohn-sül-tah-SYOH(N)",
+      "exampleFr": "La consultation recueille des besoins différents.",
+      "exampleEn": "The consultation gathers different needs."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une mesure",
+      "en": "a measure",
+      "sound": "ün muh-ZÜHR",
+      "exampleFr": "La mesure vise à réduire le bruit.",
+      "exampleEn": "The measure aims to reduce noise."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un arbitrage",
+      "en": "a trade-off; a decision between competing needs",
+      "sound": "uh(n) ar-bee-TRAHZH",
+      "exampleFr": "L'arbitrage entre calme et accès reste délicat.",
+      "exampleEn": "The trade-off between quiet and access remains difficult."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un espace commun",
+      "options": [
+        "a consultation; public consultation",
+        "a shared space",
+        "a construction site; project",
+        "access; an entrance"
+      ],
+      "answer": 1,
+      "explain": "un espace commun means a shared space."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un chantier",
+      "options": [
+        "a measure",
+        "access; an entrance",
+        "a consultation; public consultation",
+        "a construction site; project"
+      ],
+      "answer": 3,
+      "explain": "un chantier means a construction site; project."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un accès",
+      "options": [
+        "a trade-off; a decision between competing needs",
+        "access; an entrance",
+        "a consultation; public consultation",
+        "a measure"
+      ],
+      "answer": 1,
+      "explain": "un accès means access; an entrance."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une consultation",
+      "options": [
+        "a shared space",
+        "a measure",
+        "a trade-off; a decision between competing needs",
+        "a consultation; public consultation"
+      ],
+      "answer": 3,
+      "explain": "une consultation means a consultation; public consultation."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une mesure",
+      "options": [
+        "a construction site; project",
+        "a measure",
+        "a trade-off; a decision between competing needs",
+        "a shared space"
+      ],
+      "answer": 1,
+      "explain": "une mesure means a measure."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un arbitrage",
+      "options": [
+        "access; an entrance",
+        "a shared space",
+        "a construction site; project",
+        "a trade-off; a decision between competing needs"
+      ],
+      "answer": 3,
+      "explain": "un arbitrage means a trade-off; a decision between competing needs."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un accès",
+      "question": "Which word did you hear?",
+      "options": [
+        "une mesure",
+        "un accès",
+        "un chantier",
+        "une consultation"
+      ],
+      "answer": 1,
+      "explain": "You heard un accès: access; an entrance."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une consultation",
+      "question": "Which word did you hear?",
+      "options": [
+        "un arbitrage",
+        "un accès",
+        "une mesure",
+        "une consultation"
+      ],
+      "answer": 3,
+      "explain": "You heard une consultation: a consultation; public consultation."
+    }
+  ]
+}

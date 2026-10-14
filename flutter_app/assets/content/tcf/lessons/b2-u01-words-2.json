@@ -1,0 +1,176 @@
+{
+  "id": "b2-u01-words-2",
+  "unit": "b2-u01",
+  "unitTitle": "B2 · From opinion to argument: make the logic visible",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 1: B2 · From opinion to argument: make the logic visible",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une donnée",
+      "en": "a data point; a piece of data",
+      "sound": "ün doh-NAY",
+      "exampleFr": "Cette donnée ne suffit pas à prouver la tendance.",
+      "exampleEn": "This data point is not enough to prove the trend."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une conséquence",
+      "en": "a consequence",
+      "sound": "ün kohn-say-KAH(N)S",
+      "exampleFr": "Il faut aussi examiner une conséquence possible.",
+      "exampleEn": "A possible consequence must also be examined."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un point de vue",
+      "en": "a point of view",
+      "sound": "uh(n) pwa duh VÜ",
+      "exampleFr": "Son point de vue évolue après la discussion.",
+      "exampleEn": "Her point of view changes after the discussion."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "une réserve",
+      "en": "a reservation; a caveat",
+      "sound": "ün ray-ZEHRV",
+      "exampleFr": "J'appuie le projet, avec une réserve.",
+      "exampleEn": "I support the project, with one caveat."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un avantage",
+      "en": "an advantage",
+      "sound": "uh(n) ah-vahn-TAHZH",
+      "exampleFr": "La souplesse est un avantage pour certains postes.",
+      "exampleEn": "Flexibility is an advantage for some roles."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un inconvénient",
+      "en": "a drawback",
+      "sound": "uh(n) an-kohn-vay-NYAH(N)",
+      "exampleFr": "Le manque de rencontres peut être un inconvénient.",
+      "exampleEn": "The lack of in-person meetings can be a drawback."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une donnée",
+      "options": [
+        "a reservation; a caveat",
+        "a data point; a piece of data",
+        "a consequence",
+        "an advantage"
+      ],
+      "answer": 1,
+      "explain": "une donnée means a data point; a piece of data."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une conséquence",
+      "options": [
+        "an advantage",
+        "a point of view",
+        "a reservation; a caveat",
+        "a consequence"
+      ],
+      "answer": 3,
+      "explain": "une conséquence means a consequence."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un point de vue",
+      "options": [
+        "a drawback",
+        "a point of view",
+        "a reservation; a caveat",
+        "an advantage"
+      ],
+      "answer": 1,
+      "explain": "un point de vue means a point of view."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "une réserve",
+      "options": [
+        "a data point; a piece of data",
+        "an advantage",
+        "a drawback",
+        "a reservation; a caveat"
+      ],
+      "answer": 3,
+      "explain": "une réserve means a reservation; a caveat."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un avantage",
+      "options": [
+        "a consequence",
+        "an advantage",
+        "a drawback",
+        "a data point; a piece of data"
+      ],
+      "answer": 1,
+      "explain": "un avantage means an advantage."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un inconvénient",
+      "options": [
+        "a point of view",
+        "a data point; a piece of data",
+        "a consequence",
+        "a drawback"
+      ],
+      "answer": 3,
+      "explain": "un inconvénient means a drawback."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "une conséquence",
+      "question": "Which word did you hear?",
+      "options": [
+        "un avantage",
+        "une conséquence",
+        "une donnée",
+        "une réserve"
+      ],
+      "answer": 1,
+      "explain": "You heard une conséquence: a consequence."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une réserve",
+      "question": "Which word did you hear?",
+      "options": [
+        "un inconvénient",
+        "une conséquence",
+        "un avantage",
+        "une réserve"
+      ],
+      "answer": 3,
+      "explain": "You heard une réserve: a reservation; a caveat."
+    }
+  ]
+}

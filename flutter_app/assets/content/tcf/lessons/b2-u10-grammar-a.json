@@ -1,0 +1,93 @@
+{
+  "id": "b2-u10-grammar-a",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Grammar: Reference and cohesion: use en and y only when the link is clear",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Reference and cohesion: use en and y only when the link is clear",
+      "body": "En can replace a previously named complement introduced by de (parler des horaires → en parler); y can replace a place or a complement introduced by à (revenir à la proposition → y revenir). They help avoid repetition, but a pronoun is useful only when the listener can identify its reference. In a multi-speaker summary, repeat the key noun if en or y could refer to two different ideas. Use lexical links (ce point, cette mesure, la proposition) to keep the thread visible. Agreement and meaning still depend on the full sentence."
+    },
+    {
+      "type": "table",
+      "id": "t1",
+      "title": "Reference and cohesion: use en and y only when the link is clear",
+      "headers": [
+        "Meaning",
+        "Form",
+        "Example (hear)",
+        "English"
+      ],
+      "rows": [
+        [
+          "Replace a de-complement",
+          "en + verb",
+          "Les horaires? Nous en parlerons à la prochaine rencontre.",
+          "The schedule? We will talk about it at the next meeting."
+        ],
+        [
+          "Replace a place / à-complement",
+          "y + verb",
+          "La proposition est complexe; nous y reviendrons.",
+          "The proposal is complex; we will return to it."
+        ],
+        [
+          "Keep reference clear",
+          "repeat the noun if needed",
+          "La salle reste accessible; cette priorité est partagée.",
+          "The room remains accessible; this priority is shared."
+        ],
+        [
+          "Summarize a speaker",
+          "speaker + position + reason",
+          "Mina propose une soirée parce que plusieurs personnes travaillent le jour.",
+          "Mina proposes an evening because several people work during the day."
+        ]
+      ],
+      "hear": 2
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "In Nous en parlerons, what does en replace?",
+      "options": [
+        "A future date",
+        "A complement introduced by de",
+        "A place introduced by à",
+        "A person as direct object"
+      ],
+      "answer": 1,
+      "explain": "En often replaces a complement introduced by de."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "In Nous y reviendrons, what does y refer to?",
+      "options": [
+        "A quoted source",
+        "A complement introduced by de",
+        "A direct object only",
+        "A place or an à-complement"
+      ],
+      "answer": 3,
+      "explain": "Y can replace a place or an à-complement."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "When should you repeat a noun?",
+      "options": [
+        "When the pronoun's reference could be unclear",
+        "To make evidence stronger",
+        "Never in French",
+        "Only in questions"
+      ],
+      "answer": 0,
+      "explain": "Repeating the noun can prevent ambiguity."
+    }
+  ]
+}

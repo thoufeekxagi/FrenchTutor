@@ -1,0 +1,148 @@
+{
+  "id": "b1-u09-words-1",
+  "unit": "b1-u09",
+  "unitTitle": "B1 · Talk about how things are done and what you experienced",
+  "title": "Words: focus vocabulary — set 1",
+  "subtitle": "B1 · Unit 9: B1 · Talk about how things are done and what you experienced",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une étape",
+      "en": "a step; stage",
+      "sound": "ün ay-TAHP",
+      "exampleFr": "La première étape est annoncée par courriel.",
+      "exampleEn": "The first step is announced by email."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un bénévole",
+      "en": "a volunteer",
+      "sound": "uh(n) bay-nay-VOHL",
+      "exampleFr": "Les bénévoles ont préparé la salle.",
+      "exampleEn": "The volunteers prepared the room."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un participant",
+      "en": "a participant",
+      "sound": "uh(n) par-tee-see-PAH(N)",
+      "exampleFr": "Chaque participant a reçu un badge.",
+      "exampleEn": "Each participant received a badge."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un atelier",
+      "en": "a workshop",
+      "sound": "uh(n) ah-tuh-LYAY",
+      "exampleFr": "L'atelier a été animé par une résidente.",
+      "exampleEn": "The workshop was led by a resident."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un matériel",
+      "en": "equipment; supplies",
+      "sound": "uh(n) mah-tay-RYEHL",
+      "exampleFr": "Le matériel a été installé avant l'ouverture.",
+      "exampleEn": "The equipment was set up before opening."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une inscription",
+      "en": "registration",
+      "sound": "ün an-skreep-SYOH(N)",
+      "exampleFr": "Les inscriptions sont vérifiées à l'accueil.",
+      "exampleEn": "Registrations are checked at reception."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une étape",
+      "options": [
+        "a workshop",
+        "a step; stage",
+        "a volunteer",
+        "a participant"
+      ],
+      "answer": 1,
+      "explain": "une étape means a step; stage."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un bénévole",
+      "options": [
+        "equipment; supplies",
+        "a participant",
+        "a workshop",
+        "a volunteer"
+      ],
+      "answer": 3,
+      "explain": "un bénévole means a volunteer."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un participant",
+      "options": [
+        "registration",
+        "a participant",
+        "a workshop",
+        "equipment; supplies"
+      ],
+      "answer": 1,
+      "explain": "un participant means a participant."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un atelier",
+      "options": [
+        "a step; stage",
+        "equipment; supplies",
+        "registration",
+        "a workshop"
+      ],
+      "answer": 3,
+      "explain": "un atelier means a workshop."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un matériel",
+      "options": [
+        "a volunteer",
+        "equipment; supplies",
+        "registration",
+        "a step; stage"
+      ],
+      "answer": 1,
+      "explain": "un matériel means equipment; supplies."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une inscription",
+      "options": [
+        "a participant",
+        "a step; stage",
+        "a volunteer",
+        "registration"
+      ],
+      "answer": 3,
+      "explain": "une inscription means registration."
+    }
+  ]
+}

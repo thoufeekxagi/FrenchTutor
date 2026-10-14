@@ -1,0 +1,148 @@
+{
+  "id": "b2-u02-words-5",
+  "unit": "b2-u02",
+  "unitTitle": "B2 · News and public claims: report without overstating",
+  "title": "Words: core topic language — set 5",
+  "subtitle": "B2 · Unit 2: B2 · News and public claims: report without overstating",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une citation tronquée",
+      "en": "an excerpted; truncated quotation",
+      "sound": "ün see-tah-SYOH(N) trohn-KAY",
+      "exampleFr": "Une citation tronquée peut modifier le sens.",
+      "exampleEn": "A truncated quotation can change the meaning."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une version non confirmée",
+      "en": "an unconfirmed account",
+      "sound": "ün vehr-SYOH(N) nohn kohn-feer-MAY",
+      "exampleFr": "Le média présente la version comme non confirmée.",
+      "exampleEn": "The outlet presents the account as unconfirmed."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "un organe de presse",
+      "en": "a press outlet",
+      "sound": "uh(n) or-gahn duh prehs",
+      "exampleFr": "L'organe de presse a publié une correction.",
+      "exampleEn": "The press outlet published a correction."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un degré de certitude",
+      "en": "a degree of certainty",
+      "sound": "uh(n) duh-gray duh sehr-tee-TÜD",
+      "exampleFr": "Les mots choisis indiquent un faible degré de certitude.",
+      "exampleEn": "The words chosen indicate a low degree of certainty."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "faire état de",
+      "en": "to report; make mention of",
+      "sound": "fehr ay-TAH duh",
+      "exampleFr": "Le bulletin fait état d'une interruption limitée.",
+      "exampleEn": "The bulletin reports a limited interruption."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "se fier à",
+      "en": "to rely on",
+      "sound": "suh fee-YAY ah",
+      "exampleFr": "On ne devrait pas se fier à une seule publication.",
+      "exampleEn": "One should not rely on a single publication."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une citation tronquée",
+      "options": [
+        "a degree of certainty",
+        "an excerpted; truncated quotation",
+        "an unconfirmed account",
+        "a press outlet"
+      ],
+      "answer": 1,
+      "explain": "une citation tronquée means an excerpted; truncated quotation."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une version non confirmée",
+      "options": [
+        "to report; make mention of",
+        "a press outlet",
+        "a degree of certainty",
+        "an unconfirmed account"
+      ],
+      "answer": 3,
+      "explain": "une version non confirmée means an unconfirmed account."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "un organe de presse",
+      "options": [
+        "to rely on",
+        "a press outlet",
+        "a degree of certainty",
+        "to report; make mention of"
+      ],
+      "answer": 1,
+      "explain": "un organe de presse means a press outlet."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un degré de certitude",
+      "options": [
+        "an excerpted; truncated quotation",
+        "to report; make mention of",
+        "to rely on",
+        "a degree of certainty"
+      ],
+      "answer": 3,
+      "explain": "un degré de certitude means a degree of certainty."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "faire état de",
+      "options": [
+        "an unconfirmed account",
+        "to report; make mention of",
+        "to rely on",
+        "an excerpted; truncated quotation"
+      ],
+      "answer": 1,
+      "explain": "faire état de means to report; make mention of."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "se fier à",
+      "options": [
+        "a press outlet",
+        "an excerpted; truncated quotation",
+        "an unconfirmed account",
+        "to rely on"
+      ],
+      "answer": 3,
+      "explain": "se fier à means to rely on."
+    }
+  ]
+}

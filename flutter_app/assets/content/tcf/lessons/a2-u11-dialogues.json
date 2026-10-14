@@ -1,0 +1,148 @@
+{
+  "id": "a2-u11-dialogues",
+  "unit": "a2-u11",
+  "unitTitle": "Solve a practical problem politely",
+  "title": "Dialogues",
+  "subtitle": "A2 · Unit 11: Solve a practical problem politely",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Track the three parts of each exchange: problem, specific request, next step. Notice when a short imperative belongs to an instruction and when a conditional is used to ask for another person's help."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Ask about a missing delivery",
+      "body": "Karim contacts a fictional delivery service about a parcel.",
+      "examples": [
+        {
+          "fr": "Bonjour, je n'ai pas reçu le colis. Voici le numéro de suivi.",
+          "en": "Karim: Hello, I have not received the parcel. Here is the tracking number."
+        },
+        {
+          "fr": "Pourriez-vous confirmer l'adresse de livraison ?",
+          "en": "Employée: Could you confirm the delivery address?"
+        },
+        {
+          "fr": "Oui. Pourriez-vous aussi vérifier le créneau de livraison ?",
+          "en": "Karim: Yes. Could you also check the delivery time slot?"
+        },
+        {
+          "fr": "Je vérifie. Il y a eu une tentative de livraison hier.",
+          "en": "Employée: I am checking. There was a delivery attempt yesterday."
+        },
+        {
+          "fr": "Je voudrais une nouvelle livraison, s'il vous plaît.",
+          "en": "Karim: I would like a new delivery, please."
+        },
+        {
+          "fr": "D'accord. Appuyez sur le bouton de confirmation dans le message.",
+          "en": "Employée: All right. Press the confirmation button in the message."
+        },
+        {
+          "fr": "Je confirme le délai de traitement : deux jours ?",
+          "en": "Karim: I am confirming the processing time: two days?"
+        },
+        {
+          "fr": "Oui. La confirmation arrive par message.",
+          "en": "Employée: Yes. The confirmation arrives by text."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Request a repair appointment",
+      "body": "Nadia sends a fictional repair request to the property contact.",
+      "examples": [
+        {
+          "fr": "Bonjour. Il y a une fuite d'eau sous le robinet.",
+          "en": "Nadia: Hello. There is a water leak under the tap."
+        },
+        {
+          "fr": "Pourriez-vous envoyer une photo et préciser le problème ?",
+          "en": "Contact: Could you send a photo and specify the problem?"
+        },
+        {
+          "fr": "Oui. Je voudrais un rendez-vous d'entretien cette semaine.",
+          "en": "Nadia: Yes. I would like a maintenance appointment this week."
+        },
+        {
+          "fr": "Attachez la photo à votre demande, s'il vous plaît.",
+          "en": "Contact: Please attach the photo to your request."
+        },
+        {
+          "fr": "Je l'attache maintenant. Quel est le délai de traitement ?",
+          "en": "Nadia: I am attaching it now. What is the processing time?"
+        },
+        {
+          "fr": "Je peux confirmer l'heure demain.",
+          "en": "Contact: I can confirm the time tomorrow."
+        },
+        {
+          "fr": "Pourriez-vous m'envoyer une réponse écrite ?",
+          "en": "Nadia: Could you send me a written reply?"
+        },
+        {
+          "fr": "Oui, je vous envoie la confirmation demain.",
+          "en": "Contact: Yes, I will send you the confirmation tomorrow."
+        }
+      ]
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What information does the delivery employee ask Karim to confirm?",
+      "options": [
+        "The delivery address",
+        "The apartment's heating",
+        "A repair appointment",
+        "A payment option"
+      ],
+      "answer": 0,
+      "explain": "The employee asks him to confirm the delivery address."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does Karim request from the delivery service?",
+      "options": [
+        "A new delivery",
+        "A bill correction",
+        "A written repair estimate",
+        "A new account"
+      ],
+      "answer": 0,
+      "explain": "He says he would like a new delivery."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does the contact ask Nadia to attach?",
+      "options": [
+        "A photo",
+        "A double-sided copy",
+        "A receipt",
+        "An incomplete form"
+      ],
+      "answer": 0,
+      "explain": "The contact asks her to attach a photo to the request."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does Nadia request after attaching the photo?",
+      "options": [
+        "A written reply",
+        "A refund",
+        "A new tracking number",
+        "A different apartment"
+      ],
+      "answer": 0,
+      "explain": "She asks for a written reply."
+    }
+  ]
+}

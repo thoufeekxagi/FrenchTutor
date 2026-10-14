@@ -1,0 +1,58 @@
+{
+  "id": "b1-u03-listening",
+  "unit": "b1-u03",
+  "unitTitle": "B1 · Make a proposal and explore what could happen",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 3: B1 · Make a proposal and explore what could happen",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Si le centre ouvrait plus tard, les personnes qui travaillent le jour pourraient venir après leur quart. Le groupe propose de faire un essai avant de changer l'horaire toute l'année.",
+      "question": "What does the group suggest?",
+      "options": [
+        "Try a later opening before making a permanent change",
+        "Ask workers to change their shifts",
+        "Move every activity online",
+        "Close the centre all year"
+      ],
+      "answer": 0,
+      "explain": "They suggest a trial before a permanent schedule change."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "À ta place, je garderais deux options. Certains préfèrent se rencontrer, tandis que d'autres pourraient participer en ligne si la connexion fonctionne.",
+      "question": "What is the speaker recommending?",
+      "options": [
+        "Cancel all online meetings",
+        "Change the topic",
+        "Require everyone to attend in person",
+        "Keep both participation options"
+      ],
+      "answer": 3,
+      "explain": "The speaker recommends keeping both options."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Si nous déplacions l'atelier à vendredi, la salle serait libre. Il faudrait toutefois vérifier si l'animatrice peut être présente.",
+      "question": "What still needs to be checked?",
+      "options": [
+        "The room's address",
+        "The facilitator's availability",
+        "The workshop topic",
+        "The cost of transportation"
+      ],
+      "answer": 1,
+      "explain": "The facilitator's availability remains uncertain."
+    }
+  ]
+}

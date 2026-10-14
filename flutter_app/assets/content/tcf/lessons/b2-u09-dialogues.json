@@ -1,0 +1,80 @@
+{
+  "id": "b2-u09-dialogues",
+  "unit": "b2-u09",
+  "unitTitle": "B2 · Everyday economics: qualify numbers and recommendations",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 9: B2 · Everyday economics: qualify numbers and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Discussing a fictional budget report",
+      "body": "Two learners examine a small invented data set and check what it supports.",
+      "examples": [
+        {
+          "fr": "La moyenne des dépenses de transport a augmenté.",
+          "en": "Mina: The average transportation expenses increased."
+        },
+        {
+          "fr": "Est-ce que la hausse concerne tous les ménages ?",
+          "en": "Sam: Does the increase concern every household?"
+        },
+        {
+          "fr": "Le tableau ne permet pas de le savoir.",
+          "en": "Mina: The table does not let us know."
+        },
+        {
+          "fr": "Alors, il faut éviter de généraliser le résultat.",
+          "en": "Sam: Then we should avoid generalizing the result."
+        },
+        {
+          "fr": "Oui. On observe aussi un écart important entre les réponses.",
+          "en": "Mina: Yes. We also see a large gap between responses."
+        },
+        {
+          "fr": "Cela pourrait s'expliquer par les distances ou les horaires.",
+          "en": "Sam: That could be explained by distance or schedules."
+        },
+        {
+          "fr": "C'est possible, mais ces hypothèses demandent une autre enquête.",
+          "en": "Mina: That's possible, but those assumptions require another survey."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Making a cautious recommendation",
+      "body": "A learner suggests a budget change without assuming the same option suits every household.",
+      "examples": [
+        {
+          "fr": "Le rapport recommande de revoir les abonnements.",
+          "en": "Awa: The report recommends reviewing subscriptions."
+        },
+        {
+          "fr": "Cette mesure conviendrait-elle à tout le monde ?",
+          "en": "Marc: Would this measure suit everyone?"
+        },
+        {
+          "fr": "Pas nécessairement. Les besoins et les contrats varient.",
+          "en": "Awa: Not necessarily. Needs and contracts vary."
+        },
+        {
+          "fr": "Il serait prudent de comparer les frais avant de modifier quoi que ce soit.",
+          "en": "Marc: It would be prudent to compare costs before changing anything."
+        },
+        {
+          "fr": "D'accord, en tenant compte de la marge disponible.",
+          "en": "Awa: Agreed, while taking the available margin into account."
+        }
+      ]
+    }
+  ]
+}

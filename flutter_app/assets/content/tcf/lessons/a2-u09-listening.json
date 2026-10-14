@@ -1,0 +1,86 @@
+{
+  "id": "a2-u09-listening",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Listening practice",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Le terminus est fermé aujourd'hui. L'employée indique le nouvel arrêt.",
+      "question": "Who should a traveller ask?",
+      "options": [
+        "The staff member",
+        "The driver in the story",
+        "The library group",
+        "The ticket office manager"
+      ],
+      "answer": 0,
+      "explain": "The announcement says that the staff member points out the stop."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "La ligne express va au centre communautaire. Le groupe est là à 14 h.",
+      "question": "Where does the express line go?",
+      "options": [
+        "The community centre",
+        "The public library",
+        "The final stop",
+        "The airport"
+      ],
+      "answer": 0,
+      "explain": "The community centre is the named destination."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "Je donne l'adresse aux voyageurs. Je leur indique aussi le point de rencontre.",
+      "question": "What does the speaker indicate to the travellers?",
+      "options": [
+        "The meeting point",
+        "The departure time",
+        "The price of a ticket",
+        "The public building"
+      ],
+      "answer": 0,
+      "explain": "The second sentence says the speaker points out the meeting point."
+    },
+    {
+      "type": "listen",
+      "id": "l4",
+      "fr": "Le service est interrompu près du carrefour. L'arrêt provisoire est dans la rue parallèle.",
+      "question": "Where should travellers wait?",
+      "options": [
+        "At the temporary stop",
+        "At the main entrance",
+        "At the public library",
+        "At the final stop"
+      ],
+      "answer": 0,
+      "explain": "The recording names the temporary stop."
+    },
+    {
+      "type": "listen",
+      "id": "l5",
+      "fr": "Le point d'accès est dans la rue parallèle, près de l'entrée principale.",
+      "question": "Where is the access point?",
+      "options": [
+        "In the parallel street",
+        "Beside the station platform",
+        "Inside the community centre",
+        "Across from the temporary stop"
+      ],
+      "answer": 0,
+      "explain": "The recording says it is in the parallel street."
+    }
+  ]
+}

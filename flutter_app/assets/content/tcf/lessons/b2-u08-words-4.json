@@ -1,0 +1,148 @@
+{
+  "id": "b2-u08-words-4",
+  "unit": "b2-u08",
+  "unitTitle": "B2 · Education, culture and identity: synthesize what people say",
+  "title": "Words: core topic language — set 4",
+  "subtitle": "B2 · Unit 8: B2 · Education, culture and identity: synthesize what people say",
+  "minutes": 5,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "un récit collectif",
+      "en": "a collective narrative",
+      "sound": "uh(n) ray-SEE koh-lehk-TEEF",
+      "exampleFr": "Le projet rassemble plusieurs voix dans un récit collectif.",
+      "exampleEn": "The project brings several voices together in a collective narrative."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "une interprétation plurielle",
+      "en": "a plural interpretation",
+      "sound": "ün ehn-tehr-pray-tah-SYOH(N) plü-ree-EHL",
+      "exampleFr": "L'œuvre permet une interprétation plurielle.",
+      "exampleEn": "The work allows for multiple interpretations."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une initiative locale",
+      "en": "a local initiative",
+      "sound": "ün ee-nee-syah-TEEV loh-KAHL",
+      "exampleFr": "Une initiative locale rend les archives accessibles.",
+      "exampleEn": "A local initiative makes the archives accessible."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "la diversité linguistique",
+      "en": "linguistic diversity",
+      "sound": "lah dee-vehr-see-TAY lehn-gees-TEEK",
+      "exampleFr": "La diversité linguistique apparaît dans les témoignages.",
+      "exampleEn": "Linguistic diversity appears in the testimonies."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "un contexte historique",
+      "en": "historical context",
+      "sound": "uh(n) kohn-tehkst ees-toh-REEK",
+      "exampleFr": "Le guide replace le document dans son contexte historique.",
+      "exampleEn": "The guide places the document in its historical context."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "une démarche participative",
+      "en": "a participatory approach",
+      "sound": "ün day-marsh par-tee-see-pah-TEEV",
+      "exampleFr": "Une démarche participative associe les résidents au projet.",
+      "exampleEn": "A participatory approach involves residents in the project."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "un récit collectif",
+      "options": [
+        "linguistic diversity",
+        "a collective narrative",
+        "a plural interpretation",
+        "a local initiative"
+      ],
+      "answer": 1,
+      "explain": "un récit collectif means a collective narrative."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "une interprétation plurielle",
+      "options": [
+        "historical context",
+        "a local initiative",
+        "linguistic diversity",
+        "a plural interpretation"
+      ],
+      "answer": 3,
+      "explain": "une interprétation plurielle means a plural interpretation."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une initiative locale",
+      "options": [
+        "a participatory approach",
+        "a local initiative",
+        "linguistic diversity",
+        "historical context"
+      ],
+      "answer": 1,
+      "explain": "une initiative locale means a local initiative."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "la diversité linguistique",
+      "options": [
+        "a collective narrative",
+        "historical context",
+        "a participatory approach",
+        "linguistic diversity"
+      ],
+      "answer": 3,
+      "explain": "la diversité linguistique means linguistic diversity."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "un contexte historique",
+      "options": [
+        "a plural interpretation",
+        "historical context",
+        "a participatory approach",
+        "a collective narrative"
+      ],
+      "answer": 1,
+      "explain": "un contexte historique means historical context."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "une démarche participative",
+      "options": [
+        "a local initiative",
+        "a collective narrative",
+        "a plural interpretation",
+        "a participatory approach"
+      ],
+      "answer": 3,
+      "explain": "une démarche participative means a participatory approach."
+    }
+  ]
+}

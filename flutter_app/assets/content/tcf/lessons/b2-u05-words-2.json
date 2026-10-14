@@ -1,0 +1,176 @@
+{
+  "id": "b2-u05-words-2",
+  "unit": "b2-u05",
+  "unitTitle": "B2 · Health and public services: express needs and limits carefully",
+  "title": "Words: core topic language — set 2",
+  "subtitle": "B2 · Unit 5: B2 · Health and public services: express needs and limits carefully",
+  "minutes": 6,
+  "steps": [
+    {
+      "type": "word",
+      "id": "w1",
+      "fr": "une ordonnance",
+      "en": "a prescription",
+      "sound": "ün or-doh-NAH(N)S",
+      "exampleFr": "La scène mentionne une ordonnance, sans donner d'avis médical.",
+      "exampleEn": "The scene mentions a prescription without giving medical advice."
+    },
+    {
+      "type": "word",
+      "id": "w2",
+      "fr": "un suivi",
+      "en": "follow-up",
+      "sound": "uh(n) süi-VEE",
+      "exampleFr": "Un suivi est prévu après la rencontre.",
+      "exampleEn": "A follow-up is planned after the meeting."
+    },
+    {
+      "type": "word",
+      "id": "w3",
+      "fr": "une admissibilité",
+      "en": "eligibility",
+      "sound": "ün ahd-mee-see-bee-lee-TAY",
+      "exampleFr": "L'admissibilité dépend des critères du service.",
+      "exampleEn": "Eligibility depends on the service's criteria."
+    },
+    {
+      "type": "word",
+      "id": "w4",
+      "fr": "un formulaire",
+      "en": "a form",
+      "sound": "uh(n) for-mü-LEHR",
+      "exampleFr": "Le formulaire demande une date de contact.",
+      "exampleEn": "The form asks for a contact date."
+    },
+    {
+      "type": "word",
+      "id": "w5",
+      "fr": "une confirmation",
+      "en": "a confirmation",
+      "sound": "ün kohn-feer-mah-SYOH(N)",
+      "exampleFr": "Elle demande une confirmation écrite.",
+      "exampleEn": "She asks for written confirmation."
+    },
+    {
+      "type": "word",
+      "id": "w6",
+      "fr": "un cas particulier",
+      "en": "a particular case",
+      "sound": "uh(n) kah par-tee-kü-LYAY",
+      "exampleFr": "Le document renvoie les cas particuliers à un agent.",
+      "exampleEn": "The document refers particular cases to an agent."
+    },
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What does this mean?",
+      "promptFr": "une ordonnance",
+      "options": [
+        "a form",
+        "a prescription",
+        "follow-up",
+        "eligibility"
+      ],
+      "answer": 1,
+      "explain": "une ordonnance means a prescription."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "What does this mean?",
+      "promptFr": "un suivi",
+      "options": [
+        "a confirmation",
+        "eligibility",
+        "a form",
+        "follow-up"
+      ],
+      "answer": 3,
+      "explain": "un suivi means follow-up."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "What does this mean?",
+      "promptFr": "une admissibilité",
+      "options": [
+        "a particular case",
+        "eligibility",
+        "a form",
+        "a confirmation"
+      ],
+      "answer": 1,
+      "explain": "une admissibilité means eligibility."
+    },
+    {
+      "type": "choose",
+      "id": "c4",
+      "prompt": "What does this mean?",
+      "promptFr": "un formulaire",
+      "options": [
+        "a prescription",
+        "a confirmation",
+        "a particular case",
+        "a form"
+      ],
+      "answer": 3,
+      "explain": "un formulaire means a form."
+    },
+    {
+      "type": "choose",
+      "id": "c5",
+      "prompt": "What does this mean?",
+      "promptFr": "une confirmation",
+      "options": [
+        "follow-up",
+        "a confirmation",
+        "a particular case",
+        "a prescription"
+      ],
+      "answer": 1,
+      "explain": "une confirmation means a confirmation."
+    },
+    {
+      "type": "choose",
+      "id": "c6",
+      "prompt": "What does this mean?",
+      "promptFr": "un cas particulier",
+      "options": [
+        "eligibility",
+        "a prescription",
+        "follow-up",
+        "a particular case"
+      ],
+      "answer": 3,
+      "explain": "un cas particulier means a particular case."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "un suivi",
+      "question": "Which word did you hear?",
+      "options": [
+        "un formulaire",
+        "un suivi",
+        "une ordonnance",
+        "une admissibilité"
+      ],
+      "answer": 1,
+      "explain": "You heard un suivi: follow-up."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "une admissibilité",
+      "question": "Which word did you hear?",
+      "options": [
+        "une confirmation",
+        "un suivi",
+        "un formulaire",
+        "une admissibilité"
+      ],
+      "answer": 3,
+      "explain": "You heard une admissibilité: eligibility."
+    }
+  ]
+}

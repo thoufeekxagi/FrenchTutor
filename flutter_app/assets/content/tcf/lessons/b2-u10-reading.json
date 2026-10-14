@@ -1,0 +1,52 @@
+{
+  "id": "b2-u10-reading",
+  "unit": "b2-u10",
+  "unitTitle": "B2 · Community debate: connect ideas without losing the thread",
+  "title": "Reading practice",
+  "subtitle": "B2 · Unit 10: B2 · Community debate: connect ideas without losing the thread",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "choose",
+      "id": "c1",
+      "prompt": "What is the agreed next step?",
+      "options": [
+        "Choose Mina's proposal immediately",
+        "Remove transport from the discussion",
+        "End the learning space",
+        "Collect feedback after the first month"
+      ],
+      "answer": 3,
+      "explain": "The group plans to gather feedback after the first month.",
+      "promptFr": "Le groupe a examiné trois propositions pour l'espace d'apprentissage. Mina souhaite des heures du soir; Louis insiste sur les correspondances de transport; Chen propose un essai limité. Les participants s'entendent sur un point : l'accès doit être évalué à différents moments. Le compte rendu ne désigne pas encore de solution finale. Il prévoit de recueillir des commentaires après le premier mois et de revenir ensuite aux options étudiées."
+    },
+    {
+      "type": "choose",
+      "id": "c2",
+      "prompt": "Why might a writer repeat a noun instead of using y?",
+      "options": [
+        "To avoid naming the proposal",
+        "To prevent an unclear reference",
+        "To remove a point of view",
+        "To make a claim sound certain"
+      ],
+      "answer": 1,
+      "explain": "Repeating the noun can make the reference clear.",
+      "promptFr": "Dans le résumé, le pronom y renvoie à la proposition d'essai mentionnée dans la phrase précédente. Comme le texte présente aussi une salle, répéter le nom aurait été plus clair si les deux références avaient pu être confondues."
+    },
+    {
+      "type": "choose",
+      "id": "c3",
+      "prompt": "How does the report treat the objections?",
+      "options": [
+        "As concerns about different conditions, not a single total rejection",
+        "As already resolved",
+        "As proof that no one attended",
+        "As identical to the points of agreement"
+      ],
+      "answer": 0,
+      "explain": "The objections concern different conditions and are not treated as a total rejection.",
+      "promptFr": "La facilitatrice distingue deux points de convergence et trois objections. Elle ne présente pas les objections comme un rejet global; chacune concerne une condition différente. Le rapport propose un suivi pour vérifier si le compromis répond à ces conditions."
+    }
+  ]
+}

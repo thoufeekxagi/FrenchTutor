@@ -1,0 +1,80 @@
+{
+  "id": "b2-u07-dialogues",
+  "unit": "b2-u07",
+  "unitTitle": "B2 · Environment and public policy: explain causes and effects",
+  "title": "Dialogues",
+  "subtitle": "B2 · Unit 7: B2 · Environment and public policy: explain causes and effects",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Dialogues",
+      "body": "Listen for the speakers' goals and how each response changes the exchange. Read once for meaning, then cover the English and summarize each person's position."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Reviewing a waste-reduction proposal",
+      "body": "A community group reviews an invented pilot and asks what its figures mean.",
+      "examples": [
+        {
+          "fr": "Le projet vise à réduire les déchets pendant les événements.",
+          "en": "Marc: The project aims to reduce waste at events."
+        },
+        {
+          "fr": "Comment la réduction sera-t-elle mesurée ?",
+          "en": "Awa: How will the reduction be measured?"
+        },
+        {
+          "fr": "Un bilan comparera les résultats avec ceux d'un événement précédent.",
+          "en": "Marc: An assessment will compare the results with those of an earlier event."
+        },
+        {
+          "fr": "Il faudra tenir compte de la taille des événements.",
+          "en": "Awa: We will need to account for the size of the events."
+        },
+        {
+          "fr": "Oui, sinon la comparaison pourrait être trompeuse.",
+          "en": "Marc: Yes, otherwise the comparison could be misleading."
+        },
+        {
+          "fr": "Le guide devrait aussi être simplifié afin que les bénévoles puissent le suivre.",
+          "en": "Awa: The guide should also be simplified so volunteers can follow it."
+        },
+        {
+          "fr": "D'accord, à moins que l'équipe trouve une autre méthode plus accessible.",
+          "en": "Marc: Agreed, unless the team finds another, more accessible method."
+        }
+      ]
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Discussing an intended effect",
+      "body": "Two learners separate a policy's goal from an outcome that has been measured.",
+      "examples": [
+        {
+          "fr": "La mesure a pour objectif de limiter le gaspillage.",
+          "en": "Nadia: The measure aims to limit waste."
+        },
+        {
+          "fr": "Est-ce que le bilan confirme déjà une réduction ?",
+          "en": "Sam: Does the assessment already confirm a reduction?"
+        },
+        {
+          "fr": "Pas encore. Le projet vient de commencer.",
+          "en": "Nadia: Not yet. The project has just started."
+        },
+        {
+          "fr": "Donc, on peut décrire l'objectif, mais pas encore le résultat.",
+          "en": "Sam: So we can describe the objective, but not yet the result."
+        },
+        {
+          "fr": "Exactement. L'incidence sur les fournisseurs reste aussi inconnue.",
+          "en": "Nadia: Exactly. The impact on suppliers also remains unknown."
+        }
+      ]
+    }
+  ]
+}

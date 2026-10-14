@@ -1,0 +1,58 @@
+{
+  "id": "b1-u05-listening",
+  "unit": "b1-u05",
+  "unitTitle": "B1 · Explain needs, preferences and recommendations",
+  "title": "Listening practice",
+  "subtitle": "B1 · Unit 5: B1 · Explain needs, preferences and recommendations",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Listen once",
+      "body": "In the real test you hear each recording once. Tap the speaker, listen, then choose. Do not replay. Never leave a question empty."
+    },
+    {
+      "type": "listen",
+      "id": "l1",
+      "fr": "Il faut que les participants puissent réserver leur place par téléphone. La coordonnatrice souhaite aussi que les consignes soient disponibles en ligne.",
+      "question": "What two changes does the coordinator want?",
+      "options": [
+        "Fewer activities and no registration",
+        "A later start and a longer class",
+        "Free meals and a new building",
+        "Phone registration and online instructions"
+      ],
+      "answer": 3,
+      "explain": "She wants phone registration and instructions online."
+    },
+    {
+      "type": "listen",
+      "id": "l2",
+      "fr": "Je préfère suivre le cours du soir, mais il est important que la salle soit proche d'un arrêt d'autobus. Je ne veux pas que le trajet soit trop compliqué.",
+      "question": "What is the speaker's main condition?",
+      "options": [
+        "The instructor must change",
+        "The activity should be cancelled",
+        "The room should be near a bus stop",
+        "The course should be longer"
+      ],
+      "answer": 2,
+      "explain": "The speaker needs the room near a bus stop."
+    },
+    {
+      "type": "listen",
+      "id": "l3",
+      "fr": "La responsable est contente que plusieurs membres aient répondu. Elle souhaite que le prochain sondage demande aussi quelles heures leur conviennent.",
+      "question": "What should the next survey ask?",
+      "options": [
+        "Which times work for members",
+        "How much the room costs",
+        "Whether the program should close",
+        "Who will lead the class"
+      ],
+      "answer": 0,
+      "explain": "The next survey should ask which times suit members."
+    }
+  ]
+}

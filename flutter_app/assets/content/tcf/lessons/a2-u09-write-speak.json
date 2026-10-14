@@ -1,0 +1,42 @@
+{
+  "id": "a2-u09-write-speak",
+  "unit": "a2-u09",
+  "unitTitle": "Travel across the city and beyond",
+  "title": "Write and speak",
+  "subtitle": "A2 · Unit 9: Travel across the city and beyond",
+  "minutes": 3,
+  "steps": [
+    {
+      "type": "explain",
+      "id": "e1",
+      "title": "Writing: Tell someone how you will get there",
+      "body": "Write 60–90 French words to a classmate. Say where you are, name a service or route change, explain where you will go next, and ask one person for information. Use lui or leur and y at least once. Give a clear time or meeting point; use an invented route.\n\nWrite it on paper or in your notes app. Then compare with the model on the next card. You can tap Ask Marie to have her read your text and give one correction."
+    },
+    {
+      "type": "explain",
+      "id": "e2",
+      "title": "Model answer",
+      "body": "Bonjour Sam, Le service est interrompu près du terminus. Je vais demander l'heure de départ à l'employée et lui donner mon billet. Nous allons au centre communautaire par la ligne express. Si nous manquons la correspondance, je vais lui demander une mise à jour. Nous allons au point de rencontre près de l'entrée principale à 14 h. À bientôt, Karim\n\nCheck:\n• Name the person or place before replacing it with a pronoun.\n• Use lui/leur for the person in the patterns taught here; use y for a named place.\n• Put the pronoun before its verb, including before the infinitive after aller.\n• Make the route and meeting point easy to follow.\n• Write 60–90 words, then close your notes and explain the route aloud."
+    },
+    {
+      "type": "explain",
+      "id": "e3",
+      "title": "Speaking: Help Marie find the meeting point",
+      "body": "Marie knows the destination but not the changed route. Ask her for one missing detail, explain where you are going, and confirm the meeting point. Use lui/leur and y where they fit. On the retry, use a new destination and a different service change without a prepared question list.\n\n• Say the place name once before using y.\n• Say who receives the question or information before using lui or leur if the listener might lose the reference.\n• Ask one specific follow-up, such as the time or stop, rather than guessing.\n• On the second attempt, change the route and explain the change with your notes closed."
+    },
+    {
+      "type": "phrase",
+      "id": "p1",
+      "fr": "Je vais au centre communautaire. Le service est interrompu près de la gare. Je demande le nouvel arrêt à l'employée. Je lui demande aussi l'heure de départ.",
+      "en": "Model answer, part 1 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    },
+    {
+      "type": "phrase",
+      "id": "p2",
+      "fr": "Nous y allons par la ligne express. Le groupe est près de l'entrée principale.",
+      "en": "Model answer, part 2 of 2.",
+      "tip": "Listen, then say it out loud. Tap Ask Marie to have her listen to you."
+    }
+  ]
+}

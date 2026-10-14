@@ -1,0 +1,408 @@
+{
+  "id": "a2-listen-facture",
+  "title": "La facture du téléphone",
+  "titleEn": "The phone bill",
+  "level": "A2",
+  "mode": "listening",
+  "minutes": 4,
+  "summary": "A confusing phone bill prompts Karim to compare the invoice with his plan and ask customer service for a correction.",
+  "unit": "a2-u05",
+  "sentences": [
+    {
+      "fr": "Karim reçoit sa facture de téléphone par courriel.",
+      "en": "Karim receives his phone bill by email."
+    },
+    {
+      "fr": "Le montant est plus élevé que le mois précédent.",
+      "en": "The amount is higher than the previous month."
+    },
+    {
+      "fr": "Il ouvre son compte et compare les détails avec son forfait.",
+      "en": "He opens his account and compares the details with his plan."
+    },
+    {
+      "fr": "Un frais apparaît deux fois, avec la même date.",
+      "en": "One fee appears twice, with the same date."
+    },
+    {
+      "fr": "Karim appelle le service à la clientèle.",
+      "en": "Karim calls customer service."
+    },
+    {
+      "fr": "La conseillère vérifie son dossier et reconnaît une erreur.",
+      "en": "The adviser checks his file and recognizes an error."
+    },
+    {
+      "fr": "Elle retire le deuxième frais et envoie une facture corrigée.",
+      "en": "She removes the second fee and sends a corrected bill."
+    },
+    {
+      "fr": "Karim demande un numéro de suivi pour sa demande.",
+      "en": "Karim asks for a reference number for his request."
+    },
+    {
+      "fr": "Il note le numéro avec la date de l'appel.",
+      "en": "He writes down the number and the date of the call."
+    }
+  ],
+  "words": {
+    "karim": {
+      "en": "Karim (a man's name)",
+      "pos": "proper name"
+    },
+    "reçoit": {
+      "en": "receives",
+      "pos": "verb",
+      "lemma": "recevoir",
+      "note": "Present form of recevoir."
+    },
+    "sa": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Feminine singular noun form."
+    },
+    "facture": {
+      "en": "bill; invoice",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "facture"
+    },
+    "de": {
+      "en": "of; some"
+    },
+    "téléphone": {
+      "en": "telephone",
+      "sound": "luh tay-lay-FOHN",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "téléphone"
+    },
+    "par": {
+      "en": "by"
+    },
+    "courriel": {
+      "en": "email (Canada)",
+      "pos": "noun, masculine",
+      "sound": "koo-RYEL",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "courriel"
+    },
+    "le": {
+      "en": "the"
+    },
+    "montant": {
+      "en": "amount",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "est": {
+      "en": "is (être)",
+      "pos": "verb"
+    },
+    "plus": {
+      "en": "plus"
+    },
+    "élevé": {
+      "en": "high; elevated",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "élevé",
+      "note": "Masculine singular form."
+    },
+    "que": {
+      "en": "that; which",
+      "pos": "connector / pronoun"
+    },
+    "mois": {
+      "en": "month",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "mois",
+      "note": "The written form is the same in the plural."
+    },
+    "précédent": {
+      "en": "previous",
+      "pos": "adjective",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "précédent",
+      "note": "Masculine singular form."
+    },
+    "il": {
+      "en": "it, he",
+      "pos": "pronoun"
+    },
+    "ouvre": {
+      "en": "opens",
+      "pos": "verb",
+      "lemma": "ouvrir",
+      "note": "Present form of ouvrir."
+    },
+    "son": {
+      "en": "his; her; its",
+      "pos": "possessive determiner",
+      "note": "Masculine singular noun form."
+    },
+    "compte": {
+      "en": "an account; report",
+      "sound": "uh(n) koh(n)t",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "compte"
+    },
+    "et": {
+      "en": "and"
+    },
+    "compare": {
+      "en": "compares",
+      "pos": "verb",
+      "lemma": "comparer",
+      "note": "Present form of comparer."
+    },
+    "les": {
+      "en": "the (plural)"
+    },
+    "détails": {
+      "en": "a detail",
+      "sound": "uh(n) day-TAHY",
+      "lemma": "détail",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural"
+    },
+    "avec": {
+      "en": "with",
+      "pos": "preposition"
+    },
+    "forfait": {
+      "en": "phone plan",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "forfait"
+    },
+    "un": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Masculine singular article."
+    },
+    "frais": {
+      "en": "fee; charge",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "plural",
+      "lemma": "frais",
+      "note": "Usually used in the plural."
+    },
+    "apparaît": {
+      "en": "appears",
+      "pos": "verb",
+      "lemma": "apparaître",
+      "note": "Present form of apparaître."
+    },
+    "deux": {
+      "en": "two",
+      "pos": "number"
+    },
+    "fois": {
+      "en": "time; occasion",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "fois",
+      "note": "The form fois does not change in the plural."
+    },
+    "la": {
+      "en": "the"
+    },
+    "même": {
+      "en": "same; even",
+      "pos": "adjective",
+      "lemma": "même"
+    },
+    "date": {
+      "en": "date",
+      "pos": "noun, feminine",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "date"
+    },
+    "appelle": {
+      "en": "calls",
+      "pos": "verb",
+      "lemma": "appeler",
+      "note": "Present form of appeler."
+    },
+    "service": {
+      "en": "service",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular"
+    },
+    "à": {
+      "en": "in, at"
+    },
+    "clientèle": {
+      "en": "customers; clientele",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "conseillère": {
+      "en": "adviser",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "conseiller",
+      "note": "Feminine form of conseiller."
+    },
+    "vérifie": {
+      "en": "checks",
+      "pos": "verb",
+      "lemma": "vérifier",
+      "note": "Present form of vérifier."
+    },
+    "dossier": {
+      "en": "file; account record",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "dossier"
+    },
+    "reconnaît": {
+      "en": "recognizes; acknowledges",
+      "pos": "verb",
+      "lemma": "reconnaître",
+      "note": "Present form of reconnaître."
+    },
+    "une": {
+      "en": "a; one",
+      "pos": "article / number",
+      "note": "Feminine singular article."
+    },
+    "erreur": {
+      "en": "error; mistake",
+      "pos": "noun",
+      "gender": "feminine",
+      "number": "singular"
+    },
+    "elle": {
+      "en": "she",
+      "pos": "pronoun"
+    },
+    "retire": {
+      "en": "removes",
+      "pos": "verb",
+      "lemma": "retirer",
+      "note": "Present form of retirer."
+    },
+    "deuxième": {
+      "en": "second; next",
+      "pos": "adjective",
+      "number": "singular",
+      "lemma": "deuxième",
+      "note": "Same form for masculine and feminine."
+    },
+    "envoie": {
+      "en": "sends",
+      "pos": "verb",
+      "lemma": "envoyer",
+      "note": "Present form of envoyer."
+    },
+    "corrigée": {
+      "en": "corrected",
+      "pos": "verb",
+      "lemma": "corriger",
+      "note": "Feminine form of the past participle corrigé."
+    },
+    "demande": {
+      "en": "asks (demander)",
+      "pos": "verb",
+      "sound": "duh-MAH(N)d",
+      "gender": "feminine",
+      "number": "singular",
+      "lemma": "demande"
+    },
+    "numéro": {
+      "en": "number",
+      "sound": "luh nü-may-ROH",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "numéro"
+    },
+    "suivi": {
+      "en": "reference; follow-up",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "suivi"
+    },
+    "pour": {
+      "en": "for"
+    },
+    "note": {
+      "en": "writes down; notes",
+      "pos": "verb",
+      "lemma": "noter",
+      "note": "Present form of noter."
+    },
+    "l'appel": {
+      "en": "call",
+      "pos": "noun",
+      "gender": "masculine",
+      "number": "singular",
+      "lemma": "appel",
+      "note": "Elided le before a vowel."
+    }
+  },
+  "keywords": [
+    "facture",
+    "forfait",
+    "frais",
+    "service",
+    "erreur"
+  ],
+  "quiz": [
+    {
+      "prompt": "Why is the bill higher?",
+      "options": [
+        "A fee appears twice.",
+        "Karim changed his phone.",
+        "He added a family member.",
+        "The bill includes a new device."
+      ],
+      "answer": 0,
+      "explain": "The same fee is listed twice with the same date."
+    },
+    {
+      "prompt": "What does the adviser do?",
+      "options": [
+        "Removes the duplicate fee",
+        "Cancels Karim's plan",
+        "Sends a new phone",
+        "Changes the billing date"
+      ],
+      "answer": 0,
+      "explain": "She removes the second fee and sends a corrected bill."
+    },
+    {
+      "prompt": "What information does Karim keep?",
+      "options": [
+        "A reference number and call date",
+        "The adviser's home address",
+        "A copy of his old phone",
+        "The next appointment time"
+      ],
+      "answer": 0,
+      "explain": "He records the reference number and the date."
+    }
+  ]
+}
