@@ -35,6 +35,7 @@ class _V3ShellState extends State<V3Shell> {
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: V3Width(
+        maxWidth: _index == 0 ? 1120 : 680,
         child: IndexedStack(
           index: _index,
           children: const [

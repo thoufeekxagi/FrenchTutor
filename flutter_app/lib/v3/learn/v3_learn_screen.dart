@@ -6,9 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../design/app_router.dart';
-import '../../design/appearance_colors.dart';
 import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
+import '../../screens/labs/vocab_lab_screen.dart';
+import '../../screens/labs/vocabulary_flashcards_screen.dart';
 import '../lesson/v3_course.dart';
 import '../lesson/v3_lesson.dart';
 import '../lesson/v3_lesson_player.dart';
@@ -21,13 +22,15 @@ import '../ui/v3_ui.dart';
 /// Learn tab. Screen contract:
 ///
 /// User arrived to: open the app to study.
-/// They must understand: what to do next, how long it takes, how far along
-/// they are, and how far the exam is.
-/// Primary action: Start (or resume) the next lesson. Exactly one.
-/// Secondary: Path to pick any lesson, Stories to read.
-/// Success state: a lesson opens at the right step and finishing it moves the
-/// "next" card on.
-/// Must not contain: AI-generated lessons, fake progress, photo heroes.
+/// They must understand: the next authored lesson and its duration, plus the
+/// exam countdown when an exam date is saved. Full pathway progress lives in
+/// the Path segment.
+/// Primary action: Continue the course pathway. Exactly one.
+/// Secondary: Review today's flashcards; Path and Stories stay in the top
+/// segments.
+/// Success state: the lesson opens at the saved step and moves the pathway on
+/// when complete.
+/// Must not contain: AI-generated lessons, fake progress, photos, or subtitles.
 ///
 /// Everything comes from the bundled authored course. Progress is local.
 class V3LearnScreen extends ConsumerStatefulWidget {
@@ -185,6 +188,40 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     if (mounted) unawaited(_load());
   }
 
+  Future<void> _openReview() async {
+    try {
+      final entries = await ref.read(srsServiceProvider).dailyMixedQueue();
+      if (!mounted) return;
+
+      if (entries.isEmpty) {
+        await AppRouter.push(context, (_) => const VocabLabScreen());
+      } else {
+        final profile = ref.read(learningStoreProvider).profile();
+        await AppRouter.push<bool>(
+          context,
+          (_) => VocabularyFlashcardsScreen(
+            title: 'Daily review',
+            entries: entries,
+            source: 'v3_daily_review',
+            topic: 'Daily review',
+            levelBand: profile.level.toUpperCase(),
+            studyDepth: VocabularyStudyDepth.wordsAndSentences,
+            storyExamples: ref
+                .read(contentServiceProvider)
+                .vocabExamplesFor(entries),
+          ),
+          fullscreenDialog: true,
+        );
+      }
+      if (mounted) unawaited(_load());
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Review is unavailable right now.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final level = ref
@@ -195,61 +232,90 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     final chip = const {'a1', 'a2', 'b1', 'b2'}.contains(level)
         ? level.toUpperCase()
         : 'A1';
+    final days = _examDate?.difference(DateTime.now()).inDays;
     return SafeArea(
       bottom: false,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('TCF CANADA', style: V3Type.eyebrow()),
-                    const SizedBox(height: 6),
-                    Text('Learn', style: V3Type.hero(44)),
-                  ],
-                ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wideToday = _tab == 0 && constraints.maxWidth >= 840;
+          final contentWidth = wideToday
+              ? constraints.maxWidth
+              : constraints.maxWidth.clamp(0, 680).toDouble();
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: contentWidth),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('TCF CANADA', style: V3Type.eyebrow()),
+                            const SizedBox(height: 4),
+                            Text('Learn', style: V3Type.hero(36)),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: DesignTokens.primarySoft,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              chip,
+                              style: V3Type.strong(14, DesignTokens.primary),
+                            ),
+                          ),
+                          if (days != null && days >= 0) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              days == 1
+                                  ? 'Exam tomorrow'
+                                  : 'Exam in $days days',
+                              style: V3Type.body(12),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      _segment('Today', 0),
+                      const SizedBox(width: 24),
+                      _segment('Path', 1),
+                      const SizedBox(width: 24),
+                      _segment('Stories', 2),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  if (!_loaded)
+                    const SizedBox(height: 240)
+                  else if (_tab == 0)
+                    ..._today(wide: wideToday)
+                  else if (_tab == 1)
+                    ..._path()
+                  else
+                    const V3StoriesPanel(),
+                ],
               ),
-              Container(
-                margin: const EdgeInsets.only(top: 4),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 7,
-                ),
-                decoration: BoxDecoration(
-                  color: DesignTokens.primarySoft,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  chip,
-                  style: V3Type.strong(14, DesignTokens.primary),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 22),
-          Row(
-            children: [
-              _segment('Today', 0),
-              const SizedBox(width: 24),
-              _segment('Path', 1),
-              const SizedBox(width: 24),
-              _segment('Stories', 2),
-            ],
-          ),
-          const SizedBox(height: 20),
-          if (!_loaded)
-            const SizedBox(height: 240)
-          else if (_tab == 0)
-            ..._today()
-          else if (_tab == 1)
-            ..._path()
-          else
-            const V3StoriesPanel(),
-        ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -285,203 +351,103 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
 
   // ---- Today -------------------------------------------------------------
 
-  List<Widget> _today() {
-    final real = _course.where((l) => !l.dev).toList();
-    final doneCount = real.where((l) => _done.contains(l.id)).length;
-    final days = _examDate?.difference(DateTime.now()).inDays;
-    return [
-      if (days != null && days >= 0) ...[
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: DesignTokens.surface,
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: DesignTokens.hairline),
-            boxShadow: DesignTokens.surfaceShadow,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'EXAM IN',
-                      style: V3Type.eyebrow(DesignTokens.inkSoft),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      days == 1 ? '1 day' : '$days days',
-                      style: V3Type.title(30),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                'Target NCLC 7',
-                style: V3Type.strong(14, DesignTokens.mastery),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
-      ],
-      _hero(),
-      if (real.isNotEmpty) ...[
-        const SizedBox(height: 16),
+  List<Widget> _today({required bool wide}) {
+    final review = _reviewShortcut();
+    if (wide) {
+      return [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(3),
-                child: LinearProgressIndicator(
-                  value: doneCount / real.length,
-                  minHeight: 5,
-                  backgroundColor: DesignTokens.hairline,
-                  color: DesignTokens.primary,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              '$doneCount of ${real.length} lessons',
-              style: V3Type.body(13),
-            ),
+            Expanded(flex: 6, child: _hero()),
+            const SizedBox(width: 16),
+            Expanded(flex: 3, child: review),
           ],
         ),
-      ],
-      if (_stories.isNotEmpty) ...[
-        const SizedBox(height: 22),
-        V3Pressable(
-          key: const ValueKey('learn.readStory'),
-          label: 'Read a story',
-          onTap: () => setState(() => _tab = 2),
-          child: Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: DesignTokens.surface,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: DesignTokens.hairline),
-              boxShadow: DesignTokens.surfaceShadow,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Read a story', style: V3Type.strong(18)),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Short, tap any word, hear any line',
-                        style: V3Type.body(14),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  CupertinoIcons.arrow_right,
-                  color: DesignTokens.inkSoft,
-                  size: 20,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    ];
+      ];
+    }
+    return [_hero(), const SizedBox(height: 12), review];
   }
 
   Widget _hero() {
     final next = _next;
     if (next == null) {
       return _heroCard(
-        eyebrow: _course.isEmpty ? 'LESSONS' : 'ALL DONE FOR NOW',
-        title: _course.isEmpty
-            ? 'No lessons found'
-            : 'You finished every lesson',
-        subtitle: _course.isEmpty
-            ? 'Close and reopen the app. If this stays, contact support.'
-            : 'More units are coming. Replay any lesson from Path or read a story.',
+        eyebrow: 'CONTINUE PATH',
+        title: _course.isEmpty ? 'No lessons found' : 'Path complete',
+        detail: '',
+        action: 'Open path',
+        onStart: () => setState(() => _tab = 1),
       );
     }
-    final at = _pos[next.id] ?? 0;
     return _heroCard(
-      eyebrow: at > 0
-          ? 'RESUME  ·  STEP ${at + 1} OF ${next.steps.length}'
-          : 'NEXT  ·  ${next.minutes} MIN',
+      eyebrow: 'CONTINUE PATH',
       title: next.title,
-      subtitle: next.unit.isEmpty
-          ? next.subtitle
-          : '${next.unitLabel}: ${next.unitTitle}',
-      action: at > 0 ? 'Resume lesson' : 'Start lesson',
+      detail: '${next.unitLabel} · ${next.minutes} min',
+      action: 'Continue path',
       onStart: () => _openLesson(next),
+    );
+  }
+
+  Widget _reviewShortcut() {
+    return V3Pressable(
+      key: const ValueKey('learn.review'),
+      label: 'Review flashcards',
+      onTap: _openReview,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 68),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: DesignTokens.hairline),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.style_outlined, color: DesignTokens.primary, size: 22),
+            const SizedBox(width: 12),
+            Expanded(child: Text('Review', style: V3Type.strong(16))),
+            Icon(
+              CupertinoIcons.arrow_right,
+              color: DesignTokens.inkSoft,
+              size: 18,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _heroCard({
     required String eyebrow,
     required String title,
-    required String subtitle,
-    String action = 'Start lesson',
+    required String detail,
+    required String action,
     VoidCallback? onStart,
   }) {
-    // Brand-blue hero in both appearances: white text on the fixed blue keeps
-    // contrast, where the lighter dark-mode action blue would wash out.
-    const onBlue = Colors.white;
-    final dim = onBlue.withValues(alpha: 0.8);
     return Container(
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 22),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppearanceColors.blueLight,
-            Color.lerp(AppearanceColors.blueLight, Colors.black, 0.3)!,
-          ],
-        ),
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: DesignTokens.hairline),
+        boxShadow: DesignTokens.surfaceShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(eyebrow, style: V3Type.eyebrow(dim)),
-          const SizedBox(height: 12),
-          Text(title, style: V3Type.title(30, color: onBlue)),
-          const SizedBox(height: 8),
-          Text(subtitle, style: V3Type.body(15, dim)),
-          if (onStart != null) ...[
-            const SizedBox(height: 22),
-            V3Pressable(
-              key: const ValueKey('learn.startLesson'),
-              label: action,
-              onTap: onStart,
-              child: Container(
-                height: 54,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: onBlue,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      action,
-                      style: V3Type.strong(16, AppearanceColors.blueLight),
-                    ),
-                    const SizedBox(width: 10),
-                    Icon(
-                      CupertinoIcons.arrow_right,
-                      size: 18,
-                      color: AppearanceColors.blueLight,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          Text(eyebrow, style: V3Type.eyebrow()),
+          const SizedBox(height: 10),
+          Text(title, style: V3Type.title(25)),
+          if (detail.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(detail, style: V3Type.body(13)),
           ],
+          const SizedBox(height: 16),
+          V3Button(
+            key: const ValueKey('learn.continuePath'),
+            label: action,
+            onTap: onStart,
+          ),
         ],
       ),
     );
