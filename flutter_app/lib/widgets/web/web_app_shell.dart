@@ -139,7 +139,7 @@ class _Sidebar extends StatelessWidget {
   }
 }
 
-/// Brand lockup at the top of the sidebar: gradient mark plus wordmark, the
+/// Brand lockup at the top of the sidebar: shared logo mark plus wordmark, the
 /// slot the reference uses for its workspace switcher.
 class _BrandHeader extends StatelessWidget {
   const _BrandHeader();
@@ -155,19 +155,13 @@ class _BrandHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: 28,
             height: 28,
-            decoration: BoxDecoration(
-              color: DesignTokens.primary,
-              borderRadius: BorderRadius.circular(DesignTokens.radiusSmall),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              'P',
-              style: Passeport.display(
-                15,
-              ).copyWith(color: DesignTokens.surface),
+            child: Image.asset(
+              'assets/images/logo_mark.png',
+              fit: BoxFit.contain,
+              excludeFromSemantics: true,
             ),
           ),
           const SizedBox(width: DesignTokens.space3),

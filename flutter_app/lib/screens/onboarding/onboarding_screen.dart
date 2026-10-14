@@ -263,7 +263,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   // ---------------------------------------------------------------- page 0
-  /// Apple-standard welcome opener with dual-bubble conversational brand mark,
+  /// Apple-standard welcome opener with the shared ParleSprint logo,
   /// high-contrast value proposition, TEF/TCF trust badge, and Apple HIG actions.
   Widget _welcomeStep() {
     if (_web) return _webWelcomeStep();
@@ -1137,7 +1137,7 @@ class _BrandWordmark extends StatelessWidget {
   const _BrandWordmark({this.onLightBackground = false});
 
   /// The onboarding header sits on the brand gradient on phones and on a
-  /// neutral canvas on web. The shared mark stays gold on both surfaces.
+  /// neutral canvas on web. The transparent mark is shared across both surfaces.
   final bool onLightBackground;
 
   @override
@@ -1146,10 +1146,13 @@ class _BrandWordmark extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
-          'assets/images/logo_mark.png',
-          width: 18,
+          onLightBackground
+              ? 'assets/images/logo_mark.png'
+              : 'assets/images/pulse_sprint_app_icon.png',
+          width: onLightBackground ? 18 : 22,
           height: 22,
-          color: null,
+          fit: BoxFit.contain,
+          excludeFromSemantics: true,
         ),
         const SizedBox(width: 6),
         Text(

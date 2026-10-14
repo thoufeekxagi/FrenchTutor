@@ -6,8 +6,8 @@ import '../../../design/tokens.dart';
 
 /// Apple-Standard Welcome Screen for ParleSprint.
 /// Matches the verified Stitch design specification with high-contrast
-/// typography, the official dual-bubble conversational brand mark, the
-/// TEF/TCF trust badge, and Apple HIG compliant touch targets.
+/// typography, the shared ParleSprint logo, the TEF/TCF trust badge, and Apple
+/// HIG compliant touch targets.
 class AppleWelcomeView extends StatelessWidget {
   const AppleWelcomeView({
     super.key,
@@ -40,7 +40,7 @@ class AppleWelcomeView extends StatelessWidget {
             children: [
               const Spacer(flex: 2),
 
-              // Brand Mark: Overlapping Conversation Bubbles + Wordmark
+              // Shared app mark and wordmark
               const _BrandHeader(),
 
               const Spacer(flex: 3),
@@ -77,32 +77,12 @@ class _BrandHeader extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 88,
-          height: 64,
-          child: Stack(
-            alignment: Alignment.center,
-            children: const [
-              Positioned(
-                left: 10,
-                top: 6,
-                child: Icon(
-                  CupertinoIcons.bubble_left_fill,
-                  size: 46,
-                  color: Colors.white,
-                ),
-              ),
-              Positioned(
-                right: 10,
-                bottom: 6,
-                child: Icon(
-                  CupertinoIcons.bubble_right_fill,
-                  size: 38,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
+        Image.asset(
+          'assets/images/pulse_sprint_app_icon.png',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+          excludeFromSemantics: true,
         ),
         const SizedBox(height: 12),
         Text(
