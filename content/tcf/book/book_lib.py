@@ -277,7 +277,7 @@ table.words td.snd { color: #2563EB; font-size: 9.2pt; white-space: nowrap; }
 .extitle { font-size: 12pt; font-weight: 800; } .exinstr { color: #5F6673; margin: 2pt 0 4pt; }
 .q { margin: 8pt 0; break-inside: avoid; } .qt { margin-bottom: 2pt; } .rtext { background: #F5F6F8; border-radius: 8pt; padding: 7pt 10pt; margin-bottom: 4pt; }
 .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 2pt 14pt; } .opt b { color: #2563EB; margin-right: 3pt; }
-.lines { height: 62pt; background: repeating-linear-gradient(#fff, #fff 17pt, #CBD0D8 17pt, #CBD0D8 18pt); margin: 6pt 0; }
+.lines { height: 135pt; background: repeating-linear-gradient(#fff, #fff 17pt, #CBD0D8 17pt, #CBD0D8 18pt); margin: 6pt 0; }
 .chk { font-size: 9.2pt; color: #5F6673; }
 .keych { margin-top: 18pt; border-bottom: 1px solid #E1E4EA; } .kh { font-weight: 700; margin: 8pt 0 2pt; }
 .kq { font-size: 9.4pt; margin: 2pt 0; break-inside: avoid; } .scr { color: #2563EB; font-style: italic; }
@@ -322,7 +322,7 @@ def render_book(front, chapters, back_title="A1 vocabulary index"):
     body.append(render_key(key))
     idx = vocab_index(chapters)
     body.append(f'<div class="opener" style="padding-top:20mm"><div class="eyebrow">INDEX</div><div class="ttl">{md(back_title)}</div>'
-                f'<p>{len(idx)} words, A to Z, with the unit where you meet them.</p></div>')
+                f'<p>{len(idx)} vocabulary entries, including fixed phrases, A to Z, with the unit where you meet them.</p></div>')
     body.append('<div class="vindex">' + "".join(
         f"<div><b>{md(fr)}</b> <span>{md(en)} ({md(lab)})</span></div>" for fr, (en, lab) in idx) + "</div>")
     return (f"<!doctype html><meta charset='utf-8'><style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');{CSS}</style>"

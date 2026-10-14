@@ -1,0 +1,470 @@
+{
+  "version": 1,
+  "stage": "B1",
+  "title": "B1: Connect experiences, manage interaction, and explain a position",
+  "outcome": "Understand the main points of clear speech and texts about familiar work, study, travel, community and everyday topics; narrate experiences in connected order; handle common interactions with follow-up and repair; write a connected account with relevant comments; and build a separate foundation for all TCF Canada task types without promising an exam result.",
+  "prerequisite": "Complete A2 Units 1–12 or demonstrate the same abilities: recount familiar past events, use passé composé and imparfait, discuss plans, compare options, and manage practical exchanges. The current authored A2 set must be completed through Unit 12 before B1 is presented as a complete path.",
+  "planned_focused_hours_per_unit": {
+    "min": 18,
+    "max": 24,
+    "note": "Planning estimate for first learning, retrieval across days, four-skill practice and a transfer check. It is not a mastery deadline; repeat focused practice when independent retrieval is still fragile."
+  },
+  "study_design": {
+    "learner_context": "Adult learners in Canada using ParleSprint on an iPad beside a notes app.",
+    "principles": [
+      "Start from a plausible adult situation and a clear communicative goal; use brief English explanations to reduce avoidable confusion, then practise understanding and producing French.",
+      "Use the learner's notes as an active retrieval tool: record a rule in their own words, one personal example and one correction; close the notes before retrieving later.",
+      "Teach a manageable language pattern, make its meaning contrast visible, practise it in listening and reading, then retrieve it in speech and writing.",
+      "Marie follows a fixed lesson objective, offers a graduated hint only when needed, gives selective feedback and changes a detail for a second attempt.",
+      "Track recognition, supported production and independent production separately; lesson completion alone is not evidence of mastery.",
+      "Revisit useful language after delays and in new contexts. Suggested review gaps are starting points, not a claim that one schedule is optimal for every learner.",
+      "Practise TCF tasks in their actual formats and keep exam performance evidence separate from everyday communication and course mastery."
+    ],
+    "suggested_review_gaps_days": [
+      1,
+      3,
+      7,
+      14,
+      30
+    ]
+  },
+  "level_basis": [
+    {
+      "source": "Council of Europe, CEFR Global Scale and Companion Volume (2020).",
+      "url": "https://www.coe.int/en/web/common-european-framework-reference-languages/table-1-%20cefr-3.3-common-reference-levels-global-scale",
+      "application": "B1 targets clear standard input on familiar topics, connected text, everyday interaction, narration of experience and brief reasons for opinions and plans. B2, by contrast, expects more developed handling of complex topics, viewpoint and structured argument."
+    },
+    {
+      "source": "Kim and Webb (2022), The Effects of Spaced Practice on Second Language Learning: A Meta-Analysis, Language Learning 72(1), 269–319.",
+      "doi": "10.1111/lang.12479",
+      "application": "Use delayed retrieval and adapt review to performance. The suggested gaps are practical prompts, not an individually proven optimum."
+    },
+    {
+      "source": "Li, Wang and Yang (2025), Can Generative AI Chatbots Promote Second Language Acquisition? A Meta-Analysis, Journal of Computer Assisted Learning 41(4), e70060.",
+      "doi": "10.1111/jcal.70060",
+      "application": "Use Marie for goal-bound practice, feedback and a changed-situation retry. The broad second-language findings do not prove that this app accelerates French learning or guarantees TCF results."
+    }
+  ],
+  "official_tcf_source": "https://www.france-education-international.fr/test/tcf-canada",
+  "assessment_note": "TCF Canada writing Task 1 is 60–120 words and Task 2 is 120–150 words. Writing Task 3 (120–180 words) compares two supplied viewpoints. Oral Task 2 is an information-seeking interaction with two minutes of preparation and 3 minutes 30 seconds of dialogue; oral Task 3 is a separate unprepared expression of a viewpoint. Do not teach oral Task 3 as source comparison.",
+  "units": [
+    {
+      "id": "b1-u01",
+      "title": "Tell the story clearly: before, during and after",
+      "situation": "Explain an unexpected change at work or in a course to a friend, including what had already happened and how it ended.",
+      "can_do": "Tell a connected account of a familiar experience, distinguish background from completed events, and explain what happened first when two past events matter.",
+      "grammar_new": [
+        "b1g01"
+      ],
+      "grammar_review": [
+        "g24",
+        "g25",
+        "g26",
+        "g27",
+        "g23"
+      ],
+      "word_themes": [
+        "unexpected changes",
+        "sequence and timing",
+        "work and study events",
+        "reactions",
+        "resolving a misunderstanding"
+      ],
+      "canada_context": "An adult learner explains a fictional schedule change in a Canadian workplace or language class.",
+      "canada_vs_france": [],
+      "learning_loop": "First listen for the event and outcome; then map the timeline in notes. Close the notes and retell a different event the next day.",
+      "transfer_check": "Retell a new two-event story and make clear which event happened first without copying the model.",
+      "tcf_corner": {
+        "listening": "Follow the main event and its order in a short clear account.",
+        "reading": "Identify event sequence in a message or personal account.",
+        "speaking": "Practise oral Task 1 narration and short follow-up answers.",
+        "writing": "Write a 60–120 word Task 1 message, then build toward a Task 2 account of 120–150 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u02",
+      "title": "Work and study paths: explain plans and outcomes",
+      "situation": "Discuss training, a work schedule or an application and explain what is planned, expected and still uncertain.",
+      "can_do": "Describe a realistic plan, connect a future event to a condition or time, and explain how a decision may affect work or study.",
+      "grammar_new": [
+        "b1g02"
+      ],
+      "grammar_review": [
+        "g28",
+        "g23",
+        "g29"
+      ],
+      "word_themes": [
+        "training and qualifications",
+        "applications",
+        "schedules and deadlines",
+        "future expectations",
+        "decision criteria"
+      ],
+      "canada_context": "Fictional adult education and employment decisions; no advice about real eligibility, credentials or deadlines.",
+      "canada_vs_france": [
+        "Use neutral standard French for applications; explain a local Canadian term only when it is verified and needed."
+      ],
+      "learning_loop": "Sort plans, predictions and conditions into three columns, then retrieve one example in a new scenario after a delay.",
+      "transfer_check": "Explain a different study or work plan and state one condition that could change it.",
+      "tcf_corner": {
+        "listening": "Separate a confirmed schedule from a prediction or possibility.",
+        "reading": "Scan an original course or workplace notice for requirements and dates.",
+        "speaking": "Answer follow-up questions about a plan with one reason and one condition.",
+        "writing": "Write a connected Task 2 account or message within 120–150 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u03",
+      "title": "Make a proposal and explore what could happen",
+      "situation": "Suggest a practical change to a class, work schedule or neighbourhood activity and respond to another person's concern.",
+      "can_do": "Make a polite proposal, describe a realistic hypothetical situation and explain a likely consequence without presenting it as a fact.",
+      "grammar_new": [
+        "b1g03"
+      ],
+      "grammar_review": [
+        "g28",
+        "g35",
+        "g36",
+        "g29"
+      ],
+      "word_themes": [
+        "suggestions",
+        "conditions",
+        "trade-offs",
+        "availability",
+        "agreement and hesitation"
+      ],
+      "canada_context": "A fictional community group considers a change to an evening activity.",
+      "canada_vs_france": [],
+      "learning_loop": "Compare a real plan with a hypothetical proposal; retrieve both forms after a day and use one in an altered role-play.",
+      "transfer_check": "Respond to a changed constraint and revise the proposal politely.",
+      "tcf_corner": {
+        "listening": "Hear whether a speaker describes a plan, a condition or a hypothetical result.",
+        "reading": "Find the condition and proposed outcome in a short notice or discussion summary.",
+        "speaking": "Start building an unprepared oral Task 3 response with a position, reason and example.",
+        "writing": "Write a 120–150 word Task 2 account that includes a justified suggestion."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u04",
+      "title": "Describe the people, places and choices that matter",
+      "situation": "Compare housing, training or community options and explain exactly which person or feature you mean.",
+      "can_do": "Connect ideas with common relative structures, explain a useful criterion and avoid repeating the same nouns when the reference remains clear.",
+      "grammar_new": [
+        "b1g04"
+      ],
+      "grammar_review": [
+        "g29",
+        "g30",
+        "g31",
+        "g32"
+      ],
+      "word_themes": [
+        "housing and facilities",
+        "program features",
+        "people and responsibilities",
+        "criteria",
+        "trade-offs"
+      ],
+      "canada_context": "Fictional rental and adult-learning options in a Canadian city; invented prices and conditions are clearly marked as practice.",
+      "canada_vs_france": [],
+      "learning_loop": "Underline the noun each clause describes, choose the connector by its grammatical role, then explain a new comparison without notes.",
+      "transfer_check": "Compare two unfamiliar options and use a relative clause whose reference is unambiguous.",
+      "tcf_corner": {
+        "listening": "Track which option and feature a speaker refers to.",
+        "reading": "Match details to the correct option in a pair of short notices.",
+        "speaking": "Explain a choice and clarify which feature or person you mean.",
+        "writing": "Write a 120–150 word Task 2 account with clear references and no avoidable repetition."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u05",
+      "title": "Explain needs, preferences and recommendations",
+      "situation": "Discuss a class, service or community activity and say what is important, useful or necessary.",
+      "can_do": "Express a need, preference or reaction and use a small set of common subjunctive patterns accurately in familiar situations.",
+      "grammar_new": [
+        "b1g05"
+      ],
+      "grammar_review": [
+        "g36",
+        "g23",
+        "g29"
+      ],
+      "word_themes": [
+        "needs and preferences",
+        "support and access",
+        "recommendations",
+        "feelings",
+        "next steps"
+      ],
+      "canada_context": "A fictional community service asks participants what would make a program easier to use; this is language practice, not medical or legal advice.",
+      "canada_vs_france": [],
+      "learning_loop": "Notice which expressions trigger the target form, make a personal example, then retrieve it in a new conversation after a delay.",
+      "transfer_check": "Give one recommendation and explain the need or reaction behind it in a new situation.",
+      "tcf_corner": {
+        "listening": "Distinguish a preference from a requirement or suggestion.",
+        "reading": "Find a requested change and the reason given for it.",
+        "speaking": "Ask for information politely and explain what would help you participate.",
+        "writing": "Write a 120–150 word account with a relevant comment or recommendation."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u06",
+      "title": "Connect reasons, results and points of contrast",
+      "situation": "Discuss a transport, work or neighbourhood change and explain why people see its effects differently.",
+      "can_do": "Link familiar ideas with clear cause, result, purpose and contrast language, and keep a short explanation easy to follow.",
+      "grammar_new": [
+        "b1g06"
+      ],
+      "grammar_review": [
+        "b1g03",
+        "b1g05",
+        "g23"
+      ],
+      "word_themes": [
+        "causes and effects",
+        "transport and access",
+        "advantages and limits",
+        "evidence",
+        "solutions"
+      ],
+      "canada_context": "A fictional neighbourhood meeting considers a route or service change; all figures and notices are invented.",
+      "canada_vs_france": [],
+      "learning_loop": "Map each connector to the relationship it expresses, then retell the same facts with a different point of emphasis.",
+      "transfer_check": "Explain a new local change using one cause, one consequence and one limit without overstating evidence.",
+      "tcf_corner": {
+        "listening": "Identify a speaker's reason, consequence and qualification.",
+        "reading": "Distinguish evidence from a proposed explanation in a short public notice.",
+        "speaking": "Give a brief reasoned opinion and respond to one counterpoint.",
+        "writing": "Write a 120–150 word Task 2 account with connected reasons and a measured comment."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u07",
+      "title": "Report what someone said and asked",
+      "situation": "Pass along information from a meeting, appointment or class while separating the original statement from your own view.",
+      "can_do": "Report a common statement or question in connected speech, identify who said it and preserve its meaning.",
+      "grammar_new": [
+        "b1g07"
+      ],
+      "grammar_review": [
+        "b1g01",
+        "b1g04",
+        "b1g06"
+      ],
+      "word_themes": [
+        "meeting notes",
+        "messages and announcements",
+        "opinions and claims",
+        "questions",
+        "confirmation"
+      ],
+      "canada_context": "Fictional work and community announcements; no claim represents a real organization.",
+      "canada_vs_france": [],
+      "learning_loop": "Listen to a short report, note the speaker and claim, then report it with one accurate sentence and one attribution.",
+      "transfer_check": "Report a new statement and question without changing who said what.",
+      "tcf_corner": {
+        "listening": "Track the speaker's claim and the degree of certainty.",
+        "reading": "Compare a notice with a short account of what was announced.",
+        "speaking": "Retell a familiar exchange and answer a follow-up about the source.",
+        "writing": "Write a 120–150 word Task 2 report with clear attribution."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u08",
+      "title": "Ask precise questions and clarify the answer",
+      "situation": "Contact a training centre, community organization or landlord to understand a process and confirm details.",
+      "can_do": "Ask direct and indirect questions, request clarification politely and use the answer to choose a relevant follow-up.",
+      "grammar_new": [
+        "b1g08"
+      ],
+      "grammar_review": [
+        "g23",
+        "g30",
+        "g32",
+        "b1g04"
+      ],
+      "word_themes": [
+        "procedures",
+        "requirements",
+        "dates and documents",
+        "clarification",
+        "confirmation"
+      ],
+      "canada_context": "Fictional service inquiries; all organizations, forms, timelines and policies are practice material, not current instructions.",
+      "canada_vs_france": [
+        "Practise a neutral courteous register that works across Canadian French-speaking contexts."
+      ],
+      "learning_loop": "Plan three information gaps, ask in a natural order, listen to each answer and adapt the next question instead of reading a fixed script.",
+      "transfer_check": "Ask for information about a new service and follow up on one answer that is incomplete.",
+      "tcf_corner": {
+        "listening": "Identify a missing detail that requires a follow-up question.",
+        "reading": "Locate requirements and unanswered questions in an original notice.",
+        "speaking": "Practise the information-seeking purpose of TCF oral Task 2 in a fresh setting.",
+        "writing": "Write a 60–120 word Task 1 inquiry message with a clear purpose and appropriate register."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u09",
+      "title": "Talk about how things are done and what you have experienced",
+      "situation": "Describe a community event, service or learning experience and explain the steps without losing the people involved.",
+      "can_do": "Use common passive and impersonal patterns to describe a process, and use en + present participle for a clear method or simultaneous action.",
+      "grammar_new": [
+        "b1g09",
+        "b1g10"
+      ],
+      "grammar_review": [
+        "b1g01",
+        "b1g06",
+        "g31",
+        "g32"
+      ],
+      "word_themes": [
+        "event organization",
+        "steps and materials",
+        "participation",
+        "experience",
+        "results and feedback"
+      ],
+      "canada_context": "A fictional library or community event in Canada; any opening hours or registration details are invented.",
+      "canada_vs_france": [],
+      "learning_loop": "Describe one process with an explicit person first, then choose an impersonal form only when the actor is unimportant; practise the same event from a participant's perspective.",
+      "transfer_check": "Explain how a new activity was organized and what you learned while taking part.",
+      "tcf_corner": {
+        "listening": "Follow the sequence of steps and identify who is responsible when stated.",
+        "reading": "Scan an event report for process, participant and outcome.",
+        "speaking": "Recount a real or imagined experience and answer a follow-up about the process.",
+        "writing": "Write a 120–150 word Task 2 account with a clear sequence and personal comment."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u10",
+      "title": "TCF oral Task 2: get the information you need",
+      "situation": "Use a short fictional notice to ask an organizer or service representative relevant questions, respond to new information and confirm details.",
+      "can_do": "Use two minutes of preparation to plan information gaps, then conduct an adaptive 3-minute-30-second interaction with follow-up, clarification and confirmation.",
+      "grammar_new": [
+        "b1g11"
+      ],
+      "grammar_review": [
+        "b1g03",
+        "b1g07",
+        "b1g08",
+        "g36"
+      ],
+      "word_themes": [
+        "information gaps",
+        "opening and closing",
+        "follow-up questions",
+        "clarification",
+        "confirmation"
+      ],
+      "canada_context": "All notices and service details are fictional. Practise the interaction pattern, not memorized policies or answers.",
+      "canada_vs_france": [],
+      "learning_loop": "Use the notice to prepare five questions, cover it, interact with Marie and adapt when a detail changes; review one missed information gap later.",
+      "transfer_check": "Complete the same task with a different notice, role and unexpected answer without reading a script.",
+      "tcf_corner": {
+        "listening": "Listen to an answer and formulate the next relevant question.",
+        "reading": "Extract information from a brief notice before the role-play.",
+        "speaking": "Practise official oral Task 2: two minutes of preparation plus 3 minutes 30 seconds of interaction.",
+        "writing": "Write a 60–120 word Task 1 follow-up message if the interaction leaves one point to confirm."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u11",
+      "title": "TCF writing Task 2: recount, comment and support",
+      "situation": "Write for a class blog, community newsletter or several colleagues about an experience, include a relevant reaction or opinion and explain a next step.",
+      "can_do": "Plan and write a connected 120–150 word account that recounts an experience, includes relevant comments or reasons and matches the audience and purpose.",
+      "grammar_new": [
+        "b1g12"
+      ],
+      "grammar_review": [
+        "b1g01",
+        "b1g03",
+        "b1g06",
+        "b1g07",
+        "b1g09",
+        "b1g10"
+      ],
+      "word_themes": [
+        "personal experience",
+        "sequence and reaction",
+        "audience and tone",
+        "opinions and support",
+        "revision"
+      ],
+      "canada_context": "Fictional adult-learning and community publication tasks; models are original practice texts, not official TCF prompts.",
+      "canada_vs_france": [],
+      "learning_loop": "Plan with a three-part outline, draft without the model, check task coverage and word count, revise one high-impact issue, then retry a parallel prompt later.",
+      "transfer_check": "Write a new Task 2 response in 120–150 words that fits a different audience and purpose.",
+      "tcf_corner": {
+        "listening": "Take brief notes on an experience and one person's comment.",
+        "reading": "Identify the intended audience and purpose of a short post or letter.",
+        "speaking": "Explain the same experience aloud, then answer an unannounced follow-up.",
+        "writing": "Practise official writing Task 2: a 120–150 word account or narrative with relevant comments, opinions or arguments."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b1-u12",
+      "title": "B1 capstone: communicate independently across familiar situations",
+      "situation": "Handle an unfamiliar but familiar-life topic by listening, reading, asking for information, narrating an experience and explaining a brief position.",
+      "can_do": "Use the B1 toolkit with notes closed to understand clear standard input, interact and repair, write connected text, briefly support an opinion and identify a next learning need.",
+      "grammar_new": [],
+      "grammar_review": [
+        "b1g01",
+        "b1g02",
+        "b1g03",
+        "b1g04",
+        "b1g05",
+        "b1g06",
+        "b1g07",
+        "b1g08",
+        "b1g09",
+        "b1g10",
+        "b1g11",
+        "b1g12"
+      ],
+      "word_themes": [
+        "capstone vocabulary recycling",
+        "repair and clarification",
+        "connected opinions",
+        "task management",
+        "self-assessment"
+      ],
+      "canada_context": "A fictional community issue with no claims about current policy or real organizations.",
+      "canada_vs_france": [],
+      "learning_loop": "Complete four short first attempts with notes closed. Then review evidence for each skill separately, choose one high-impact gap and retry a changed prompt after a delay.",
+      "transfer_check": "Complete a new listening, reading, speaking and writing task about a familiar-life issue without using a memorized model; compare the evidence with the B1 can-do goals.",
+      "tcf_corner": {
+        "listening": "Follow the main point and important details in clear standard speech on a familiar issue.",
+        "reading": "Find explicit information, purpose and a supported simple inference.",
+        "speaking": "Practise oral Tasks 1–3 separately; oral Task 3 is an unprepared viewpoint, not source comparison.",
+        "writing": "Practise Task 1 (60–120 words) and Task 2 (120–150 words); recognize Task 3 source comparison as a separate target developed further in B2."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    }
+  ]
+}

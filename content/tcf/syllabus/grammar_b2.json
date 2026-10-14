@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "stage": "B2",
+  "note": "A communicative progression: introduce one new control point in each unit, then reuse it in unfamiliar speaking and writing. The course teaches choices in context, not isolated rule memorization.",
+  "points": [
+    {"id": "b2g01", "title": "Build an argument: concession, contrast and qualification", "level": "B2"},
+    {"id": "b2g02", "title": "Report claims carefully: indirect speech, passive and impersonal forms", "level": "B2"},
+    {"id": "b2g03", "title": "Choose relative forms: qui, que, dont, où, lequel and ce qui/ce dont", "level": "B2"},
+    {"id": "b2g04", "title": "Place events in time: imparfait, passé composé, plus-que-parfait and conditional past", "level": "B2"},
+    {"id": "b2g05", "title": "Use the subjunctive for stance, doubt, necessity and concession", "level": "B2"},
+    {"id": "b2g06", "title": "Express realistic and unreal hypotheses across present and past", "level": "B2"},
+    {"id": "b2g07", "title": "Signal cause, result, purpose and condition precisely", "level": "B2"},
+    {"id": "b2g08", "title": "Summarize and attribute ideas with reported speech and tense shifts", "level": "B2"},
+    {"id": "b2g09", "title": "Use nominalization and impersonal phrasing without making prose vague", "level": "B2"},
+    {"id": "b2g10", "title": "Maintain reference with en, y, relative clauses and lexical cohesion", "level": "B2"},
+    {"id": "b2g11", "title": "Ask purposeful questions, follow up and repair an information gap politely", "level": "B2"},
+    {"id": "b2g12", "title": "Compare sources, paraphrase claims and state a qualified position", "level": "B2"},
+    {"id": "b2g13", "title": "Structure an unprepared spoken argument with signposting and self-repair", "level": "B2"},
+    {"id": "b2g14", "title": "Edit for agreement, verb government, register, cohesion and task completion", "level": "B2"}
+  ]
+}

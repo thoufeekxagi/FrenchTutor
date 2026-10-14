@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "stage": "A2",
+  "title": "A2: Handle everyday life with growing independence",
+  "outcome": "Understand and take part in short connected exchanges about familiar life in Canada; recount simple events, describe routines and places, explain a problem, make plans, and complete progressively scaffolded TCF Canada tasks in listening, reading, writing and speaking.",
+  "cumulative_word_target": 1200,
+  "a1_cumulative_words": 630,
+  "new_word_target": 570,
+  "planned_focused_hours_per_unit": {"min": 14, "max": 16, "note": "Pacing estimate, not a completion rule. Move on when delayed recall and a new-context task show usable mastery."},
+  "study_design": {
+    "learner_context": "Adult learners in Canada using ParleSprint on an iPad beside a notes app.",
+    "principles": [
+      "Start with a meaningful Canadian-life scene; make the French understandable with audio, context and brief English support.",
+      "Use adult strengths: concise grammar explanations and learner notes, followed immediately by French comprehension and production.",
+      "Make notes active: learner records a pattern, an original example and one error, then closes the notes and retrieves the language.",
+      "Use goal-bound tutor conversations with a hint ladder, selective correction and a second attempt in a changed situation.",
+      "Review vocabulary and grammar after delays and in new scenes; track recognition and independent production separately.",
+      "Every unit includes listening, reading, speaking, writing, and a transfer task that is not a memorized dialogue.",
+      "TCF practice follows official task types and is tracked separately from everyday conversational transfer. No score guarantees."
+    ],
+    "suggested_review_gaps_days": [1, 3, 7, 14, 30],
+    "review_gap_note": "Starting schedule for adaptive retrieval practice, not a claim that one interval sequence is optimal for every learner. Bring an item back sooner when retrieval fails."
+  },
+  "research_basis": [
+    {
+      "source": "Kim and Webb (2022), The Effects of Spaced Practice on Second Language Learning: A Meta-Analysis, Language Learning 72(1), 269–319.",
+      "doi": "10.1111/lang.12479",
+      "finding": "Across 48 experiments and 3,411 participants, spaced practice had a medium-to-large average effect on second-language learning; longer spacing outperformed shorter spacing on delayed tests, while equal and expanding schedules were statistically equivalent.",
+      "course_application": "Use delayed retrieval and adapt the next review to whether the learner recalls the item. The proposed day gaps are a practical starting schedule, not an individually proven optimum."
+    },
+    {
+      "source": "Li, Wang and Yang (2025), Can Generative AI Chatbots Promote Second Language Acquisition? A Meta-Analysis, Journal of Computer Assisted Learning 41(4), e70060.",
+      "doi": "10.1111/jcal.70060",
+      "finding": "The review synthesized 41 experimental or quasi-experimental studies, 48 effect sizes and 3,515 participants, reporting a positive average effect (ES 0.576).",
+      "course_application": "Use Marie for objective-bound practice and feedback, then check performance in a changed situation. This broad L2 result is not evidence that this app makes French learning faster or guarantees TCF results."
+    }
+  ],
+  "official_tcf_source": "https://www.france-education-international.fr/test/tcf-canada",
+  "unit_template": [
+    {"slot": 1, "kind": "words", "title": "Words in a scene", "note": "Five contextual word groups; teach only useful, high-frequency items and recycle A1 vocabulary."},
+    {"slot": 2, "kind": "phrases", "title": "Chunks and retrieval", "note": "Useful spoken blocks, then recall them without looking and adapt them to the learner's life."},
+    {"slot": 3, "kind": "grammar", "title": "Grammar for the task", "note": "One main pattern at a time: plain-English explanation, notice it in context, guided use, independent example."},
+    {"slot": 4, "kind": "dialogues", "title": "Goal-bound interaction", "note": "Two original Canadian scenes; include clarification, follow-up and repair, not just scripted turn-taking."},
+    {"slot": 5, "kind": "story", "title": "Connected reading", "note": "One original story that recycles current and prior language; use it for meaning and retelling."},
+    {"slot": 6, "kind": "listening", "title": "Listen for meaning", "note": "Short connected speech; one-play exam-style questions plus an independent gist/detail retell."},
+    {"slot": 7, "kind": "reading", "title": "Read real-world formats", "note": "Original messages, notices, schedules or short information texts; teach scanning and inference."},
+    {"slot": 8, "kind": "writing", "title": "Write, check, rewrite", "note": "Supported output first, then a TCF-aligned task with a checklist and a later independent retry."},
+    {"slot": 9, "kind": "speaking", "title": "Speak, repair, transfer", "note": "Marie follows a fixed objective, offers graduated hints, gives selective feedback and changes the scenario for the retry."},
+    {"slot": 10, "kind": "assessment", "title": "TCF practice and mastery gate", "note": "Cumulative retrieval, four-skill check and an unfamiliar transfer prompt; weak items feed later reviews."}
+  ],
+  "units": [
+    {
+      "id": "a2-u01", "title": "A week in my life: connect the details",
+      "situation": "A learner explains a busy week to a coworker or classmate and asks follow-up questions.",
+      "can_do": "Connect several short present-tense ideas, give a simple reason or contrast, ask someone to clarify, and write a short connected message.",
+      "grammar_new": ["g23"], "grammar_review": ["g09a", "g09b", "g10", "g15", "g16"],
+      "new_words_target": 45,
+      "word_themes": ["habits and routines", "study and work tasks", "sequence and frequency", "availability and feelings", "clarifying and repairing a conversation"],
+      "canada_context": "An adult learner balances work, French class, transit and appointments in a Canadian city; notes are made beside the lesson on an iPad.",
+      "canada_vs_france": ["Use clear standard French for production; mark only verified Canadian vocabulary differences."],
+      "learning_loop": "Attempt the scene before reading its translation; record one pattern and one personal example; retrieve them with notes closed the next day; use the same language in a different conversation later in the unit.",
+      "transfer_check": "Explain a different week from a new prompt without using the unit's model sentences.",
+      "tcf_corner": {"listening": "Short connected message: identify schedule, reason and one detail.", "reading": "Read a short message or timetable and distinguish main point from details.", "speaking": "Directed interview: describe a week and answer two unannounced follow-up questions.", "writing": "Scaffold a 60–80 word message, building toward the TCF Task 1 range of 60–120 words."}
+    },
+    {
+      "id": "a2-u02", "title": "What happened this week?",
+      "situation": "Tell a friend or colleague about completed errands, classes and events.",
+      "can_do": "Describe completed everyday actions in the recent past and understand their order in a short message.",
+      "grammar_new": ["g24"], "grammar_review": ["g23", "g09a", "g10", "g15"],
+      "new_words_target": 48,
+      "word_themes": ["everyday completed actions", "errands and appointments", "time markers", "places and services", "reactions to an event"],
+      "canada_context": "A learner recounts a week involving a clinic, library, grocery store, transit and French class.",
+      "canada_vs_france": [],
+      "learning_loop": "Retrieve A1 time expressions, notice the past form in a short story, practise from meaning to French, then recount a different day after a delay.",
+      "transfer_check": "Give a 45-second account of a new set of events without seeing a model.",
+      "tcf_corner": {"listening": "Identify when and what happened in one-play messages.", "reading": "Understand a short event recap.", "speaking": "Task 1 interview: describe a recent activity and answer follow-ups.", "writing": "Write a 60–90 word message recounting an event with time order."}
+    },
+    {
+      "id": "a2-u03", "title": "Everyday events: what I did",
+      "situation": "Tell a classmate about completed errands, classes and first experiences in Canada.",
+      "can_do": "Describe completed familiar actions with several common irregular past forms and place events in a clear order.",
+      "grammar_new": ["g25"], "grammar_review": ["g23", "g24"],
+      "new_words_target": 48,
+      "word_themes": ["common completed actions", "appointments and errands", "study and work events", "time order", "reactions and outcomes"],
+      "canada_context": "A learner recounts completed events from a week involving a clinic, library, grocery store, transit and French class.",
+      "canada_vs_france": [],
+      "learning_loop": "Retrieve the regular past forms from Unit 2, notice fait, pris, vu, lu and eu in a short listening scene, then recount a different day after a delay.",
+      "transfer_check": "Give a 45-second account of a new day using at least two taught irregular past forms, without seeing a model.",
+      "tcf_corner": {"listening": "Identify what happened and put completed events in order.", "reading": "Read a short event recap.", "speaking": "Describe a recent activity and answer follow-up questions.", "writing": "Write a 60–90 word message recounting an event with time order."}
+    },
+    {
+      "id": "a2-u04", "title": "Tell a clear story",
+      "situation": "Explain what was happening when a plan changed or a problem occurred.",
+      "can_do": "Use past-event forms to make a simple story understandable, with a background, event and outcome.",
+      "grammar_new": ["g26", "g27"], "grammar_review": ["g23", "g24", "g25"],
+      "new_words_target": 48,
+      "word_themes": ["unexpected events", "sequence and interruption", "problems and solutions", "emotions and reactions", "story connectors"],
+      "canada_context": "A delayed bus, weather change or appointment mix-up gives a realistic reason to narrate and resolve a problem.",
+      "canada_vs_france": [],
+      "learning_loop": "Notice how imparfait sets a past routine or scene; then contrast it with the completed-event forms from Units 2 and 3. Retell a different event after a delay.",
+      "transfer_check": "Explain a new interruption and its result without copying the lesson story.",
+      "tcf_corner": {"listening": "Identify cause, interruption and outcome.", "reading": "Follow a short narrative with two time frames.", "speaking": "Tell a brief connected story and answer a why-question.", "writing": "Write a short account with a beginning, event and result."}
+    },
+    {
+      "id": "a2-u05", "title": "Work, study and future plans",
+      "situation": "Discuss a course schedule, a work change and plans for next month.",
+      "can_do": "Talk about near plans and simple future intentions, and understand dates and conditions in a schedule.",
+      "grammar_new": ["g28"], "grammar_review": ["g15", "g16", "g23"],
+      "new_words_target": 48,
+      "word_themes": ["work and study goals", "schedules and deadlines", "applications and meetings", "plans and predictions", "availability and conditions"],
+      "canada_context": "A learner plans a class, a shift and an appointment around transit and work responsibilities.",
+      "canada_vs_france": [],
+      "learning_loop": "Predict from a schedule, compare two future forms in context, then plan a different week and retrieve the forms after a delay.",
+      "transfer_check": "Explain a plan that changes because of a new schedule.",
+      "tcf_corner": {"listening": "Understand a schedule change and future intention.", "reading": "Scan a short course or work notice for dates and requirements.", "speaking": "Explain a plan and give one reason.", "writing": "Write a short message about an upcoming change."}
+    },
+    {
+      "id": "a2-u06", "title": "Choose a home and describe a neighbourhood",
+      "situation": "Compare rental options and ask questions about a neighbourhood.",
+      "can_do": "Compare two familiar places and combine information into clearer descriptions.",
+      "grammar_new": ["g29"], "grammar_review": ["g17", "g18", "g23", "g28"],
+      "new_words_target": 48,
+      "word_themes": ["rental options", "neighbourhood facilities", "noise and distance", "housing features", "preferences and trade-offs"],
+      "canada_context": "Read original rental notices and discuss transit, heating, laundry and access to services in a Canadian city.",
+      "canada_vs_france": ["Use verified Canadian rental terms only; explain regional terms rather than presenting them as universal French."],
+      "learning_loop": "Compare two notices, mark one useful pattern in notes, use it in a simulated conversation, and later compare unseen options.",
+      "transfer_check": "Recommend one of two new apartments and explain the choice with two details.",
+      "tcf_corner": {"listening": "Compare two housing options from spoken details.", "reading": "Read a rental notice and infer which option fits stated needs.", "speaking": "Ask a landlord several relevant questions.", "writing": "Write a short inquiry about an apartment."}
+    },
+    {
+      "id": "a2-u07", "title": "Health, appointments and getting help",
+      "situation": "Describe a concern, ask for help and follow appointment instructions.",
+      "can_do": "Explain a simple health or service problem and refer to a thing already mentioned.",
+      "grammar_new": ["g30"], "grammar_review": ["g10", "g15", "g19", "g21", "g23"],
+      "new_words_target": 48,
+      "word_themes": ["symptoms and duration", "appointments and instructions", "pharmacy and clinic services", "documents and information", "clarification and reassurance"],
+      "canada_context": "Clinic, pharmacy, 811 and 911 contexts are clearly distinguished; emergency guidance is factual and not presented as medical diagnosis.",
+      "canada_vs_france": ["Canadian health-system terms are checked against Government of Canada terminology sources."],
+      "learning_loop": "Practise listening to instructions before reading them, then role-play a new request with Marie and retrieve the object-pronoun pattern later.",
+      "transfer_check": "Explain a different appointment issue and ask for the missing information.",
+      "tcf_corner": {"listening": "Identify instructions, time and next step.", "reading": "Read an appointment notice and locate required information.", "speaking": "Role-play a clinic or pharmacy interaction.", "writing": "Write a short message to confirm or change an appointment."}
+    },
+    {
+      "id": "a2-u08", "title": "Ask, answer and follow up at work or school",
+      "situation": "Exchange detailed practical information with a colleague, instructor or classmate.",
+      "can_do": "Ask who receives an action, give someone information, and keep a short exchange going.",
+      "grammar_new": ["g31"], "grammar_review": ["g10", "g23", "g27", "g30"],
+      "new_words_target": 48,
+      "word_themes": ["colleagues and classmates", "tasks and instructions", "documents and messages", "feedback and questions", "responsibility and cooperation"],
+      "canada_context": "An adult learner asks for clarification about a work shift, class assignment or service appointment.",
+      "canada_vs_france": [],
+      "learning_loop": "Use information-gap tasks so each person has a reason to ask; notes capture the form, not the whole dialogue; repeat with changed names and details.",
+      "transfer_check": "Get three missing details from a new role-play without a prepared question list.",
+      "tcf_corner": {"listening": "Track who gives or receives which information.", "reading": "Understand a short work or school message.", "speaking": "Ask follow-up questions in a guided interaction.", "writing": "Write a clear practical message to a colleague or classmate."}
+    },
+    {
+      "id": "a2-u09", "title": "Travel across the city and beyond",
+      "situation": "Navigate a trip, ask for directions and explain a travel change.",
+      "can_do": "Refer to places without repeating every place name and describe a simple trip or change.",
+      "grammar_new": ["g32", "g33"], "grammar_review": ["g17", "g23", "g24", "g26"],
+      "new_words_target": 48,
+      "word_themes": ["transit connections", "regional travel", "delays and detours", "destinations and landmarks", "tickets and travel information"],
+      "canada_context": "Use original examples from city transit, intercity buses and trains; route details must be invented or verified, never presented as current schedules.",
+      "canada_vs_france": [],
+      "learning_loop": "Listen to an announcement for the destination, use a map or route diagram, then explain a new route without looking at the model.",
+      "transfer_check": "Adapt a journey when a new service interruption is announced.",
+      "tcf_corner": {"listening": "Identify destination, platform or route change.", "reading": "Scan a schedule-style notice for the relevant trip detail.", "speaking": "Ask for and confirm directions in a role-play.", "writing": "Send a short message explaining a delay and a revised arrival plan."}
+    },
+    {
+      "id": "a2-u10", "title": "Food, shopping and quantities",
+      "situation": "Compare options, buy the right quantity and explain a preference.",
+      "can_do": "Talk about quantities without repeating the whole noun and compare familiar choices.",
+      "grammar_new": ["g34"], "grammar_review": ["g07a", "g13", "g14", "g19", "g28"],
+      "new_words_target": 48,
+      "word_themes": ["quantities and packaging", "ingredients and meals", "prices and value", "preferences and restrictions", "shopping and return policies"],
+      "canada_context": "Shopping vocabulary is clear across Canada; Québec-specific everyday words are marked as regional when appropriate.",
+      "canada_vs_france": ["Keep formal production standard and label regional forms as regional."],
+      "learning_loop": "Rebuild a shopping list from memory, listen to a changed order, then use quantities in a new menu or shopping situation.",
+      "transfer_check": "Choose between two unfamiliar baskets and justify the quantity and value.",
+      "tcf_corner": {"listening": "Track items, quantity and price in a short order.", "reading": "Read a menu, flyer or return notice for specific information.", "speaking": "Ask for a quantity and explain a preference.", "writing": "Write a short message about a meal or purchase."}
+    },
+    {
+      "id": "a2-u11", "title": "Solve a practical problem politely",
+      "situation": "Explain a service problem, give or follow simple instructions, and make a polite request.",
+      "can_do": "Ask someone to take a practical action politely, give a simple instruction and explain what needs to change.",
+      "grammar_new": ["g35", "g36"], "grammar_review": ["g10", "g19", "g23", "g30", "g31"],
+      "new_words_target": 48,
+      "word_themes": ["forms and missing information", "service problems", "instructions and steps", "polite requests", "resolution and confirmation"],
+      "canada_context": "Original scenarios include a billing question, a missed delivery, a landlord repair request and a government-office information request; no legal advice is given.",
+      "canada_vs_france": ["Practise vous for unfamiliar service contacts and tu only when the relationship makes it appropriate."],
+      "learning_loop": "First attempt the request, use a concise correction, rewrite it in notes, then handle a different service problem without the sample.",
+      "transfer_check": "Make a polite request in an unfamiliar service scenario and confirm the next step.",
+      "tcf_corner": {"listening": "Understand a procedure and the next action.", "reading": "Read a service notice and identify what the reader must do.", "speaking": "Role-play a polite request and follow-up.", "writing": "Write a clear short service message with the problem, request and contact details."}
+    },
+    {
+      "id": "a2-u12", "title": "A2 capstone: handle a changing week",
+      "situation": "Combine plans, past events and practical requests across work, study, health and transit.",
+      "can_do": "Understand the main point and relevant details in short connected texts, manage a routine interaction, tell a simple story and write a clear practical message.",
+      "grammar_new": [], "grammar_review": ["g23", "g24", "g25", "g26", "g27", "g28", "g29", "g30", "g31", "g32", "g33", "g34", "g35", "g36"],
+      "new_words_target": 45,
+      "word_themes": ["recycling high-value course vocabulary", "repair phrases", "planning and rescheduling", "simple opinions and reasons", "exam instructions"],
+      "canada_context": "A multi-day scenario requires listening, reading, speaking and writing without relying on one rehearsed script.",
+      "canada_vs_france": [],
+      "learning_loop": "Use cumulative retrieval before review, then repeat the capstone with changed names, dates, places and a new problem after a delay.",
+      "transfer_check": "Complete a new four-skill scenario, with receptive and productive results reported separately.",
+      "tcf_corner": {"listening": "Section-length practice with varied A2-level original items.", "reading": "Section-length practice with original everyday texts.", "speaking": "Short directed interview, practical interaction and supported first opinion task.", "writing": "Complete all three task shapes progressively; Task 2 and Task 3 remain supported previews, not A2 mastery claims."}
+    }
+  ]
+}

@@ -20,8 +20,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from check_book import load  # noqa: E402
-from story_gloss import STORY_META, STORY_GLOSS  # noqa: E402
+from check_book import load, load_all  # noqa: E402
+from story_gloss import COMMON_GLOSS, STORY_META, STORY_GLOSS  # noqa: E402
+from listening_story_extensions import LISTENING_GLOSS, LISTENING_STORIES  # noqa: E402
 
 APP = HERE.parents[2] / "flutter_app" / "assets" / "content" / "tcf"
 LESSONS = APP / "lessons"
@@ -358,7 +359,12 @@ def build_chapter(ch):
             lessons.append(L)
             continue
         u = ch["id"]
-        if k == 1:  # words: one lesson per WORDS block, notes ride along
+        if k == 0 and u.startswith(("b1-", "b2-")):
+            level = u.split("-", 1)[0].upper()
+            L = Lesson(f"{u}-diagnostic", ch, f"{level} readiness check", "Four-skill baseline before Unit 1")
+            add_blocks(L, blocks, None)
+            lessons.append(L)
+        elif k == 1:  # words: one lesson per WORDS block, notes ride along
             idx = 0
             L = None
             for b in blocks:
@@ -482,11 +488,11 @@ def build_story(ch, chapters):
         return None
     sb = next((b for b in sec["blocks"] if b[0] == "story"), None)
     q = next((b for b in sec["blocks"] if b[0] == "mcq"), None)
-    meta = STORY_META.get(ch["id"])
+    meta = ch.get("story_meta") or STORY_META.get(ch["id"])
     if not (sb and q and meta):
         return None
     _, title, title_en, sents, notes = sb
-    gloss = STORY_GLOSS.get(meta["id"], {})
+    gloss = {**STORY_GLOSS.get(meta["id"], {}), **ch.get("story_gloss", {})}
     lex = lexicon_upto(chapters, ch)
     words, missing = {}, []
     for fr, en in sents:
@@ -503,12 +509,27 @@ def build_story(ch, chapters):
                 if sd and " " not in sd:
                     w["sound"] = sd
                 words[t] = w
+            elif t in COMMON_GLOSS:
+                g = COMMON_GLOSS[t]
+                words[t] = {"en": g[0], **({"pos": g[1]} if len(g) > 1 and g[1] else {})}
+            elif "'" in t and t.split("'", 1)[1] in lex:
+                # Resolve elided articles and pronouns through the lexical
+                # token (for example l'itinéraire -> itinéraire) so the story
+                # reader can still explain every tap.
+                e, sd = lex[t.split("'", 1)[1]]
+                w = {"en": e}
+                if sd and " " not in sd:
+                    w["sound"] = sd
+                words[t] = w
+            elif re.fullmatch(r"\d+(?:[,.]\d+)*", t):
+                words[t] = {"en": f"number {t}"}
             else:
                 missing.append(t)
     if missing:
         report["missing_story_tokens"][meta["id"]] = sorted(set(missing))
     return {
-        "id": meta["id"], "title": clean(title), "titleEn": clean(title_en), "level": "A1", "minutes": meta.get("minutes", 3),
+        "id": meta["id"], "title": clean(title), "titleEn": clean(title_en),
+        "level": ch["id"].split("-", 1)[0].upper(), "minutes": meta.get("minutes", 3),
         "summary": meta["summary"], "unit": ch["id"],
         "sentences": [{"fr": clean(fr), "en": clean(en), **({"note": clean(notes[i])} if i in notes else {})} for i, (fr, en) in enumerate(sents)],
         "words": words, "keywords": meta["keywords"],
@@ -516,18 +537,171 @@ def build_story(ch, chapters):
     }
 
 
+def course_word_details(chapters):
+    """Gender/number metadata recoverable from the authored word tables."""
+    details = {}
+    for ch in chapters:
+        for block in ch["blocks"]:
+            if block[0] != "words":
+                continue
+            for fr, *_ in block[1]:
+                raw_forms = clean(fr).split(" / ")
+                for raw_form in raw_forms:
+                    lower = raw_form.lower()
+                    gender = ""
+                    number = ""
+                    if re.search(r"\(\s*m\.\s*\)", lower) or re.match(r"\s*(le|un)\s+", lower):
+                        gender = "masculine"
+                    elif re.search(r"\(\s*f\.\s*\)", lower) or re.match(r"\s*(la|une)\s+", lower):
+                        gender = "feminine"
+                    elif re.match(r"\s*(les|des)\s+", lower):
+                        number = "plural"
+                    term = strip_paren(raw_form)
+                    term = re.sub(r"^(le|la|les|un|une|des)\s+", "", term, flags=re.I)
+                    key = story_key(term)
+                    if not key:
+                        continue
+                    if gender:
+                        details[key] = {
+                            "pos": "noun",
+                            "gender": gender,
+                            "number": number or "singular",
+                            "lemma": key,
+                        }
+                    elif number:
+                        details[key] = {"pos": "noun", "number": "plural", "lemma": key}
+    return details
+
+
+def build_listening_story(source, chapters):
+    """Export one fixed listening story and a complete contextual glossary."""
+    lex = lexicon_upto(chapters, chapters[-1])
+    source_details = course_word_details(chapters)
+    story_lexicon = {}
+    for entries in STORY_GLOSS.values():
+        story_lexicon.update(entries)
+    words, missing = {}, []
+
+    def authored_gloss(token):
+        gloss = LISTENING_GLOSS.get(token)
+        if gloss:
+            return gloss
+        if token.endswith("s"):
+            singular = LISTENING_GLOSS.get(token[:-1])
+            if singular and len(singular) > 3 and singular[1] == "noun":
+                en, pos, gender, _, lemma, note = singular
+                plural_en = en if en.endswith("s") else f"{en}s"
+                return (plural_en, pos, gender, "plural", lemma or token[:-1], note or f"Plural of {token[:-1]}.")
+        if "'" in token:
+            suffix = token.split("'", 1)[1]
+            gloss = LISTENING_GLOSS.get(suffix)
+            if gloss:
+                return gloss
+        return None
+
+    def lexical_form(token):
+        if token in lex:
+            return token
+        if token.endswith("s") and token[:-1] in lex:
+            candidate = token[:-1]
+            if source_details.get(candidate, {}).get("pos") == "noun":
+                return candidate
+        if "'" in token and token.split("'", 1)[1] in lex:
+            return token.split("'", 1)[1]
+        return None
+
+    for fr, _ in source["sentences"]:
+        for raw in clean(fr).split():
+            token = story_key(raw)
+            if not token or token in words:
+                continue
+            custom = authored_gloss(token)
+            detail = {}
+            if custom:
+                en, pos, gender, number, lemma, note = custom
+                detail = {"en": en}
+                if pos: detail["pos"] = pos
+                if gender: detail["gender"] = gender
+                if number: detail["number"] = number
+                if lemma: detail["lemma"] = lemma
+                if note: detail["note"] = note
+            else:
+                gloss = story_lexicon.get(token) or COMMON_GLOSS.get(token)
+                if gloss:
+                    detail["en"] = gloss[0]
+                    if len(gloss) > 1 and gloss[1]: detail["pos"] = gloss[1]
+                    if len(gloss) > 2 and gloss[2]: detail["sound"] = gloss[2]
+                else:
+                    form = lexical_form(token)
+                    if form is None:
+                        missing.append(token)
+                        continue
+                    detail["en"] = lex[form][0]
+                    if lex[form][1]: detail["sound"] = lex[form][1]
+                morph = source_details.get(token)
+                if morph is None and token.endswith("s"):
+                    singular = token[:-1]
+                    if source_details.get(singular, {}).get("pos") == "noun":
+                        morph = {
+                            **source_details[singular],
+                            "number": "plural",
+                            "lemma": singular,
+                        }
+                        detail["lemma"] = singular
+                if morph:
+                    detail.setdefault("pos", morph.get("pos", ""))
+                    detail.setdefault("gender", morph.get("gender", ""))
+                    detail.setdefault("number", morph.get("number", ""))
+                    detail.setdefault("lemma", morph.get("lemma", ""))
+            words[token] = {key: value for key, value in detail.items() if value}
+
+    if missing:
+        report["missing_story_tokens"][source["id"]] = sorted(set(missing))
+    keyword_list = source["keywords"]
+    return {
+        "id": source["id"], "title": source["title"], "titleEn": source["titleEn"],
+        "level": source["level"], "mode": "listening", "minutes": source["minutes"],
+        "summary": source["summary"], "unit": source["unit"],
+        "sentences": [
+            {"fr": fr, "en": en, **({"note": note} if note else {})}
+            for row in source["sentences"]
+            for fr, en, *rest in [row]
+            for note in [rest[0] if rest else ""]
+        ],
+        "words": words,
+        "keywords": keyword_list,
+        "quiz": [
+            {"prompt": prompt, "options": options, "answer": answer, "explain": explain}
+            for prompt, options, answer, explain in source["quiz"]
+        ],
+    }
+
+
 # ------------------------------------------------------------------ main
 
 
 def main():
-    chapters = load()
+    a2_only = "--a2-only" in sys.argv[1:]
+    b1_only = "--b1-only" in sys.argv[1:]
+    b2_only = "--b2-only" in sys.argv[1:]
+    listening_only = "--listening-only" in sys.argv[1:]
+    if sum((a2_only, b1_only, b2_only, listening_only)) > 1:
+        raise SystemExit("Choose one scoped stage: --a2-only, --b1-only or --b2-only")
+    # A2 stories need the preceding Stage 0/A1/A2 vocabulary ledger, not later
+    # levels. Keep the scoped A2 export independent of downstream source data.
+    chapters = load() if a2_only else load_all()
+    scoped_stage = "a2" if a2_only else "b1" if b1_only else "b2" if b2_only else None
+    export_chapters = [] if listening_only else [ch for ch in chapters if ch["id"].startswith(f"{scoped_stage}-")] if scoped_stage else chapters
     LESSONS.mkdir(parents=True, exist_ok=True)
     STORIES.mkdir(parents=True, exist_ok=True)
-    for f in LESSONS.glob("*.json"):
-        if f.name != "dev_sample.json":
-            f.unlink()
+    # A listening-only content export must never touch the lesson directory.
+    # Scoped full exports also preserve lessons from every other stage.
+    if not listening_only and not scoped_stage:
+        for f in LESSONS.glob("*.json"):
+            if f.name != "dev_sample.json":
+                f.unlink()
     order, story_files = [], []
-    for ch in chapters:
+    for ch in export_chapters:
         for L in build_chapter(ch):
             d = L.json()
             if not d["steps"]:
@@ -540,8 +714,52 @@ def main():
         if st:
             (STORIES / f"{st['id']}.json").write_text(json.dumps(st, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             story_files.append(f"{st['id']}.json")
-    (APP / "course.json").write_text(json.dumps({"version": 2, "lessons": order + ["dev_sample.json"]}, indent=2) + "\n")
-    (APP / "stories.json").write_text(json.dumps({"version": 2, "stories": story_files}, indent=2) + "\n")
+    listening_story_files = []
+    if not scoped_stage:
+        counts = {level: 0 for level in ("A1", "A2", "B1", "B2")}
+        for source in LISTENING_STORIES:
+            counts[source["level"]] += 1
+            st = build_listening_story(source, chapters)
+            filename = f"{st['id']}.json"
+            (STORIES / filename).write_text(json.dumps(st, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            listening_story_files.append(filename)
+        if counts != {level: 5 for level in ("A1", "A2", "B1", "B2")}:
+            raise SystemExit(f"Listening stories must have exactly five per level; found {counts}")
+    if listening_only:
+        stories_path = APP / "stories.json"
+        old_stories = json.loads(stories_path.read_text(encoding="utf-8"))
+        stories = old_stories.get("stories", [])
+        listening_stories = listening_story_files
+    elif scoped_stage:
+        # Scoped exports update only one authored stage and merge its ordered
+        # IDs into the app indexes, leaving every other generated stage intact.
+        def merge_stage(existing, generated, stage_prefixes):
+            keep = [name for name in existing
+                    if name != "dev_sample.json"
+                    and not Path(name).stem.startswith(f"{scoped_stage}-")]
+            insert_at = next(
+                (i for i, name in enumerate(keep)
+                 if Path(name).stem.split("-", 1)[0] in stage_prefixes),
+                len(keep),
+            )
+            return keep[:insert_at] + generated + keep[insert_at:]
+
+        course_path = APP / "course.json"
+        old_course = json.loads(course_path.read_text(encoding="utf-8"))
+        downstream = {"b1", "b2"} if scoped_stage == "a2" else {"b2"} if scoped_stage == "b1" else set()
+        lessons = merge_stage(old_course.get("lessons", []), order, downstream)
+        lessons.append("dev_sample.json")
+        stories_path = APP / "stories.json"
+        old_stories = json.loads(stories_path.read_text(encoding="utf-8"))
+        stories = merge_stage(old_stories.get("stories", []), story_files, downstream)
+        listening_stories = old_stories.get("listeningStories", [])
+    else:
+        lessons = order + ["dev_sample.json"]
+        stories = story_files
+        listening_stories = listening_story_files
+    if not listening_only:
+        (APP / "course.json").write_text(json.dumps({"version": 2, "lessons": lessons}, indent=2) + "\n")
+    (APP / "stories.json").write_text(json.dumps({"version": 3, "stories": stories, "listeningStories": listening_stories}, indent=2) + "\n")
     print(f"{report['lessons']} lessons, {report['steps']} steps, {report['checks']} generated checks, {len(story_files)} stories")
     for s in report["skipped_exercises"]:
         print("  exercise kept on paper (no safe distractors):", s)

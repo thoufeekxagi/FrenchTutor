@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "note": "A2 grammar is a tool for communicative tasks. Teach one main pattern at a time, retrieve it after a delay, and reuse it in a changed situation. A1 grammar remains in review.",
+  "points": [
+    {"id": "g23", "title": "Connect clauses and organize a short answer: et, mais, parce que, donc, d'abord, ensuite, enfin", "level": "A2"},
+    {"id": "g24", "title": "Passé composé with avoir and regular -er past participles", "level": "A2"},
+    {"id": "g25", "title": "Common irregular past forms with avoir and a starter set of common verbs with être", "level": "A2"},
+    {"id": "g26", "title": "Imparfait for past habits, descriptions and background", "level": "A2"},
+    {"id": "g27", "title": "Choose passé composé for completed events and imparfait for background or habit", "level": "A2"},
+    {"id": "g28", "title": "Futur proche review and common futur simple forms for plans and predictions", "level": "A2"},
+    {"id": "g29", "title": "Comparatives and superlatives for familiar choices", "level": "A2"},
+    {"id": "g30", "title": "Relative pronouns qui, que and où to combine familiar details", "level": "A2"},
+    {"id": "g31", "title": "Direct object pronouns le, la and les before the verb", "level": "A2"},
+    {"id": "g32", "title": "Indirect object pronouns lui and leur with common verbs", "level": "A2"},
+    {"id": "g33", "title": "Y for a previously named place with common aller/être patterns", "level": "A2"},
+    {"id": "g34", "title": "En for quantities with common partitive and quantity patterns", "level": "A2"},
+    {"id": "g35", "title": "Affirmative and negative imperative for simple instructions", "level": "A2"},
+    {"id": "g36", "title": "Polite conditional requests with pouvoir and vouloir; build on je voudrais", "level": "A2"}
+  ]
+}

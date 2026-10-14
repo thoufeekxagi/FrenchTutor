@@ -1,0 +1,556 @@
+{
+  "version": 1,
+  "stage": "B2",
+  "title": "B2: Explain, compare, qualify and defend a position in French",
+  "outcome": "Handle complex but familiar public, work, study and community topics; follow the main argument and significant detail in extended speech and text; participate spontaneously; and produce clear, structured writing with relevant support. B2 course progress is not a TCF result or an NCLC/CLB guarantee.",
+  "prerequisite": "A completed B1 pathway. B2 assumes the learner can already narrate past events, explain reasons, compare options, manage routine interactions and write connected paragraphs. The first app lesson checks those skills without notes; learners who are not ready should complete B1 before continuing.",
+  "design": {
+    "learner": "Adult beginner who has progressed through A1, A2 and B1, studying independently in Canada with an iPad and a notes app.",
+    "unit_pacing": "Each unit is a mastery sequence, not a one-week promise. Plan roughly 14–18 focused hours per unit as a starting estimate; move on when the learner can retrieve and transfer the targets. A short daily session plus delayed reviews is preferable to cramming.",
+    "lesson_loop": [
+      "Attempt a realistic scene before seeing its full translation; first listen or read for the situation and speaker goal.",
+      "Notice one useful language choice, write a short note on the iPad, then close the notes and retrieve the form aloud.",
+      "Study one grammar choice through meaning and contrast, then use it in a new example rather than copying the model.",
+      "Practise listening, reading, writing and speaking in the same topic, with explicit strategy instruction and feedback.",
+      "Ask Marie to run a bounded task: first attempt, one graduated hint if needed, one selective correction, retry with changed facts, then an unfamiliar transfer prompt.",
+      "Review weak items after a delay. The suggested day gaps are adaptive starting points; bring an item back sooner after a failed retrieval."
+    ],
+    "mastery_evidence": "Keep listening recognition, reading comprehension, prompted production and independent production as separate evidence in the learner's notes. The current app does not calculate CEFR mastery or a four-skill score. Use later transfer tasks with changed sources, claims, people or constraints; do not infer exam readiness from lesson completion or repeated scripts.",
+    "notes_workflow": "Use the right-side notes app for a compact grammar contrast, one corrected personal sentence and a short error log. Close the notes before retrieval, then return later to revise from memory.",
+    "lexical_scope": "Each unit teaches 30 high-value topic terms in five six-term retrieval sets plus reusable collocations. Original texts add receptive breadth; the 420-term authored focus bank is a planning target, not a claim about the complete vocabulary needed for B2.",
+    "canadian_context": "Use varied adult contexts across Canada, including work, study, public information, housing, health communication, media and community decisions. Examples are fictional language-learning material, not current service, medical, legal or immigration advice. Teach broadly intelligible standard French for production and label verified Canadian usage when it matters.",
+    "assessment_policy": "Train transferable French first and TCF task control explicitly. Report each skill separately. Do not promise a score or imply B2 automatically equals NCLC 7."
+  },
+  "tcf_canada_format": {
+    "listening": "39 multiple-choice questions, 35 minutes; four options and one answer.",
+    "reading": "39 multiple-choice questions, 60 minutes; four options and one answer.",
+    "writing": "Three tasks in 60 minutes: Task 1 60–120 words; Task 2 120–150 words; Task 3 120–180 words comparing two source viewpoints and stating the candidate's position.",
+    "speaking": "Three tasks in 12 minutes including 2 minutes of preparation: Task 1 directed interview (2 minutes); Task 2 information-seeking interaction (2 minutes of preparation plus 3 minutes 30 seconds of interaction); Task 3 spontaneous viewpoint (4 minutes 30 seconds, no preparation)."
+  },
+  "research_basis": [
+    {
+      "source": "Council of Europe, CEFR Companion Volume (2020), B2 descriptors.",
+      "url": "https://www.coe.int/en/web/common-european-framework-reference-languages/cefr-descriptors",
+      "application": "Build clear, systematically developed explanations, support opinions with relevant reasons and examples, and sustain spontaneous interaction. CEFR can-do descriptors guide course outcomes; they do not certify a TCF score."
+    },
+    {
+      "source": "France Éducation international, TCF Canada format and candidate information.",
+      "url": "https://www.france-education-international.fr/test/tcf-canada",
+      "application": "Use the official current task shapes, timing and word ranges; create original scenarios and items rather than copying sample questions."
+    },
+    {
+      "source": "IRCC, accepted language tests and NCLC equivalencies for TCF Canada.",
+      "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/language-test.html",
+      "application": "Keep all four skills distinct and report official NCLC equivalencies from the test authority. A B2 course label is not an NCLC 7 prediction."
+    },
+    {
+      "source": "Kim and Webb (2022), The Effects of Spaced Practice on Second Language Learning: A Meta-Analysis, Language Learning 72(1), 269–319.",
+      "doi": "10.1111/lang.12479",
+      "application": "Use delayed retrieval and adaptive review. The interval sequence is a practical default, not a proven universal optimum."
+    },
+    {
+      "source": "Li, Wang and Yang (2025), Can Generative AI Chatbots Promote Second Language Acquisition? A Meta-Analysis, Journal of Computer Assisted Learning 41(4), e70060.",
+      "doi": "10.1111/jcal.70060",
+      "application": "Use the tutor for goal-bound practice and feedback, then check independent transfer. The average result across broad L2 studies is not evidence of a guaranteed speed advantage for French or TCF Canada."
+    }
+  ],
+  "suggested_review_gaps_days": [
+    1,
+    3,
+    7,
+    14,
+    30
+  ],
+  "review_gap_note": "Adaptive starting schedule only: shorten the gap after a failed retrieval and lengthen it after reliable independent recall.",
+  "unit_template": [
+    {
+      "slot": 1,
+      "kind": "words",
+      "title": "Topic language in context",
+      "note": "Small high-value sets with examples, precise meaning and contrast; review prior-level language through the scene."
+    },
+    {
+      "slot": 2,
+      "kind": "phrases",
+      "title": "Reusable collocations and discourse moves",
+      "note": "Practise retrieval and adapt each chunk to a new claim or situation."
+    },
+    {
+      "slot": 3,
+      "kind": "grammar",
+      "title": "Grammar that changes the meaning",
+      "note": "One main choice explained in plain English, contrasted in context and used independently."
+    },
+    {
+      "slot": 4,
+      "kind": "dialogues",
+      "title": "Extended interaction",
+      "note": "Original Canadian adult contexts with follow-up, qualification, repair and a real information or decision gap."
+    },
+    {
+      "slot": 5,
+      "kind": "listening",
+      "title": "Extended listening and TCF-style listening",
+      "note": "Gist, speaker stance, evidence and inference; explicitly distinguish replayable learning practice from one-play exam practice."
+    },
+    {
+      "slot": 6,
+      "kind": "reading",
+      "title": "Read and compare real-world text types",
+      "note": "Original articles, notices, interviews and paired viewpoints; infer purpose, stance, evidence and qualification."
+    },
+    {
+      "slot": 7,
+      "kind": "writing",
+      "title": "Plan, draft, check and rewrite",
+      "note": "Rotate through the official TCF task shapes and ranges; prioritize task completion, source handling, structure and language control."
+    },
+    {
+      "slot": 8,
+      "kind": "speaking",
+      "title": "Speak, interact and transfer",
+      "note": "Practise all three official oral task purposes across the level; Marie uses bounded hints, selective correction, changed-detail retry and novel transfer."
+    },
+    {
+      "slot": 9,
+      "kind": "assessment",
+      "title": "Cumulative retrieval and mastery gate",
+      "note": "Check all four skills, grammar in a new context and independent performance; feed errors into later reviews."
+    }
+  ],
+  "units": [
+    {
+      "id": "b2-u01",
+      "title": "From opinion to argument: make the logic visible",
+      "situation": "A learner joins a community discussion about flexible work and has to explain a position without flattening the other side.",
+      "can_do": "State a qualified position, connect claims to evidence, acknowledge a counterpoint and conclude clearly in speech and writing.",
+      "grammar_new": [
+        "b2g01"
+      ],
+      "grammar_review": [],
+      "word_themes": [
+        "claim and evidence",
+        "concession and contrast",
+        "degree of certainty",
+        "argument signposting"
+      ],
+      "canada_context": "A fictional workplace discussion; policies and survey figures are invented for language practice.",
+      "transfer_check": "Give a 90-second position on a new topic, answer one challenge, and write a separate 130–160-word comparison of two short viewpoints.",
+      "tcf_corner": {
+        "listening": "Identify the speaker's main claim, concession and conclusion.",
+        "reading": "Separate a writer's position from an example or counterargument.",
+        "speaking": "Task 3 practice: spontaneous position, no preparation, 4 minutes 30 seconds in the official format.",
+        "writing": "Task 3 practice: compare two source viewpoints and state your position in 120–180 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u02",
+      "title": "News and public claims: report without overstating",
+      "situation": "A learner compares a radio interview and a short online report about a proposed public initiative.",
+      "can_do": "Attribute a claim, distinguish fact from interpretation, summarize indirect speech and signal uncertainty accurately.",
+      "grammar_new": [
+        "b2g02"
+      ],
+      "grammar_review": [
+        "b2g01"
+      ],
+      "word_themes": [
+        "media and sources",
+        "claims and evidence",
+        "uncertainty and verification",
+        "reported speech"
+      ],
+      "canada_context": "Original fictional public-information materials; no current policy or news claim is presented as fact.",
+      "transfer_check": "Listen to a new two-speaker exchange and summarize who claims what, with one uncertainty marker.",
+      "tcf_corner": {
+        "listening": "Track source, claim, evidence and speaker certainty.",
+        "reading": "Compare headline, body and attribution in an original report.",
+        "speaking": "Task 3: evaluate a public claim and respond to a follow-up.",
+        "writing": "Task 2: report an experience and comment on it in 120–150 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u03",
+      "title": "Work and study decisions: describe relationships precisely",
+      "situation": "A learner discusses a training opportunity, its requirements and the people or conditions that matter.",
+      "can_do": "Explain a decision with specific qualifying clauses and avoid ambiguous references in a connected account.",
+      "grammar_new": [
+        "b2g03"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g02"
+      ],
+      "word_themes": [
+        "training and qualifications",
+        "selection criteria",
+        "professional strengths",
+        "relative relationships"
+      ],
+      "canada_context": "Fictional course and job notices; eligibility details are invented and are not employment or immigration advice.",
+      "transfer_check": "Recommend one of two unfamiliar options and support the recommendation with three precise references to their conditions.",
+      "tcf_corner": {
+        "listening": "Identify which requirement belongs to which option.",
+        "reading": "Scan a course or job notice, then infer which candidate it suits.",
+        "speaking": "Task 2: ask for missing information about a course or work opportunity.",
+        "writing": "Task 2: recount a learning or work experience and explain its value in 120–150 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u04",
+      "title": "Housing and city life: compare competing needs",
+      "situation": "Neighbours discuss a proposed change to a shared urban space and disagree about convenience, cost and access.",
+      "can_do": "Compare trade-offs, relate past events to a current proposal and qualify a recommendation.",
+      "grammar_new": [
+        "b2g04"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g03"
+      ],
+      "word_themes": [
+        "housing and public space",
+        "access and affordability",
+        "past causes and consequences",
+        "urban trade-offs"
+      ],
+      "canada_context": "Fictional neighbourhood meeting with invented figures; it makes no claims about current municipal plans.",
+      "transfer_check": "Explain a different city proposal, distinguish background from key events and give a qualified recommendation.",
+      "tcf_corner": {
+        "listening": "Reconstruct background, change and consequence from a discussion.",
+        "reading": "Compare two short community viewpoints and identify their common ground.",
+        "speaking": "Task 3: defend a choice while acknowledging a practical objection.",
+        "writing": "Task 3: compare two views on a social issue and give your position in 120–180 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u05",
+      "title": "Health and public services: express needs and limits carefully",
+      "situation": "A learner prepares questions for an information appointment and distinguishes a personal concern from general advice.",
+      "can_do": "Express necessity, doubt, evaluation and concession, and ask a professional for clarification without treating language practice as advice.",
+      "grammar_new": [
+        "b2g05"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g02",
+        "b2g04"
+      ],
+      "word_themes": [
+        "appointments and information",
+        "recommendations and requirements",
+        "uncertainty and reassurance",
+        "public-service communication"
+      ],
+      "canada_context": "Fictional appointment dialogue only; the lesson gives no diagnosis, treatment or official service instructions.",
+      "transfer_check": "Role-play a different appointment: explain what is unclear, ask a focused question and summarize the answer without changing its certainty.",
+      "tcf_corner": {
+        "listening": "Distinguish a recommendation from a requirement and a possibility.",
+        "reading": "Understand a fictional notice's purpose, conditions and limits.",
+        "speaking": "Task 2: obtain information, follow up and confirm details.",
+        "writing": "Task 1 or 2: send a clear message about an appointment experience within the assigned word range."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u06",
+      "title": "Technology and privacy: reason through possibilities",
+      "situation": "A team discusses a new digital service, its convenience, privacy implications and alternatives.",
+      "can_do": "Explain realistic and unreal possibilities, describe consequences and avoid presenting a hypothetical as a fact.",
+      "grammar_new": [
+        "b2g06"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g02",
+        "b2g05"
+      ],
+      "word_themes": [
+        "digital services",
+        "privacy and consent",
+        "conditions and consequences",
+        "risk and alternatives"
+      ],
+      "canada_context": "Invented product scenario; it is not legal, privacy or cybersecurity advice.",
+      "transfer_check": "Respond to a new technology scenario by outlining one likely outcome, one hypothetical alternative and one uncertainty.",
+      "tcf_corner": {
+        "listening": "Follow a speaker's condition and the result they predict.",
+        "reading": "Separate current facts, forecasts and hypothetical outcomes.",
+        "speaking": "Task 3: discuss a technology change and defend a balanced position.",
+        "writing": "Task 3: compare two views on a technology issue in 120–180 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u07",
+      "title": "Environment and public policy: explain causes and effects",
+      "situation": "Residents examine a fictional local proposal and ask what problem it addresses and what result is expected.",
+      "can_do": "Connect cause, consequence, purpose and condition; evaluate a proposal using evidence and limits.",
+      "grammar_new": [
+        "b2g07"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g02",
+        "b2g06"
+      ],
+      "word_themes": [
+        "environment and resources",
+        "public proposals",
+        "causes and outcomes",
+        "conditions and intended effects"
+      ],
+      "canada_context": "Invented proposal and data; do not treat the exercise as a real environmental assessment.",
+      "transfer_check": "Explain the logic of a different proposal and identify one missing piece of evidence.",
+      "tcf_corner": {
+        "listening": "Identify problem, proposed measure, intended effect and caveat.",
+        "reading": "Trace how evidence supports or fails to support a conclusion.",
+        "speaking": "Task 3: recommend, reject or qualify a proposal with reasons.",
+        "writing": "Task 3: compare two arguments and give a structured position in 120–180 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u08",
+      "title": "Education, culture and identity: synthesize what people say",
+      "situation": "A learner compares two interview excerpts about adult education and cultural participation.",
+      "can_do": "Summarize a speaker's view accurately, distinguish reported claims from personal judgment and retell a past experience with clear time relations.",
+      "grammar_new": [
+        "b2g08"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g03",
+        "b2g04",
+        "b2g07"
+      ],
+      "word_themes": [
+        "adult education",
+        "cultural participation",
+        "reported viewpoints",
+        "experience and reflection"
+      ],
+      "canada_context": "Original fictional interviews featuring different adult perspectives; no single identity or newcomer experience is assumed.",
+      "transfer_check": "Summarize two unfamiliar short viewpoints, attribute each claim and add your own clearly marked response.",
+      "tcf_corner": {
+        "listening": "Attribute an opinion to the correct speaker and preserve its nuance.",
+        "reading": "Compare two interview perspectives without confusing them with the author's framing.",
+        "speaking": "Task 3: connect a personal example to a broader position.",
+        "writing": "Task 2: recount an experience with a clear comment or argument in 120–150 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u09",
+      "title": "Everyday economics: qualify numbers and recommendations",
+      "situation": "A learner compares a fictional household budget report and two proposals for reducing everyday costs.",
+      "can_do": "Describe trends cautiously, qualify a recommendation and avoid making a stronger conclusion than the numbers support.",
+      "grammar_new": [
+        "b2g09"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g02",
+        "b2g07",
+        "b2g08"
+      ],
+      "word_themes": [
+        "budgets and costs",
+        "proportion and trend",
+        "recommendation and caveat",
+        "formal summary language"
+      ],
+      "canada_context": "All amounts and survey figures are fictional, illustrative language-learning data.",
+      "transfer_check": "Summarize a new small data set in speech, state what it supports and name one conclusion it cannot establish.",
+      "tcf_corner": {
+        "listening": "Distinguish a measured result from a speaker's interpretation.",
+        "reading": "Read a fictional table or report and check whether the conclusion follows.",
+        "speaking": "Task 3: explain a practical recommendation with an explicit caveat.",
+        "writing": "Task 3: compare positions on a public issue using careful claims in 120–180 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u10",
+      "title": "Community debate: connect ideas without losing the thread",
+      "situation": "A learner prepares for a community discussion involving several speakers, competing priorities and a decision.",
+      "can_do": "Maintain clear reference across a longer explanation, synthesize shared and conflicting points and respond directly to an objection.",
+      "grammar_new": [
+        "b2g10"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g03",
+        "b2g07",
+        "b2g09"
+      ],
+      "word_themes": [
+        "community participation",
+        "shared priorities",
+        "reference and cohesion",
+        "response to objections"
+      ],
+      "canada_context": "Fictional community meeting; participants have different needs and the lesson avoids assuming consensus.",
+      "transfer_check": "Summarize a new three-person discussion and propose a next step that reflects at least two speakers' needs.",
+      "tcf_corner": {
+        "listening": "Track changing speaker positions and links between ideas.",
+        "reading": "Identify overlap and disagreement across short source texts.",
+        "speaking": "Task 3: answer a counterargument while keeping a clear line of reasoning.",
+        "writing": "Task 3: synthesize two viewpoints and state a position in 120–180 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u11",
+      "title": "TCF speaking Task 2: get the information you need",
+      "situation": "A learner must ask an examiner role-player about a notice, service, activity or opportunity and keep the exchange moving.",
+      "can_do": "Prepare a short question plan, ask varied relevant questions, follow answers with clarification and close by confirming key details.",
+      "grammar_new": [
+        "b2g11"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g03",
+        "b2g05",
+        "b2g10"
+      ],
+      "word_themes": [
+        "question purposes",
+        "polite information requests",
+        "follow-up and clarification",
+        "confirmation and closing"
+      ],
+      "canada_context": "Rotating fictional community, course and workplace notices; any dates, eligibility details and prices are invented.",
+      "transfer_check": "Use a new notice, prepare for two minutes, then sustain a three-minute-thirty information exchange without reading a script.",
+      "tcf_corner": {
+        "listening": "Respond to the examiner's answers, not only your prepared list.",
+        "reading": "Use a short notice to identify what is known and what still needs asking.",
+        "speaking": "Official Task 2 shape: 2 minutes' preparation, then 3 minutes 30 seconds of information-seeking interaction.",
+        "writing": "Write a concise follow-up message with a clear purpose and suitable register."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u12",
+      "title": "TCF writing Task 3: compare two sources and take a position",
+      "situation": "A learner reads two short documents on a social question, identifies each position and writes a concise synthesis with a personal conclusion.",
+      "can_do": "Represent both source views fairly, paraphrase rather than copy, organize comparison and support a qualified position within the official range.",
+      "grammar_new": [
+        "b2g12"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g02",
+        "b2g05",
+        "b2g07",
+        "b2g09",
+        "b2g10"
+      ],
+      "word_themes": [
+        "source attribution",
+        "similarity and difference",
+        "paraphrase",
+        "qualified conclusion"
+      ],
+      "canada_context": "Original fictional source texts on a neutral community issue; source claims are practice material.",
+      "transfer_check": "Read two unseen short texts, make a two-column notes plan, then write 120–180 words without copying full clauses.",
+      "tcf_corner": {
+        "listening": "Listen for one viewpoint and compare it with a written source.",
+        "reading": "Extract each author's position, support and caveat.",
+        "speaking": "Explain the two source views orally before stating your own position.",
+        "writing": "Official Task 3: compare two viewpoints on a social issue and give your view in 120–180 words."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u13",
+      "title": "TCF speaking Task 3: speak spontaneously and develop a viewpoint",
+      "situation": "A learner receives a broad social prompt and develops a reasoned response without preparation.",
+      "can_do": "State a clear thesis, develop two relevant reasons with examples, acknowledge a limitation, conclude and answer a follow-up without relying on a memorized speech.",
+      "grammar_new": [
+        "b2g13"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g05",
+        "b2g06",
+        "b2g07",
+        "b2g10",
+        "b2g12"
+      ],
+      "word_themes": [
+        "oral signposting",
+        "supporting examples",
+        "counterarguments",
+        "repair and clarification"
+      ],
+      "canada_context": "Prompts use broad, nonpartisan adult topics and do not require specialist knowledge or one cultural viewpoint.",
+      "transfer_check": "Draw a new prompt at random and give a structured, responsive answer; Marie changes one assumption in the follow-up.",
+      "tcf_corner": {
+        "listening": "Notice how a speaker moves from position to reasons and conclusion.",
+        "reading": "Turn a short prompt into a balanced oral plan, without drafting a script.",
+        "speaking": "Official Task 3 shape: 4 minutes 30 seconds, no preparation; maintain a position and interact with follow-up.",
+        "writing": "Write a separate 120–180-word argument from a changed prompt to test transfer."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    },
+    {
+      "id": "b2-u14",
+      "title": "Capstone: transfer across four skills and all TCF tasks",
+      "situation": "A learner handles a new public issue through listening, reading, an interaction, a spontaneous viewpoint and timed writing tasks.",
+      "can_do": "Use the B2 toolkit independently across unfamiliar sources, sustain spontaneous interaction, synthesize viewpoints and revise language without notes.",
+      "grammar_new": [
+        "b2g14"
+      ],
+      "grammar_review": [
+        "b2g01",
+        "b2g02",
+        "b2g03",
+        "b2g04",
+        "b2g05",
+        "b2g06",
+        "b2g07",
+        "b2g08",
+        "b2g09",
+        "b2g10",
+        "b2g11",
+        "b2g12",
+        "b2g13"
+      ],
+      "word_themes": [
+        "cumulative high-value language",
+        "precision and self-correction",
+        "exam task control",
+        "unfamiliar transfer"
+      ],
+      "canada_context": "All capstone sources and details are original fictional materials. Official test dates, procedures and results must be checked with the test provider.",
+      "transfer_check": "Complete fresh, timed tasks in all four skills; compare independent performance with the learner's earlier diagnostic and choose the next study priorities.",
+      "tcf_corner": {
+        "listening": "Practise original B2 items with the official 35-minute section timing; the complete official listening section has 39 questions.",
+        "reading": "Practise original B2 items with the official 60-minute section timing; the complete official reading section has 39 questions.",
+        "speaking": "Practise all three task purposes and rehearse the official 12-minute sequence, including the 2-minute preparation period.",
+        "writing": "Practise all three official writing tasks within the 60-minute overall limit and each task's word range."
+      },
+      "core_focus_words_target": 30,
+      "reusable_chunks_target": 8
+    }
+  ],
+  "new_focus_word_target": 420
+}

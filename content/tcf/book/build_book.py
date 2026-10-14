@@ -25,7 +25,10 @@ def load_chapters():
         spec = importlib.util.spec_from_file_location(path.stem, path)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        chapters.append(mod.CHAPTER)
+        # This script builds the A1 reference PDF. Keep later CEFR stages out
+        # even after their source chapters are added to the shared book folder.
+        if mod.CHAPTER["id"] == "s0" or mod.CHAPTER["id"].startswith("a1-"):
+            chapters.append(mod.CHAPTER)
     return chapters
 
 

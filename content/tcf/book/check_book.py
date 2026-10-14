@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quality checks for the A1 book.
+"""Quality checks for the authored A1 and A2 course chapters.
 
   python3 content/tcf/book/check_book.py
 
@@ -8,10 +8,13 @@
    an example sentence) earlier in the book, or be a proper name.
 2. Structure: every question has 4 options (listening/reading), a valid answer
    index, distinct options and an explanation; exercises have answers.
-Run after every chapter. Exit code 1 on structural errors; ledger gaps are
-listed as WARN so you can decide: teach the word, or change the sentence.
+Run after every chapter. For authored A2 units, also check the syllabus word
+target and reject repeated word entries from A1 or an earlier A2 unit. Exit
+code 1 on structural errors; ledger gaps are listed as WARN so you can decide:
+teach the word, or change the sentence.
 """
 import importlib.util
+import json
 import re
 import sys
 from pathlib import Path
@@ -47,18 +50,51 @@ def split_elision(t):
 
 
 def load():
+    """Load Stage 0, A1 and A2 chapters for the A1/A2-only exporter callers."""
+    chapters = []
+    for path in sorted((HERE / "chapters").glob("[0-9][0-9]_*.py")):
+        # Later stages are deliberately outside this A1/A2 ledger check.
+        if "_b1_" in path.name or "_b2_" in path.name:
+            continue
+        spec = importlib.util.spec_from_file_location(path.stem, path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        chapter = mod.CHAPTER
+        if chapter["id"] == "s0" or chapter["id"].startswith(("a1-", "a2-")):
+            chapters.append(chapter)
+    return chapters
+
+
+def load_all():
+    """Load every authored stage in numeric source order for export and checks."""
     chapters = []
     for path in sorted((HERE / "chapters").glob("[0-9][0-9]_*.py")):
         spec = importlib.util.spec_from_file_location(path.stem, path)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        chapters.append(mod.CHAPTER)
+        chapter = mod.CHAPTER
+        if chapter["id"] == "s0" or chapter["id"].split("-", 1)[0] in {"a1", "a2", "b1", "b2"}:
+            chapters.append(chapter)
     return chapters
 
 
 def main():
     chapters = load()
     known, errors, warns, notes = set(PROPER), [], [], []
+    syllabus_path = HERE.parent / "syllabus" / "a2.json"
+    a2_targets = {}
+    if syllabus_path.exists():
+        a2_targets = {u["id"]: u["new_words_target"]
+                      for u in json.loads(syllabus_path.read_text(encoding="utf-8")).get("units", [])}
+    # A2 word groups must add the planned number of genuinely new entries.
+    # Phrases and grammar examples are excluded from the new-word count.
+    seen_vocabulary = {
+        row[0].strip().casefold()
+        for ch in chapters if ch["id"].startswith("a1-")
+        for b in ch["blocks"] if b[0] == "words"
+        for row in b[1]
+    }
+    a2_authored = 0
 
     def teach(text):
         for t in toks(text):
@@ -153,6 +189,25 @@ def main():
             elif k in ("write", "speak"):
                 need(b[4], f"{where} {b[1]} model")
                 teach(b[4])
+        if ch["id"].startswith("a2-"):
+            a2_authored += 1
+            target = a2_targets.get(ch["id"])
+            unit_words, section = [], ""
+            for b in ch["blocks"]:
+                if b[0] == "h2":
+                    section = b[1]
+                elif b[0] == "words" and re.match(r"^\d+\.1\s+Words\b", section):
+                    unit_words.extend(row[0].strip().casefold() for row in b[1])
+            if target is None:
+                errors.append(f"{ch['label']}: no matching A2 syllabus target for {ch['id']}")
+            elif len(unit_words) != target:
+                errors.append(f"{ch['label']}: syllabus expects {target} new word entries, found {len(unit_words)}")
+            if len(unit_words) != len(set(unit_words)):
+                errors.append(f"{ch['label']}: duplicate new word entries within the unit")
+            repeated = sorted(set(unit_words) & seen_vocabulary)
+            if repeated:
+                errors.append(f"{ch['label']}: word entries already taught: {', '.join(repeated[:10])}")
+            seen_vocabulary.update(unit_words)
     if "--verbose" in sys.argv:
         for n in notes:
             print("NOTE :", n)
@@ -161,7 +216,7 @@ def main():
     for e in errors:
         print("ERROR:", e)
     print(
-        f"{len(chapters)} chapters, {len(known)} known tokens, {len(warns)} ledger "
+        f"{len(chapters)} chapters ({a2_authored} A2 authored), {len(known)} known tokens, {len(warns)} ledger "
         f"warning(s), {len(notes)} example note(s) (--verbose to list), {len(errors)} error(s)"
     )
     sys.exit(1 if errors else 0)

@@ -50,7 +50,9 @@ def check_syllabus():
     grammar = load(SYL / "grammar.json")
     a1 = load(SYL / "a1.json")
     s0 = load(SYL / "stage0.json")
-    if not (grammar and a1 and s0):
+    grammar_a2 = load(SYL / "grammar_a2.json")
+    a2 = load(SYL / "a2.json")
+    if not (grammar and a1 and s0 and grammar_a2 and a2):
         return None
     ids = [p["id"] for p in grammar["points"]]
     if len(ids) != len(set(ids)):
@@ -100,11 +102,66 @@ def check_syllabus():
         ref = unit.get("mini_mock_after")
         if ref and ref not in mock_ids:
             err(f"{unit['id']}: mini_mock_after {ref} not defined")
+
+    # A2 extends the A1 grammar and vocabulary ledger. Reviews may use A1
+    # grammar at the start, then only A2 points introduced in an earlier unit.
+    a1_grammar_ids = set(ids)
+    a2_ids = [p.get("id") for p in grammar_a2.get("points", [])]
+    if len(a2_ids) != len(set(a2_ids)):
+        err("grammar_a2.json: duplicate grammar ids")
+    overlap = a1_grammar_ids & set(a2_ids)
+    if overlap:
+        err(f"grammar_a2.json: ids overlap A1 grammar: {', '.join(sorted(overlap))}")
+    if a2.get("stage") != "A2":
+        err("a2.json: stage must be A2")
+    if a2.get("a1_cumulative_words") != a1.get("word_target_total"):
+        err("a2.json: a1_cumulative_words must match the A1 cumulative target")
+    a2_required = required + ["learning_loop", "transfer_check"]
+    introduced_a2 = set()
+    a2_unit_ids = []
+    a2_word_total = 0
+    for idx, unit in enumerate(a2.get("units", []), start=1):
+        uid = unit.get("id", f"#{idx}")
+        for field in a2_required:
+            if field not in unit or unit[field] in (None, ""):
+                err(f"{uid}: missing field '{field}'")
+        if uid != f"a2-u{idx:02d}":
+            err(f"{uid}: unit ids must be sequential (expected a2-u{idx:02d})")
+        a2_unit_ids.append(uid)
+        a2_word_total += unit.get("new_words_target", 0)
+        for gid in unit.get("grammar_new", []):
+            if gid not in a2_ids:
+                err(f"{uid}: unknown A2 grammar id {gid}")
+            elif gid in introduced_a2:
+                err(f"{uid}: {gid} already introduced in an earlier A2 unit")
+            else:
+                introduced_a2.add(gid)
+        prior_grammar = a1_grammar_ids | introduced_a2
+        for gid in unit.get("grammar_review", []):
+            if gid not in a1_grammar_ids and gid not in a2_ids:
+                err(f"{uid}: unknown grammar id {gid} in review")
+            elif gid not in prior_grammar:
+                err(f"{uid}: reviews {gid} before it is introduced")
+        tc = unit.get("tcf_corner", {})
+        for k in ("listening", "reading", "speaking", "writing"):
+            if k not in tc:
+                err(f"{uid}: tcf_corner missing '{k}'")
+    if len(a2.get("units", [])) != 12:
+        err(f"a2.json: expected 12 planned units, found {len(a2.get('units', []))}")
+    if a2_word_total != a2.get("new_word_target"):
+        err(f"a2.json: new_word_target {a2.get('new_word_target')} != sum of units {a2_word_total}")
+    if a2.get("cumulative_word_target") != a2.get("a1_cumulative_words", 0) + a2_word_total:
+        err("a2.json: cumulative_word_target must equal A1 target plus A2 new words")
+    for gid in a2_ids:
+        if gid not in introduced_a2:
+            err(f"A2 grammar {gid} is never introduced")
+
     s0_ids = [lesson["id"] for lesson in s0["lessons"]]
     if len(s0_ids) != len(set(s0_ids)):
         err("stage0.json: duplicate lesson ids")
     slots = [t["kind"] for t in a1["unit_template"]]
-    return {"a1": a1, "slots": slots, "total": total, "s0": len(s0_ids)}
+    return {"a1": a1, "a2": a2, "slots": slots, "total": total,
+            "a2_total": a2_word_total, "s0": len(s0_ids)}
 
 
 FUNCTION_WORDS = set(
@@ -274,8 +331,13 @@ def check_lessons():
                     warn(f"{sw}: no 'explain' text for the feedback bar")
             for text in fr:
                 lines += 1
-                if len(text) > 220:
-                    err(f"{sw}: French line is over 220 characters")
+                # A B2 reading item can carry a short original passage in
+                # promptFr. Keep ordinary voiced examples compact, but allow
+                # a bounded passage here so the learner can read and hear the
+                # full text before answering its comprehension question.
+                limit = 1200 if kind == "choose" and step.get("promptFr") == text else 220
+                if len(text) > limit:
+                    err(f"{sw}: French line is over {limit} characters")
         if lesson.get("dev"):
             warn(f"{where}: is marked dev (hidden in release builds)")
     return len(seen_ids), lines
@@ -296,79 +358,91 @@ def story_tokens(text):
 
 
 def check_stories():
-    """Validates the reading stories. Every token of every sentence must have
-    a meaning in `words`, so a tapped word is never blank."""
+    """Validates authored reading/listening stories and their tap glosses."""
     index_path = APP_CONTENT / "stories.json"
     if not index_path.exists():
         return 0, 0
     index = load(index_path) or {}
     seen, lines = set(), 0
-    for name in index.get("stories", []):
-        path = APP_CONTENT / "stories" / name
-        if not path.exists():
-            err(f"stories.json lists {name} but the file does not exist")
-            continue
-        st = load(path)
-        if not st:
-            continue
-        sid = st.get("id", name)
-        w = f"story {sid}"
-        if sid in seen:
-            err(f"{w}: duplicate story id")
-        seen.add(sid)
-        for key in ("title", "titleEn", "summary"):
-            _need(st, key, w)
-        if st.get("level") not in ("A1", "A2", "B1", "B2"):
-            err(f"{w}: level must be A1, A2, B1 or B2")
-        if not isinstance(st.get("minutes"), int):
-            err(f"{w}: minutes must be a whole number")
-        sents = st.get("sentences", [])
-        if st.get("level") == "A1" and not 6 <= len(sents) <= 12:
-            warn(f"{w}: A1 stories are usually 6 to 12 sentences (has {len(sents)})")
-        words = st.get("words", {})
-        used = set()
-        for i, sent in enumerate(sents, 1):
-            fr, en = sent.get("fr", ""), sent.get("en", "")
-            if not fr.strip() or not en.strip():
-                err(f"{w} sentence {i}: needs both fr and en")
+    for catalog_key in ("stories", "listeningStories"):
+        catalog = index.get(catalog_key, [])
+        level_counts = {level: 0 for level in ("A1", "A2", "B1", "B2")}
+        for name in catalog:
+            path = APP_CONTENT / "stories" / name
+            if not path.exists():
+                err(f"stories.json lists {name} but the file does not exist")
                 continue
-            lines += 1
-            toks = story_tokens(fr)
-            if st.get("level") == "A1" and len(toks) > 12:
-                warn(f"{w} sentence {i}: {len(toks)} words is long for A1")
-            for t in toks:
-                used.add(t)
-                if t not in words:
-                    err(f"{w} sentence {i}: word '{t}' has no meaning in 'words'")
-        for t, entry in words.items():
-            if not (isinstance(entry, dict) and str(entry.get("en", "")).strip()):
-                err(f"{w}: word '{t}' has an empty meaning")
-            if t not in used:
-                warn(f"{w}: word '{t}' is not used in any sentence")
-        kws = st.get("keywords", [])
-        if not 4 <= len(kws) <= 8:
-            warn(f"{w}: keywords usually 4 to 8 (has {len(kws)})")
-        for k in kws:
-            if k not in words:
-                err(f"{w}: keyword '{k}' is not in 'words'")
-        quiz = st.get("quiz", [])
-        if len(quiz) < 3:
-            err(f"{w}: needs at least 3 quiz questions")
-        for j, q in enumerate(quiz, 1):
-            qw = f"{w} quiz {j}"
-            _need(q, "prompt", qw)
-            _need(q, "explain", qw)
-            opts = q.get("options")
-            if not (isinstance(opts, list) and len(opts) >= 2 and all(isinstance(o, str) and o.strip() for o in opts)):
-                err(f"{qw}: needs at least 2 non-empty options")
+            st = load(path)
+            if not st:
                 continue
-            if len(opts) != 4:
-                warn(f"{qw}: TCF questions have 4 options (has {len(opts)})")
-            if len(set(opts)) != len(opts):
-                err(f"{qw}: options must be different from each other")
-            ans = q.get("answer")
-            if not (isinstance(ans, int) and 0 <= ans < len(opts)):
-                err(f"{qw}: answer must be a valid option index")
+            sid = st.get("id", name)
+            w = f"story {sid}"
+            if sid in seen:
+                err(f"{w}: duplicate story id")
+            seen.add(sid)
+            for key in ("title", "titleEn", "summary"):
+                _need(st, key, w)
+            if st.get("level") not in ("A1", "A2", "B1", "B2"):
+                err(f"{w}: level must be A1, A2, B1 or B2")
+            elif catalog_key == "listeningStories":
+                level_counts[st["level"]] += 1
+                if st.get("mode") != "listening":
+                    err(f"{w}: listening catalog entry must declare mode=\"listening\"")
+            if not isinstance(st.get("minutes"), int):
+                err(f"{w}: minutes must be a whole number")
+            sents = st.get("sentences", [])
+            if st.get("level") == "A1" and not 6 <= len(sents) <= 12:
+                warn(f"{w}: A1 stories are usually 6 to 12 sentences (has {len(sents)})")
+            words = st.get("words", {})
+            used = set()
+            for i, sent in enumerate(sents, 1):
+                fr, en = sent.get("fr", ""), sent.get("en", "")
+                if not fr.strip() or not en.strip():
+                    err(f"{w} sentence {i}: needs both fr and en")
+                    continue
+                lines += 1
+                toks = story_tokens(fr)
+                if st.get("level") == "A1" and len(toks) > 12:
+                    warn(f"{w} sentence {i}: {len(toks)} words is long for A1")
+                for t in toks:
+                    used.add(t)
+                    if t not in words:
+                        err(f"{w} sentence {i}: word '{t}' has no meaning in 'words'")
+            for t, entry in words.items():
+                if not (isinstance(entry, dict) and str(entry.get("en", "")).strip()):
+                    err(f"{w}: word '{t}' has an empty meaning")
+                if t not in used:
+                    warn(f"{w}: word '{t}' is not used in any sentence")
+            kws = st.get("keywords", [])
+            if not 4 <= len(kws) <= 8:
+                warn(f"{w}: keywords usually 4 to 8 (has {len(kws)})")
+            for k in kws:
+                if k not in words:
+                    err(f"{w}: keyword '{k}' is not in 'words'")
+            quiz = st.get("quiz", [])
+            if len(quiz) < 3:
+                err(f"{w}: needs at least 3 quiz questions")
+            for j, q in enumerate(quiz, 1):
+                qw = f"{w} quiz {j}"
+                _need(q, "prompt", qw)
+                _need(q, "explain", qw)
+                opts = q.get("options")
+                if not (
+                    isinstance(opts, list)
+                    and len(opts) >= 2
+                    and all(isinstance(o, str) and o.strip() for o in opts)
+                ):
+                    err(f"{qw}: needs at least 2 non-empty options")
+                    continue
+                if len(opts) != 4:
+                    warn(f"{qw}: TCF questions have 4 options (has {len(opts)})")
+                if len(set(opts)) != len(opts):
+                    err(f"{qw}: options must be different from each other")
+                ans = q.get("answer")
+                if not (isinstance(ans, int) and 0 <= ans < len(opts)):
+                    err(f"{qw}: answer must be a valid option index")
+        if catalog_key == "listeningStories" and level_counts != {level: 5 for level in level_counts}:
+            err(f"listeningStories must contain five stories per CEFR level; found {level_counts}")
     return len(seen), lines
 
 def main():
@@ -383,7 +457,8 @@ def main():
         print("ERROR:", e)
     if info:
         print(f"syllabus: stage0 {info['s0']} lessons, A1 {len(info['a1']['units'])} units, "
-              f"{info['total']} target words, {n_units} authored unit file(s)")
+              f"{info['total']} target words; A2 {len(info['a2']['units'])} planned units, "
+              f"{info['a2_total']} new-word target; {n_units} legacy authored unit file(s)")
     print(f"lessons: {n_lessons} file(s), {n_lines} French lines to voice")
     print(f"stories: {n_stories} file(s), {n_story_lines} sentences")
     print(f"content validation: {len(errors)} error(s), {len(warnings)} warning(s)")
