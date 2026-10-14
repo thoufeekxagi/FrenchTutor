@@ -25,7 +25,7 @@ heavy tool is last, never first.
 | 0 | format, analyzer gate, v3 lint, content checks | `tool/check.sh --quick` | about 10 s | no |
 | 1a | pure logic tests | `flutter test --no-pub test/<name>_test.dart` | under 1 s each | no |
 | 1b | widget tests, one screen, fake Marie, size matrix | same | about 1 to 5 s per file | no |
-| 1c | all v3 unit and widget tests together | `flutter test --no-pub test/v3_*_test.dart test/mic_echo_gate_test.dart` | about 15 s for 138 tests | no |
+| 1c | all v3 unit and widget tests together | `flutter test --no-pub test/v3_*_test.dart test/mic_echo_gate_test.dart` | about 16 s for 266 tests | no |
 | 2 | one on-device integration test | `tool/e2e.sh integration_test/<name>_test.dart <device-id> <max-seconds>` | 90 to 145 s on iPhone, build included | yes |
 | 3 | hot reload session for visual tuning | `tool/device.sh run` | about 25 s once, then about 1 s per change | yes |
 | 4 | release build installed on a device | see section 7 | 45 s (warm) to 6 minutes (cold) | yes |
@@ -242,6 +242,11 @@ python3 content/tcf/tools/validate.py
 flutter test --no-pub test/v3_lesson_test.dart test/v3_story_test.dart test/v3_layout_test.dart
 ```
 Then, with a phone: `E2E_DEFINES='--dart-define=E2E_SHELL=true --dart-define=E2E_ONLY=a1-u06' tool/e2e.sh integration_test/v3_course_walk_test.dart <device-id> 900`.
+
+For the complete A2 device walk, story pass and human iPad checklist, follow
+[`A2_REVIEW_AND_DEVICE_QA.md`](A2_REVIEW_AND_DEVICE_QA.md). It splits the
+173-lesson A2 walk into three prefix-filtered batches and explains how to save
+each batch's evidence before the next run replaces `artifacts/e2e/`.
 
 ### Add a widget test for a new lesson step type
 

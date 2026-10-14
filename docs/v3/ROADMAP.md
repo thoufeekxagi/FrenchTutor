@@ -6,9 +6,9 @@ Owner decisions are in bold. This file is the single place for the plan. Update 
 
 | Area | Status |
 |---|---|
-| A1 master chapters | **Stage 0 and Units 1 to 14 authored.** Units 6 to 14 pass the book ledger; app lessons are exported. The PDF remains a reference and was not rebuilt in this pass. |
+| A1 master chapters | **Stage 0 and all 14 A1 units are authored and exported.** The PDF remains a reference and was not rebuilt in this pass. |
 | App shell, onboarding, Learn, Stories, lesson player | built, tested on the phone |
-| Book to app lessons | **Stage 0 and Units 1 to 14 are in the app export** (219 authored lessons, 14 stories), produced by `export_app.py` |
+| Book to app lessons | **Stage 0, A1 (14 units), A2 (12), B1 (12), and B2 (14) are exported in sequence** (733 indexed lessons including the dev sample; 46 stories). |
 | Marie live inside lessons | **built, inline**: phone button, panel (Mute, End, Skip), response pill, speaker taps say the exact line in the chosen voice. Story reader does not have it yet. See `MARIE_TUTOR.md` |
 | Progress and review | **built**: furthest step is real progress, Previous, review, replay, Resume. See `AGENT_RULES.md` section 9 |
 | Review (spaced repetition) | **not built.** Learn has no review card until it is |
@@ -41,15 +41,47 @@ Each unit follows the same path: words (5 groups), phrases, grammar, 2 dialogues
 
 **Book front and back matter still to add:** A1 grammar summary (all conjugations on two pages), numbers and dates reference, Canadian French mini-dictionary, study calendar (14 to 18 weeks), a printable progress sheet.
 
-## After A1: A2, B1, B2 (same method, same checks)
+## A2–B2 course path
 
 | Level | Units | Grammar focus | Skills and TCF tasks | Cumulative words (target) |
 |---|---|---|---|---|
-| A2 | 12 | passé composé, imparfait intro, futur proche/simple, pronoms COD/COI, comparatives, *y* and *en*, reflexive verbs | writing task 1 (60 to 120 words: message, short note), speaking task 1 (guided interview), short listening and reading texts | about 1 200 |
-| B1 | 12 | imparfait vs passé composé, conditionnel, subjonctif intro, relative pronouns, connectors, indirect speech basics | writing task 2 (120 to 150 words), speaking task 2 (prepared monologue, 2 min prep), longer audio | about 2 500 |
-| B2 | 14 | subjonctif, concession and cause, passive, hypothesis, formal register, argument structure | writing task 3 (120 to 180 words, opinion), speaking task 3 (interaction, give a point of view), news and interview audio | about 4 500 |
+| A2 | 12 | see `content/tcf/syllabus/grammar_a2.json` and `content/tcf/syllabus/a2.json` | all four skills; writing Task 1 (60–120 words); oral Task 1 interview practice | 570 new word entries; 173 app lessons |
+| B1 | 12 | plus-que-parfait, future clauses, hypothetical conditions, relative pronouns, subjunctive, connectors, reported speech, indirect questions, passive/on, gerund and past-participle agreement | all four skills; writing Task 2 (120–150 words); oral Task 2 information-seeking dialogue (2 min prep + 3 min 30); short, clearly labelled oral Task 3 practice | 360 new focus terms (30 per unit); 157 app lessons |
+| B2 | 14 | see `content/tcf/syllabus/grammar_b2.json`; argument, reporting, relative clauses, narrative time, subjunctive, hypotheses, cohesion, question strategy, synthesis and editing | all four skills; writing Tasks 1–3 and oral Tasks 1–3; original listening/reading; independent transfer | 420 new focus terms (30 per unit); 183 app lessons |
 
 Targets are planning numbers, not promises. Vocabulary source: the 1 392-word legacy lists (`assets/content/vocab_phase1..3.json`) as a candidate pool only; every word, sound guide and example is written fresh.
+
+**A1 delivery status:** All 14 A1 units are authored and included in the app path. The book ledger and general app validator pass in this content audit.
+
+**A2 delivery status:** All 12 units are authored and exported (173 lessons, 12 stories, 1,820 steps and 516 generated checks). The 570 new-word target is a planning count, not an official CEFR vocabulary requirement. A focused refinement pass cleaned up examples and past-tense progression. `check_book.py`, scoped export, `validate.py`, `tool/check.sh --quick` and 266 Flutter tests pass. The complete 152-page reviewer copy is `docs/v3/book/ParleSprint_A2_Reviewer_Draft.pdf`; human French/TCF and audio review and physical iPad/iPhone testing remain open. See `docs/v3/A2_REVIEW_AND_DEVICE_QA.md` for the handoff and test steps.
+
+**B1 delivery status:** All 12 units are authored in `content/tcf/book/b1_source.py` with numbered chapter adapters, 30 focus terms and 8 reusable chunks per unit, a four-skill readiness baseline, 12 sequenced grammar targets, and TCF practice. The scoped app export contains 157 B1 lessons and is ordered after A2 and before B2. `validate_b1.py` checks the source, all five six-term vocabulary sets, lesson exports, model word ranges, and answer keys.
+
+**B2 content status:** All 14 units are authored in `content/tcf/book/b2_source.py` and export 183 lessons, including 30 focus terms in five six-term sets per unit, 8 reusable chunks per unit and 14 sequenced grammar targets. The B2 syllabus sets 420 new focus terms as a planning target. `validate_b2.py` checks the vocabulary sets, writing ranges, lesson files and answer keys. The app path is ordered after B1 but does not enforce CEFR prerequisites. A fluent French and audio review remains outstanding across levels.
+
+**Stories tab additions:** Ten original B1 and ten original B2 reading stories are attached to Units 1–10 and exported into the Stories tab. Each has seven French sentences with English lines, tap-to-define word coverage, a three-question comprehension quiz and an adult-life theme connected to its unit. Source: `content/tcf/book/story_extensions.py`. The app index contains 46 stories total. This pass did not add separate listening materials; fluent-speaker review of the French, translations and glosses remains open.
+
+**Cross-level content audit (2026-10-13):** The authored path contains 14 A1, 12 A2, 12 B1 and 14 B2 units (52 total). The planned focused word entries sum to 1,980 across the four syllabi; this is not a count of every word learners need to know or a CEFR/TCF guarantee. `check_book.py` passes with 0 errors and 0 ledger warnings; `validate.py` reports 0 errors and one expected warning for the hidden `dev-sample`; `validate_b1.py` and `validate_b2.py` pass. The app index contains 732 non-dev lessons plus the dev sample and 46 stories. The later A2 QA pass ran 266 Flutter tests and built the A2 reviewer PDF; no physical device install/test or human French/audio review has been completed.
+
+| A2 unit | Focus | Main new grammar |
+|---|---|---|
+| 1 | Explain a weekly routine and clarify details | clause connectors and sequencing |
+| 2 | Recount what happened this week | passé composé with *avoir* and regular participles |
+| 3 | Describe an earlier routine and a first experience | common irregular past participles |
+| 4 | Tell a clear past story | imparfait for background and habits |
+| 5 | Explain an event against its background | passé composé / imparfait contrast |
+| 6 | Compare homes and make future plans | futur simple basics; comparatives and superlatives |
+| 7 | Handle a health or service appointment | *qui, que, où* to connect details |
+| 8 | Ask and follow up at work or school | direct object pronouns (*le, la, les*) |
+| 9 | Navigate a trip and adapt to a change | indirect object pronouns; *y* for places |
+| 10 | Shop and talk about food quantities | *en* with quantities |
+| 11 | Resolve a service problem politely | imperative; polite conditional requests |
+| 12 | Integrate A2 across a changing week | cumulative retrieval and four-skill transfer |
+
+Pacing is a planning estimate, not a weekly lock: at 14–16 focused hours per
+unit, 52 units take roughly 728–832 hours. That is about 12–14 months at two
+hours a day or 6–7 months at four hours a day, with progress gated by delayed
+recall and new-context performance rather than lesson completion alone.
 
 **TCF Canada facts to keep correct** (verify on the France Éducation international site before release): Listening 39 questions in 35 minutes, one play; Reading 39 in 60; Writing 3 tasks in 60; Speaking 3 tasks in 12 minutes. Questions run from easiest to hardest. A wrong and a blank answer both score zero. NCLC 7 is the common immigration target. Never promise a score.
 

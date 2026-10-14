@@ -45,6 +45,11 @@ interaction (see BUILD_STRUCTURE.md).
 
 **Course walk filter.** `E2E_ONLY=s0-01,a1-u02` (a `--dart-define`) limits `v3_course_walk_test.dart` to lessons whose id starts with one of the prefixes. `tool/e2e_all.sh` walks a representative sample (about 9 minutes). `FULL_WALK=1 tool/e2e_all.sh walk` plays every lesson (about an hour, 1 000+ steps).
 
+For the full A2-specific walk, run the three batches and the filtered A2 story
+walk in [`A2_REVIEW_AND_DEVICE_QA.md`](A2_REVIEW_AND_DEVICE_QA.md). The course
+walk never taps a speaker and uses `E2E_SHELL` progress keys; it checks app
+lesson flow and authored answer keys, not real speech or French naturalness.
+
 **Test progress is separate from real progress.** In debug builds started with `E2E_SHELL`, every progress key is stored with an `e2e_` prefix (`lib/v3/v3_prefs.dart`, `v3Key()`), so a test run can never read or erase what you learned on the same phone.
 
 `tool/e2e.sh` stops any leftover copy of our own app on the phone before each run (matched by bundle id, never other apps). A copy still running under a debugger makes Flutter's launch fail.
@@ -162,4 +167,3 @@ removal passes it.
 ## Progress and navigation
 
 `test/v3_progress_test.dart` (frontier only moves forward, finished lessons get none, `pickNext` order) and `test/v3_lesson_navigation_test.dart` (Previous, Go to step N, review does not rewrite progress, replay changes nothing, answered questions persist, skip when reviewing). `integration_test/v3_resume_test.dart` also goes back a step before leaving and checks Resume still offers the furthest step.
-

@@ -19,9 +19,10 @@ vocabulary, then phrases and sentence building, then grammar (how words
 connect), then dialogues and stories, then listening, speaking, reading and
 writing, then TCF-style practice.** A1, A2, B1, B2.
 
-Gemini Live (the tutor, voiced as Marie, Julien, Camille or Mathieu) makes
-learning faster: pronunciation, explanations, speaking practice. It is never
-the source of the curriculum. The curriculum is authored files, validated.
+Gemini Live (the tutor, voiced as Marie, Julien, Camille or Mathieu) can support
+pronunciation, explanations and speaking practice. The course does not promise
+that AI accelerates learning. The tutor is never the source of the curriculum;
+the curriculum is authored and validated.
 
 ## 2. Decisions already made (do not reopen without the owner)
 
@@ -145,13 +146,13 @@ Evidence-based rules and the screen list: `UI_STRUCTURE.md`.
 
 | # | Work | Done when |
 |---|---|---|
-| 1 | **A1 Units 6 to 14** (book chapters, then export) | each unit meets "Definition of done" in `LESSON_PIPELINE.md`; PDF rebuilt; all new lessons play in the course walk |
+| 1 | **Complete: cross-level content and export audit, including B2 vocabulary expansion** | complete; all four authored levels pass their available source/export validators |
 | 2 | **Inline Marie in the story reader** | `V3MarieSession` in the reader, narration and call share one socket, tests with the fake |
 | 3 | **Review (spaced repetition)** over words learned, missed and saved | Learn shows a real review card; nothing invented; unit tests for the scheduler |
 | 4 | **TCF mock engine** | real timers, one-play audio, 39-question sets, estimate labelled as an estimate |
 | 5 | **Writing and speaking feedback** | one concise correction, one better version, one reason; no invented scores |
 | 6 | **A1 mini mocks** after Units 5, 10, 14 | 10 listening and 10 reading in real format |
-| 7 | **A2, B1, B2** | same method; targets in `ROADMAP.md` |
+| 7 | **Course-wide progression, review and prerequisite design** | A1–B2 pacing and mastery gates are explicit; review scheduling adapts to learner evidence |
 | 8 | **Progress sync** between devices | account-based; reinstall keeps progress |
 | 9 | **Fluent French speaker review** | `REVIEW_NEEDED.md` items confirmed with name and date |
 | 10 | **App Store update** | screenshots and notes match the TCF-only app; no claim of affiliation; Restore, Terms, Privacy, account deletion, AI consent kept |
@@ -169,8 +170,9 @@ Evidence-based rules and the screen list: `UI_STRUCTURE.md`.
 
 Take-over rule: one agent works in an area at a time. Before starting, run
 `git log --oneline -10`, read the "Current state" block below, and run
-`tool/check.sh --quick`. Before stopping, commit, update the block and
-`ROADMAP.md`, and say what you could not verify.
+`tool/check.sh --quick`. Before stopping, update the block and `ROADMAP.md`,
+and say what you could not verify. Commit only when the owner has asked for a
+commit; never push without an explicit request.
 
 ## 8. Copy-paste prompt for another agent
 
@@ -178,35 +180,53 @@ Take-over rule: one agent works in an area at a time. Before starting, run
 You are continuing ParleSprint (TCF Canada French app) in this repo, branch tcf-v3.
 Read docs/v3/README.md, then docs/v3/HANDOFF.md, docs/v3/AGENT_RULES.md,
 docs/v3/FAST_ITERATION_TESTING.md and docs/v3/LESSON_PIPELINE.md before changing anything.
-Your task: <say which backlog item, for example "write A1 Unit 6, Days, time and appointments">.
-Rules: hand-author content in content/tcf/book/chapters/NN_*.py (never edit generated
-files in flutter_app/assets/content/tcf/), run check_book.py, export_app.py, validate.py,
-the Flutter content tests, rebuild the PDF, commit the unit alone. Use the cheapest test
-first. Report plainly what you did not verify. Do not push unless asked.
+Before doing A2 work, read `docs/v3/A2_REVIEW_AND_DEVICE_QA.md`. All twelve
+A2 units exist; do not start rewriting or expanding them without a concrete
+review finding. The current handoff is to get a French/TCF specialist review,
+then complete the connected-device A2 walk when the owner connects the iPad.
+Keep corrections in canonical chapter sources, use `export_app.py --a2-only`,
+and rerun the checks described in the A2 QA note. Never edit generated JSON,
+commit unless requested, or push unless explicitly asked. State clearly what
+was and was not verified.
 ```
 
 ## 9. Current state (update on every handoff)
 
-Date: 2026-10-13. Branch `tcf-v3`, pushed to `origin/tcf-v3`.
+Date: 2026-10-13. Branch `tcf-v3`; the working tree contains uncommitted
+course-source and generated-app content. The untracked `docs/v3/branding/`
+folder belongs to the owner and was left untouched.
 
-Done and in the app: Stage 0 (13 lessons) and A1 Units 1 to 5 (87 lessons in
-total, 1,053 steps, 5 stories), all 290 word steps with example sentences;
-premium story reader; inline Marie with speaker taps, response pill, Mute,
-Skip, echo gate; real progress, Previous, review and replay; iPhone and iPad
-build; production build installed on the iPad.
+Done and in the app: Stage 0, all 14 A1 units, all 12 A2 units, all 12 B1 units,
+and all 14 B2 units. The app index orders A1 → A2 → B1 → B2. It contains 732
+non-dev lessons plus the hidden dev sample, and 46 stories. A2 exports 173
+lessons; B1 exports 157; B2 exports 183. B1 source and its 12 chapter adapters
+are in `content/tcf/book/b1_source.py` and `chapters/27_b1_unit01.py` through
+`38_b1_unit12.py`. Its five vocabulary lessons per unit teach 30 focus terms
+each, with 8 reusable chunks, 12 grammar targets, four-skill practice and a
+four-skill entry baseline. B2 exports five vocabulary lessons per unit with 30
+focus terms each and 8 reusable chunks, for a 420-term planning target. The app
+still does not enforce CEFR prerequisites.
 
-Verified: 138 unit and widget tests pass (progress, navigation, Marie, layouts
-on four sizes at two text scales, lessons, stories). The analyzer gate is at
-its baseline of 34 known items. The v3 lint is clean.
+The Stories tab also contains ten new B1 and ten new B2 reading stories,
+attached to Units 1–10. Their master text, sentence translations, quizzes and
+story gloss are in `content/tcf/book/story_extensions.py`; `validate.py` passes
+with zero errors. These additions do not include separate listening materials.
+A fluent speaker should review the new French, translations and glosses before
+release.
 
-Not verified on a device: the newest on-device tests (resume with Previous,
-Marie fake test) did not launch because Xcode was open on the Mac; real
-Gemini behaviour (tone, echo with AirPods, reconnect over a long lesson) needs
-the manual script in `FAST_ITERATION_TESTING.md` section 8.
+Cross-level validation: `check_book.py` reports 0 errors and 0 ledger warnings;
+`validate.py` reports 0 errors and one expected warning for the hidden
+`dev-sample`; `validate_b1.py` checks all 157 B1 lessons and five six-term
+vocabulary sets per unit; `validate_b2.py` checks all 183 B2 lessons and five
+six-term vocabulary sets per unit. The A2-only export produces 173 lessons,
+1,820 steps, 516 generated checks and 12 stories; the other stage exports were
+preserved. `tool/check.sh --quick` and 266 Flutter v3/mic-echo tests pass. The
+complete 152-page reviewer PDF was built from the A2 chapter sources and
+visually checked; see `docs/v3/A2_REVIEW_AND_DEVICE_QA.md`.
 
-Next: backlog item 1 (Units 6 to 14). Open owner questions: none.
-
-Known issues and risks: see `MARIE_TUTOR.md` section 8, and
-`content/tcf/REVIEW_NEEDED.md` (a fluent speaker must confirm sound guides and
-Canadian usage notes). The untracked folder `docs/v3/branding/` is the owner's
-and is not part of this work.
+No physical iPad/iPhone course walk, production install or human French/audio
+review has been done. The owner will connect the iPad for device and learner
+checks. Next priorities are specialist review, device QA, course-wide review
+scheduling and prerequisite gates. The B2 syllabus, grammar map and human-review checklist
+are in `content/tcf/syllabus/b2.json`, `content/tcf/syllabus/grammar_b2.json`
+and `content/tcf/REVIEW_NEEDED.md`.

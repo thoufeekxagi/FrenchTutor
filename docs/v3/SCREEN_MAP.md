@@ -529,15 +529,21 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/v3/story/v3_stories_panel.dart`
 - widgets: V3StoriesPanel
-- opens: V3StoryReader
-- tap handlers: 3
-- keys: `stories.card.${s.id}`, `stories.featured`, `stories.level.$level`
+- opens: ListeningPracticeScreen, V3StoryReader
+- tap handlers: 4
+- keys: `stories.card.${s.id}`, `stories.featured`, `stories.level.$level`, `stories.mode.$id`
 
 ## `lib/v3/story/v3_story_reader.dart`
-- widgets: V3StoryReader, _WordPopover, _SettingsSheet
-- tap handlers: 19
-- keys: `story.back`, `story.dock.play`, `story.dock.rate`, `story.dock.replay`, `story.dock.stop`, `story.finish`, `story.popover`, `story.popover.dismiss`, `story.popover.hear`, `story.quiz.check`, `story.quiz.next`, `story.quiz.option.$i`, `story.settings`, `story.settings.$id`, `story.settings.$id.${it.$2}`, `story.tab.${names[i].toLowerCase()}`, `story.textSize`, `story.translate`, `story.words.hear.$key`, `story.words.save.$key`
-- labels: 'Check', 'Done', 'Hear word'
+- widgets: V3StoryReader, _SettingsSheet
+- tap handlers: 17
+- keys: `story.back`, `story.dock.play`, `story.dock.rate`, `story.dock.replay`, `story.dock.stop`, `story.finish`, `story.quiz.check`, `story.quiz.next`, `story.quiz.option.$i`, `story.settings`, `story.settings.$id`, `story.settings.$id.${it.$2}`, `story.tab.${names[i].toLowerCase()}`, `story.textSize`, `story.translate`, `story.words.hear.$key`, `story.words.save.$key`
+- labels: 'Check', 'Done'
+
+## `lib/v3/story/v3_story_word_popover.dart`
+- widgets: V3StoryWordPopover
+- tap handlers: 2
+- keys: `story.popover`, `story.popover.dismiss`, `story.popover.hear`
+- labels: 'Hear word'
 
 ## `lib/v3/tests/v3_tests_screen.dart`
 - widgets: V3TestsScreen
@@ -559,8 +565,8 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - labels: 'Create account', 'Sign in'
 
 ## `lib/widgets/bilingual_word_text.dart`
-- widgets: BilingualWordText
-- tap handlers: 1
+- widgets: BilingualWordText, _SourceWord
+- tap handlers: 2
 
 ## `lib/widgets/error_notice.dart`
 - widgets: ErrorNotice

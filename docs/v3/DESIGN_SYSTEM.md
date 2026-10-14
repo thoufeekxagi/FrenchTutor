@@ -61,7 +61,7 @@ and screens may not invent their own.
 | Any tappable | `V3Pressable`: scale feedback, haptic, one clean accessibility label | `v3_ui.dart` |
 | Progress | `V3Segments` (steps) or a 4 high bar (story position) | `v3_ui.dart` |
 | Cards | radius 22, hairline border, `surfaceShadow` | `DesignTokens` |
-| Chips | radius 22, 44 high, ink fill when selected | |
+| Chips and segmented controls | radius 22, 44 high. **Selected = the action blue with white text, never black.** Black is for body text only | `v3_stories_panel.dart` |
 | Screen gutter | 24 | |
 | Colors | `DesignTokens` / `AppearanceColors` only. One blue for actions, green for correct, red for fix, gold only for the exam target | |
 

@@ -18,11 +18,15 @@ Branch: `tcf-v3`. Bundle id: `com.thoufeekx.frenchtutor` (never change).
 | 4 | `LESSON_PIPELINE.md` | how units are written, checked, exported and turned into the PDF; style card; sources; the plan for Units 6 to 14 and beyond |
 | 5 | `MARIE_TUTOR.md` | the in-lesson tutor: behaviour, architecture, numbers, bugs fixed, open risks |
 
+For the complete A2 package, French/TCF reviewer handoff and three-batch iPad
+course walk, read [`A2_REVIEW_AND_DEVICE_QA.md`](A2_REVIEW_AND_DEVICE_QA.md).
+
 Reference docs: `TESTING.md` (on-device scripts and probe), `DESIGN_SYSTEM.md`
 and `UI_STRUCTURE.md` (look and screens), `LESSON_FORMAT.md` and
 `STORY_FORMAT.md` (file formats), `CONTENT_AUTHORING.md` (sources and gates),
 `BUILD_STRUCTURE.md` (repo layout, release), `ROADMAP.md` (what is done and next),
-`SCREEN_MAP.md` (generated, every screen and key).
+`SCREEN_MAP.md` (generated, every screen and key), and
+`A2_REVIEW_AND_DEVICE_QA.md` (A2 review status and exact on-device recipes).
 
 ## First ten minutes in the repo
 
@@ -39,7 +43,7 @@ python3 ../content/tcf/book/check_book.py     # the course checks
 
 | Job | Commands |
 |---|---|
-| Write a unit | edit `content/tcf/book/chapters/NN_*.py`, then `check_book.py`, `export_app.py`, `content/tcf/tools/validate.py`, `build_book.py` (see `LESSON_PIPELINE.md`) |
+| Write a unit | edit `content/tcf/book/chapters/NN_*.py`, then `check_book.py`, the stage-scoped `export_app.py`, and `content/tcf/tools/validate.py`. Build the matching reference PDF after the stage is complete; A2 uses `build_a2_review.py` (see `LESSON_PIPELINE.md`) |
 | Change the app | `tool/check.sh --quick`, then `flutter test --no-pub test/<file>`, then one device test if behaviour needs it |
 | Test on a device | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh integration_test/<name>_test.dart <device-id> 600` |
 | Deliver a build to the iPad | release build and `xcrun devicectl device install app` (exact steps in `FAST_ITERATION_TESTING.md` section 7) |
