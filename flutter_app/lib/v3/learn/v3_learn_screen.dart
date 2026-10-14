@@ -205,10 +205,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
             source: 'v3_daily_review',
             topic: 'Daily review',
             levelBand: profile.level.toUpperCase(),
-            studyDepth: VocabularyStudyDepth.wordsAndSentences,
-            storyExamples: ref
-                .read(contentServiceProvider)
-                .vocabExamplesFor(entries),
+            studyDepth: VocabularyStudyDepth.wordsOnly,
+            dailyReviewMode: true,
           ),
           fullscreenDialog: true,
         );

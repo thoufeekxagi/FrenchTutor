@@ -54,6 +54,9 @@ abstract final class DesignTokens {
   static Color get primaryReadable => primary;
   static Color get primaryDeep =>
       isDark ? AppearanceColors.blueDark : AppearanceColors.blueDeep;
+  static Color get flashcardBlue => AppearanceColors.blueLight;
+  static Color get flashcardBlueDeep => AppearanceColors.blueDeep;
+  static const Color onFlashcardBlue = Color(0xFFFFFFFF);
   static Color get primarySoft => AppearanceColors.accentSoftFor(isDark);
   // Secondary/info are semantic slots, not a second brand color. They share
   // the gold accent so legacy screens cannot reintroduce a competing hue.
