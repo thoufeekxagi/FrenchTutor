@@ -4,9 +4,11 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'design/app_theme.dart';
+import 'design/appearance_colors.dart';
 import 'models/pilot_access.dart';
 import 'providers/appearance_provider.dart';
 import 'providers/database_provider.dart';
@@ -44,14 +46,14 @@ class FrenchTutorApp extends ConsumerWidget {
 /// The single decision point for what the user sees, re-evaluated on every
 /// auth state change AND when onboarding completes. Deliberate ORDER — the
 /// learner experiences value first, commits second:
-///   1. not onboarded -> [SpeakOnboardingScreen] (goal, level, tutor — no account
-///      wall in front of the product)
+///   1. not onboarded -> [V3OnboardingFlow] (greeting, three TCF value screens,
+///      optional exam date and reminders, and starting level)
 ///   2. onboarded, AI data-use not yet accepted -> [AiConsentScreen] (must
 ///      run before any feature can call the AI provider — Apple Guideline
 ///      5.1.2(i))
-///   3. onboarded + consented but no session -> [AuthScreen] ("create an
+///   3. onboarded + consented but no session -> [SpeakAuthScreen] ("create an
 ///      account to save your progress" — the natural close of onboarding)
-///   4. onboarded + consented + session -> [MainTabScreen]
+///   4. signed in -> optional three-minute Marie practice -> [MainTabScreen]
 ///
 /// Everything renders INSIDE this gate (no pushReplacement out of it) so a
 /// later sign-out from Settings always lands back on the sign-in screen —
@@ -73,6 +75,8 @@ class _AuthGateState extends ConsumerState<AuthGate>
   bool? _aiConsented;
   bool _isRestoringAccount = AuthService.shared.currentSession != null;
   bool _requiresInstallOnboarding = true;
+  bool _onboardingTrialLoaded = false;
+  bool _onboardingTrialPending = false;
   String? _restoreInFlightUserId;
   String? _restoredUserId;
   Future<void>? _resumeSyncInFlight;
@@ -86,6 +90,14 @@ class _AuthGateState extends ConsumerState<AuthGate>
         .read(learningStoreProvider)
         .profile()
         .isOnboarded;
+    SharedPreferences.getInstance().then((prefs) {
+      if (!mounted) return;
+      setState(() {
+        _onboardingTrialPending =
+            prefs.getBool('onboarding_trial_pending') ?? false;
+        _onboardingTrialLoaded = true;
+      });
+    });
     _subscription = AuthService.shared.onAuthStateChange.listen(
       _onAuthStateChange,
     );
@@ -286,12 +298,24 @@ class _AuthGateState extends ConsumerState<AuthGate>
     final session = AuthService.shared.currentSession;
     setState(() {
       _requiresInstallOnboarding = false;
+      _onboardingTrialLoaded = true;
+      _onboardingTrialPending = true;
       if (session != null) _isRestoringAccount = true;
     });
     if (session != null) {
       _prepareSignedInLocalState(session.user.id);
       _startAccountRestore(session.user.id);
     }
+  }
+
+  void _completeOnboardingTrial() {
+    setState(() => _onboardingTrialPending = false);
+    unawaited(_clearOnboardingTrialFlag());
+  }
+
+  Future<void> _clearOnboardingTrialFlag() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_trial_pending', false);
   }
 
   Future<void> _restoreAndSeedContent(String restoringUserId) async {
@@ -306,11 +330,10 @@ class _AuthGateState extends ConsumerState<AuthGate>
       final restoreReady =
           hydration?.profileFetchSucceeded == true &&
           hydration?.adaptiveCourseFetchSucceeded == true;
-      // The optional onboarding trial was recorded while signed out, so its
-      // per-write sync calls intentionally no-op. Claim and upload those
-      // learner-owned rows explicitly once this account is authenticated. It
-      // is deliberately background work: local Course creation must not wait
-      // on a network timeout after signup.
+      // Older onboarding versions allowed the optional trial before account
+      // creation, so claim any learner-owned rows from that path. New installs
+      // now offer the practice after sign-in. This remains background work:
+      // local course creation must not wait on a network timeout after signup.
       unawaited(
         ref.read(syncServiceProvider).syncAdoptedOnboardingTrials().catchError((
           error,
@@ -440,6 +463,10 @@ class _AuthGateState extends ConsumerState<AuthGate>
       );
     }
     if (!_hasSession) return const SpeakAuthScreen();
+    if (!_onboardingTrialLoaded) return const _RestoringProgressView();
+    if (_onboardingTrialPending) {
+      return V3OnboardingTrialOffer(onComplete: _completeOnboardingTrial);
+    }
     return const V3Shell();
   }
 }
@@ -454,23 +481,23 @@ class _RestoringProgressView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF08090B),
+      backgroundColor: AppearanceColors.blueLight,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              'assets/images/pulse_sprint_logo.png',
-              width: 128,
-              height: 128,
+              'assets/images/parlesprint_app_icon.png',
+              width: 88,
+              height: 88,
               fit: BoxFit.contain,
             ),
             const SizedBox(height: 22),
-            const CircularProgressIndicator(color: Color(0xFFB8F36B)),
+            const CircularProgressIndicator(color: Colors.white),
             const SizedBox(height: 14),
             const Text(
-              'Restoring your progress…',
-              style: TextStyle(color: Colors.white70, fontSize: 15),
+              'Getting your course ready',
+              style: TextStyle(color: Colors.white, fontSize: 15),
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 8),

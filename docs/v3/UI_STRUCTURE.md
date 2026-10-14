@@ -38,7 +38,7 @@ Put the contract as a comment at the top of the screen file.
 
 | Screen | Intent | Pattern source |
 |---|---|---|
-| Onboarding (7) | goal, target level, exam date, start level, daily time, tutor voice, plan | Speak (level picker), existing flow |
+| Onboarding | animated greeting, three concise TCF value screens, optional exam date, single-row level choices, optional reminders, consent/account gates, then optional Marie practice | Babbel greeting/value slides; single-column choice rows |
 | Today | one next action with reason and time, reviews due, exam countdown, level vs target | new |
 | Path | stage and unit list with states, what each unit lets you do | Babbel course list |
 | Lesson player | one instruction per step, big answers, bottom feedback bar, Previous beside Continue, Marie phone button and inline panel | Speak lesson skeleton |

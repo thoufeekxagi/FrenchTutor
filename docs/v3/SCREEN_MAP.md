@@ -516,11 +516,11 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - labels: 'Dark mode', 'Settings'
 
 ## `lib/v3/onboarding/v3_onboarding_flow.dart`
-- widgets: V3OnboardingFlow
+- widgets: V3OnboardingFlow, _GreetingIntro, _OnboardingHeader, _OnboardingCTA, _VoiceWave, V3OnboardingTrialOffer
 - opens: SpeakingPracticeScreen
-- tap handlers: 13
-- keys: `onboarding.day.${d.$1}`, `onboarding.examDate`, `onboarding.finish`, `onboarding.getStarted`, `onboarding.level.${l.$1}`, `onboarding.levelContinue`, `onboarding.marieSkip`, `onboarding.marieStart`, `onboarding.minutes.$m`, `onboarding.notSure`, `onboarding.planContinue`, `onboarding.reminder`
-- labels: 'Continue', 'Create my account', 'Exam date (optional)', 'Get started', 'Not sure? Let Marie check', 'Reminder', 'Skip for now'
+- tap handlers: 16
+- keys: `onboarding.courseContinue`, `onboarding.examDate`, `onboarding.examDateContinue`, `onboarding.examDateSkip`, `onboarding.goalContinue`, `onboarding.helloContinue`, `onboarding.level.${level.$1}`, `onboarding.levelContinue`, `onboarding.practiceContinue`, `onboarding.reminderDay.$value`, `onboarding.reminderTime`, `onboarding.remindersSave`, `onboarding.remindersSkip`, `onboarding.trial.skip`, `onboarding.trial.start`
+- labels: 'Continue', 'Save reminders', 'Skip for now', 'Start 3-minute practice', 'Start learning'
 
 ## `lib/v3/shell/v3_shell.dart`
 - widgets: V3Shell

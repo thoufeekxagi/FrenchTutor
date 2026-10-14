@@ -56,7 +56,7 @@ the source of the curriculum. The curriculum is authored files, validated.
 content/tcf/                      course source (book chapters, checkers, exporter), REVIEW_NEEDED.md
 docs/v3/                          all v3 docs, the PDF, design mockups
 flutter_app/lib/v3/
-  onboarding/                     launch, welcome, level, tutor voice, rhythm, plan, account gate
+  onboarding/                     animated blue/white greeting, split TCF value screens, optional date/reminders, level, account gate, optional post-sign-in Marie practice
   shell/                          four-tab shell: Learn, Marie, Tests, Me
   learn/                          Learn tab: Today, Path, Stories
   lesson/                         lesson model, course loader, V3Progress, lesson player, V3Speaker
@@ -82,10 +82,14 @@ why, what they must understand, exactly one primary action, success state, and
 what the screen must not contain. Then build from existing primitives.
 
 **Launch and onboarding** (`lib/v3/onboarding/v3_onboarding_flow.dart` has the
-exact steps): launch screen, welcome, level choice, tutor voice (Marie, Julien,
-Camille, Mathieu), daily rhythm, a plan screen that states real facts (level,
-target, time per day), then the account gate. No fake progress, no scores. Device test:
-`integration_test/v3_onboarding_test.dart`.
+exact steps): the native blue logo launch is followed by a white/blue animated
+greeting, then separate course, TCF goal/skills, and Marie screens. The short
+setup asks for an optional exam date, the current A1–B2 level, and optional
+reminder days/time. Consent and account gates follow; after sign-in, learners
+can try the optional three-minute Marie practice. No extra profile questions,
+fake progress, or scores. The existing onboarding device test still targets
+the former screen order and needs a probe-based update before it can verify
+this flow.
 
 **Shell**: four tabs, Learn, Marie, Tests, Me. Light by default, Dark toggle in
 Settings.
