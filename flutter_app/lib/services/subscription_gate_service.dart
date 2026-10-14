@@ -18,7 +18,13 @@ class DevSubscriptionOverride {
 
   static bool _enabled = false;
 
-  static bool get enabled => kDebugMode && _enabled;
+  /// A tester build (`--dart-define=REVIEW_BUILD=true`) opens every paid area
+  /// so the whole product can be reviewed without a purchase. It is a
+  /// compile-time constant, false in every normal build, and never set by the
+  /// store build scripts.
+  static const _reviewBuild = bool.fromEnvironment('REVIEW_BUILD');
+
+  static bool get enabled => _reviewBuild || (kDebugMode && _enabled);
 
   static Future<void> load() async {
     if (!kDebugMode) return;

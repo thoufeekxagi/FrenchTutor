@@ -33,12 +33,21 @@ class WordMeaningResolver {
     final translation = data['translation']?.toString().trim() ?? '';
     final rawWord = data['word']?.toString().trim() ?? '';
     final partOfSpeech = data['part_of_speech']?.toString().toLowerCase() ?? '';
+    final gender = data['gender']?.toString().trim() ?? '';
+    final number = data['number']?.toString().trim() ?? '';
+    final lemma = data['infinitive']?.toString().trim() ?? '';
+    final tense = data['tense']?.toString().trim() ?? '';
     return WordMeaningResult(
       entry: VocabEntry(
         id: 'word-meaning:${word.trim().toLowerCase()}',
         fr: rawWord.isNotEmpty ? rawWord : word,
         en: translation,
         phonetic: '',
+        partOfSpeech: data['part_of_speech']?.toString().trim() ?? '',
+        gender: gender,
+        number: number,
+        lemma: lemma,
+        contextNote: tense,
       ),
       canConjugate:
           data['can_conjugate'] == true || partOfSpeech.contains('verb'),

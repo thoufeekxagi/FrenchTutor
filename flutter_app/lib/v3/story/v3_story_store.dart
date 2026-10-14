@@ -12,11 +12,21 @@ abstract final class V3Stories {
   static const indexPath = 'assets/content/tcf/stories.json';
   static const dir = 'assets/content/tcf/stories/';
 
-  static Future<List<V3Story>> load({AssetBundle? bundle}) async {
+  static Future<List<V3Story>> load({AssetBundle? bundle}) =>
+      _loadCatalog(listening: false, bundle: bundle);
+
+  static Future<List<V3Story>> loadListening({AssetBundle? bundle}) =>
+      _loadCatalog(listening: true, bundle: bundle);
+
+  static Future<List<V3Story>> _loadCatalog({
+    required bool listening,
+    AssetBundle? bundle,
+  }) async {
     final b = bundle ?? rootBundle;
     final index =
         jsonDecode(await b.loadString(indexPath)) as Map<String, dynamic>;
-    final files = (index['stories'] as List? ?? const []).cast<String>();
+    final catalogKey = listening ? 'listeningStories' : 'stories';
+    final files = (index[catalogKey] as List? ?? const []).cast<String>();
     final stories = <V3Story>[];
     for (final file in files) {
       try {

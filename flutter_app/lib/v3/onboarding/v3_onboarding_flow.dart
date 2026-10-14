@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,11 +25,91 @@ import '../ui/v3_ui.dart';
 /// Screen: V3 onboarding. Key prefix: onboarding.
 /// User arrived to: a fresh install of the TCF Canada course.
 /// They must understand: one course, one TCF goal, four skills, and Marie.
-/// Primary action: continue through the short value story and choose a level.
-/// Secondary action: skip the optional exam date or reminder setup.
+/// Primary action: continue through the short value story, give a name, choose
+/// a level, and finish on a personal pledge.
+/// Secondary action: skip the optional name, exam date or reminder setup.
 /// Success state: preferences saved, then consent and account gates.
-/// Must not contain: extra profile questions, unsupported community claims, fake data.
+/// Must not contain: extra profile questions, unsupported community claims,
+/// fake data, subtitles beyond one short line, or boxes where a row will do.
 /// States: default, loading during reminder save, interrupted, completed.
+/// The words on the last onboarding screen. Pure, so every combination of
+/// name, exam date and reminder can be tested. It never promises a result: it
+/// says ParleSprint will help the learner get ready.
+class OnboardingPledgeCopy {
+  const OnboardingPledgeCopy({
+    required this.title,
+    required this.body,
+    required this.commitment,
+  });
+
+  final String title;
+  final String body;
+  final String commitment;
+
+  static const _months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+  static const _dayNames = {
+    'mon': 'Monday',
+    'tue': 'Tuesday',
+    'wed': 'Wednesday',
+    'thu': 'Thursday',
+    'fri': 'Friday',
+    'sat': 'Saturday',
+    'sun': 'Sunday',
+  };
+
+  static String examDate(DateTime d) =>
+      '${_months[d.month - 1]} ${d.day}, ${d.year}';
+
+  /// "every day", "Monday to Friday", or "Mon, Wed, Fri" in week order.
+  static String daysLabel(Iterable<String> dayIds) {
+    final chosen = [
+      for (final id in _dayNames.keys)
+        if (dayIds.contains(id)) id,
+    ];
+    if (chosen.length == 7) return 'every day';
+    if (chosen.length == 5 &&
+        !chosen.contains('sat') &&
+        !chosen.contains('sun')) {
+      return 'Monday to Friday';
+    }
+    return chosen.map((id) => _dayNames[id]!.substring(0, 3)).join(', ');
+  }
+
+  static OnboardingPledgeCopy build({
+    required String name,
+    DateTime? exam,
+    String? timeLabel,
+    Iterable<String> dayIds = const [],
+  }) {
+    final who = name.trim();
+    final days = dayIds.toSet();
+    final hasPlan =
+        timeLabel != null && timeLabel.isNotEmpty && days.isNotEmpty;
+    return OnboardingPledgeCopy(
+      title: who.isEmpty ? 'Welcome,' : 'Dear $who,',
+      body: exam == null
+          ? 'ParleSprint is proud to help you get ready for the TCF Canada exam.'
+          : 'ParleSprint is proud to help you get ready for your TCF Canada exam on ${examDate(exam)}.',
+      commitment: hasPlan
+          ? 'Your daily commitment: $timeLabel, ${daysLabel(days)}.'
+          : 'Your commitment: one lesson at a time, at your own pace.',
+    );
+  }
+}
+
 class V3OnboardingFlow extends ConsumerStatefulWidget {
   const V3OnboardingFlow({super.key, required this.onFinished});
 
@@ -42,8 +123,12 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
   static const _greetingPage = 0;
   static const _coursePage = 1;
   static const _practicePage = 3;
-  static const _valueStepCount = 4;
-  static const _setupStepCount = 3;
+  static const _pledgePage = 8;
+  static const _pageCount = 9;
+
+  /// Pages drawn in the blue brand colour; the others are white.
+  static const _bluePages = {_coursePage, _practicePage, _pledgePage};
+  static const _pagePadding = EdgeInsets.fromLTRB(24, 64, 24, 20);
 
   static const _weekdays = [
     ('mon', 'M', 'Monday'),
@@ -55,8 +140,9 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     ('sun', 'S', 'Sunday'),
   ];
 
-  final _controller = PageController();
+  final _nameController = TextEditingController();
   var _page = _greetingPage;
+  var _finishing = false;
   String? _level;
   DateTime? _examDate;
   TimeOfDay? _reminderTime;
@@ -67,20 +153,16 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
   void _go(int page) {
     FocusManager.instance.primaryFocus?.unfocus();
-    unawaited(
-      _controller.animateToPage(
-        page,
-        duration: const Duration(milliseconds: 380),
-        curve: Curves.easeOutCubic,
-      ),
-    );
+    setState(() => _page = page.clamp(0, _pageCount - 1));
   }
+
+  void _back() => _go(_page - 1);
 
   void _next() => _go(_page + 1);
 
@@ -103,10 +185,18 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
   }
 
   Future<void> _finish() async {
+    if (_finishing) return;
+    setState(() => _finishing = true);
     final profile = _profile();
     ref.read(learningStoreProvider).saveProfile(profile);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('tcf_target_nclc', 7);
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      await prefs.remove('learner_name');
+    } else {
+      await prefs.setString('learner_name', name);
+    }
     if (_examDate == null) {
       await prefs.remove('tcf_exam_date');
     } else {
@@ -158,12 +248,15 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     ProductAnalytics.capture('notification_permission_prompted');
     final permission = await NotificationPermissionService.request();
     if (!mounted) return;
-    setState(() => _notificationPermissionState = permission);
+    setState(() {
+      _notificationPermissionState = permission;
+      _savingReminders = false;
+    });
     ProductAnalytics.capture(
       'notification_permission_result',
       properties: {'state': permission},
     );
-    await _finish();
+    _go(_pledgePage);
   }
 
   String _wireReminderTime(TimeOfDay time) =>
@@ -178,32 +271,79 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     return '${now.timeZoneName}|UTC$sign$hours:$minutes';
   }
 
+  Widget _pageFor(int page) => switch (page) {
+    0 => _helloScreen(),
+    1 => _courseScreen(),
+    2 => _goalScreen(),
+    3 => _practiceScreen(),
+    4 => _nameStep(),
+    5 => _examDateStep(),
+    6 => _levelStep(),
+    7 => _remindersStep(),
+    _ => _pledgeScreen(),
+  };
+
   @override
   Widget build(BuildContext context) {
-    final onBlue = _page == _coursePage || _page == _practicePage;
-    final lightIcons = onBlue || DesignTokens.isDark;
+    final blue = _bluePages.contains(_page);
+    final reduce = MediaQuery.of(context).disableAnimations;
+    final fade = reduce ? Duration.zero : const Duration(milliseconds: 460);
+    final ink = blue ? Colors.white : AppearanceColors.blueDeep;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: lightIcons
+      value: (blue || DesignTokens.isDark)
           ? SystemUiOverlayStyle.light
           : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: onBlue
-            ? AppearanceColors.blueLight
-            : AppearanceColors.lightSurface,
-        body: V3Width(
-          child: PageView(
-            controller: _controller,
-            physics: const NeverScrollableScrollPhysics(),
-            onPageChanged: (page) => setState(() => _page = page),
-            children: [
-              _helloScreen(),
-              _courseScreen(),
-              _goalScreen(),
-              _practiceScreen(),
-              _examDateStep(),
-              _levelStep(),
-              _remindersStep(),
-            ],
+        backgroundColor: AppearanceColors.lightSurface,
+        resizeToAvoidBottomInset: false,
+        body: AnimatedContainer(
+          duration: fade,
+          curve: Curves.easeOutCubic,
+          color: blue
+              ? AppearanceColors.blueLight
+              : AppearanceColors.lightSurface,
+          child: V3Width(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: AnimatedSwitcher(
+                    duration: fade,
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) => FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0.03, 0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    ),
+                    child: KeyedSubtree(
+                      key: ValueKey(_page),
+                      child: _pageFor(_page),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: SafeArea(
+                    bottom: false,
+                    child: _OnboardingChrome(
+                      progress: _page == _greetingPage
+                          ? 0
+                          : (_page + 1) / _pageCount,
+                      color: ink,
+                      onBack: _page > _greetingPage ? _back : null,
+                      showMark: true,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -218,17 +358,11 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
 
   Widget _courseScreen() {
     return V3Screen(
-      background: AppearanceColors.blueLight,
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+      background: Colors.transparent,
+      padding: _pagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _OnboardingHeader(
-            index: 1,
-            count: _valueStepCount,
-            color: Colors.white,
-            inverted: true,
-          ),
           const Spacer(),
           V3FadeIn(
             child: Text(
@@ -261,27 +395,50 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
 
   Widget _courseLevelPath() {
     const levels = ['A1', 'A2', 'B1', 'B2'];
-    return Row(
-      children: [
-        for (final level in levels)
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Container(
-                constraints: const BoxConstraints(minHeight: 58),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Text(
-                  level,
-                  style: V3Type.strong(17, AppearanceColors.blueDeep),
+    return SizedBox(
+      height: 70,
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final slot = box.maxWidth / levels.length;
+          return Stack(
+            children: [
+              Positioned(
+                left: slot / 2,
+                right: slot / 2,
+                top: 13,
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-          ),
-      ],
+              Row(
+                children: [
+                  for (final level in levels)
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(level, style: V3Type.strong(17, Colors.white)),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -295,16 +452,11 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
       (Icons.edit_note_rounded, 'Writing'),
     ];
     return V3Screen(
-      background: AppearanceColors.lightSurface,
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+      background: Colors.transparent,
+      padding: _pagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _OnboardingHeader(
-            index: 2,
-            count: _valueStepCount,
-            color: AppearanceColors.blueDeep,
-          ),
           const SizedBox(height: 30),
           V3FadeIn(
             child: Text(
@@ -337,17 +489,11 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
 
   Widget _practiceScreen() {
     return V3Screen(
-      background: AppearanceColors.blueLight,
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
+      background: Colors.transparent,
+      padding: _pagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _OnboardingHeader(
-            index: 3,
-            count: _valueStepCount,
-            color: Colors.white,
-            inverted: true,
-          ),
           const Spacer(),
           const Center(child: _VoiceWave(color: Colors.white)),
           const SizedBox(height: 40),
@@ -410,12 +556,12 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
 
   Widget _examDateStep() {
     return V3Screen(
-      background: AppearanceColors.lightSurface,
+      background: Colors.transparent,
+      padding: _pagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _stepHeader(0),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           Text(
             'When is your TCF Canada exam?',
             style: V3Type.title(34, color: AppearanceColors.lightText),
@@ -455,12 +601,12 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
   Widget _levelStep() {
     const levels = [('a1', 'A1'), ('a2', 'A2'), ('b1', 'B1'), ('b2', 'B2')];
     return V3Screen(
-      background: AppearanceColors.lightSurface,
+      background: Colors.transparent,
+      padding: _pagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _stepHeader(1),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           Text(
             'What is your current French level?',
             style: V3Type.title(34, color: AppearanceColors.lightText),
@@ -497,12 +643,12 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
 
   Widget _remindersStep() {
     return V3Screen(
-      background: AppearanceColors.lightSurface,
+      background: Colors.transparent,
+      padding: _pagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _stepHeader(2),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           Text(
             'Set a learning reminder',
             style: V3Type.title(34, color: AppearanceColors.lightText),
@@ -551,7 +697,7 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
                       _preferredDays.clear();
                       _notificationPermissionState = 'not_requested';
                     });
-                    unawaited(_finish());
+                    _go(_pledgePage);
                   },
           ),
         ],
@@ -596,22 +742,124 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     );
   }
 
-  Widget _stepHeader(int index) {
-    return Row(
-      children: [
-        Expanded(
-          child: V3Segments(count: _setupStepCount, current: index),
-        ),
-        const SizedBox(width: 16),
-        Text(
-          '${index + 1}/$_setupStepCount',
-          style: V3Type.body(13, AppearanceColors.lightMuted),
-        ),
-      ],
+  // ---- Name -------------------------------------------------------------
+
+  Widget _nameStep() {
+    final hasName = _nameController.text.trim().isNotEmpty;
+    return V3Screen(
+      background: Colors.transparent,
+      padding: _pagePadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            'What should we call you?',
+            style: V3Type.title(34, color: AppearanceColors.lightText),
+          ),
+          const SizedBox(height: 22),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            constraints: const BoxConstraints(minHeight: 58),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppearanceColors.lightHairline),
+            ),
+            child: TextField(
+              key: const ValueKey('onboarding.name'),
+              controller: _nameController,
+              textCapitalization: TextCapitalization.words,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.givenName],
+              inputFormatters: [LengthLimitingTextInputFormatter(30)],
+              onChanged: (_) => setState(() {}),
+              onSubmitted: (_) {
+                if (_nameController.text.trim().isNotEmpty) _next();
+              },
+              style: V3Type.strong(18, AppearanceColors.lightText),
+              cursorColor: AppearanceColors.blueLight,
+              decoration: InputDecoration.collapsed(
+                hintText: 'First name',
+                hintStyle: V3Type.body(18, AppearanceColors.lightMuted),
+              ),
+            ),
+          ),
+          const Spacer(),
+          V3Button(
+            key: const ValueKey('onboarding.nameContinue'),
+            label: 'Continue',
+            onTap: hasName ? _next : null,
+          ),
+          V3TextAction(
+            key: const ValueKey('onboarding.nameSkip'),
+            label: 'Skip for now',
+            onTap: () {
+              _nameController.clear();
+              _next();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---- Pledge -----------------------------------------------------------
+
+  Widget _pledgeScreen() {
+    final copy = OnboardingPledgeCopy.build(
+      name: _nameController.text,
+      exam: _examDate,
+      timeLabel: _reminderTime?.format(context),
+      dayIds: _preferredDays,
+    );
+    return V3Screen(
+      background: Colors.transparent,
+      padding: _pagePadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Spacer(),
+          V3FadeIn(
+            child: Text(
+              copy.title,
+              key: const ValueKey('onboarding.pledgeTitle'),
+              style: V3Type.hero(46, color: Colors.white),
+            ),
+          ),
+          const SizedBox(height: 18),
+          V3FadeIn(
+            delayMs: 150,
+            child: Text(
+              copy.body,
+              style: V3Type.title(26, color: Colors.white),
+            ),
+          ),
+          const SizedBox(height: 18),
+          V3FadeIn(
+            delayMs: 300,
+            child: Text(
+              copy.commitment,
+              style: V3Type.body(18, Colors.white.withValues(alpha: 0.92)),
+            ),
+          ),
+          const Spacer(),
+          _OnboardingCTA(
+            key: const ValueKey('onboarding.pledgeContinue'),
+            label: _finishing ? 'One moment' : 'Start learning',
+            onTap: () => unawaited(_finish()),
+            background: Colors.white,
+            foreground: AppearanceColors.blueDeep,
+          ),
+        ],
+      ),
     );
   }
 }
 
+/// First screen, as approved: a white page, the big blue greeting with the
+/// next words fading below it, one short line, one button.
 class _GreetingIntro extends StatefulWidget {
   const _GreetingIntro({required this.onContinue});
 
@@ -622,31 +870,22 @@ class _GreetingIntro extends StatefulWidget {
 }
 
 class _GreetingIntroState extends State<_GreetingIntro> {
-  static const _greetings = ['Hello', 'Bonjour', 'Salut', 'Bienvenue'];
+  static const _words = ['Hello', 'Bonjour', 'Salut'];
 
   Timer? _timer;
-  var _index = 0;
-  var _disableAnimations = false;
+  var _lead = 0;
+  var _reduce = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _disableAnimations = MediaQuery.of(context).disableAnimations;
-    if (_disableAnimations) {
-      _timer?.cancel();
-      _timer = null;
-      _index = 0;
-    } else if (_timer == null && _index < _greetings.length - 1) {
-      _timer = Timer.periodic(const Duration(milliseconds: 1150), (timer) {
-        if (!mounted) {
-          timer.cancel();
-          return;
-        }
-        setState(() => _index++);
-        if (_index == _greetings.length - 1) {
-          timer.cancel();
-          _timer = null;
-        }
+    _reduce = MediaQuery.of(context).disableAnimations;
+    _timer?.cancel();
+    _timer = null;
+    if (!_reduce) {
+      // After the words have faded in, the bright one moves down the list.
+      _timer = Timer.periodic(const Duration(milliseconds: 2400), (_) {
+        if (mounted) setState(() => _lead = (_lead + 1) % _words.length);
       });
     }
   }
@@ -657,158 +896,161 @@ class _GreetingIntroState extends State<_GreetingIntro> {
     super.dispose();
   }
 
+  double _opacity(int i) {
+    final distance = (i - _lead) % _words.length;
+    return switch (distance) {
+      0 => 1.0,
+      1 => 0.3,
+      _ => 0.14,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isBlue = _index.isOdd;
-    final background = isBlue
-        ? AppearanceColors.blueLight
-        : AppearanceColors.lightSurface;
-    final foreground = isBlue ? Colors.white : AppearanceColors.blueDeep;
-    final duration = _disableAnimations
-        ? Duration.zero
-        : const Duration(milliseconds: 320);
-
-    return Scaffold(
-      backgroundColor: background,
-      body: AnimatedContainer(
-        duration: duration,
-        curve: Curves.easeOutCubic,
-        color: background,
-        child: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: isBlue
-              ? SystemUiOverlayStyle.light
-              : SystemUiOverlayStyle.dark,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _OnboardingHeader(
-                    index: 0,
-                    count: _valueStepCount,
-                    color: foreground,
-                    inverted: isBlue,
+    final blue = AppearanceColors.blueLight;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 64, 24, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Spacer(flex: 2),
+          for (var i = 0; i < _words.length; i++)
+            V3FadeIn(
+              delayMs: i * 160,
+              child: AnimatedOpacity(
+                duration: _reduce
+                    ? Duration.zero
+                    : const Duration(milliseconds: 800),
+                curve: Curves.easeInOutCubic,
+                opacity: _opacity(i),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _words[i],
+                    maxLines: 1,
+                    style: V3Type.hero(92, color: blue).copyWith(height: 0.98),
                   ),
-                  const Spacer(),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 112,
-                    child: AnimatedSwitcher(
-                      duration: duration,
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      transitionBuilder: (child, animation) => FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.08),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: child,
-                        ),
-                      ),
-                      child: Align(
-                        key: ValueKey(_greetings[_index]),
-                        alignment: Alignment.centerLeft,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            _greetings[_index],
-                            maxLines: 1,
-                            style: V3Type.hero(84, color: foreground),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  _OnboardingCTA(
-                    key: const ValueKey('onboarding.helloContinue'),
-                    label: 'Continue',
-                    onTap: widget.onContinue,
-                    background: isBlue
-                        ? Colors.white
-                        : AppearanceColors.blueLight,
-                    foreground: isBlue
-                        ? AppearanceColors.blueDeep
-                        : Colors.white,
-                  ),
-                ],
+                ),
               ),
             ),
+          const SizedBox(height: 28),
+          V3FadeIn(
+            delayMs: 520,
+            child: Text(
+              'Your French, ready for TCF Canada.',
+              style: V3Type.title(26, color: blue),
+            ),
           ),
-        ),
+          const Spacer(flex: 3),
+          _OnboardingCTA(
+            key: const ValueKey('onboarding.helloContinue'),
+            label: 'Continue',
+            onTap: widget.onContinue,
+            background: blue,
+            foreground: Colors.white,
+          ),
+        ],
       ),
     );
   }
 }
 
-class _OnboardingHeader extends StatelessWidget {
-  const _OnboardingHeader({
-    required this.index,
-    required this.count,
+/// One header for every screen: the mark, a back arrow once there is a screen
+/// to go back to, and a single continuous line that fills as the learner moves
+/// through onboarding.
+class _OnboardingChrome extends StatelessWidget {
+  const _OnboardingChrome({
+    required this.progress,
     required this.color,
-    this.inverted = false,
+    required this.onBack,
+    required this.showMark,
   });
 
-  final int index;
-  final int count;
+  final double progress;
   final Color color;
-  final bool inverted;
+  final VoidCallback? onBack;
+  final bool showMark;
 
   @override
   Widget build(BuildContext context) {
-    final inactive = color.withValues(alpha: inverted ? 0.32 : 0.14);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Image.asset(
-                'assets/images/parlesprint_app_icon.png',
-                fit: BoxFit.contain,
-                excludeFromSemantics: true,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text('ParleSprint', style: V3Type.strong(15, color)),
-            ),
-            Text(
-              '${(index + 1).toString().padLeft(2, '0')} / ${count.toString().padLeft(2, '0')}',
-              style: V3Type.eyebrow(color),
-            ),
-          ],
-        ),
-        const SizedBox(height: 14),
-        Row(
-          children: [
-            for (var i = 0; i < count; i++) ...[
-              Expanded(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 280),
-                  height: 3,
+    final reduce = MediaQuery.of(context).disableAnimations;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 24, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (onBack != null)
+                V3Pressable(
+                  key: const ValueKey('onboarding.back'),
+                  label: 'Back',
+                  onTap: onBack,
+                  child: SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: Icon(
+                      CupertinoIcons.chevron_left,
+                      size: 22,
+                      color: color,
+                    ),
+                  ),
+                )
+              else
+                const SizedBox(width: 12),
+              if (showMark) ...[
+                Container(
+                  width: 26,
+                  height: 26,
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: i <= index ? color : inactive,
-                    borderRadius: BorderRadius.circular(2),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: color.withValues(alpha: 0.12)),
+                  ),
+                  child: Image.asset(
+                    'assets/images/parlesprint_app_icon.png',
+                    fit: BoxFit.contain,
+                    excludeFromSemantics: true,
                   ),
                 ),
-              ),
-              if (i < count - 1) const SizedBox(width: 6),
+                const SizedBox(width: 9),
+                Text('ParleSprint', style: V3Type.strong(15, color)),
+              ],
             ],
-          ],
-        ),
-      ],
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: SizedBox(
+                height: 3,
+                width: double.infinity,
+                child: Stack(
+                  children: [
+                    if (progress > 0)
+                      Container(color: color.withValues(alpha: 0.18)),
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(end: progress),
+                      duration: reduce
+                          ? Duration.zero
+                          : const Duration(milliseconds: 520),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, _) => FractionallySizedBox(
+                        widthFactor: value.clamp(0.0, 1.0),
+                        alignment: Alignment.centerLeft,
+                        child: Container(color: color),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -13,6 +13,7 @@ import '../ui/v3_ui.dart';
 import 'v3_story.dart';
 import 'v3_story_audio.dart';
 import 'v3_story_store.dart';
+import 'v3_story_word_popover.dart';
 
 /// V3 story reader. Screen contract:
 ///
@@ -231,10 +232,14 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
       _selected = s;
     });
     _popover = OverlayEntry(
-      builder: (_) => _WordPopover(
+      builder: (_) => V3StoryWordPopover(
         anchor: rect,
         word: unit.key,
-        meaning: word,
+        meaning: word.en,
+        pos: word.pos,
+        sound: word.sound,
+        gender: word.gender,
+        number: word.number,
         onDismiss: _dismissPopover,
         onHear: () => unawaited(_audio.speakWord(unit.key)),
       ),
@@ -460,7 +465,9 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: _tab == i ? DesignTokens.ink : Colors.transparent,
+                      color: _tab == i
+                          ? DesignTokens.primary
+                          : Colors.transparent,
                       width: 2.5,
                     ),
                   ),
@@ -469,7 +476,7 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
                   names[i],
                   style: V3Type.strong(
                     16,
-                    _tab == i ? DesignTokens.ink : DesignTokens.inkSoft,
+                    _tab == i ? DesignTokens.primary : DesignTokens.inkSoft,
                   ),
                 ),
               ),
@@ -937,146 +944,6 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
           ),
         ],
       ),
-    );
-  }
-}
-
-/// The small card that appears just above a tapped word. Small on purpose:
-/// the word and its meaning, nothing that competes with the story.
-class _WordPopover extends StatelessWidget {
-  const _WordPopover({
-    required this.anchor,
-    required this.word,
-    required this.meaning,
-    required this.onDismiss,
-    required this.onHear,
-  });
-
-  final Rect anchor;
-  final String word;
-  final V3Word meaning;
-  final VoidCallback onDismiss;
-  final VoidCallback onHear;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final width = math.min(250.0, size.width - 32);
-    final left = (anchor.center.dx - width / 2).clamp(
-      16.0,
-      size.width - 16 - width,
-    );
-    final arrowX = (anchor.center.dx - left - 7).clamp(18.0, width - 32);
-    final above = anchor.top > 190;
-    final meta = [
-      meaning.pos,
-      if (meaning.sound.isNotEmpty) meaning.sound,
-    ].where((e) => e.isNotEmpty).join('  ·  ');
-
-    final card = Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: DesignTokens.hairline),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 22,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(word, style: V3Type.strong(17)),
-                const SizedBox(height: 2),
-                Text(meaning.en, style: V3Type.body(14.5, DesignTokens.ink)),
-                if (meta.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(meta, style: V3Type.body(12)),
-                ],
-              ],
-            ),
-          ),
-          V3Pressable(
-            key: const ValueKey('story.popover.hear'),
-            label: 'Hear word',
-            onTap: onHear,
-            child: SizedBox(
-              width: 44,
-              height: 44,
-              child: Icon(
-                CupertinoIcons.speaker_2_fill,
-                size: 20,
-                color: DesignTokens.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    final arrow = Positioned(
-      left: arrowX,
-      top: above ? null : -6,
-      bottom: above ? -6 : null,
-      child: Transform.rotate(
-        angle: math.pi / 4,
-        child: Container(
-          width: 13,
-          height: 13,
-          decoration: BoxDecoration(
-            color: DesignTokens.surface,
-            border: Border(
-              right: above
-                  ? BorderSide(color: DesignTokens.hairline)
-                  : BorderSide.none,
-              bottom: above
-                  ? BorderSide(color: DesignTokens.hairline)
-                  : BorderSide.none,
-              left: above
-                  ? BorderSide.none
-                  : BorderSide(color: DesignTokens.hairline),
-              top: above
-                  ? BorderSide.none
-                  : BorderSide(color: DesignTokens.hairline),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: GestureDetector(
-            key: const ValueKey('story.popover.dismiss'),
-            behavior: HitTestBehavior.translucent,
-            onTap: onDismiss,
-          ),
-        ),
-        Positioned(
-          left: left,
-          width: width,
-          top: above ? null : anchor.bottom + 10,
-          bottom: above ? size.height - anchor.top + 10 : null,
-          child: Semantics(
-            key: const ValueKey('story.popover'),
-            container: true,
-            label: 'Meaning of $word: ${meaning.en}',
-            child: Material(
-              type: MaterialType.transparency,
-              child: Stack(clipBehavior: Clip.none, children: [card, arrow]),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

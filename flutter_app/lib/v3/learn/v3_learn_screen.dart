@@ -7,12 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
+import '../../models/content_models.dart';
 import '../../providers/database_provider.dart';
-import '../../screens/labs/vocab_lab_screen.dart';
 import '../../screens/labs/vocabulary_flashcards_screen.dart';
+import '../../services/srs_service.dart';
 import '../lesson/v3_course.dart';
 import '../lesson/v3_lesson.dart';
 import '../lesson/v3_lesson_player.dart';
+import '../review/v3_review_queue.dart';
 import '../story/v3_stories_panel.dart';
 import '../story/v3_story.dart';
 import '../story/v3_story_reader.dart';
@@ -42,6 +44,8 @@ class V3LearnScreen extends ConsumerStatefulWidget {
 
 class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   var _tab = 0;
+  var _storiesListening = false;
+  int? _reviewCount;
   var _loaded = false;
   List<V3Lesson> _course = const [];
   Set<String> _done = const {};
@@ -81,6 +85,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       _examDate = raw == null ? null : DateTime.tryParse(raw);
       _loaded = true;
     });
+    unawaited(_refreshReviewCount());
   }
 
   /// Where Resume goes. One rule, kept in [V3Progress.pickNext].
@@ -188,35 +193,72 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     if (mounted) unawaited(_load());
   }
 
+  void _say(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// What daily review would show now: only words this learner has met in their
+  /// own lessons. Null means they have not met any yet.
+  Future<List<VocabEntry>?> _reviewEntries() async {
+    final learned = V3ReviewQueue.learnedWords(_course, _done, _pos);
+    if (learned.isEmpty) return null;
+    final store = ref.read(learningStoreProvider);
+    final target = await SRSService.autoQueueSize;
+    final cap = await SRSService.newCardsPerDay;
+    final budget = (cap - store.newEntriesIntroducedToday())
+        .clamp(0, cap)
+        .toInt();
+    return V3ReviewQueue.build(
+      learned: learned,
+      states: store.allSRSStates(),
+      now: DateTime.now(),
+      targetSize: target,
+      newBudget: budget,
+    );
+  }
+
+  Future<void> _refreshReviewCount() async {
+    try {
+      final entries = await _reviewEntries();
+      if (mounted) setState(() => _reviewCount = entries?.length ?? 0);
+    } catch (_) {
+      if (mounted) setState(() => _reviewCount = null);
+    }
+  }
+
+  /// Daily review of the words this learner has met in their own lessons. It
+  /// grows as they finish lessons, and shows nothing they have not learned.
   Future<void> _openReview() async {
     try {
-      final entries = await ref.read(srsServiceProvider).dailyMixedQueue();
+      final entries = await _reviewEntries();
       if (!mounted) return;
-
-      if (entries.isEmpty) {
-        await AppRouter.push(context, (_) => const VocabLabScreen());
-      } else {
-        final profile = ref.read(learningStoreProvider).profile();
-        await AppRouter.push<bool>(
-          context,
-          (_) => VocabularyFlashcardsScreen(
-            title: 'Daily review',
-            entries: entries,
-            source: 'v3_daily_review',
-            topic: 'Daily review',
-            levelBand: profile.level.toUpperCase(),
-            studyDepth: VocabularyStudyDepth.wordsOnly,
-            dailyReviewMode: true,
-          ),
-          fullscreenDialog: true,
-        );
+      if (entries == null) {
+        _say('Review opens after your first word lesson.');
+        return;
       }
+      if (entries.isEmpty) {
+        _say('Nothing to review right now. Your next words are due later.');
+        return;
+      }
+      final profile = ref.read(learningStoreProvider).profile();
+      await AppRouter.push<bool>(
+        context,
+        (_) => VocabularyFlashcardsScreen(
+          title: 'Daily review',
+          entries: entries,
+          source: 'v3_daily_review',
+          topic: 'Daily review',
+          levelBand: profile.level.toUpperCase(),
+          studyDepth: VocabularyStudyDepth.wordsOnly,
+          dailyReviewMode: true,
+        ),
+        fullscreenDialog: true,
+      );
       if (mounted) unawaited(_load());
     } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Review is unavailable right now.')),
-      );
+      if (mounted) _say('Review is unavailable right now.');
     }
   }
 
@@ -247,30 +289,45 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('TCF CANADA', style: V3Type.eyebrow()),
-                            const SizedBox(height: 4),
-                            Text('Learn', style: V3Type.hero(36)),
-                          ],
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Parle',
+                                style: V3Type.title(
+                                  24,
+                                  color: DesignTokens.ink,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Sprint',
+                                style: V3Type.title(
+                                  24,
+                                  color: DesignTokens.primary,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Container(
-                            margin: const EdgeInsets.only(top: 2),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
-                              vertical: 7,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: DesignTokens.primarySoft,
                               borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: DesignTokens.primary.withValues(
+                                  alpha: 0.55,
+                                ),
+                              ),
                             ),
                             child: Text(
                               chip,
@@ -290,14 +347,22 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 26),
+                  Text('TCF CANADA', style: V3Type.eyebrow()),
+                  const SizedBox(height: 4),
+                  Text(
+                    const ['Today', 'Path', 'Stories'][_tab],
+                    key: const ValueKey('learn.title'),
+                    style: V3Type.hero(40),
+                  ),
                   const SizedBox(height: 18),
                   Row(
                     children: [
-                      _segment('Today', 0),
-                      const SizedBox(width: 24),
-                      _segment('Path', 1),
-                      const SizedBox(width: 24),
-                      _segment('Stories', 2),
+                      Expanded(child: _segment('Today', 0)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _segment('Path', 1)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _segment('Stories', 2)),
                     ],
                   ),
                   const SizedBox(height: 18),
@@ -308,7 +373,10 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                   else if (_tab == 1)
                     ..._path()
                   else
-                    const V3StoriesPanel(),
+                    V3StoriesPanel(
+                      key: ValueKey('learn.stories.$_storiesListening'),
+                      initialListening: _storiesListening,
+                    ),
                 ],
               ),
             ),
@@ -331,16 +399,20 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: on ? DesignTokens.ink : Colors.transparent,
+              color: on ? DesignTokens.primary : Colors.transparent,
               width: 2.5,
             ),
           ),
         ),
-        child: Text(
-          label,
-          style: V3Type.strong(
-            17,
-            on ? DesignTokens.ink : DesignTokens.inkSoft,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.bottomLeft,
+          child: Text(
+            label,
+            style: V3Type.strong(
+              17,
+              on ? DesignTokens.primary : DesignTokens.inkSoft,
+            ),
           ),
         ),
       ),
@@ -350,20 +422,29 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   // ---- Today -------------------------------------------------------------
 
   List<Widget> _today({required bool wide}) {
-    final review = _reviewShortcut();
+    final tiles = _tiles();
     if (wide) {
       return [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(flex: 6, child: _hero()),
+            Expanded(flex: 5, child: _hero()),
             const SizedBox(width: 16),
-            Expanded(flex: 3, child: review),
+            Expanded(flex: 6, child: tiles),
           ],
         ),
       ];
     }
-    return [_hero(), const SizedBox(height: 12), review];
+    return [_hero(), const SizedBox(height: 14), tiles];
+  }
+
+  /// "A2" from a2-u03-words-1, "Stage 0" from s0-01.
+  String _levelOf(V3Lesson l) {
+    final head = l.id.split('-').first;
+    if (head == 's0') return 'Stage 0';
+    return const {'a1', 'a2', 'b1', 'b2'}.contains(head)
+        ? head.toUpperCase()
+        : '';
   }
 
   Widget _hero() {
@@ -377,37 +458,87 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
         onStart: () => setState(() => _tab = 1),
       );
     }
+    final level = _levelOf(next);
     return _heroCard(
       eyebrow: 'CONTINUE PATH',
       title: next.title,
-      detail: '${next.unitLabel} · ${next.minutes} min',
+      detail: [if (level.isNotEmpty) level, '${next.minutes} min'].join(' · '),
       action: 'Continue path',
       onStart: () => _openLesson(next),
     );
   }
 
-  Widget _reviewShortcut() {
+  Widget _tiles() {
+    final count = _reviewCount;
+    return Row(
+      children: [
+        Expanded(
+          child: _tile(
+            const ValueKey('learn.review'),
+            CupertinoIcons.arrow_2_circlepath,
+            count == null || count == 0 ? 'Review' : 'Review · $count',
+            'Review flashcards',
+            _openReview,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _tile(
+            const ValueKey('learn.tile.stories'),
+            CupertinoIcons.book,
+            'Stories',
+            'Read stories',
+            () => setState(() {
+              _storiesListening = false;
+              _tab = 2;
+            }),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _tile(
+            const ValueKey('learn.tile.listening'),
+            CupertinoIcons.headphones,
+            'Listening',
+            'Listen to stories',
+            () => setState(() {
+              _storiesListening = true;
+              _tab = 2;
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tile(
+    Key key,
+    IconData icon,
+    String label,
+    String semantics,
+    VoidCallback onTap,
+  ) {
     return V3Pressable(
-      key: const ValueKey('learn.review'),
-      label: 'Review flashcards',
-      onTap: _openReview,
+      key: key,
+      label: semantics,
+      onTap: onTap,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 68),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        constraints: const BoxConstraints(minHeight: 96),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
         decoration: BoxDecoration(
           color: DesignTokens.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: DesignTokens.hairline),
         ),
-        child: Row(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.style_outlined, color: DesignTokens.primary, size: 22),
-            const SizedBox(width: 12),
-            Expanded(child: Text('Review', style: V3Type.strong(16))),
-            Icon(
-              CupertinoIcons.arrow_right,
-              color: DesignTokens.inkSoft,
-              size: 18,
+            Icon(icon, size: 28, color: DesignTokens.ink),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: V3Type.strong(14, DesignTokens.ink),
             ),
           ],
         ),
@@ -427,8 +558,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       decoration: BoxDecoration(
         color: DesignTokens.surface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: DesignTokens.hairline),
-        boxShadow: DesignTokens.surfaceShadow,
+        border: Border.all(color: DesignTokens.primary.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,9 +568,9 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
           Text(title, style: V3Type.title(25)),
           if (detail.isNotEmpty) ...[
             const SizedBox(height: 6),
-            Text(detail, style: V3Type.body(13)),
+            Text(detail, style: V3Type.body(14)),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           V3Button(
             key: const ValueKey('learn.continuePath'),
             label: action,

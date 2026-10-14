@@ -15,17 +15,25 @@
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="0.031" green="0.035" blue="0.043" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.145" green="0.388" blue="0.922" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="parle-logo">
-                                <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                <rect key="frame" x="0.0" y="0.0" width="92" height="92"/>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ParleSprint" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignCenters" adjustsFontSizeToFit="YES" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="parle-wordmark">
+                                <rect key="frame" x="0.0" y="0.0" width="160" height="25"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="20"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <constraints>
                             <constraint firstItem="parle-logo" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="parle-logo-center-x"/>
-                            <constraint firstItem="parle-logo" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="parle-logo-center-y"/>
-                            <constraint firstItem="parle-logo" firstAttribute="width" constant="128" id="parle-logo-width"/>
-                            <constraint firstItem="parle-logo" firstAttribute="height" constant="128" id="parle-logo-height"/>
+                            <constraint firstItem="parle-logo" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="-22" id="parle-logo-center-y"/>
+                            <constraint firstItem="parle-logo" firstAttribute="width" constant="92" id="parle-logo-width"/>
+                            <constraint firstItem="parle-logo" firstAttribute="height" constant="92" id="parle-logo-height"/>
+                            <constraint firstItem="parle-wordmark" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="parle-wordmark-center-x"/>
+                            <constraint firstItem="parle-wordmark" firstAttribute="top" secondItem="parle-logo" secondAttribute="bottom" constant="12" id="parle-wordmark-top"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -35,6 +43,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchImage" width="128" height="128"/>
+        <image name="LaunchImage" width="92" height="92"/>
     </resources>
 </document>

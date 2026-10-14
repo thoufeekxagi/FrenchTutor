@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../design/app_router.dart';
 import '../../design/appearance_colors.dart';
 import '../../design/tokens.dart';
+import '../../models/content_models.dart';
+import '../../screens/lessons/listening_practice_screen.dart';
 import '../ui/v3_ui.dart';
 import 'v3_story.dart';
 import 'v3_story_reader.dart';
@@ -13,15 +15,18 @@ import 'v3_story_store.dart';
 
 /// Stories list, shown as the third segment of the Learn tab. Screen contract:
 ///
-/// User arrived to: read something real in French.
-/// They must understand: stories are short, sorted by level, and their place is
-/// remembered.
-/// Primary action: Resume or start the featured story.
-/// Success state: a story opens in the reader; finished ones are ticked.
-/// Must not contain: photos, a second font, levels with fake content. A level
-/// with no stories is shown as coming soon and cannot be tapped.
+/// User arrived to: practise French through a short story.
+/// They must understand: reading and listening stories are separate modes,
+/// grouped by level, and listening transcripts stay hidden until requested.
+/// Primary action: start the featured story in the selected mode.
+/// Success state: the story opens in its reader or listen-first player.
+/// Must not contain: photos, a second font, or levels with fake content. A
+/// level with no stories is shown as coming soon and cannot be tapped.
 class V3StoriesPanel extends StatefulWidget {
-  const V3StoriesPanel({super.key});
+  const V3StoriesPanel({super.key, this.initialListening = false});
+
+  /// Open on the Listen stories mode (the Listening tile on Today).
+  final bool initialListening;
 
   @override
   State<V3StoriesPanel> createState() => _V3StoriesPanelState();
@@ -31,9 +36,11 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
   static const _levels = ['A1', 'A2', 'B1', 'B2'];
 
   List<V3Story> _stories = const [];
+  List<V3Story> _listeningStories = const [];
   Set<String> _done = const {};
   Map<String, int> _pos = const {};
   var _level = 'A1';
+  late var _listening = widget.initialListening;
   var _loaded = false;
 
   @override
@@ -43,12 +50,18 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
   }
 
   Future<void> _load() async {
-    final stories = await V3Stories.load();
+    final catalogs = await Future.wait([
+      V3Stories.load(),
+      V3Stories.loadListening(),
+    ]);
+    final stories = catalogs[0];
+    final listeningStories = catalogs[1];
     final done = await V3StoryProgress.done();
     final pos = await V3StoryProgress.positions();
     if (!mounted) return;
     setState(() {
       _stories = stories;
+      _listeningStories = listeningStories;
       _done = done;
       _pos = pos;
       _loaded = true;
@@ -56,11 +69,74 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
   }
 
   Future<void> _open(V3Story story) async {
-    await AppRouter.push<bool>(
-      context,
-      (_) => V3StoryReader(story: story, startAt: _pos[story.id] ?? 0),
-    );
+    if (_listening) {
+      await AppRouter.push<bool>(
+        context,
+        (_) => ListeningPracticeScreen(story: _asListeningStory(story)),
+      );
+    } else {
+      await AppRouter.push<bool>(
+        context,
+        (_) => V3StoryReader(story: story, startAt: _pos[story.id] ?? 0),
+      );
+    }
     if (mounted) unawaited(_load());
+  }
+
+  GeneratedStory _asListeningStory(V3Story story) {
+    VocabEntry entry(String key, V3Word word) => VocabEntry(
+      id: key,
+      fr: key,
+      en: word.en,
+      phonetic: word.sound,
+      partOfSpeech: word.pos,
+      gender: word.gender,
+      number: word.number,
+      lemma: word.lemma,
+      contextNote: word.note,
+    );
+
+    final words = {
+      for (final key in story.words.keys) key: entry(key, story.words[key]!),
+    };
+    final passage = ReadingPassage(
+      id: story.id,
+      title: story.title,
+      titleEn: story.titleEn,
+      segments: [
+        for (final sentence in story.sentences)
+          ReadingSegment(
+            fr: sentence.fr,
+            en: sentence.en,
+            grammarNote: sentence.note,
+            pronunciationTip: '',
+          ),
+      ],
+      fullText: story.sentences.map((sentence) => sentence.fr).join(' '),
+      wordDetails: words,
+    );
+    return GeneratedStory(
+      id: story.id,
+      passage: passage,
+      quiz: [
+        for (final question in story.quiz)
+          MultipleChoiceQuestion(
+            q: question.prompt,
+            choices: question.options,
+            answerIndex: question.answer,
+          ),
+      ],
+      keywords: [
+        for (final key in story.keywords)
+          if (words.containsKey(key)) words[key]!,
+      ],
+      createdAt: DateTime.now(),
+      levelBand: story.level,
+      summary: story.summary,
+      topic: story.unit,
+      readTimeMinutes: story.minutes,
+      practiceMode: 'listening',
+    );
   }
 
   V3Story? _featured(List<V3Story> atLevel) {
@@ -76,8 +152,9 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
   @override
   Widget build(BuildContext context) {
     if (!_loaded) return const SizedBox(height: 200);
+    final catalog = _listening ? _listeningStories : _stories;
     final atLevel = [
-      for (final s in _stories)
+      for (final s in catalog)
         if (s.level == _level) s,
     ];
     final featured = _featured(atLevel);
@@ -89,9 +166,13 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Short stories at your level. Tap any word, hear any line.',
+          _listening
+              ? 'Listen first. Open the transcript when you want to study a word or line.'
+              : 'Short stories at your level. Tap any word, hear any line.',
           style: V3Type.body(15),
         ),
+        const SizedBox(height: 16),
+        _modePicker(),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -120,8 +201,54 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
     );
   }
 
+  Widget _modePicker() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Row(
+        children: [
+          _modeButton('read', 'Read stories', listening: false),
+          const SizedBox(width: 4),
+          _modeButton('listen', 'Listen stories', listening: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _modeButton(String id, String label, {required bool listening}) {
+    final selected = _listening == listening;
+    return Expanded(
+      child: V3Pressable(
+        key: ValueKey('stories.mode.$id'),
+        label: label,
+        onTap: () => setState(() => _listening = listening),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 46),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? DesignTokens.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Text(
+            label,
+            style: V3Type.strong(
+              14,
+              selected ? DesignTokens.onPrimary : DesignTokens.inkSoft,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _chip(String level) {
-    final has = _stories.any((s) => s.level == level);
+    final has = (_listening ? _listeningStories : _stories).any(
+      (s) => s.level == level,
+    );
     final on = _level == level;
     return V3Pressable(
       key: ValueKey('stories.level.$level'),
@@ -132,10 +259,10 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: on ? DesignTokens.ink : Colors.transparent,
+          color: on ? DesignTokens.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: on ? DesignTokens.ink : DesignTokens.hairline,
+            color: on ? DesignTokens.primary : DesignTokens.hairline,
           ),
         ),
         child: Text(
@@ -143,7 +270,7 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
           style: V3Type.strong(
             15,
             on
-                ? DesignTokens.canvas
+                ? DesignTokens.onPrimary
                 : (has ? DesignTokens.ink : DesignTokens.muted),
           ),
         ),
@@ -177,7 +304,7 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${started ? 'CONTINUE' : 'START HERE'}  ·  ${s.minutes} MIN',
+              '${_listening ? (started ? 'CONTINUE LISTENING' : 'LISTEN FIRST') : (started ? 'CONTINUE' : 'START HERE')}  ·  ${s.minutes} MIN',
               style: V3Type.eyebrow(dim),
             ),
             const SizedBox(height: 12),
@@ -208,7 +335,9 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    started ? 'Resume reading' : 'Start reading',
+                    _listening
+                        ? (started ? 'Resume listening' : 'Start listening')
+                        : (started ? 'Resume reading' : 'Start reading'),
                     style: V3Type.strong(16, AppearanceColors.blueLight),
                   ),
                   const SizedBox(width: 10),
@@ -236,7 +365,7 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
     return V3Pressable(
       key: ValueKey('stories.card.${s.id}'),
       label:
-          '${s.title}, ${s.titleEn}, ${s.minutes} minutes${done ? ', read' : ''}',
+          '${s.title}, ${s.titleEn}, ${s.minutes} minutes${done ? (_listening ? ', listened' : ', read') : ''}',
       onTap: () => _open(s),
       child: Container(
         padding: const EdgeInsets.all(14),

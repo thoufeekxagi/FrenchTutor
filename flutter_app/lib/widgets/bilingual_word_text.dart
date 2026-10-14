@@ -20,6 +20,7 @@ class BilingualWordText extends StatelessWidget {
     required this.keywords,
     required this.selectedSourceWord,
     required this.onSourceWordTap,
+    this.onSourceWordTapAt,
     this.sourceToTranslation,
     this.playbackSourceWord,
     this.accentColor,
@@ -37,6 +38,7 @@ class BilingualWordText extends StatelessWidget {
   final List<VocabEntry> keywords;
   final int? selectedSourceWord;
   final ValueChanged<int> onSourceWordTap;
+  final void Function(int wordIndex, Offset globalPosition)? onSourceWordTapAt;
 
   /// Optional explicit alignment for authored bilingual lines. Each source
   /// word index maps to the translation word indexes that express it.
@@ -72,17 +74,17 @@ class BilingualWordText extends StatelessWidget {
             runSpacing: 4,
             children: [
               for (var index = 0; index < sourceWords.length; index++)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onSourceWordTap(index),
-                  child: Text(
-                    '${sourceWords[index]}${index == sourceWords.length - 1 ? '' : ' '}',
-                    style: _wordStyle(
-                      sourceStyle,
-                      selected: selectedSourceWord == index,
-                      playing: playbackSourceWord == index,
-                    ),
+                _SourceWord(
+                  index: index,
+                  text:
+                      '${sourceWords[index]}${index == sourceWords.length - 1 ? '' : ' '}',
+                  style: _wordStyle(
+                    sourceStyle,
+                    selected: selectedSourceWord == index,
+                    playing: playbackSourceWord == index,
                   ),
+                  onTap: onSourceWordTap,
+                  onTapAt: onSourceWordTapAt,
                 ),
             ],
           ),
@@ -116,7 +118,42 @@ class BilingualWordText extends StatelessWidget {
     }
     return base;
   }
+}
 
+class _SourceWord extends StatelessWidget {
+  const _SourceWord({
+    required this.index,
+    required this.text,
+    required this.style,
+    required this.onTap,
+    this.onTapAt,
+  });
+
+  final int index;
+  final String text;
+  final TextStyle style;
+  final ValueChanged<int> onTap;
+  final void Function(int wordIndex, Offset globalPosition)? onTapAt;
+
+  @override
+  Widget build(BuildContext context) {
+    var globalPosition = Offset.zero;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: onTapAt == null
+          ? null
+          : (details) => globalPosition = details.globalPosition,
+      onTap: () {
+        final withPosition = onTapAt;
+        if (withPosition == null) {
+          onTap(index);
+        } else {
+          withPosition(index, globalPosition);
+        }
+      },
+      child: Text(text, style: style),
+    );
+  }
 }
 
 List<String> _wordParts(String text) =>

@@ -42,18 +42,33 @@ class VocabEntry {
     required this.en,
     required this.fr,
     required this.phonetic,
+    this.partOfSpeech = '',
+    this.gender = '',
+    this.number = '',
+    this.lemma = '',
+    this.contextNote = '',
   });
 
   final String id;
   final String en;
   final String fr;
   final String phonetic;
+  final String partOfSpeech;
+  final String gender;
+  final String number;
+  final String lemma;
+  final String contextNote;
 
   factory VocabEntry.fromJson(Map<String, dynamic> json) => VocabEntry(
     id: json['id'] as String,
     en: json['en'] as String,
     fr: json['fr'] as String,
     phonetic: json['phonetic'] as String,
+    partOfSpeech: json['partOfSpeech'] as String? ?? '',
+    gender: json['gender'] as String? ?? '',
+    number: json['number'] as String? ?? '',
+    lemma: json['lemma'] as String? ?? '',
+    contextNote: json['contextNote'] as String? ?? '',
   );
 
   Map<String, dynamic> toJson() => {
@@ -61,6 +76,11 @@ class VocabEntry {
     'en': en,
     'fr': fr,
     'phonetic': phonetic,
+    if (partOfSpeech.isNotEmpty) 'partOfSpeech': partOfSpeech,
+    if (gender.isNotEmpty) 'gender': gender,
+    if (number.isNotEmpty) 'number': number,
+    if (lemma.isNotEmpty) 'lemma': lemma,
+    if (contextNote.isNotEmpty) 'contextNote': contextNote,
   };
 }
 
@@ -594,6 +614,7 @@ class ReadingPassage {
     required this.segments,
     required this.fullText,
     this.titleEn,
+    this.wordDetails = const {},
   });
 
   final String id;
@@ -604,6 +625,11 @@ class ReadingPassage {
   /// The English learner-facing heading for [title]. New generated stories
   /// always provide this value; older cached rows may not.
   final String? titleEn;
+
+  /// Optional authored lookup for a word as it appears in this passage.
+  /// Curated listening stories use this to show meaning and morphology without
+  /// asking a model to guess at a form each time it is tapped.
+  final Map<String, VocabEntry> wordDetails;
 
   factory ReadingPassage.fromJson(Map<String, dynamic> json) {
     final rawSegments = json['segments'] ?? json['sentences'];
@@ -633,6 +659,12 @@ class ReadingPassage {
       segments: segments,
       fullText: fullText,
       titleEn: json['titleEn']?.toString() ?? json['title_en']?.toString(),
+      wordDetails: (json['wordDetails'] as Map? ?? const {}).map(
+        (key, value) => MapEntry(
+          key.toString(),
+          VocabEntry.fromJson((value as Map).cast<String, dynamic>()),
+        ),
+      ),
     );
   }
 
@@ -659,6 +691,11 @@ class ReadingPassage {
     'segments': segments.map((s) => s.toJson()).toList(),
     'fullText': fullText,
     if (titleEn != null) 'titleEn': titleEn,
+    if (wordDetails.isNotEmpty)
+      'wordDetails': {
+        for (final entry in wordDetails.entries)
+          entry.key: entry.value.toJson(),
+      },
   };
 
   /// The English learner-facing heading. Legacy rows without [titleEn] fall

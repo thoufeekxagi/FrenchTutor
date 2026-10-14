@@ -236,7 +236,9 @@ class LearningStore {
         p.level,
         p.sessionLength,
         p.reminderTime,
-        p.preferredDays.isEmpty ? null : p.preferredDays.join(','),
+        // The column is NOT NULL. No chosen days is saved as an empty string
+        // (read back as the default plan), never as NULL.
+        p.preferredDays.join(','),
         p.timeZone,
         p.notificationPermissionState,
         p.onboardingVersion,

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../../design/tokens.dart';
@@ -24,10 +25,15 @@ class _V3ShellState extends State<V3Shell> {
   var _index = 0;
 
   static const _tabs = [
-    (Icons.menu_book_outlined, Icons.menu_book_rounded, 'Learn', 'learn'),
-    (Icons.mic_none_rounded, Icons.mic_rounded, 'Marie', 'marie'),
-    (Icons.timer_outlined, Icons.timer_rounded, 'Tests', 'tests'),
-    (Icons.person_outline_rounded, Icons.person_rounded, 'Me', 'me'),
+    (CupertinoIcons.house, CupertinoIcons.house_fill, 'Learn', 'learn'),
+    (
+      CupertinoIcons.person_crop_circle,
+      CupertinoIcons.person_crop_circle_fill,
+      'Marie',
+      'marie',
+    ),
+    (CupertinoIcons.doc_text, CupertinoIcons.doc_text_fill, 'Tests', 'tests'),
+    (CupertinoIcons.gear, CupertinoIcons.gear_solid, 'Me', 'me'),
   ];
 
   @override

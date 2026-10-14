@@ -19,9 +19,8 @@ import '../../widgets/bilingual_word_text.dart';
 import '../../widgets/dark_error_snackbar.dart';
 import '../../widgets/floating_notetaker.dart';
 import '../../widgets/story_cover_image.dart';
-import '../../widgets/word_conjugation_sheet.dart';
-import '../../widgets/word_meaning_overlay.dart';
 import '../../utils/narration_alignment.dart';
+import '../../v3/story/v3_story_word_popover.dart';
 import 'story_reader_screen.dart';
 
 enum _ListeningStage { firstListen, check, focus, dictation, shadow, recap }
@@ -76,7 +75,9 @@ class _ListeningPracticeScreenState
   int? _lyricsSelectedWordIndex;
   int? _currentWord;
   VocabEntry? _resolvedWordMeaning;
-  bool _resolvedWordCanConjugate = false;
+  OverlayEntry? _wordMeaningPopover;
+  Rect? _wordMeaningAnchor;
+  String? _selectedFrenchWord;
   int? _dictationSegment;
   bool _isPlaying = false;
   bool _audioLoading = false;
@@ -217,6 +218,7 @@ class _ListeningPracticeScreenState
     WidgetsBinding.instance.removeObserver(this);
     _coverRefreshTimer?.cancel();
     _narrationHighlightTimer?.cancel();
+    _dismissWordMeaningPopover();
     _call.dispose();
     _livePlaybackGeneration++;
     unawaited(_liveNarrationAudio.dispose());
@@ -323,15 +325,33 @@ class _ListeningPracticeScreenState
   }
 
   void _selectListeningWord(int segmentIndex, int wordIndex) {
+    _selectListeningWordAt(segmentIndex, wordIndex, null);
+  }
+
+  void _selectListeningWordAt(
+    int segmentIndex,
+    int wordIndex,
+    Offset? globalPosition,
+  ) {
+    if (segmentIndex < 0 || segmentIndex >= _segments.length) return;
+    final sentenceWords = _plainWords(_segments[segmentIndex].fr);
+    if (wordIndex < 0 || wordIndex >= sentenceWords.length) return;
     final isSame =
         _selectedWordSegment == segmentIndex &&
         _lyricsSelectedWordIndex == wordIndex;
+    _dismissWordMeaningPopover();
     setState(() {
       _selectedWordSegment = isSame ? null : segmentIndex;
       _lyricsSelectedWordIndex = isSame ? null : wordIndex;
       if (isSame) {
         _resolvedWordMeaning = null;
-        _resolvedWordCanConjugate = false;
+        _wordMeaningAnchor = null;
+        _selectedFrenchWord = null;
+      } else {
+        _selectedFrenchWord = sentenceWords[wordIndex];
+        _wordMeaningAnchor = globalPosition == null
+            ? null
+            : Rect.fromCenter(center: globalPosition, width: 1, height: 1);
       }
     });
     if (!isSame) {
@@ -354,6 +374,17 @@ class _ListeningPracticeScreenState
     final selectedWord = words[wordIndex];
     if (selectedWord.isEmpty) return;
     try {
+      final authored = _story.passage.wordDetails[_storyWordKey(selectedWord)];
+      if (authored != null) {
+        if (!mounted ||
+            _selectedWordSegment != segmentIndex ||
+            _lyricsSelectedWordIndex != wordIndex) {
+          return;
+        }
+        setState(() => _resolvedWordMeaning = authored);
+        _showWordMeaningPopover();
+        return;
+      }
       final result = await WordMeaningResolver.resolve(
         word: selectedWord,
         sentence: segment.fr,
@@ -367,8 +398,8 @@ class _ListeningPracticeScreenState
       }
       setState(() {
         _resolvedWordMeaning = result.entry;
-        _resolvedWordCanConjugate = result.canConjugate;
       });
+      _showWordMeaningPopover();
     } catch (_) {
       // No local fallback shown here (unlike Reading's positional guess) --
       // the panel simply stays hidden until a retry succeeds, which the
@@ -376,23 +407,52 @@ class _ListeningPracticeScreenState
     }
   }
 
-  Future<void> _showListeningConjugation() async {
-    final entry = _resolvedWordMeaning;
-    final segmentIndex = _selectedWordSegment;
-    if (entry == null || segmentIndex == null) return;
-    final segment = _segments[segmentIndex];
-    await showWordConjugationSheet(
-      context,
-      darkMode: _darkMode,
-      word: entry.fr,
-      translation: entry.en,
-      future: LessonAgentService.shared.buildWordConjugation(
-        word: entry.fr,
-        translation: entry.en,
-        sentence: segment.fr,
-        levelBand: _story.levelBand,
+  String _storyWordKey(String word) {
+    const punctuation = '«»"“”‘’\'.,!?;:()—–…';
+    var value = word.replaceAll('\u2019', "'").trim();
+    var start = 0;
+    var end = value.length;
+    while (start < end && punctuation.contains(value[start])) {
+      start++;
+    }
+    while (end > start && punctuation.contains(value[end - 1])) {
+      end--;
+    }
+    return value.substring(start, end).toLowerCase();
+  }
+
+  void _showWordMeaningPopover() {
+    final meaning = _resolvedWordMeaning;
+    final anchor = _wordMeaningAnchor;
+    if (!mounted || meaning == null || anchor == null) return;
+    _dismissWordMeaningPopover();
+    _wordMeaningPopover = OverlayEntry(
+      builder: (_) => V3StoryWordPopover(
+        anchor: anchor,
+        word: _selectedFrenchWord ?? meaning.fr,
+        meaning: meaning.en,
+        pos: meaning.partOfSpeech,
+        gender: meaning.gender,
+        number: meaning.number,
+        onDismiss: _dismissWordMeaningPopover,
+        onHear: () => unawaited(
+          LessonSpeechService.shared.speak(
+            items: [
+              SpeechItem(
+                text: _selectedFrenchWord ?? meaning.fr,
+                language: 'fr-FR',
+              ),
+            ],
+          ),
+        ),
       ),
     );
+    Overlay.of(context).insert(_wordMeaningPopover!);
+  }
+
+  void _dismissWordMeaningPopover() {
+    _wordMeaningPopover?.remove();
+    _wordMeaningPopover = null;
   }
 
   int? _findDictationSegment() {
@@ -722,6 +782,7 @@ class _ListeningPracticeScreenState
 
   void _selectListeningTab(int index) {
     final tab = _ListeningTab.values[index.clamp(0, 3).toInt()];
+    if (tab != _ListeningTab.transcript) _dismissWordMeaningPopover();
     if (tab != _ListeningTab.transcript && (_isPlaying || _audioLoading)) {
       unawaited(_stopLivePlayback());
     }
@@ -761,6 +822,7 @@ class _ListeningPracticeScreenState
 
   void _closeLyrics() {
     if (_isPlaying || _audioLoading) unawaited(_stopLivePlayback());
+    _dismissWordMeaningPopover();
     setState(() {
       _showTranscript = false;
       _tab = _ListeningTab.transcript;
@@ -1157,27 +1219,8 @@ class _ListeningPracticeScreenState
                       ),
                     ),
                   ),
-                if (_resolvedWordMeaning != null)
-                  Positioned(
-                    left: 14,
-                    right: 14,
-                    top: 60,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: WordMeaningOverlay(
-                        word: _resolvedWordMeaning!,
-                        accent: DesignTokens.nightAccent,
-                        darkMode: _darkMode,
-                        onConjugate: _resolvedWordCanConjugate
-                            ? _showListeningConjugation
-                            : null,
-                      ),
-                    ),
-                  ),
                 if (showLyrics)
                   Positioned.fill(
-                    // Keep a fixed meaning/conjugation shelf above the
-                    // transcript so the story never slides underneath it.
                     top: 178,
                     bottom: 14,
                     child: _ListeningFullscreenTranscript(
@@ -1187,6 +1230,7 @@ class _ListeningPracticeScreenState
                       currentWord: _currentWord,
                       selectedSegment: _selectedWordSegment,
                       selectedWord: _lyricsSelectedWordIndex,
+                      onWordTapAt: _selectListeningWordAt,
                       keywords: _story.keywords,
                       highlightWords: _highlightWords,
                       underlineWords: _underlineWords,
@@ -2374,6 +2418,7 @@ class _ListeningTranscriptLines extends StatelessWidget {
     required this.highlightWords,
     required this.underlineWords,
     required this.onWordTap,
+    required this.onWordTapAt,
     required this.showTranslation,
     required this.isDarkMode,
     required this.segmentKeys,
@@ -2389,6 +2434,8 @@ class _ListeningTranscriptLines extends StatelessWidget {
   final bool highlightWords;
   final bool underlineWords;
   final void Function(int segmentIndex, int wordIndex) onWordTap;
+  final void Function(int segmentIndex, int wordIndex, Offset? position)
+  onWordTapAt;
   final bool showTranslation;
   final bool isDarkMode;
   final List<GlobalKey> segmentKeys;
@@ -2457,6 +2504,8 @@ class _ListeningTranscriptLines extends StatelessWidget {
                   : null,
               playbackSourceWord: _isActive(index, active) ? currentWord : null,
               onSourceWordTap: (wordIndex) => onWordTap(index, wordIndex),
+              onSourceWordTapAt: (wordIndex, position) =>
+                  onWordTapAt(index, wordIndex, position),
             ),
           ),
           const SizedBox(height: 10),
@@ -2497,6 +2546,7 @@ class _ListeningFullscreenTranscript extends StatefulWidget {
     required this.onToggleTranslation,
     required this.onCycleTextSize,
     required this.onWordTap,
+    required this.onWordTapAt,
     required this.isDarkMode,
   });
 
@@ -2523,6 +2573,8 @@ class _ListeningFullscreenTranscript extends StatefulWidget {
   final VoidCallback onToggleTranslation;
   final VoidCallback onCycleTextSize;
   final void Function(int segmentIndex, int wordIndex) onWordTap;
+  final void Function(int segmentIndex, int wordIndex, Offset? position)
+  onWordTapAt;
   final bool isDarkMode;
 
   @override
@@ -2613,6 +2665,7 @@ class _ListeningFullscreenTranscriptState
                         highlightWords: widget.highlightWords,
                         underlineWords: widget.underlineWords,
                         onWordTap: widget.onWordTap,
+                        onWordTapAt: widget.onWordTapAt,
                         showTranslation: widget.showTranslation,
                         textScale: widget.textScale,
                         isDarkMode: widget.isDarkMode,

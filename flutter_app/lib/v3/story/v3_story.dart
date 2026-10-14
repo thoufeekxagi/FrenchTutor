@@ -1,11 +1,23 @@
 /// V3 story format (see docs/v3/STORY_FORMAT.md). A story is one JSON file of
 /// sentences plus a meaning for every word, so a tapped word is never blank.
 class V3Word {
-  const V3Word({required this.en, this.pos = '', this.sound = ''});
+  const V3Word({
+    required this.en,
+    this.pos = '',
+    this.sound = '',
+    this.gender = '',
+    this.number = '',
+    this.lemma = '',
+    this.note = '',
+  });
 
   final String en;
   final String pos;
   final String sound;
+  final String gender;
+  final String number;
+  final String lemma;
+  final String note;
 }
 
 /// One tappable word as drawn on screen. Punctuation that French sets apart
@@ -149,6 +161,10 @@ class V3Story {
           en: str((e.value as Map).cast<String, dynamic>(), 'en'),
           pos: ((e.value as Map)['pos'] as String?) ?? '',
           sound: ((e.value as Map)['sound'] as String?) ?? '',
+          gender: ((e.value as Map)['gender'] as String?) ?? '',
+          number: ((e.value as Map)['number'] as String?) ?? '',
+          lemma: ((e.value as Map)['lemma'] as String?) ?? '',
+          note: ((e.value as Map)['note'] as String?) ?? '',
         ),
     };
 

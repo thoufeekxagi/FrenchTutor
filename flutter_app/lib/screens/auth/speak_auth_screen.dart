@@ -1,8 +1,9 @@
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../../design/tokens.dart';
 import '../../services/auth_service.dart';
-import '../speak/speak_ui.dart';
+import '../../v3/ui/v3_ui.dart';
 
 class SpeakAuthScreen extends StatefulWidget {
   const SpeakAuthScreen({super.key, this.initialSignUp = true});
@@ -163,148 +164,149 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
     const googleForeground = DesignTokens.googleButtonForeground;
     const googleBorder = DesignTokens.googleButtonBorder;
 
-    return SpeakScaffold(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 26, 24, 30),
-        children: [
-          Center(
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: SpeakColors.accent,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.forum_rounded,
-                color: Colors.white,
-                size: 27,
-              ),
-            ),
-          ),
-          const SizedBox(height: 22),
-          Text(
-            _signUp ? 'Save your plan\nand keep speaking.' : 'Welcome back.',
-            textAlign: TextAlign.center,
-            style: DesignTokens.display(29),
-          ),
-          const SizedBox(height: 9),
-          Text(
-            _signUp
-                ? 'Create an account so your course, roleplays and progress stay with you.'
-                : 'Pick up exactly where you left off.',
-            textAlign: TextAlign.center,
-            style: DesignTokens.body(
-              14,
-            ).copyWith(color: SpeakColors.inkSoft, height: 1.4),
-          ),
-          const SizedBox(height: 28),
-          _providerButton(
-            Icons.apple_rounded,
-            'Continue with Apple',
-            appleBackground,
-            appleForeground,
-            () => _run(AuthService.shared.signInWithApple),
-          ),
-          const SizedBox(height: 10),
-          _providerButton(
-            Icons.g_mobiledata_rounded,
-            'Continue with Google',
-            googleBackground,
-            googleForeground,
-            () => _run(AuthService.shared.signInWithGoogle),
-            outlined: true,
-            borderColor: googleBorder,
-            leading: Image.asset(
-              'assets/images/google_logo.png',
-              width: 22,
-              height: 22,
-              filterQuality: FilterQuality.high,
-            ),
-          ),
-          const SizedBox(height: 22),
-          Row(
+    // Same look as onboarding: the mark, one heading, rows, one main button.
+    return Scaffold(
+      backgroundColor: DesignTokens.canvas,
+      body: SafeArea(
+        child: V3Width(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
             children: [
-              Expanded(child: Divider(color: SpeakColors.line)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  'or use email',
-                  style: DesignTokens.body(
-                    11,
-                  ).copyWith(color: SpeakColors.inkSoft),
+              Row(
+                children: [
+                  Container(
+                    width: 26,
+                    height: 26,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: DesignTokens.hairline),
+                    ),
+                    child: Image.asset(
+                      'assets/images/parlesprint_app_icon.png',
+                      fit: BoxFit.contain,
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+                  const SizedBox(width: 9),
+                  Text(
+                    'ParleSprint',
+                    style: V3Type.strong(15, DesignTokens.primary),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              Text(
+                _signUp ? 'Save your progress.' : 'Welcome back.',
+                style: V3Type.title(36),
+              ),
+              const SizedBox(height: 26),
+              _providerButton(
+                Icons.apple_rounded,
+                'Continue with Apple',
+                appleBackground,
+                appleForeground,
+                () => _run(AuthService.shared.signInWithApple),
+                key: const ValueKey('auth.apple'),
+              ),
+              const SizedBox(height: 10),
+              _providerButton(
+                Icons.g_mobiledata_rounded,
+                'Continue with Google',
+                googleBackground,
+                googleForeground,
+                () => _run(AuthService.shared.signInWithGoogle),
+                outlined: true,
+                borderColor: googleBorder,
+                key: const ValueKey('auth.google'),
+                leading: Image.asset(
+                  'assets/images/google_logo.png',
+                  width: 22,
+                  height: 22,
+                  filterQuality: FilterQuality.high,
                 ),
               ),
-              Expanded(child: Divider(color: SpeakColors.line)),
-            ],
-          ),
-          const SizedBox(height: 18),
-          _field(_email, 'Email address', Icons.mail_outline_rounded),
-          const SizedBox(height: 10),
-          _field(
-            _password,
-            'Password',
-            Icons.lock_outline_rounded,
-            obscure: true,
-          ),
-          if (!_signUp)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: _loading ? null : _sendPasswordReset,
-                child: const Text('Forgot password?'),
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Expanded(child: Divider(color: DesignTokens.hairline)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('or use email', style: V3Type.body(13)),
+                  ),
+                  Expanded(child: Divider(color: DesignTokens.hairline)),
+                ],
               ),
-            ),
-          if (_message != null) ...[
-            const SizedBox(height: 10),
-            Text(
-              _message!,
-              textAlign: TextAlign.center,
-              style: DesignTokens.body(12).copyWith(color: SpeakColors.inkSoft),
-            ),
-          ],
-          if (_awaitingEmailConfirmation)
-            TextButton.icon(
-              onPressed: _loading ? null : _resendConfirmation,
-              icon: const Icon(Icons.mark_email_unread_outlined, size: 18),
-              label: Text(_loading ? 'Sending…' : 'Resend confirmation email'),
-            ),
-          const SizedBox(height: 16),
-          SpeakPrimaryButton(
-            label: _loading
-                ? 'Working…'
-                : _signUp
-                ? 'Create account'
-                : 'Sign in',
-            icon: Icons.arrow_forward_rounded,
-            onTap: _loading ? () {} : _submitEmail,
-          ),
-          const SizedBox(height: 14),
-          Center(
-            child: GestureDetector(
-              onTap: () => setState(() {
-                _signUp = !_signUp;
-                _awaitingEmailConfirmation = false;
-                _message = null;
-              }),
-              child: Text(
-                _signUp
+              const SizedBox(height: 18),
+              _field(
+                _email,
+                'Email address',
+                CupertinoIcons.mail,
+                key: const ValueKey('auth.email'),
+              ),
+              const SizedBox(height: 10),
+              _field(
+                _password,
+                'Password',
+                CupertinoIcons.lock,
+                obscure: true,
+                key: const ValueKey('auth.password'),
+              ),
+              if (!_signUp)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: V3Pressable(
+                    key: const ValueKey('auth.forgot'),
+                    label: 'Forgot password?',
+                    onTap: _loading ? null : _sendPasswordReset,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        'Forgot password?',
+                        style: V3Type.strong(14, DesignTokens.primary),
+                      ),
+                    ),
+                  ),
+                ),
+              if (_message != null) ...[
+                const SizedBox(height: 10),
+                Text(_message!, style: V3Type.body(14, DesignTokens.ink)),
+              ],
+              if (_awaitingEmailConfirmation)
+                V3TextAction(
+                  key: const ValueKey('auth.resend'),
+                  label: _loading ? 'Sending…' : 'Resend confirmation email',
+                  onTap: _loading ? null : _resendConfirmation,
+                ),
+              const SizedBox(height: 18),
+              V3Button(
+                key: const ValueKey('auth.submit'),
+                label: _signUp ? 'Create account' : 'Sign in',
+                loading: _loading,
+                onTap: _submitEmail,
+              ),
+              V3TextAction(
+                key: const ValueKey('auth.toggle'),
+                label: _signUp
                     ? 'Already have an account? Sign in'
                     : 'New to ParleSprint? Create an account',
-                style: DesignTokens.body(
-                  12,
-                  weight: FontWeight.w700,
-                ).copyWith(color: DesignTokens.primaryReadable),
+                onTap: () => setState(() {
+                  _signUp = !_signUp;
+                  _awaitingEmailConfirmation = false;
+                  _message = null;
+                }),
               ),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                'By continuing, you agree to our Terms and Privacy Policy.',
+                style: V3Type.body(12),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            'By continuing, you agree to our Terms and Privacy Policy.',
-            textAlign: TextAlign.center,
-            style: DesignTokens.body(10.5).copyWith(color: SpeakColors.inkSoft),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -318,68 +320,72 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
     bool outlined = false,
     Color? borderColor,
     Widget? leading,
+    Key? key,
   }) {
-    return GestureDetector(
+    return V3Pressable(
+      key: key,
+      label: label,
       onTap: _loading ? null : onTap,
       child: Container(
-        height: 50,
+        height: 58,
         decoration: BoxDecoration(
           color: background,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           border: outlined
-              ? Border.all(color: borderColor ?? SpeakColors.navy)
+              ? Border.all(color: borderColor ?? DesignTokens.hairline)
               : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             leading ?? Icon(icon, color: foreground, size: 22),
-            const SizedBox(width: 9),
-            Text(
-              label,
-              style: DesignTokens.body(
-                14,
-                weight: FontWeight.w700,
-              ).copyWith(color: foreground),
-            ),
+            const SizedBox(width: 10),
+            Text(label, style: V3Type.strong(16, foreground)),
           ],
         ),
       ),
     );
   }
 
+  /// A row, like every other choice in the app: white, rounded, hairline.
   Widget _field(
     TextEditingController controller,
     String hint,
     IconData icon, {
     bool obscure = false,
+    Key? key,
   }) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      keyboardType: obscure
-          ? TextInputType.visiblePassword
-          : TextInputType.emailAddress,
-      cursorColor: DesignTokens.primaryReadable,
-      style: DesignTokens.body(14).copyWith(color: Colors.black87),
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: Colors.black54, size: 20),
-        hintText: hint,
-        hintStyle: DesignTokens.body(14).copyWith(color: Colors.black54),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: SpeakColors.line),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: SpeakColors.line),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: DesignTokens.primaryReadable, width: 2),
-        ),
+    return Container(
+      constraints: const BoxConstraints(minHeight: 58),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: DesignTokens.hairline),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: DesignTokens.inkSoft, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              key: key,
+              controller: controller,
+              obscureText: obscure,
+              autocorrect: false,
+              keyboardType: obscure
+                  ? TextInputType.visiblePassword
+                  : TextInputType.emailAddress,
+              cursorColor: DesignTokens.primary,
+              style: V3Type.strong(16, DesignTokens.ink),
+              decoration: InputDecoration.collapsed(
+                hintText: hint,
+                hintStyle: V3Type.body(16, DesignTokens.inkSoft),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

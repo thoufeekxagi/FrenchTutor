@@ -86,10 +86,11 @@ class _AuthGateState extends ConsumerState<AuthGate>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _requiresInstallOnboarding = !ref
-        .read(learningStoreProvider)
-        .profile()
-        .isOnboarded;
+    // A tester build (`--dart-define=REVIEW_BUILD=true`) shows onboarding on
+    // every launch so it can be reviewed in depth. False in every normal build.
+    _requiresInstallOnboarding =
+        const bool.fromEnvironment('REVIEW_BUILD') ||
+        !ref.read(learningStoreProvider).profile().isOnboarded;
     SharedPreferences.getInstance().then((prefs) {
       if (!mounted) return;
       setState(() {
