@@ -1,6 +1,6 @@
 # V3 testing and fast iteration rules
 
-> Start with `FAST_ITERATION_TESTING.md` (how tests are chosen and designed, iPhone and iPad). This file is the reference for the on-device scripts and probe.
+> Start with `FAST_TESTING_PLAYBOOK.md` (one-stop guide), then `FAST_ITERATION_TESTING.md` (how tests are chosen and designed, iPhone and iPad). This file is the reference for the on-device scripts and probe.
 
 Goal: no assumptions, no trial and error. Every claim about the app (a screen
 exists, a button is called X, a tap does Y) must come from a tool result in the

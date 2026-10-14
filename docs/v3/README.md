@@ -14,7 +14,8 @@ Branch: `tcf-v3`. Bundle id: `com.thoufeekx.frenchtutor` (never change).
 |---|---|---|
 | 1 | `HANDOFF.md` | the mission, decisions already made, how the UI is designed, ordered backlog, current state, and a copy-paste prompt for another agent |
 | 2 | `AGENT_RULES.md` | the operating rules (evidence before action, stop after two failures, echo rule, progress rule) |
-| 3 | `FAST_ITERATION_TESTING.md` | how to prove changes quickly on the Mac and on iPhone and iPad, test patterns, traps, device install steps |
+| 3 | `FAST_TESTING_PLAYBOOK.md` | **the one-stop guide**: plan, code, unit and end-to-end tests, connected devices, one-process rule, stale processes, edge cases, builds, commit and push |
+| 3b | `FAST_ITERATION_TESTING.md` | how to prove changes quickly on the Mac and on iPhone and iPad, test patterns, traps, device install steps |
 | 4 | `LESSON_PIPELINE.md` | how units are written, checked, exported and turned into the PDF; style card; sources; the plan for Units 6 to 14 and beyond |
 | 5 | `MARIE_TUTOR.md` | the in-lesson tutor: behaviour, architecture, numbers, bugs fixed, open risks |
 

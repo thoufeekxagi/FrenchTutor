@@ -1,5 +1,7 @@
 # V3 fast iteration testing (iPhone and iPad)
 
+> The one-stop step-by-step guide is `FAST_TESTING_PLAYBOOK.md`. This file keeps the test patterns and traps in more detail.
+
 How this project is tested quickly, without hunting through a connected phone
 for every change. Read this before you write a test or touch a device. It
 explains the method, the numbers we measured, the traps we fell into, and the
