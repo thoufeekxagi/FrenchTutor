@@ -149,7 +149,7 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
         children: [
           V3Header(
             title: 'Exam readiness',
-            subtitle: 'Free TCF and TEF preparation',
+            subtitle: 'TCF Canada practice',
             leading: const V3BackButton(),
           ),
           Expanded(
@@ -175,26 +175,11 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
                   ).copyWith(color: SpeakColors.inkSoft, letterSpacing: 1.2),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _ChoiceCard(
-                        title: 'TCF Canada',
-                        subtitle: 'General French test',
-                        selected: _exam == _ExamFamily.tcf,
-                        onTap: () => setState(() => _exam = _ExamFamily.tcf),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _ChoiceCard(
-                        title: 'TEF Canada',
-                        subtitle: 'French assessment test',
-                        selected: _exam == _ExamFamily.tef,
-                        onTap: () => setState(() => _exam = _ExamFamily.tef),
-                      ),
-                    ),
-                  ],
+                _ChoiceCard(
+                  title: 'TCF Canada',
+                  subtitle: 'General French test',
+                  selected: true,
+                  onTap: () => setState(() => _exam = _ExamFamily.tcf),
                 ),
                 const SizedBox(height: 22),
                 Text(
@@ -226,7 +211,7 @@ class _ExamReadinessScreenState extends ConsumerState<ExamReadinessScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Free readiness practice. Your choice is used to calibrate the live content; it does not change your course level.',
+                          'Readiness practice. Your choice sets the difficulty of the practice; it does not change your course level.',
                           style: DesignTokens.body(
                             13,
                           ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
