@@ -151,7 +151,7 @@ export default defineContentScript({
       name: "parlesprint-immersion",
       position: "inline",
       // The host must participate in the page stacking order, not only its child.
-      css: ":host{display:block!important;position:relative!important;width:100%!important;z-index:2147483647!important;overflow:visible!important;}",
+      css: ":host{display:block!important;position:relative!important;width:100%!important;z-index:2147483647!important;overflow:visible!important;}:host(.ps-ov){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important;}",
       isolateEvents: true,
       anchor: "body",
       onMount(container) {
@@ -166,8 +166,22 @@ export default defineContentScript({
     ui.mount();
 
     const host = ui.shadowHost;
-    let placement: "below" | "floating" = "below";
+    let placement: "overlay" | "below" | "floating" = "below";
     const placeHost = () => {
+      if (placement === "overlay") {
+        const player = document.querySelector<HTMLElement>("#movie_player");
+        if (player) {
+          if (host.parentElement !== player) player.append(host);
+          host.classList.add("ps-ov");
+          for (const name of ["position", "left", "top", "right", "bottom", "width", "height"])
+            host.style.removeProperty(name);
+          return;
+        }
+      }
+      host.classList.remove("ps-ov");
+      host.style.removeProperty("pointer-events");
+      host.style.removeProperty("bottom");
+      host.style.removeProperty("right");
       if (placement === "floating") {
         if (host.parentElement !== document.body) document.body.append(host);
         host.style.setProperty("position", "fixed", "important");
@@ -182,6 +196,13 @@ export default defineContentScript({
       host.style.setProperty("top", "auto", "important");
       host.style.setProperty("width", "100%", "important");
       host.style.setProperty("height", "auto", "important");
+      const topRow = document.querySelector<HTMLElement>(
+        "ytd-watch-metadata #top-row, #above-the-fold #top-row",
+      );
+      if (topRow && topRow.parentElement) {
+        if (host.previousElementSibling !== topRow) topRow.insertAdjacentElement("afterend", host);
+        return;
+      }
       const below = document.querySelector<HTMLElement>(
         "ytd-watch-flexy #below, #below",
       );
@@ -219,7 +240,7 @@ export default defineContentScript({
         const value = prefs && typeof prefs === "object"
           ? (prefs as Record<string, unknown>).placement
           : undefined;
-        placement = value === "floating" ? "floating" : "below";
+        placement = value === "floating" || value === "overlay" ? value : "below";
         placeHost();
       }).catch(placeHost);
     };
@@ -267,10 +288,10 @@ export default defineContentScript({
     const changed = (changes: Record<string, { newValue?: unknown }>, area: string) => {
       if (area !== "local" || !changes.prefs) return;
       const value = changes.prefs.newValue;
-      placement = value && typeof value === "object" &&
-        (value as Record<string, unknown>).placement === "floating"
-        ? "floating"
-        : "below";
+      const next = value && typeof value === "object"
+        ? (value as Record<string, unknown>).placement
+        : undefined;
+      placement = next === "floating" || next === "overlay" ? next : "below";
       placeHost();
     };
     browser.storage.onChanged.addListener(changed);

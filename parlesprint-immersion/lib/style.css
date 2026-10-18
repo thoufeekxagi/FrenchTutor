@@ -1319,3 +1319,98 @@ body {
 .ps .subtitle-manager .subtitle-import {
   margin: 12px 0;
 }
+
+/* On-video caption bar (default placement) */
+.ps.ov {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  pointer-events: none;
+  font-size: 14px;
+}
+.ps.ov > * { pointer-events: auto; }
+.ps.ov .ov-line {
+  max-width: min(80%, 900px);
+  padding: 6px 16px 8px;
+  border-radius: 12px;
+  background: rgba(8, 10, 14, 0.78);
+  color: #fff;
+  text-align: center;
+  backdrop-filter: blur(6px);
+}
+.ps.ov .sentence { margin: 0; font-size: clamp(16px, 1.7vw, 26px); line-height: 1.35; letter-spacing: -0.2px; color: #fff; }
+.ps.ov.caption-large .sentence { font-size: clamp(20px, 2.2vw, 32px); }
+.ps.ov .word { color: #fff; min-height: 0; padding: 0 1px; border-radius: 5px; cursor: pointer; background: transparent; border: 0; }
+.ps.ov .word:hover { background: rgba(255,255,255,.22); color: #fff; }
+.ps.ov .word.selected, .ps.ov .word.selected:hover { background: var(--accent); color: #fff; }
+.ps.ov .word.notebook-word { text-decoration: underline; text-decoration-color: #7aa7ff; text-underline-offset: 4px; }
+.ps.ov .word.spoken { color: #ffe08a; }
+.ps.ov .ov-tx { margin: 4px 0 0; font-size: clamp(13px, 1.3vw, 19px); color: #cfd6e4; line-height: 1.35; }
+.ps.ov .ov-controls {
+  align-self: flex-end; margin-right: 14px;
+  display: flex; gap: 4px; padding: 3px; border-radius: 999px;
+  background: rgba(8,10,14,.62); opacity: .55; transition: opacity .15s;
+}
+.ps.ov .ov-controls:hover, .ps.ov .ov-controls:focus-within { opacity: 1; }
+.ps.ov .ov-controls button {
+  min-height: 0; height: 26px; min-width: 34px; padding: 0 9px; border: 0; border-radius: 999px;
+  background: transparent; color: #cfd6e4; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.ps.ov .ov-controls button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.ps.ov .ov-controls button:disabled { opacity: .4; cursor: default; }
+.ps.ov .ov-meaning {
+  width: min(360px, 86%); padding: 12px 14px; border-radius: 14px;
+  background: #fff; color: var(--ink); box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.ps.ov .ov-meaning-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ps.ov .ov-meaning-head strong { font-size: 18px; }
+.ps.ov .ov-meaning-head button { min-height: 0; height: 26px; width: 26px; padding: 0; border-radius: 50%; border: 0; background: var(--raised); cursor: pointer; font-size: 16px; line-height: 1; }
+.ps.ov .ov-save { min-height: 0; height: 30px; margin-top: 8px; padding: 0 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+.meaning-card .meaning-main { margin: 4px 0; font-size: 17px; font-weight: 650; color: var(--accent-deep); }
+.meaning-card .meaning-alt { margin: 2px 0; font-size: 13px; color: var(--muted); }
+.meaning-card .meaning-alt em { font-style: normal; font-weight: 600; margin-right: 4px; }
+
+/* Compact bar docked under the YouTube channel row */
+.ps.ov.docked {
+  position: static;
+  bottom: auto;
+  align-items: stretch;
+  gap: 8px;
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  pointer-events: auto;
+}
+.ps.ov.docked .ov-line {
+  max-width: none;
+  padding: 2px 4px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  backdrop-filter: none;
+  order: 1;
+}
+.ps.ov.docked .sentence { color: var(--ink); font-size: 22px; line-height: 1.45; letter-spacing: -0.3px; font-weight: 600; }
+.ps.ov.docked.caption-large .sentence { font-size: 28px; }
+.ps.ov.docked .ov-tx { color: var(--muted); font-size: 16px; }
+.ps.ov.docked .word { color: var(--ink); }
+.ps.ov.docked .word:hover { background: var(--accent-soft); color: var(--accent); }
+.ps.ov.docked .word.selected, .ps.ov.docked .word.selected:hover { background: #fff; color: var(--accent-deep); box-shadow: inset 0 -3px 0 var(--accent); }
+.ps.ov.docked .word.spoken, .ps.ov.docked .word.spoken:hover { background: var(--accent); color: #fff; }
+.ps.ov.docked .ov-controls { order: 2; align-self: flex-end; margin: 0; background: var(--raised); opacity: 1; }
+.ps.ov.docked .ov-controls button { color: var(--muted); }
+.ps.ov.docked .ov-controls button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.ps.ov.docked .ov-meaning { order: 3; width: auto; box-shadow: none; background: var(--accent-soft); }
+.ps.ov .word.spoken, .ps.ov .word.spoken:hover { background: var(--accent); color: #fff; }
+
+/* Chrome sizes the toolbar popup from its first paint; reserve the full height up front. */
+html.popup-document, html.popup-document body { min-height: 580px; }
+html.popup-document #root { min-height: 580px; }

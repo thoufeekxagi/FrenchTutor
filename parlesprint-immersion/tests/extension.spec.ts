@@ -26,7 +26,10 @@ test("real MV3 popup, subtitle timing, replay, notebook, navigation, errors", as
   expect(worker.url()).toContain(id);
   // This spec exercises the signed-out error path; don't inherit an auth
   // session from any other extension test or an existing Chromium profile.
-  await worker.evaluate(() => (globalThis as any).chrome.storage.local.clear());
+  await worker.evaluate(async () => {
+    await (globalThis as any).chrome.storage.local.clear();
+    await (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false } });
+  });
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${id}/popup.html`);
   await expect(popup.locator(".brand-word")).toBeVisible();
@@ -141,14 +144,9 @@ test("real MV3 popup, subtitle timing, replay, notebook, navigation, errors", as
   await panel
     .getByRole("button", { name: "Study sentence", exact: true })
     .click();
-  await expect(
-    panel.getByRole("button", { name: "Explain in context" }),
-  ).toBeDisabled();
-  await panel.getByRole("button", { name: "Allow explanations" }).click();
-  await panel.getByRole("button", { name: "Explain in context" }).click();
-  await expect(panel.getByRole("alert")).toContainText(
-    "Connect your ParleSprint account",
-  );
+  // Word meaning is free and needs no account; AI explanation is opt-in only.
+  await expect(panel.getByRole("button", { name: "Explain in context" })).toHaveCount(0);
+  await expect(panel.getByRole("button", { name: "Allow explanations" })).toHaveCount(0);
   await page.evaluate(() => {
     history.pushState({}, "", "/watch?v=fixture-two");
   });

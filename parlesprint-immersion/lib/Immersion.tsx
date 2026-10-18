@@ -14,11 +14,13 @@ import { browser } from "wxt/browser";
 import {
   activeCue,
   cuesFromTextTrack,
+  spokenWordAt,
   estimatedLiveCueRange,
   parseSubtitles,
   type Cue,
 } from "./captions";
 import { fetchYoutubeCues } from "./youtubeCaptions";
+import type { Meaning } from "./freeTranslate";
 import { useStore } from "./store";
 import { Brand, Headphones } from "./Brand";
 import {
@@ -117,6 +119,10 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const [cues, setCues] = useState<Cue[]>([]);
   const [source, setSource] = useState("");
   const [captionStatus, setCaptionStatus] = useState<"idle" | "loading" | "ready" | "none">("idle");
+  const [meaning, setMeaning] = useState<Meaning>();
+  const [meaningState, setMeaningState] = useState<"idle" | "loading" | "error">("idle");
+  const [lineTx, setLineTx] = useState<Record<string, string>>({});
+  const pausedByLookup = useRef(false);
   const [liveInterim, setLiveInterim] = useState("");
   const [liveCaptureActive, setLiveCaptureActive] = useState(false);
   const [liveHoldReason, setLiveHoldReason] = useState<"ad" | "seek" | "paused" | "muted" | null>(null);
@@ -312,6 +318,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     setCues([]);
     setSource("");
     setCaptionStatus("idle");
+    setLineTx({});
     setLiveInterim("");
     setOffset(0);
     setSelected("");
@@ -398,7 +405,8 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     let shown: string | undefined;
     const poll = window.setInterval(() => {
       const t = video.currentTime;
-      const id = activeCue(cuesRef.current, t - offsetRef.current)?.id;
+      const active = activeCue(cuesRef.current, t - offsetRef.current);
+      const id = active ? `${active.id}:${spokenWordAt(active, t - offsetRef.current)}` : undefined;
       if (id !== shown) { shown = id; setNow(t); }
     }, 80);
     const seek = () => {
@@ -444,12 +452,48 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   useEffect(() => {
     setHeldCue(undefined);
   }, [videoId, cues, offset]);
+  useEffect(() => {
+    if (practice || !selected) {
+      setMeaning(undefined);
+      setMeaningState("idle");
+      return;
+    }
+    let live = true;
+    setMeaningState("loading");
+    browser.runtime
+      .sendMessage({ type: "lookup", text: selected })
+      .then((result) => {
+        if (!live) return;
+        if (result?.meaning) { setMeaning(result.meaning); setMeaningState("idle"); }
+        else setMeaningState("error");
+      })
+      .catch(() => live && setMeaningState("error"));
+    return () => { live = false; };
+  }, [selected, practice]);
   const cue = playerAdShowing || (playerSeeking && /live/i.test(source))
     ? undefined
     : video?.paused && heldCue && Math.abs(now - heldCue.end - offset) < 0.3
       ? heldCue
       : activeCue(cues, now - offset);
   const cueKey = `${videoId}:${cue?.id}`;
+  useEffect(() => {
+    if (practice || !prefs.showTranslation || !cue) return;
+    const at = cues.findIndex((c) => c.id === cue.id);
+    const wanted = cues.slice(Math.max(0, at), at + 4).filter((c) => !(c.id in lineTx));
+    let live = true;
+    for (const c of wanted) {
+      setLineTx((old) => (c.id in old ? old : { ...old, [c.id]: "" }));
+      browser.runtime
+        .sendMessage({ type: "lookup", text: c.text })
+        .then((result) => {
+          if (live && result?.meaning?.translation)
+            setLineTx((old) => ({ ...old, [c.id]: result.meaning.translation }));
+        })
+        .catch(() => undefined);
+    }
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cue?.id, prefs.showTranslation, practice]);
   const tokens = useMemo(() => tokenizeCaption(cue?.text ?? ""), [cue?.text]);
   const spokenWordIndex =
     prefs.highlightSpokenWords &&
@@ -462,6 +506,17 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
           (now - offset - cue.start) / Math.max(0.05, cue.end - cue.start),
         )
       : undefined;
+  const wsOf = useMemo(() => {
+    let w = 0;
+    const map: Record<number, number> = {};
+    for (const token of tokens) {
+      if (token.kind !== "word") { if (/\s/.test(token.text)) w++; continue; }
+      map[token.index] = w;
+    }
+    return map;
+  }, [tokens]);
+  const timedWord = cue && video && !video.paused ? spokenWordAt(cue, now - offset) : -1;
+  const spokenGroup = timedWord >= 0 ? timedWord : spokenWordIndex !== undefined ? wsOf[spokenWordIndex] : undefined;
   const savedRanges = useMemo(
     () =>
       prefs.highlightSaved
@@ -625,7 +680,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     setError("");
       setSubtitleNotice("");
     setMeaningRevealed(false);
-    video?.pause();
+    if (video && !video.paused) { pausedByLookup.current = true; video.pause(); }
   }
   async function requestExplanation(text: string, line: string) {
     if (!text.trim()) return;
@@ -717,26 +772,17 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
       setTranslationVisible(false);
       return;
     }
-    if (!prefs.aiConsent && !approved) {
-      setTranslationNeedsConsent(true);
-      return;
-    }
     const seq = ++translationRequest.current;
     setTranslationBusy(true);
     setTranslationNeedsConsent(false);
     setError("");
     try {
-      const result = await browser.runtime.sendMessage({
-        type: "translate",
-        text: cue.text,
-        sentence: cue.text,
-        level: prefs.level,
-      });
+      const result = await browser.runtime.sendMessage({ type: "lookup", text: cue.text });
       if (seq !== translationRequest.current) return;
       if (result.error) throw Error(result.error);
-      if (typeof result.translation !== "string" || !result.translation.trim())
+      if (typeof result.meaning?.translation !== "string" || !result.meaning.translation.trim())
         throw Error("The translation was incomplete. Please try again.");
-      setTranslation(result.translation);
+      setTranslation(result.meaning.translation);
       setTranslationVisible(true);
     } catch (e) {
       if (seq === translationRequest.current) setError((e as Error).message);
@@ -801,6 +847,87 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const practiceCue = practice?.cues.find(
     (c) => c.id === cue?.id && c.text === cue?.text,
   );
+  const tokenButtons = () =>
+    tokens.map((token) => {
+      if (token.kind !== "word") return <span key={token.index}>{token.text}</span>;
+      const isSelected = !!selectedRange && token.index >= selectedRange.start && token.index <= selectedRange.end;
+      const isSaved = savedRanges.some((range) => token.index >= range.start && token.index <= range.end);
+      const isSpoken = spokenGroup !== undefined && wsOf[token.index] === spokenGroup;
+      return (
+        <button
+          key={token.index}
+          className={`word${isSelected ? " selected" : ""}${isSaved ? " notebook-word" : ""}${isSpoken ? " spoken" : ""}`}
+          aria-label={`Study ${token.text}`}
+          aria-pressed={isSelected}
+          onClick={(event) => chooseToken(token.index, event.shiftKey)}
+        >
+          {token.text}
+        </button>
+      );
+    });
+  if (!practice && prefs.compactView && (prefs.placement === "overlay" || prefs.placement === "below")) {
+    const docked = prefs.placement === "below";
+    const stop = (event: React.SyntheticEvent) => event.stopPropagation();
+    const closeMeaning = () => {
+      setSelected("");
+      setSelection(undefined);
+      if (pausedByLookup.current) void video?.play().catch(() => undefined);
+      pausedByLookup.current = false;
+    };
+    const tx = cue ? lineTx[cue.id] : "";
+    return (
+      <aside
+        className={`ps ov${docked ? " docked" : ""} caption-${prefs.captionSize}`}
+        aria-label="ParleSprint Immersion"
+        onClick={stop}
+        onDoubleClick={stop}
+        onMouseDown={stop}
+        onPointerDown={stop}
+        onContextMenu={stop}
+      >
+        {prefs.showCaptions && selected && (
+          <section className="ov-meaning" aria-label="Selected phrase">
+            <div className="ov-meaning-head">
+              <strong lang="fr">{selected}</strong>
+              <button aria-label="Close meaning" onClick={closeMeaning}>×</button>
+            </div>
+            <MeaningCard meaning={meaning} state={meaningState} compact />
+            <button className="ov-save" onClick={() => void saveWord()} disabled={saved}>
+              {saved ? "Saved ✓" : "Save to notebook"}
+            </button>
+          </section>
+        )}
+        {prefs.showCaptions && (cue || liveInterim) && (
+          <div className="ov-line">
+            {liveInterim ? (
+              <p className="sentence" lang="fr">{liveInterim}</p>
+            ) : (
+              <p className="sentence" lang="fr">{tokenButtons()}</p>
+            )}
+            {prefs.showTranslation && tx && <p className="ov-tx" lang="en">{tx}</p>}
+          </div>
+        )}
+        <div className="ov-controls" role="toolbar" aria-label="Caption controls">
+          <button
+            aria-pressed={prefs.showCaptions}
+            title="Show or hide French captions"
+            onClick={() => void update({ showCaptions: !prefs.showCaptions })}
+          >
+            FR
+          </button>
+          <button
+            aria-pressed={prefs.showTranslation}
+            title="Show or hide English translation under each line"
+            onClick={() => void update({ showTranslation: !prefs.showTranslation })}
+          >
+            EN
+          </button>
+          <button title="Repeat this line" disabled={!cue} onClick={() => cue && replay(cue)}>↻</button>
+          <button title="More settings, transcript and notebook" onClick={() => void update({ compactView: false })}>⋯</button>
+        </div>
+      </aside>
+    );
+  }
   const companionStyle = {
     display: fullscreen ? "none" : "block",
     ...(!practice && prefs.placement === "floating"
@@ -880,6 +1007,11 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
               ···
             </button>
           </div>
+        )}
+        {!practice && (prefs.placement === "overlay" || prefs.placement === "below") && (
+          <button className="icon-button" aria-label="Back to compact captions" title="Back to compact captions" onClick={() => void update({ compactView: true })}>
+            ⌄
+          </button>
         )}
         <button
           className="icon-button"
@@ -1381,34 +1513,30 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                 </div>
               </div>
               <p className="muted">From: {sentence}</p>
-              {!prefs.aiConsent && (
+              {!practice && <MeaningCard meaning={meaning} state={meaningState} />}
+              {practice && !prefs.aiConsent && (
                 <div className="card stack">
                   <p>
                     For translation or word study, the selected text, its
                     sentence, and your level are sent to ParleSprint and Google
                     Gemini. AI can make mistakes.
                   </p>
-                  <button
-                    disabled={consentBusy}
-                    onClick={() => void allowExplanations()}
-                  >
-                    {consentBusy
-                      ? "Enabling explanations…"
-                      : "Allow explanations"}
+                  <button disabled={consentBusy} onClick={() => void allowExplanations()}>
+                    {consentBusy ? "Enabling explanations…" : "Allow explanations"}
                   </button>
                 </div>
               )}
-              <button onClick={() => void openConnection()}>
-                Account connection for AI
-              </button>
-              <div className="caption-actions">
-                <button
-                  className="primary"
-                  disabled={busy || consentBusy || !prefs.aiConsent}
-                  onClick={() => void explain()}
-                >
-                  {busy ? "Explaining…" : "Explain in context"}
+              {practice && (
+                <button onClick={() => void openConnection()}>
+                  Account connection for AI
                 </button>
+              )}
+              <div className="caption-actions">
+                {(practice || prefs.aiConsent) && (
+                  <button className="primary" disabled={busy || consentBusy || !prefs.aiConsent} onClick={() => void explain()}>
+                    {busy ? "Explaining…" : "Explain in context"}
+                  </button>
+                )}
                 <button onClick={() => void saveWord()} disabled={saved}>
                   {saved ? "Saved ✓" : "Save phrase"}
                 </button>
@@ -1496,5 +1624,19 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
         </button>
       )}
     </aside>
+  );
+}
+
+function MeaningCard({ meaning, state, compact }: { meaning?: Meaning; state: "idle" | "loading" | "error"; compact?: boolean }) {
+  if (state === "loading" && !meaning) return <p className="muted" role="status">Looking up…</p>;
+  if (state === "error" && !meaning) return <p className="muted" role="status">No meaning found. Check your connection.</p>;
+  if (!meaning) return null;
+  return (
+    <div className={`meaning-card${compact ? " compact" : ""}`} aria-live="polite">
+      <p className="meaning-main">{meaning.translation}</p>
+      {meaning.alternatives.map((entry) => (
+        <p key={entry.pos} className="meaning-alt"><em>{entry.pos}</em> {entry.terms.join(", ")}</p>
+      ))}
+    </div>
   );
 }

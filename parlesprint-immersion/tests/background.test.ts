@@ -638,6 +638,9 @@ describe("practice setup and preference migration", () => {
       captionSize: "comfortable",
       dock: "right",
       placement: "below",
+      showCaptions: true,
+      showTranslation: false,
+      compactView: true,
       floatRect: { left: 0.54, top: 0.16, width: 0.4, height: 0.34 },
     });
     expect(mock.data.prefs).toEqual(result.prefs);

@@ -1,3 +1,4 @@
+import { translateFrench } from "../lib/freeTranslate";
 import { browser } from "wxt/browser";
 import { defineBackground } from "wxt/utils/define-background";
 import {
@@ -648,6 +649,13 @@ export default defineBackground(() => {
             await browser.storage.local.set({ words });
             return { words };
           });
+        if (message.type === "lookup") {
+          if (typeof message.text !== "string" || !message.text.trim() || message.text.length > 600)
+            throw Error("Nothing to translate.");
+          const meaning = await translateFrench(message.text);
+          if (!meaning) throw Error("No translation found.");
+          return { meaning };
+        }
         if (message.type === "open-practice") {
           await browser.tabs.create({
             url: browser.runtime.getURL("/practice.html"),

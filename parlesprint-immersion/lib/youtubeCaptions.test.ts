@@ -46,3 +46,19 @@ describe("pickFrenchTrack", () => {
     expect(pickFrenchTrack([tracks[0]!])).toBeUndefined();
   });
 });
+
+import { spokenWordAt } from "./captions";
+describe("word timing and sentence splitting", () => {
+  it("finds the spoken word from per-word start times", () => {
+    const [cue] = parseTimedText(asr);
+    expect(spokenWordAt(cue, 0.1)).toBe(-1);
+    expect(spokenWordAt(cue, 0.3)).toBe(0);
+    expect(spokenWordAt(cue, 1.0)).toBe(1);
+  });
+  it("splits separate sentences in one caption but keeps wrapped ones whole", () => {
+    const cues = parseTimedText(`<p t="0" d="4000">Patrick, c'est fini.
+Ne m'appelle plus!</p><p t="5000" d="2000">Salut<br/>tout le monde</p>`);
+    expect(cues.map((c) => c.text)).toEqual(["Patrick, c'est fini.", "Ne m'appelle plus!", "Salut tout le monde"]);
+    expect(cues[0]!.end).toBeLessThanOrEqual(cues[1]!.start + 0.001);
+  });
+});

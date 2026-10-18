@@ -15,6 +15,7 @@ export default defineConfig({
     host_permissions: [
       "https://oxfnrsjskdjbroekxdco.supabase.co/*",
       "https://generativelanguage.googleapis.com/*",
+      "https://translate.googleapis.com/*",
       ...(qa ? ["https://www.youtube.com/*"] : []),
     ],
     web_accessible_resources: [

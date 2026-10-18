@@ -35,7 +35,7 @@ function groupWords(words: Word[]): Cue[] {
       nextStart !== undefined ? Math.min(natural + 1, Math.max(natural, nextStart)) : natural,
     );
     const text = line.map((word) => word.text).join(" ").replace(/\s+([,.;:!?])/g, "$1").trim();
-    if (text) cues.push({ id: `yt-${cues.length}`, start, end, text });
+    if (text) cues.push({ id: `yt-${cues.length}`, start, end, text, wordStarts: line.map((word) => word.start) });
     line = [];
   };
   for (const word of words) {
@@ -74,14 +74,23 @@ export function parseTimedText(xml: string): Cue[] {
         words.push({ start: (start + offset) / 1000, text });
       }
     } else {
-      const text = subtitlePlainText(body.replace(/<br\s*\/?>/gi, " "));
-      if (text && duration && duration > 0)
-        lines.push({
-          id: `yt-${lines.length}`,
-          start: start / 1000,
-          end: (start + duration) / 1000,
-          text,
-        });
+      if (duration && duration > 0) {
+        // A wrapped sentence stays whole; separate sentences share the time by length.
+        const parts: string[] = [];
+        for (const piece of body.split(/<br\s*\/?>|\n/i)) {
+          const text = subtitlePlainText(piece);
+          if (!text) continue;
+          if (parts.length && !/[.!?…]$/.test(parts[parts.length - 1]!)) parts[parts.length - 1] += ` ${text}`;
+          else parts.push(text);
+        }
+        const total = parts.reduce((sum, part) => sum + part.length, 0);
+        let at = start;
+        for (const text of parts) {
+          const span = (duration * text.length) / total;
+          lines.push({ id: `yt-${lines.length}`, start: at / 1000, end: (at + span) / 1000, text });
+          at += span;
+        }
+      }
     }
   }
   const raw = words.length ? groupWords(words.sort((a, b) => a.start - b.start)) : lines;

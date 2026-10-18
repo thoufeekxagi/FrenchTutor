@@ -4,6 +4,17 @@ export interface Cue {
   start: number;
   end: number;
   text: string;
+  /** Start time (seconds) of each whitespace-separated word, when the source provides it. */
+  wordStarts?: number[];
+}
+
+/** Index of the word being spoken at time t, or -1 without word timing. */
+export function spokenWordAt(cue: Cue | undefined, time: number): number {
+  const starts = cue?.wordStarts;
+  if (!cue || !starts?.length || cue.text.split(/\s+/).length !== starts.length) return -1;
+  let found = -1;
+  for (let i = 0; i < starts.length; i++) if (starts[i]! <= time + 0.04) found = i;
+  return found;
 }
 
 /** Approximate a provider's untimed text on the video timeline, including playback speed. */

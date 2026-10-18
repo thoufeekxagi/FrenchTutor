@@ -297,13 +297,13 @@ export function Popup() {
               <div className="card stack live-card" aria-label="Live French captions">
                 <div className="section-title">
                   <div>
-                    <div className="badge">Watch any video</div>
-                    <h2 style={{ marginTop: 6 }}>Live French captions</h2>
+                    <div className="badge">Automatic on YouTube</div>
+                    <h2 style={{ marginTop: 6 }}>Videos without captions</h2>
                   </div>
                   {liveSession && <span className="pill">{liveSession.status === "listening" ? "Listening" : "Connecting"}</span>}
                 </div>
                 <p className="muted">
-                  Play a video on this tab, then start. ParleSprint transcribes the tab audio, so a subtitle track or file is not required.
+                  French captions appear under YouTube videos by themselves. If a video has none, start live captions and ParleSprint transcribes the tab audio instead.
                   {liveSession ? ` Current tab: ${liveSession.hostname}.` : ""}
                 </p>
                 <label className="stack" style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
@@ -446,11 +446,12 @@ export function Popup() {
                       value={prefs.placement}
                       onChange={(event) =>
                         updatePrefs({
-                          placement: event.target.value as "below" | "floating",
+                          placement: event.target.value as "overlay" | "below" | "floating",
                         })
                       }
                     >
-                      <option value="below">Below the video</option>
+                      <option value="below">Under the video (recommended)</option>
+                      <option value="overlay">On the video</option>
                       <option value="floating">Floating overlay</option>
                     </select>
                   </div>

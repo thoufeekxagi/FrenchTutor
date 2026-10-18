@@ -23,7 +23,10 @@ export interface Preferences {
   highlightSpokenWords: boolean;
   captionSize: "comfortable" | "large";
   dock: "right" | "left";
-  placement: "below" | "floating";
+  placement: "overlay" | "below" | "floating";
+  showCaptions: boolean;
+  showTranslation: boolean;
+  compactView: boolean;
   /** Normalized viewport coordinates, persisted so the floating panel survives reloads. */
   floatRect: { left: number; top: number; width: number; height: number };
 }
@@ -38,6 +41,9 @@ export const defaults: Preferences = {
   captionSize: "comfortable",
   dock: "right",
   placement: "below",
+  showCaptions: true,
+  showTranslation: false,
+  compactView: true,
   floatRect: { left: 0.54, top: 0.16, width: 0.4, height: 0.34 },
 };
 
@@ -57,6 +63,9 @@ export function validatedPreferencePatch(raw: unknown): Partial<Preferences> {
     "aiConsent",
     "highlightSaved",
     "highlightSpokenWords",
+    "showCaptions",
+    "showTranslation",
+    "compactView",
   ] as const) {
     if (typeof value[key] === "boolean") patch[key] = value[key];
   }
@@ -65,7 +74,7 @@ export function validatedPreferencePatch(raw: unknown): Partial<Preferences> {
   if (value.captionSize === "comfortable" || value.captionSize === "large")
     patch.captionSize = value.captionSize;
   if (value.dock === "left" || value.dock === "right") patch.dock = value.dock;
-  if (value.placement === "below" || value.placement === "floating")
+  if (value.placement === "overlay" || value.placement === "below" || value.placement === "floating")
     patch.placement = value.placement;
   if (value.floatRect && typeof value.floatRect === "object" && !Array.isArray(value.floatRect)) {
     const rect = value.floatRect as Record<string, unknown>;
@@ -85,7 +94,8 @@ export function validatedPreferencePatch(raw: unknown): Partial<Preferences> {
   return patch;
 }
 export function normalizePreferences(raw: unknown): Preferences {
-  return { ...defaults, ...validatedPreferencePatch(raw) };
+  const patch = validatedPreferencePatch(raw);
+  return { ...defaults, ...patch };
 }
 export function applyPreferencesPatch(
   current: unknown,
