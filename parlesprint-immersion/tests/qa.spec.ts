@@ -111,7 +111,7 @@ test("watch-page default stays compact, brand-free and below the player", async 
   expect(videoBox).not.toBeNull();
   expect(panelBox!.y).toBeGreaterThanOrEqual(videoBox!.y + videoBox!.height);
   await expect(panel).toHaveClass(/layout-below/);
-  await expect(panel.locator(".sentence")).toHaveCSS("-webkit-line-clamp", "2");
+  await expect(panel.locator(".sentence")).toHaveCSS("-webkit-line-clamp", "4");
   expect(
     await page.locator("parlesprint-immersion").evaluate(
       (host) =>

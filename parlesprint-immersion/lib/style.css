@@ -1577,3 +1577,21 @@ body {
 .ps.ov.docked .seg-nav.compact .seg-chevron { flex: 0 0 32px; min-width: 32px; padding: 0; }
 .ps.ov.docked .seg-nav.compact .seg-repeat { padding: 0 10px; }
 .ps.ov.docked .seg-nav.compact { gap: 2px; }
+
+/* English translation sits directly under the French line, same family and rhythm */
+.ps.youtube-companion .sentence-translation {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+  border-top: 0;
+  padding: 0 2px 4px;
+  margin: -2px 0 6px;
+  color: #3f4a5c;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.ps.youtube-companion.caption-large .sentence-translation { font-size: 23px; line-height: 1.5; }
+.ps.youtube-companion .sentence-translation.pending { color: #9aa3b2; }
+.ps.youtube-companion .sentence { -webkit-line-clamp: 4; max-height: calc(4 * 1.45em); }
+.ps.youtube-companion.caption-large .sentence { -webkit-line-clamp: 4; max-height: calc(4 * 1.5em); }

@@ -1388,6 +1388,16 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                     <i className="legend-saved" /> Saved in notebook
                   </span>
                 </div>}
+                {!practice && prefs.showTranslation && cue && !(translationVisible && translation) && (
+                  <p className={`sentence-translation${lineTx[cue.id] ? "" : " pending"}`} lang="en" aria-live="polite">
+                    {lineTx[cue.id] || "Translating…"}
+                  </p>
+                )}
+                {!practice && translationVisible && translation && (
+                  <p className="sentence-translation" lang="en" aria-live="polite">
+                    {translation}
+                  </p>
+                )}
                 <div className="caption-actions">
                   {practice ? (
                     <button
@@ -1435,14 +1445,6 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                     </>
                   )}
                 </div>
-                {!practice && prefs.showTranslation && cue && lineTx[cue.id] && !(translationVisible && translation) && (
-                  <p className="sentence-translation" lang="en" aria-live="polite">{lineTx[cue.id]}</p>
-                )}
-                {!practice && translationVisible && translation && (
-                  <p className="sentence-translation" lang="en" aria-live="polite">
-                    {translation}
-                  </p>
-                )}
                 {!practice && translationNeedsConsent && !prefs.aiConsent && (
                   <div className="translation-consent">
                     <span>Allow ParleSprint to send this sentence for an English translation.</span>
