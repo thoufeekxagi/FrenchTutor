@@ -1,4 +1,5 @@
 import { translateFrench } from "../lib/freeTranslate";
+import { limitMessage } from "../lib/plan";
 import { browser } from "wxt/browser";
 import { defineBackground } from "wxt/utils/define-background";
 import {
@@ -287,7 +288,9 @@ async function api(path: string, body: unknown, token?: string) {
   const result = response.status === 204 ? {} : await response.json();
   if (!response.ok)
     throw Error(
-      response.status === 429
+      result.error === "daily_explanation_limit_reached"
+        ? limitMessage("explain")
+        : response.status === 429
         ? "The AI service is busy right now. Please try again shortly."
         : (result.error_description ??
             result.msg ??
@@ -790,11 +793,6 @@ export default defineBackground(() => {
         if (!translationMode && message.type !== "explain") throw Error("Unsupported request.");
         const expected = generation;
         if (
-          !preferences((await browser.storage.local.get("prefs")).prefs)
-            .aiConsent
-        )
-          throw Error("Allow translations and explanations before sending text.");
-        if (
           typeof message.text !== "string" ||
           !message.text.trim() ||
           message.text.length > (translationMode ? 1600 : 240) ||
@@ -829,9 +827,10 @@ export default defineBackground(() => {
               text: message.text,
               sentence: message.sentence,
               level: message.level,
+              installationId: await installationId(),
               ...(translationMode ? { mode: "translation" } : {}),
             },
-            await token(expected),
+            anon,
           );
           if (translationMode ? !validTranslation(result) : !validExplanation(result))
             throw Error(translationMode
@@ -844,7 +843,6 @@ export default defineBackground(() => {
               "explanationCache",
               "translationCache",
             ]);
-            if (!preferences(data.prefs).aiConsent) throw invalidated();
             assertGeneration(expected);
             if (translationMode) {
               const cache = translationCache(data.translationCache);

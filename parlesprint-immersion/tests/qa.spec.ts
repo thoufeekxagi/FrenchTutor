@@ -30,7 +30,7 @@ test.beforeEach(async () => {
     (await context.waitForEvent("serviceworker"));
   await w.evaluate(async () => {
     await (globalThis as any).chrome.storage.local.clear();
-    await (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false } });
+    await (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false, tourDone: true } });
   });
 });
 test.afterEach(async () => {
@@ -426,6 +426,7 @@ test("caption reveal and meaning reveal stay independent across playback", async
         enabled: true,
         aiConsent: true,
         compactView: false,
+        tourDone: true,
         offset: 0,
       },
     });
@@ -452,6 +453,7 @@ test("caption reveal and meaning reveal stay independent across playback", async
   await panel
     .getByRole("button", { name: "Study Bonjour", exact: true })
     .click();
+  await panel.getByRole("button", { name: "Explain in context", exact: true }).click();
   await expect(
     panel.getByRole("button", { name: "Reveal meaning", exact: true }),
   ).toBeVisible();
@@ -856,4 +858,49 @@ test("notebook accent search filters phrases while Anki export retains actual co
   await expect(
     popup.getByRole("button", { name: "Remove phrase", exact: true }),
   ).toHaveCount(2);
+});
+
+test("compact bar: first-run tour, word meaning, Explain in context without login, live English", async () => {
+  const { page, panel } = await imported();
+  const worker = context.serviceWorkers()[0]!;
+  await context.route("https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-explain", (route) => {
+    const sent = route.request().postDataJSON();
+    expect(route.request().headers().authorization).toBe(`Bearer ${route.request().headers().apikey}`);
+    expect(sent.installationId).toMatch(/^[0-9a-f-]{36}$/);
+    return route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify({ meaning: "Fixture meaning", grammar: "Fixture grammar", example: "Bonjour !", exampleTranslation: "Hello!" }),
+    });
+  });
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: false } }));
+  await seek(page, 1);
+  const bar = page.getByRole("complementary", { name: "ParleSprint Immersion" });
+  const tour = bar.getByRole("dialog", { name: "Quick tour" });
+  await expect(tour).toBeVisible();
+  await expect(tour).toContainText("Tap any word");
+  for (let i = 0; i < 5; i++) await tour.getByRole("button", { name: /Next|Done/ }).click();
+  await expect(tour).toHaveCount(0);
+  await bar.getByRole("button", { name: "Study Bonjour", exact: true }).click();
+  await bar.getByRole("button", { name: "Explain in context" }).click();
+  await expect(bar.locator(".ov-explain")).toContainText("Fixture meaning");
+  await expect(bar.getByText(/log in|sign in|account/i)).toHaveCount(0);
+  await bar.getByRole("button", { name: "EN", exact: true }).click();
+  await expect(bar.getByRole("button", { name: "EN", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await context.unroute("https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-explain");
+});
+
+test("floating panel has the English toggle and the move/resize tour", async () => {
+  const { page, panel } = await imported();
+  const worker = context.serviceWorkers()[0]!;
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { placement: "floating", tourDone: false } }));
+  await seek(page, 1);
+  await expect(panel).toHaveClass(/layout-floating/);
+  const english = panel.getByRole("button", { name: /English: off/ });
+  await expect(english).toBeVisible();
+  await english.click();
+  await expect(panel.getByRole("button", { name: "English: on" })).toBeVisible();
+  const tour = panel.getByRole("dialog", { name: "Quick tour" });
+  await expect(tour).toContainText("Move");
+  await tour.getByRole("button", { name: "Next" }).click();
+  await expect(tour).toContainText("Resize");
 });

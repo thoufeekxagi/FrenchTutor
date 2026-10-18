@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { browser } from "wxt/browser";
 import { Arrow, Book, Brand, Headphones } from "./Brand";
+import { APP, feedbackUrl } from "./config";
 import { useStore } from "./store";
 import type { Level } from "./types";
 import { matchesVocabulary, vocabularyCsv } from "./vocabularyExport";
@@ -210,15 +211,32 @@ export function Popup() {
                 </div>
                 <div className="row-item">
                   <label htmlFor="caption-placement">Caption placement</label>
-                  <select id="caption-placement" value={prefs.placement} onChange={(event) => updatePrefs({ placement: event.target.value as "overlay" | "below" | "floating" })}>
+                  <select id="caption-placement" value={prefs.placement} onChange={(event) => updatePrefs({ placement: event.target.value as "side" | "overlay" | "below" | "floating" })}>
+                    <option value="side">Next to suggested videos</option>
                     <option value="below">Under the video</option>
                     <option value="overlay">On the video</option>
-                    <option value="floating">Floating</option>
+                    <option value="floating">Floating (movable)</option>
                   </select>
                 </div>
                 <div className="row-item">
                   <label htmlFor="hl-spoken">Highlight spoken words</label>
                   <input id="hl-spoken" type="checkbox" checked={prefs.highlightSpokenWords} onChange={(event) => updatePrefs({ highlightSpokenWords: event.target.checked })} />
+                </div>
+              </div>
+              <div className="group">
+                <a className="row-item link-row" href={feedbackUrl(browser.runtime.getManifest().version)} target="_blank" rel="noreferrer">
+                  <span>Send feedback</span>
+                  <span aria-hidden="true">›</span>
+                </a>
+                {APP.supportUrl && (
+                  <a className="row-item link-row" href={APP.supportUrl} target="_blank" rel="noreferrer">
+                    <span>Support ParleSprint</span>
+                    <span aria-hidden="true">›</span>
+                  </a>
+                )}
+                <div className="row-item">
+                  <span>ParleSprint Pro</span>
+                  <span className="pill">Coming soon</span>
                 </div>
               </div>
               <details className="group live-card" aria-label="Live French captions">

@@ -166,7 +166,10 @@ export default defineContentScript({
     ui.mount();
 
     const host = ui.shadowHost;
-    let placement: "overlay" | "below" | "floating" = "below";
+    type Placement = "side" | "overlay" | "below" | "floating";
+    const parsePlacement = (value: unknown): Placement =>
+      value === "floating" || value === "overlay" || value === "below" ? value : "side";
+    let placement: Placement = "side";
     const placeHost = () => {
       if (placement === "overlay") {
         const player = document.querySelector<HTMLElement>("#movie_player");
@@ -190,6 +193,16 @@ export default defineContentScript({
         host.style.setProperty("width", "0", "important");
         host.style.setProperty("height", "0", "important");
         return;
+      }
+      if (placement === "side") {
+        const column = document.querySelector<HTMLElement>("ytd-watch-flexy #secondary-inner, #secondary-inner");
+        if (column) {
+          if (host.parentElement !== column || column.firstElementChild !== host) column.prepend(host);
+          host.style.setProperty("position", "relative", "important");
+          host.style.setProperty("width", "100%", "important");
+          host.style.setProperty("height", "auto", "important");
+          return;
+        }
       }
       host.style.setProperty("position", "relative", "important");
       host.style.setProperty("left", "auto", "important");
@@ -240,7 +253,7 @@ export default defineContentScript({
         const value = prefs && typeof prefs === "object"
           ? (prefs as Record<string, unknown>).placement
           : undefined;
-        placement = value === "floating" || value === "overlay" ? value : "below";
+        placement = parsePlacement(value);
         placeHost();
       }).catch(placeHost);
     };
@@ -291,7 +304,7 @@ export default defineContentScript({
       const next = value && typeof value === "object"
         ? (value as Record<string, unknown>).placement
         : undefined;
-      placement = next === "floating" || next === "overlay" ? next : "below";
+      placement = parsePlacement(next);
       placeHost();
     };
     browser.storage.onChanged.addListener(changed);

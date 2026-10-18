@@ -1,5 +1,5 @@
 const policy = `ParleSprint Immersion privacy policy
-Version 0.3 · Updated October 18, 2026
+Version 0.4 · Updated October 18, 2026
 
 ParleSprint Immersion helps you learn French from videos on YouTube. It shows French captions under the video, English meanings for words you tap, and a private vocabulary notebook on your device.
 
@@ -15,11 +15,15 @@ When you tap a word or phrase, or turn on English translation, the selected Fren
 
 ParleSprint does not run a server for translation and does not receive these requests.
 
+Explain in context (optional)
+
+When you press Explain in context, the selected French word or phrase, the caption line it came from and your chosen level (A1 to B2) are sent to a ParleSprint Supabase function, which asks Google's Gemini service for a short explanation. The request also carries the random installation identifier, which the function hashes to apply a daily limit per installation. No account, name, email, video URL or video ID is sent. The explanation is returned to you, cached on your device, and also cached on the server keyed only by a hash of the text, so the same explanation is not generated twice. Do not select sensitive personal text.
+
 Live captions for videos without captions (optional)
 
 This feature is off unless you open the extension popup, accept a separate audio notice, and choose Start live captions on this tab. Chrome then lets the extension capture the audio of that one tab. The sound keeps playing for you. Your microphone is not used and no video frames are captured.
 
-While live captions run, the tab audio is streamed directly from your browser to Google's Gemini Live transcription service. Raw audio is not sent to or stored by ParleSprint. To start a session, the extension asks a ParleSprint Supabase function for a short-lived, single-use Google session token. That request contains a random installation identifier, which the function hashes to enforce a daily time limit. The Google API key stays on the server and never enters the extension. Supabase stores only hashed daily time counters.
+While live captions run, the tab audio is streamed directly from your browser to Google's Gemini Live transcription service. Raw audio is not sent to or stored by ParleSprint. To start a session, the extension asks a ParleSprint Supabase function for a short-lived, single-use Google session token. That request contains your consent flag. The Google API key stays on the server and never enters the extension. ParleSprint does not receive or store the audio.
 
 Google's Gemini API terms depend on whether a service is unpaid or paid. Content submitted through unpaid services may be used to improve Google products, and people may review it. Do not use live captions with sensitive or confidential audio. Capture stops when you press Stop or close the tab.
 
@@ -35,7 +39,7 @@ This version has no sign-in and no accounts. It contains no analytics, advertisi
 
 Your choices and contact
 
-You can turn captions off on videos, stop live captions, withdraw audio consent and delete saved words at any time from the extension. Requests already processed by Google cannot be recalled by ParleSprint. For privacy questions contact thoufeek@agiventures.ca.
+You can turn captions off on videos, stop live captions, withdraw audio consent and delete saved words at any time from the extension. Requests already processed by Google cannot be recalled by ParleSprint. If you choose Send feedback, your email app opens a message to thoufeekbaber1@gmail.com; nothing is sent automatically. For privacy questions contact thoufeekbaber1@gmail.com.
 
 Provider policies: Google Translate terms (https://policies.google.com/terms), Google privacy policy (https://policies.google.com/privacy), Gemini API terms (https://ai.google.dev/gemini-api/terms), Supabase privacy (https://supabase.com/privacy).
 `;

@@ -28,7 +28,7 @@ test("real MV3 popup, subtitle timing, replay, notebook, navigation, errors", as
   // session from any other extension test or an existing Chromium profile.
   await worker.evaluate(async () => {
     await (globalThis as any).chrome.storage.local.clear();
-    await (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false } });
+    await (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false, tourDone: true } });
   });
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${id}/popup.html`);
@@ -135,8 +135,8 @@ test("real MV3 popup, subtitle timing, replay, notebook, navigation, errors", as
   await panel
     .getByRole("button", { name: "Study sentence", exact: true })
     .click();
-  // Word meaning is free and needs no account; AI explanation is opt-in only.
-  await expect(panel.getByRole("button", { name: "Explain in context" })).toHaveCount(0);
+  // Word meaning and Explain in context need no account.
+  await expect(panel.getByRole("button", { name: "Explain in context" })).toBeEnabled();
   await expect(panel.getByRole("button", { name: "Allow explanations" })).toHaveCount(0);
   await page.evaluate(() => {
     history.pushState({}, "", "/watch?v=fixture-two");

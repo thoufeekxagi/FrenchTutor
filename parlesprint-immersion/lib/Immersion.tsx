@@ -100,6 +100,21 @@ function watchKey(): string | null {
   }
   return `site-${(hash >>> 0).toString(16)}`;
 }
+
+type TourStep = { target: string; title: string; body: string };
+const compactTour: TourStep[] = [
+  { target: "word", title: "Tap any word", body: "See its English meaning right away. Press Explain in context for grammar and an example." },
+  { target: "fr", title: "FR", body: "Show or hide the French line. Hide it to test your listening." },
+  { target: "en", title: "EN", body: "Show the English translation under every line, live as the video plays." },
+  { target: "repeat", title: "Repeat", body: "Replay the current line, then carry on." },
+  { target: "more", title: "More", body: "Open the full panel: transcript, timing, saved words, caption size. In Floating mode you can move and resize it there." },
+];
+const panelTour: TourStep[] = [
+  { target: "move", title: "Move", body: "Drag this handle to move the panel anywhere. Arrow keys nudge it." },
+  { target: "resize", title: "Resize", body: "Drag the bottom-right corner to make the panel bigger or smaller." },
+  { target: "en", title: "English", body: "Turn on live English under each French line." },
+  { target: "compact", title: "Compact view", body: "Go back to the slim caption bar whenever you like." },
+];
 export function Immersion({ practice }: { practice?: Practice } = {}) {
   const { prefs, ready, load, update, save, words, storageError } = useStore();
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
@@ -123,6 +138,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const [meaningState, setMeaningState] = useState<"idle" | "loading" | "error">("idle");
   const [lineTx, setLineTx] = useState<Record<string, string>>({});
   const pausedByLookup = useRef(false);
+  const [tourStep, setTourStep] = useState<number | null>(null);
   const [liveInterim, setLiveInterim] = useState("");
   const [liveCaptureActive, setLiveCaptureActive] = useState(false);
   const [liveHoldReason, setLiveHoldReason] = useState<"ad" | "seek" | "paused" | "muted" | null>(null);
@@ -232,6 +248,12 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   useEffect(() => {
     cuesRef.current = cues;
   }, [cues]);
+  useEffect(() => {
+    if (ready && !practice && !prefs.tourDone && cues.length) setTourStep((step) => step ?? 0);
+  }, [ready, practice, prefs.tourDone, cues.length]);
+  useEffect(() => {
+    setTourStep(prefs.tourDone ? null : 0);
+  }, [prefs.compactView, prefs.placement]);
   useEffect(() => {
     offsetRef.current = offset;
   }, [offset]);
@@ -716,7 +738,6 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     if (!next) return;
     choose(next.text, cue.text);
     setSelection({ cue: cueKey, range: next });
-    if (prefs.aiConsent) void requestExplanation(next.text, cue.text);
     if (phraseMode) {
       if (phraseAnchor === undefined) setPhraseAnchor(index);
       else {
@@ -730,7 +751,6 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     choose(cue.text, cue.text);
     const range = selectTokenRange(tokens, 0, tokens.length - 1);
     if (range) setSelection({ cue: cueKey, range });
-    if (prefs.aiConsent) void requestExplanation(cue.text, cue.text);
     setPhraseMode(false);
     setPhraseAnchor(undefined);
   }
@@ -865,8 +885,41 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
         </button>
       );
     });
-  if (!practice && prefs.compactView && (prefs.placement === "overlay" || prefs.placement === "below")) {
-    const docked = prefs.placement === "below";
+  const fullTour = prefs.placement === "floating"
+    ? panelTour.filter((step) => step.target !== "compact")
+    : panelTour.filter((step) => step.target === "en" || step.target === "compact");
+  const hl = (target: string, steps: TourStep[]) =>
+    tourStep !== null && steps[tourStep]?.target === target ? " tour-hl" : "";
+  const renderTour = (steps: TourStep[]) => {
+    if (tourStep === null || !steps[tourStep]) return null;
+    const step = steps[tourStep]!;
+    const last = tourStep === steps.length - 1;
+    const finish = () => { setTourStep(null); void update({ tourDone: true }); };
+    return (
+      <div className="tour" role="dialog" aria-label="Quick tour">
+        <div className="tour-head">
+          <strong>{step.title}</strong>
+          <span className="tour-count">{tourStep + 1} / {steps.length}</span>
+        </div>
+        <p>{step.body}</p>
+        <div className="tour-actions">
+          <button onClick={finish}>Skip</button>
+          {tourStep > 0 && <button onClick={() => setTourStep(tourStep - 1)}>Back</button>}
+          <button className="tour-next" onClick={() => (last ? finish() : setTourStep(tourStep + 1))}>{last ? "Done" : "Next"}</button>
+        </div>
+      </div>
+    );
+  };
+  const explanationView = () => explanation && (
+    <div className="ov-explain">
+      <p><strong>Meaning</strong> {explanation.meaning}</p>
+      <p><strong>Grammar</strong> {explanation.grammar}</p>
+      <p lang="fr"><strong>Example</strong> {explanation.example}</p>
+      <p className="muted">{explanation.exampleTranslation}</p>
+    </div>
+  );
+  if (!practice && prefs.compactView && prefs.placement !== "floating") {
+    const docked = prefs.placement !== "overlay";
     const stop = (event: React.SyntheticEvent) => event.stopPropagation();
     const closeMeaning = () => {
       setSelected("");
@@ -877,7 +930,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     const tx = cue ? lineTx[cue.id] : "";
     return (
       <aside
-        className={`ps ov${docked ? " docked" : ""} caption-${prefs.captionSize}`}
+        className={`ps ov${docked ? " docked" : ""}${prefs.placement === "side" ? " side" : ""} caption-${prefs.captionSize}`}
         aria-label="ParleSprint Immersion"
         onClick={stop}
         onDoubleClick={stop}
@@ -892,13 +945,23 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
               <button aria-label="Close meaning" onClick={closeMeaning}>×</button>
             </div>
             <MeaningCard meaning={meaning} state={meaningState} compact />
-            <button className="ov-save" onClick={() => void saveWord()} disabled={saved}>
-              {saved ? "Saved ✓" : "Save to notebook"}
-            </button>
+            {explanationView()}
+            <div className="ov-meaning-actions">
+              {!explanation && (
+                <button className="ov-explain-btn" onClick={() => void explain()} disabled={busy}>
+                  {busy ? "Explaining…" : "Explain in context"}
+                </button>
+              )}
+              <button className="ov-save" onClick={() => void saveWord()} disabled={saved}>
+                {saved ? "Saved ✓" : "Save to notebook"}
+              </button>
+            </div>
+            {error && <p className="ov-error" role="alert">{error}</p>}
           </section>
         )}
+        {renderTour(compactTour)}
         {prefs.showCaptions && (cue || liveInterim) && (
-          <div className="ov-line">
+          <div className={`ov-line${tourStep !== null && compactTour[tourStep]?.target === "word" ? " tour-hl" : ""}`}>
             {liveInterim ? (
               <p className="sentence" lang="fr">{liveInterim}</p>
             ) : (
@@ -909,6 +972,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
         )}
         <div className="ov-controls" role="toolbar" aria-label="Caption controls">
           <button
+            className={hl("fr", compactTour)}
             aria-pressed={prefs.showCaptions}
             title="Show or hide French captions"
             onClick={() => void update({ showCaptions: !prefs.showCaptions })}
@@ -916,14 +980,16 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
             FR
           </button>
           <button
+            className={hl("en", compactTour)}
             aria-pressed={prefs.showTranslation}
             title="Show or hide English translation under each line"
             onClick={() => void update({ showTranslation: !prefs.showTranslation })}
           >
             EN
           </button>
-          <button title="Repeat this line" disabled={!cue} onClick={() => cue && replay(cue)}>↻</button>
-          <button title="More settings, transcript and notebook" onClick={() => void update({ compactView: false })}>⋯</button>
+          <button className={hl("repeat", compactTour)} title="Repeat this line" disabled={!cue} onClick={() => cue && replay(cue)}>↻</button>
+          <button className={hl("more", compactTour)} title="More settings, transcript and notebook" onClick={() => void update({ compactView: false })}>⋯</button>
+          <button title="How this works" aria-label="How this works" onClick={() => setTourStep(0)}>?</button>
         </div>
       </aside>
     );
@@ -945,7 +1011,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   };
   return (
     <aside
-      className={`ps companion dock-${prefs.dock} caption-${prefs.captionSize}${!practice ? ` youtube-companion layout-${prefs.placement}` : ""}${!practice && moreOpen ? " tools-open" : ""}${collapsed ? " collapsed" : ""}`}
+      className={`ps companion dock-${prefs.dock} caption-${prefs.captionSize}${!practice ? ` youtube-companion layout-${prefs.placement === "side" ? "below" : prefs.placement}` : ""}${!practice && moreOpen ? " tools-open" : ""}${collapsed ? " collapsed" : ""}`}
       aria-label="ParleSprint Immersion"
       style={companionStyle}
     >
@@ -977,7 +1043,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
             </select>
             {!practice && (
               <button
-                className="move-handle"
+                className={`move-handle${hl("move", fullTour)}`}
                 aria-label="Move captions"
                 title="Drag to move captions. Use arrow keys to nudge."
                 onPointerDown={(event) => beginFloatingTransform("move", event)}
@@ -1008,8 +1074,13 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
             </button>
           </div>
         )}
-        {!practice && (prefs.placement === "overlay" || prefs.placement === "below") && (
-          <button className="icon-button" aria-label="Back to compact captions" title="Back to compact captions" onClick={() => void update({ compactView: true })}>
+        {!practice && (
+          <button className="icon-button" aria-label="How this works" title="How this works" onClick={() => setTourStep(0)}>
+            ?
+          </button>
+        )}
+        {!practice && prefs.placement !== "floating" && (
+          <button className={`icon-button${hl("compact", fullTour)}`} aria-label="Back to compact captions" title="Back to compact captions" onClick={() => void update({ compactView: true })}>
             ⌄
           </button>
         )}
@@ -1023,6 +1094,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
       </div>
       {!collapsed && (
         <div className="stack">
+          {renderTour(fullTour)}
           {practice && <div className="section-title">
             <div className="row">
               <label htmlFor="ps-level">Your French</label>
@@ -1262,6 +1334,13 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                   ) : (
                     <>
                       <button
+                        className={`translate-button${hl("en", fullTour)}`}
+                        aria-pressed={prefs.showTranslation}
+                        onClick={() => void update({ showTranslation: !prefs.showTranslation })}
+                      >
+                        {prefs.showTranslation ? "English: on" : "English: off"}
+                      </button>
+                      <button
                         className="translate-button"
                         aria-pressed={translationVisible}
                         disabled={!cue || translationBusy}
@@ -1283,6 +1362,9 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                     </>
                   )}
                 </div>
+                {!practice && prefs.showTranslation && cue && lineTx[cue.id] && !(translationVisible && translation) && (
+                  <p className="sentence-translation" lang="en" aria-live="polite">{lineTx[cue.id]}</p>
+                )}
                 {!practice && translationVisible && translation && (
                   <p className="sentence-translation" lang="en" aria-live="polite">
                     {translation}
@@ -1516,7 +1598,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
               {!practice && <MeaningCard meaning={meaning} state={meaningState} />}
 
               <div className="caption-actions">
-                {!practice && prefs.aiConsent && (
+                {!practice && (
                   <button className="primary" disabled={busy} onClick={() => void explain()}>
                     {busy ? "Explaining…" : "Explain in context"}
                   </button>
@@ -1585,7 +1667,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
       )}
       {!practice && prefs.placement === "floating" && !collapsed && (
         <button
-          className="resize-handle"
+          className={`resize-handle${hl("resize", fullTour)}`}
           aria-label="Resize captions"
           title="Drag to resize captions. Use arrow keys to resize."
           onPointerDown={(event) => beginFloatingTransform("resize", event)}

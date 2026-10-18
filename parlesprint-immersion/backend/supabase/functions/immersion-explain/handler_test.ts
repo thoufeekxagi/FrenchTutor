@@ -106,3 +106,27 @@ Deno.test('provider rate limit does not retry or expose upstream response', asyn
     assertEquals(providerCalls, 1);
   });
 });
+
+Deno.test('anonymous mode needs an installation id, is quota limited, and never calls the user lookup', async () => {
+  const anon = new Request('https://backend.invalid/functions/v1/immersion-explain', {
+    method: 'POST', headers: { Authorization: 'Bearer test-public-key', apikey: 'test-public-key', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: 'bonjour', sentence: 'Bonjour Marie.', level: 'A1', installationId: '3f2b8f0e-6c1a-4d3b-9a77-0c5d2e1b4a10' }),
+  });
+  const urls: string[] = [];
+  await withFetch((async (input) => {
+    const url = String(input); urls.push(url);
+    if (url.includes('/immersion_ai_cache?')) return json([]);
+    if (url.includes('/rpc/immersion_take_quota')) return json(false);
+    throw new Error('Unexpected network call');
+  }) as typeof fetch, async () => {
+    const result = await handle(anon);
+    assertEquals(result.status, 429);
+    assertEquals(await result.json(), { error: 'daily_explanation_limit_reached' });
+    assertEquals(urls.some((u) => u.endsWith('/auth/v1/user')), false);
+  });
+  const missingId = new Request('https://backend.invalid/functions/v1/immersion-explain', {
+    method: 'POST', headers: { Authorization: 'Bearer test-public-key', apikey: 'test-public-key' },
+    body: JSON.stringify({ text: 'bonjour', sentence: 'Bonjour Marie.', level: 'A1' }),
+  });
+  assertEquals((await handle(missingId)).status, 400);
+});

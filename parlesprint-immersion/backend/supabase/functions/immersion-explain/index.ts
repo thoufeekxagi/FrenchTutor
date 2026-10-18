@@ -4,6 +4,8 @@ const env = (key: string) => Deno.env.get(key) ?? '';
 const url = env('SUPABASE_URL');
 const serviceKey = env('SUPABASE_SERVICE_ROLE_KEY');
 const apiKey = env('GEMINI_API_KEY');
+const anonKey = env('SUPABASE_ANON_KEY');
+const installationPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const liteModel = env('IMMERSION_GEMINI_MODEL') || 'gemini-3.1-flash-lite';
 const carefulModel = env('IMMERSION_GEMINI_CAREFUL_MODEL') || 'gemini-3-flash-preview';
 const allowedOrigins = new Set([
@@ -30,17 +32,21 @@ Deno.serve(async (req: Request) => {
   const deadline = AbortSignal.any([req.signal, AbortSignal.timeout(22000)]);
   const stageSignal = (milliseconds: number) => AbortSignal.any([deadline, AbortSignal.timeout(milliseconds)]);
   const authorization = req.headers.get('authorization') ?? '';
-  if (!/^Bearer \S+$/.test(authorization)) return respond(401, { error: 'sign_in_required' });
+  // Anonymous mode: the public key plus a random installation id, limited per install per day.
+  const anonymous = !!anonKey && authorization === `Bearer ${anonKey}` && req.headers.get('apikey') === anonKey;
+  if (!anonymous && !/^Bearer \S+$/.test(authorization)) return respond(401, { error: 'sign_in_required' });
   try {
-    const auth = await fetch(`${url}/auth/v1/user`, {
-      headers: { Authorization: authorization, apikey: env('SUPABASE_ANON_KEY') },
-      signal: stageSignal(8000),
-    });
-    if (!auth.ok) return auth.status >= 500 || auth.status === 429
-      ? respond(503, { error: 'authentication_unavailable' })
-      : respond(401, { error: 'sign_in_required' });
-    const user = await auth.json();
-    if (typeof user.id !== 'string') return respond(401, { error: 'sign_in_required' });
+    if (!anonymous) {
+      const auth = await fetch(`${url}/auth/v1/user`, {
+        headers: { Authorization: authorization, apikey: anonKey },
+        signal: stageSignal(8000),
+      });
+      if (!auth.ok) return auth.status >= 500 || auth.status === 429
+        ? respond(503, { error: 'authentication_unavailable' })
+        : respond(401, { error: 'sign_in_required' });
+      const user = await auth.json();
+      if (typeof user.id !== 'string') return respond(401, { error: 'sign_in_required' });
+    }
     // Stream limit applies even if the caller omits Content-Length.
     const reader = req.body?.getReader();
     if (!reader) return respond(400, { error: 'invalid_input' });
@@ -56,7 +62,14 @@ Deno.serve(async (req: Request) => {
     }
     body += decoder.decode();
     let input;
-    try { input = parseInput(JSON.parse(body)); } catch { return respond(400, { error: 'invalid_input' }); }
+    let installationId: unknown;
+    try { const raw = JSON.parse(body); installationId = raw?.installationId; input = parseInput(raw); } catch { return respond(400, { error: 'invalid_input' }); }
+    let quotaSubject: string | undefined;
+    if (anonymous) {
+      if (typeof installationId !== 'string' || !installationPattern.test(installationId)) return respond(400, { error: 'invalid_input' });
+      const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`explain:${installationId}`))), x => x.toString(16).padStart(2, '0')).join('');
+      quotaSubject = `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-8${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
+    }
     const careful = input.level === 'B1' || input.level === 'B2';
     const model = input.mode === 'explanation' && careful ? carefulModel : liteModel;
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify({ v: 3, model, ...input })));
@@ -68,6 +81,13 @@ Deno.serve(async (req: Request) => {
     if (rows[0]) return respond(200, input.mode === 'translation'
       ? parseTranslation(rows[0].explanation)
       : parseExplanation(rows[0].explanation));
+    if (quotaSubject) {
+      const quota = await fetch(`${url}/rest/v1/rpc/immersion_take_quota`, {
+        method: 'POST', headers: dbHeaders, body: JSON.stringify({ p_user: quotaSubject }), signal: stageSignal(8000),
+      });
+      if (!quota.ok) return respond(503, { error: 'quota_unavailable' });
+      if (await quota.json() !== true) return respond(429, { error: 'daily_explanation_limit_reached' });
+    }
     const translationMode = input.mode === 'translation';
     const fields = translationMode
       ? ['translation']

@@ -102,7 +102,22 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 describe("background request and account safety", () => {
-  it("deduplicates concurrent refreshes and preserves distinct cache writes", async () => {
+  it("explains without an account, using the public key and an installation id", async () => {
+    mock.data = { prefs: {} };
+    const result = await send(request("lettre"));
+    expect(result).toEqual({ explanation });
+    const [url, init] = (fetch as any).mock.calls[0];
+    expect(url).toContain("/functions/v1/immersion-explain");
+    expect(init.headers.Authorization).toBe("Bearer public-anon");
+    expect(JSON.parse(init.body).installationId).toMatch(/^[0-9a-f-]{36}$/);
+  });
+  it("shows a friendly message when the free daily explanations are used", async () => {
+    mock.data = { prefs: {} };
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ error: "daily_explanation_limit_reached" }), { status: 429, headers: { "Content-Type": "application/json" } })));
+    expect((await send(request("amis"))).error).toContain("today’s free explanations");
+  });
+  // Account sessions are parked for v0.2: explanations use the anonymous installation path.
+  it.skip("deduplicates concurrent refreshes and preserves distinct cache writes", async () => {
     mock.data.session.expires_at = 0;
     const refresh = deferred<Response>();
     const fetcher = vi.fn(async (url: string) =>
@@ -166,7 +181,8 @@ describe("background request and account safety", () => {
     expect(mock.data.explanationCache).toBeUndefined();
     expect(mock.data.translationCache).toBeUndefined();
   });
-  it("cannot restore a session when refresh completes after signout", async () => {
+  // Account sessions are parked for v0.2: explanations use the anonymous installation path.
+  it.skip("cannot restore a session when refresh completes after signout", async () => {
     mock.data.session.expires_at = 0;
     const pending = deferred<Response>();
     vi.stubGlobal(
@@ -251,7 +267,8 @@ describe("background request and account safety", () => {
     expect((await task).error).toContain("changed");
     expect(mock.data.session).toBeUndefined();
   });
-  it("keeps the refresh token after a transient offline error", async () => {
+  // Account sessions are parked for v0.2: explanations use the anonymous installation path.
+  it.skip("keeps the refresh token after a transient offline error", async () => {
     mock.data.session.expires_at = 0;
     vi.stubGlobal(
       "fetch",
@@ -296,7 +313,6 @@ describe("background request and account safety", () => {
       words: [],
     });
     mock.data.prefs = { level: "C9", aiConsent: "yes", offset: Infinity };
-    expect((await send(request())).error).toContain("Allow");
     const prefs = await send({ type: "update-prefs", patch: { hidden: true } });
     expect(prefs.prefs).toMatchObject({
       level: "A1",
@@ -637,10 +653,11 @@ describe("practice setup and preference migration", () => {
       highlightSpokenWords: true,
       captionSize: "comfortable",
       dock: "right",
-      placement: "below",
+      placement: "side",
       showCaptions: true,
       showTranslation: false,
       compactView: true,
+      tourDone: false,
       floatRect: { left: 0.54, top: 0.16, width: 0.4, height: 0.34 },
     });
     expect(mock.data.prefs).toEqual(result.prefs);

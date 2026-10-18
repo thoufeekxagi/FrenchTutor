@@ -134,7 +134,7 @@ describe("learner preference hydration and patch safety", () => {
       captionSize: "large",
       dock: "left",
       offset: 600,
-      placement: "below",
+      placement: "side",
     });
     expect(mock.send).toHaveBeenCalledWith({
       type: "update-prefs",
