@@ -31,6 +31,7 @@ test("real MV3 popup, subtitle timing, replay, notebook, navigation, errors", as
     await (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false, tourDone: true } });
   });
   const popup = await context.newPage();
+  await popup.setViewportSize({ width: 400, height: 600 });
   await popup.goto(`chrome-extension://${id}/popup.html`);
   await expect(popup.locator(".brand-word")).toBeVisible();
   await expect(popup.locator(".live-card")).toBeVisible();

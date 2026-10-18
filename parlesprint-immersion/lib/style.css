@@ -1420,8 +1420,10 @@ body {
 .ps.ov .word.spoken, .ps.ov .word.spoken:hover { background: var(--accent); color: #fff; }
 
 /* Chrome sizes the toolbar popup from its first paint; reserve the full height up front. */
-html.popup-document, html.popup-document body { min-height: 580px; }
-html.popup-document #root { min-height: 580px; }
+@media (max-width: 519px) {
+  html.popup-document, html.popup-document body { min-height: 580px; }
+  html.popup-document #root { min-height: 580px; }
+}
 
 /* Popup: calm, grouped, Apple-style */
 .ps.popup .pop-hero { padding: 6px 2px 2px; }
@@ -1509,3 +1511,29 @@ html.popup-document #root { min-height: 580px; }
 @keyframes wait-pulse { 0%, 100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .ps.ov .wait-dot { animation: none; } }
 .ps.popup .gate-hint { color: #8a5a00; background: #fff6e0; border-radius: 8px; padding: 8px 10px; }
+
+/* The same page opened in a full browser tab: centered card, normal scrolling */
+@media (min-width: 520px) {
+  html.popup-document,
+  html.popup-document body,
+  html.popup-document #root { width: auto; min-width: 0; max-width: none; }
+  html.popup-document body {
+    min-height: 100vh;
+    padding: 40px 16px 56px;
+    background: #e9edf5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  html.popup-document #root { width: min(520px, 100%); }
+  .ps.popup {
+    width: 100%;
+    min-width: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 28px;
+    border-radius: 28px;
+    background: var(--canvas);
+    box-shadow: 0 24px 60px rgba(20, 40, 90, 0.14), 0 2px 6px rgba(20, 40, 90, 0.06);
+  }
+}
