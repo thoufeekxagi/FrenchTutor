@@ -299,19 +299,6 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                           11,
                         ).copyWith(color: DesignTokens.muted, height: 1.35),
                       ),
-                      const SizedBox(height: 30),
-                      const SubscriptionMarketingSections(),
-                      if (_selected != null) ...[
-                        const SizedBox(height: 24),
-                        SubscriptionBottomOffer(
-                          price: _selected!.storeProduct.priceString,
-                          terms: _bottomTerms(_selected!),
-                          ctaLabel: _ctaLabel(),
-                          loading: _purchasing,
-                          onTap: _purchasing ? null : _purchase,
-                        ),
-                      ],
-                      const SizedBox(height: 16),
                       Center(
                         child: TextButton(
                           key: const ValueKey('paywall.restore'),
@@ -328,6 +315,18 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 30),
+                      const SubscriptionMarketingSections(),
+                      if (_selected != null) ...[
+                        const SizedBox(height: 24),
+                        SubscriptionBottomOffer(
+                          price: _selected!.storeProduct.priceString,
+                          terms: _bottomTerms(_selected!),
+                          ctaLabel: _ctaLabel(),
+                          loading: _purchasing,
+                          onTap: _purchasing ? null : _purchase,
+                        ),
+                      ],
                       Text(
                         'Subscriptions renew automatically and can be cancelled in your App Store account.',
                         textAlign: TextAlign.center,
