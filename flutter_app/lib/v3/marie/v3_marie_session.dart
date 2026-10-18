@@ -104,6 +104,10 @@ abstract class V3MarieSession extends ChangeNotifier {
   /// The same step changed (an answer was checked): silently refresh.
   void screenUpdated();
 
+  /// Close the learner mic during short app-played feedback sounds so the
+  /// model cannot mistake the sound for learner speech.
+  void blockMicUntil(DateTime time) {}
+
   /// Hang up only when the app is really in the background. Split View on an
   /// iPad (notes beside the app) only makes the app inactive, and that must not
   /// end a call.
@@ -382,6 +386,11 @@ class V3LiveMarieSession extends V3MarieSession {
   }
 
   @override
+  void blockMicUntil(DateTime time) {
+    _callInstance?.audio?.blockMicUntil(time);
+  }
+
+  @override
   void dispose() {
     _callInstance?.dispose();
     super.dispose();
@@ -428,7 +437,7 @@ class V3FakeMarieSession extends V3MarieSession {
     touch();
     notifyListeners();
     debugSay(
-      'Marie is connected. If you need any assistance, feel free to talk.',
+      '${ActiveTutor.current.displayName} is connected. If you need any assistance, feel free to talk.',
     );
   }
 
@@ -526,6 +535,11 @@ class V3FakeMarieSession extends V3MarieSession {
   @override
   void screenUpdated() {
     if (isLive) V3MarieSession.debugLog.add('context:update');
+  }
+
+  @override
+  void blockMicUntil(DateTime time) {
+    V3MarieSession.debugLog.add('feedback-mic-blocked');
   }
 
   @override

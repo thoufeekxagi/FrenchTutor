@@ -1,0 +1,9 @@
+project_id = "parlesprint-immersion"
+[functions.immersion-explain]
+verify_jwt = true
+
+[functions.immersion-privacy]
+verify_jwt = false
+
+[functions.immersion-live-token]
+verify_jwt = false

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "a1-gender",
+    "text": "une amie",
+    "sentence": "C'est une amie française.",
+    "level": "A1",
+    "focus": "Feminine noun and adjective",
+    "reviewChecklist": [
+      "States une/amie are feminine; feminine amie is formed from ami with e.",
+      "Does not claim vowel-initial spelling causes feminine gender or selected phrase conveys nationality."
+    ]
+  },
+  {
+    "id": "a2-imperfect",
+    "text": "faisait",
+    "sentence": "Quand j'étais petit, il faisait froid en hiver.",
+    "level": "A2",
+    "focus": "Imperfect background description",
+    "reviewChecklist": [
+      "Correctly identifies imperfect of faire and contextual weather meaning.",
+      "If explaining formation, explicitly removes ons from faisons before adding ait."
+    ]
+  },
+  {
+    "id": "b1-pronoun-y",
+    "text": "j'y tiens",
+    "sentence": "Cette bague vient de ma mère et j'y tiens beaucoup.",
+    "level": "B1",
+    "focus": "Tenir à and pronoun y",
+    "reviewChecklist": [
+      "Correctly explains tenir à as value/care about and y as referring to the ring.",
+      "Does not call tenir à a reflexive verb or mislabel a pronoun-containing construction as pronominal verb."
+    ]
+  },
+  {
+    "id": "b1-caption-error",
+    "text": "sa va",
+    "sentence": "sa va je sui la demain",
+    "level": "B1",
+    "focus": "Malformed subtitles: likely ça va / suis; mark reconstruction uncertainty",
+    "reviewChecklist": [
+      "Calls sa possessive and ça demonstrative pronoun if category discussed.",
+      "Marks corrections as likely or possible and avoids asserting intent from damaged context."
+    ]
+  },
+  {
+    "id": "b2-caption-ambiguity",
+    "text": "ver vert verre",
+    "sentence": "Il a dit ver vert verre puis le sous-titre s'est coupé.",
+    "level": "B2",
+    "focus": "Homophones, truncated context; do not invent certainty",
+    "reviewChecklist": [
+      "Defines ver worm, vert green, verre glass with correct categories.",
+      "Does not assert famous tongue twister or pretend absent vers was in subtitle."
+    ]
+  }
+]

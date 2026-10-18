@@ -338,6 +338,25 @@ class InlineCallController {
     );
     audio = a;
     gemini = g;
+    // Lesson calls use full duplex only when platform AEC/NS is active. The
+    // local VAD forwards a short speech segment and closes it explicitly so
+    // silence and unrelated room noise stay off Gemini's billable stream.
+    a.speechGateEnabled = sessionType == LiveSessionType.lessonCoach;
+    a.preferFullDuplexVoiceProcessing =
+        sessionType == LiveSessionType.lessonCoach;
+    a.onSpeechStarted = () {
+      if (!_isCurrentGeneration(generation) || !a.fullDuplexActive) return;
+      if (a.hasPendingPlayback) {
+        if (g.isModelGenerating) g.suppressCurrentReply();
+        unawaited(a.stopPlayback());
+        a.isOutputActive = false;
+        tutorSpeaking = false;
+        _notify();
+      }
+    };
+    a.onSpeechEnded = () {
+      if (_isCurrentGeneration(generation)) g.endAudioTurn();
+    };
 
     g.onConnected = () {
       if (_isCurrentGeneration(generation) && !completer.isCompleted) {
@@ -425,6 +444,13 @@ class InlineCallController {
     };
     g.onInterrupted = () {
       if (!_isCurrentGeneration(generation)) return;
+      // Gemini may interrupt a turn after audio has already reached the
+      // player's local queue. Discard it now; otherwise Marie keeps talking
+      // over the next turn despite the server having stopped generation.
+      unawaited(a.stopPlayback());
+      a.isOutputActive = false;
+      tutorSpeaking = false;
+      _notify();
       final narration = _externalNarrationCompletion;
       if (narration != null && !narration.isCompleted) {
         narration.completeError(

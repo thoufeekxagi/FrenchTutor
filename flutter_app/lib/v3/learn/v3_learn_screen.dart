@@ -11,7 +11,6 @@ import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/profile.dart';
 import '../../providers/database_provider.dart';
-import '../../screens/labs/labs_screen.dart';
 import '../../screens/speak/live_tutor_setup_screen.dart';
 import '../../screens/labs/vocabulary_flashcards_screen.dart';
 import '../../services/learning_streak_service.dart';
@@ -38,19 +37,25 @@ import '../ui/v3_ui.dart';
 /// when complete.
 /// Must not contain: AI-generated lessons, fake progress, photos, or subtitles.
 ///
-/// Everything comes from the bundled authored course. Progress is local.
+/// Lessons are authored and bundled. Progress is stored locally and synced to
+/// the signed-in learner's account.
 class V3LearnScreen extends ConsumerStatefulWidget {
-  const V3LearnScreen({super.key});
+  const V3LearnScreen({super.key, this.isActive = true});
+
+  /// The shell keeps Learn mounted in its IndexedStack. Refresh when it becomes
+  /// visible again so returning from Marie or Tests shows current learner data.
+  final bool isActive;
 
   @override
   ConsumerState<V3LearnScreen> createState() => _V3LearnScreenState();
 }
 
-class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
-  var _tab = 0;
+class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
+    with WidgetsBindingObserver {
   int? _reviewCount;
   var _loaded = false;
   List<V3Lesson> _course = const [];
+  List<V3Lesson> _allCourse = const [];
   Set<String> _done = const {};
   Map<String, int> _pos = const {};
   String? _active;
@@ -58,7 +63,11 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   String? _openUnit;
   DateTime? _examDate;
   String? _selectedLevel;
+  String? _openPathLevel = 'Stage 0';
   V3DailyChallenge? _dailyChallenge;
+  bool _allPathLoaded = false;
+  bool _pathLoading = false;
+  bool _pathLoadFailed = false;
   int _streakDays = 0;
   int _activeWeekDays = 0;
   List<bool> _weekActivity = const [
@@ -75,27 +84,56 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     unawaited(_load());
   }
 
-  Future<void> _load() async {
+  @override
+  void didUpdateWidget(covariant V3LearnScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.isActive && widget.isActive) unawaited(_load());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && widget.isActive) {
+      unawaited(_load());
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  Future<void> _load({bool refreshAccount = true}) async {
+    final generation = ++_loadGeneration;
     const e2eShell = bool.fromEnvironment('E2E_SHELL');
     const e2eOnly = String.fromEnvironment('E2E_ONLY');
-    final profile = ref.read(learningStoreProvider).profile();
+    final learningStore = ref.read(learningStoreProvider);
+    await V3Progress.importLegacyPreferences(learningStore);
+    final profile = learningStore.profile();
     final level = LearnerLevel.cefrValues.contains(profile.level)
         ? profile.level
         : 'a1';
+    final challengeForLevel = _selectedLevel == level ? _dailyChallenge : null;
     final lessonPrefixes = kDebugMode && e2eShell && e2eOnly.isNotEmpty
         ? e2eOnly.split(',').map((prefix) => prefix.trim()).toList()
         : <String>['s0', level];
     final course = await V3Course.load(idPrefixes: lessonPrefixes);
-    final challenge = await V3DailyChallengeRepository.load(level);
-    final done = await V3Progress.completed();
-    final pos = await V3Progress.positions();
-    final active = await V3Progress.lastActive();
-    final lastDone = await V3Progress.lastCompleted();
+    final done = await V3Progress.completed(store: learningStore);
+    final pos = await V3Progress.positions(store: learningStore);
+    final active = await V3Progress.lastActive(store: learningStore);
+    final lastDone = await V3Progress.lastCompleted(store: learningStore);
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString('tcf_exam_date');
+    final examDate =
+        profile.tcfExamDate ?? (raw == null ? null : DateTime.tryParse(raw));
+    if (profile.tcfExamDate == null && examDate != null) {
+      profile.tcfExamDate = examDate;
+      learningStore.saveProfile(profile);
+    }
     final sessions = ref.read(storageServiceProvider).getAllSessions();
     final streak = LearningStreakService.summarize(sessions);
     final now = DateTime.now();
@@ -106,22 +144,78 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       return !day.isAfter(today) && streak.isActiveOn(day);
     });
     final activeWeekDays = weekActivity.where((active) => active).length;
-    if (!mounted) return;
+    if (!mounted || generation != _loadGeneration) return;
     setState(() {
       _course = course;
+      if (!_allPathLoaded) _allCourse = course;
       _done = done;
       _pos = pos;
       _active = active;
       _lastDone = lastDone;
-      _examDate = raw == null ? null : DateTime.tryParse(raw);
+      _examDate = examDate;
       _selectedLevel = level;
-      _dailyChallenge = challenge;
+      _dailyChallenge = challengeForLevel;
       _streakDays = streak.currentDays;
       _activeWeekDays = activeWeekDays;
       _weekActivity = weekActivity;
       _loaded = true;
     });
+    unawaited(_loadDailyChallenge(level, generation));
     unawaited(_refreshReviewCount());
+    if (refreshAccount) _refreshAccountInBackground(generation);
+  }
+
+  int _loadGeneration = 0;
+
+  void _refreshAccountInBackground(int generation) {
+    final sync = ref.read(syncServiceProvider);
+    if (!sync.isSignedIn) return;
+    unawaited(
+      sync.refreshLearnHomeFromAccount().then((_) {
+        if (!mounted || !widget.isActive || generation != _loadGeneration) {
+          return;
+        }
+        unawaited(_load(refreshAccount: false));
+      }),
+    );
+  }
+
+  Future<void> _loadDailyChallenge(String level, int generation) async {
+    try {
+      final challenge = await V3DailyChallengeRepository.load(level);
+      if (!mounted || generation != _loadGeneration) return;
+      setState(() => _dailyChallenge = challenge);
+    } catch (_) {
+      // The home remains usable while the remote challenge feed is offline.
+    }
+  }
+
+  Future<void> _loadAllCoursePath() async {
+    if (_allPathLoaded || _pathLoading) return;
+    setState(() {
+      _pathLoading = true;
+      _pathLoadFailed = false;
+    });
+    try {
+      const e2eShell = bool.fromEnvironment('E2E_SHELL');
+      const e2eOnly = String.fromEnvironment('E2E_ONLY');
+      final prefixes = kDebugMode && e2eShell && e2eOnly.isNotEmpty
+          ? e2eOnly.split(',').map((prefix) => prefix.trim()).toList()
+          : const <String>[];
+      final course = await V3Course.load(idPrefixes: prefixes);
+      if (!mounted) return;
+      setState(() {
+        _allCourse = course;
+        _allPathLoaded = true;
+        _pathLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _pathLoading = false;
+        _pathLoadFailed = true;
+      });
+    }
   }
 
   /// Where Resume goes. One rule, kept in [V3Progress.pickNext].
@@ -313,10 +407,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                     : constraints.maxWidth.clamp(0, 680).toDouble(),
               ),
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 children: [
-                  Text('Bonjour!', style: V3Type.title(31)),
-                  const SizedBox(height: 12),
                   Row(
                     children: [
                       _levelSelector(level),
@@ -324,13 +416,10 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                       _examCountdown(days),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  if (!_loaded)
-                    const SizedBox(height: 240)
-                  else if (_tab == 0)
-                    ...(_showPath ? _pathPage() : _courseHome())
-                  else
-                    ..._practiceHome(),
+                  const SizedBox(height: 12),
+                  _homePathToggle(),
+                  const SizedBox(height: 13),
+                  ...(_showPath ? _pathPage() : _courseHome()),
                 ],
               ),
             ),
@@ -338,6 +427,55 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
         },
       ),
     );
+  }
+
+  Widget _homePathToggle() => Container(
+    padding: const EdgeInsets.all(4),
+    decoration: BoxDecoration(
+      color: DesignTokens.canvasDim,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: DesignTokens.hairline),
+    ),
+    child: Row(
+      children: [
+        _topTab('Home', selected: !_showPath),
+        const SizedBox(width: 4),
+        _topTab('Path', selected: _showPath),
+      ],
+    ),
+  );
+
+  Widget _topTab(String label, {required bool selected}) => Expanded(
+    child: V3Pressable(
+      key: ValueKey('learn.topTab.${label.toLowerCase()}'),
+      label: label,
+      selected: selected,
+      onTap: label == 'Path'
+          ? _showCoursePath
+          : () => setState(() => _showPath = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        constraints: const BoxConstraints(minHeight: 46),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? DesignTokens.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: selected ? DesignTokens.surfaceShadow : null,
+        ),
+        child: Text(
+          label,
+          style: V3Type.strong(
+            15,
+            selected ? DesignTokens.primary : DesignTokens.inkSoft,
+          ),
+        ),
+      ),
+    ),
+  );
+
+  void _showCoursePath() {
+    setState(() => _showPath = true);
+    unawaited(_loadAllCoursePath());
   }
 
   Widget _levelSelector(String level) => V3Pressable(
@@ -472,6 +610,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       _selectedLevel = selected;
       _showPath = false;
       _loaded = false;
+      _dailyChallenge = null;
     });
     await _load();
   }
@@ -491,6 +630,9 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     final value = DateTime(picked.year, picked.month, picked.day);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('tcf_exam_date', value.toIso8601String());
+    final profile = ref.read(learningStoreProvider).profile()
+      ..tcfExamDate = value;
+    ref.read(learningStoreProvider).saveProfile(profile);
     if (mounted) setState(() => _examDate = value);
   }
 
@@ -512,126 +654,173 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
 
   List<Widget> _courseHome() => [
     _streakStrip(),
-    const SizedBox(height: 14),
+    const SizedBox(height: 12),
     _continuePathCard(),
-    const SizedBox(height: 19),
+    const SizedBox(height: 14),
     _quickPracticeGrid(),
-    const SizedBox(height: 13),
+    const SizedBox(height: 10),
     _coursePathCard(),
   ];
 
-  List<Widget> _pathPage() => [
-    V3Pressable(
-      key: const ValueKey('learn.backToCourse'),
-      label: 'Back home',
-      onTap: () => setState(() => _showPath = false),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 44),
-        alignment: Alignment.centerLeft,
-        child: Row(
-          children: [
-            Icon(
-              CupertinoIcons.chevron_left,
-              color: DesignTokens.primary,
-              size: 17,
+  List<Widget> _pathPage() {
+    if (!_allPathLoaded) {
+      return [
+        Text('Your course path', style: V3Type.title(27)),
+        const SizedBox(height: 4),
+        Text('Build your French from A1 through B2.', style: V3Type.body(14)),
+        const SizedBox(height: 24),
+        if (_pathLoading)
+          const Center(child: CircularProgressIndicator())
+        else
+          V3Pressable(
+            key: const ValueKey('learn.path.retry'),
+            label: _pathLoadFailed
+                ? 'Retry loading your path'
+                : 'Load your path',
+            onTap: () => unawaited(_loadAllCoursePath()),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 52),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: DesignTokens.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: DesignTokens.hairline),
+              ),
+              child: Text(
+                _pathLoadFailed ? 'Try again' : 'Load course levels',
+                style: V3Type.strong(14, DesignTokens.primary),
+              ),
             ),
-            const SizedBox(width: 5),
-            Text('Home', style: V3Type.strong(14, DesignTokens.primary)),
-          ],
-        ),
-      ),
-    ),
-    const SizedBox(height: 4),
-    Text('Your course path', style: V3Type.title(28)),
-    const SizedBox(height: 14),
-    ..._path(),
-  ];
-
-  List<Widget> _practiceHome() => [
-    V3Pressable(
-      key: const ValueKey('learn.practiceBack'),
-      label: 'Back home',
-      onTap: () => setState(() => _tab = 0),
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 44),
-        alignment: Alignment.centerLeft,
-        child: Row(
-          children: [
-            Icon(
-              CupertinoIcons.chevron_left,
-              color: DesignTokens.primary,
-              size: 17,
-            ),
-            const SizedBox(width: 5),
-            Text('Home', style: V3Type.strong(14, DesignTokens.primary)),
-          ],
-        ),
-      ),
-    ),
-    const SizedBox(height: 4),
-    Text('Your practice', style: V3Type.title(28)),
-    const SizedBox(height: 14),
-    Row(
-      children: [
-        Expanded(
-          child: _practiceAction(
-            key: const ValueKey('learn.review'),
-            icon: CupertinoIcons.arrow_2_circlepath,
-            title: _reviewCount == null || _reviewCount == 0
-                ? 'Review words'
-                : 'Review · $_reviewCount',
-            label: 'Review flashcards',
-            onTap: _openReview,
           ),
+      ];
+    }
+    return [
+      Text('Your course path', style: V3Type.title(27)),
+      const SizedBox(height: 4),
+      Text('Build your French from A1 through B2.', style: V3Type.body(14)),
+      const SizedBox(height: 16),
+      if (_allCourse.any((lesson) => lesson.id.startsWith('s0'))) ...[
+        _pathLevelCard(
+          'Stage 0',
+          _allCourse.where((lesson) => lesson.id.startsWith('s0')).toList(),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _practiceAction(
-            key: const ValueKey('learn.practiceLibrary'),
-            icon: CupertinoIcons.slider_horizontal_3,
-            title: 'Practice library',
-            label: 'Explore practice library',
-            onTap: () => unawaited(_openPracticeLibrary()),
-          ),
-        ),
+        const SizedBox(height: 10),
       ],
-    ),
-    const SizedBox(height: 14),
-    V3StoriesPanel(key: const ValueKey('learn.stories')),
-  ];
+      for (final level in const ['A1', 'A2', 'B1', 'B2']) ...[
+        _pathLevelCard(
+          level,
+          _allCourse
+              .where((lesson) => lesson.id.startsWith(level.toLowerCase()))
+              .toList(),
+        ),
+        const SizedBox(height: 10),
+      ],
+    ];
+  }
 
-  Widget _practiceAction({
-    required Key key,
-    required IconData icon,
-    required String title,
-    required String label,
-    required VoidCallback onTap,
-  }) => V3Pressable(
-    key: key,
-    label: label,
-    onTap: onTap,
-    child: Container(
-      constraints: const BoxConstraints(minHeight: 82),
-      padding: const EdgeInsets.all(14),
+  Widget _pathLevelCard(String level, List<V3Lesson> lessons) {
+    final open = _openPathLevel == level;
+    final done = lessons.where((lesson) => _done.contains(lesson.id)).length;
+    final isCurrent = lessons.any((lesson) => lesson.id == _next?.id);
+    final label = lessons.isEmpty
+        ? '$level, coming soon'
+        : '$level, $done of ${lessons.length} lessons';
+    final progress = lessons.isEmpty ? 0.0 : done / lessons.length;
+    final color = isCurrent ? DesignTokens.primary : DesignTokens.success;
+    return Container(
       decoration: BoxDecoration(
         color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(color: DesignTokens.hairline),
+        boxShadow: DesignTokens.surfaceShadow,
       ),
-      child: Row(
+      child: Column(
         children: [
-          Icon(icon, size: 23, color: DesignTokens.primary),
-          const SizedBox(width: 10),
-          Expanded(child: Text(title, style: V3Type.strong(14))),
-          Icon(
-            CupertinoIcons.chevron_right,
-            size: 15,
-            color: DesignTokens.inkSoft,
+          V3Pressable(
+            key: ValueKey('learn.pathLevel.$level'),
+            label: label,
+            onTap: lessons.isEmpty
+                ? null
+                : () => setState(() {
+                    _openPathLevel = open
+                        ? (_selectedLevel?.toUpperCase() ?? 'A1')
+                        : level;
+                  }),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: lessons.isEmpty
+                          ? DesignTokens.canvasDim
+                          : DesignTokens.primarySoft,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      level == 'Stage 0' ? '0' : level,
+                      style: V3Type.strong(
+                        level == 'Stage 0' ? 18 : 14,
+                        lessons.isEmpty
+                            ? DesignTokens.muted
+                            : DesignTokens.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(level, style: V3Type.strong(16)),
+                        const SizedBox(height: 3),
+                        Text(
+                          lessons.isEmpty
+                              ? 'Coming soon'
+                              : '$done of ${lessons.length} lessons',
+                          style: V3Type.body(12.5),
+                        ),
+                        if (lessons.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(3),
+                            child: LinearProgressIndicator(
+                              value: progress,
+                              minHeight: 4,
+                              backgroundColor: DesignTokens.canvasDim,
+                              color: color,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Icon(
+                    open
+                        ? CupertinoIcons.chevron_up
+                        : CupertinoIcons.chevron_down,
+                    size: 18,
+                    color: DesignTokens.inkSoft,
+                  ),
+                ],
+              ),
+            ),
           ),
+          if (open && lessons.isNotEmpty)
+            for (final group in _lessonGroups(lessons))
+              _unitCard(
+                group.key,
+                group.value,
+                group.key == _openUnit || group.key == _next?.unit,
+              ),
         ],
       ),
-    ),
-  );
+    );
+  }
 
   Widget _quickPracticeGrid() {
     final challenge = _dailyChallenge;
@@ -709,10 +898,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                 title: 'Stories',
                 subtitle: 'Read or listen',
                 label: 'Open Stories. Read or listen.',
-                onTap: () => setState(() {
-                  _tab = 1;
-                  _showPath = false;
-                }),
+                onTap: _openStories,
                 accent: DesignTokens.homeStories,
                 tint: DesignTokens.homeStoriesSoft,
               ),
@@ -721,6 +907,71 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _openStories() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.6,
+        maxChildSize: 0.96,
+        expand: false,
+        builder: (context, controller) => Container(
+          decoration: BoxDecoration(
+            color: DesignTokens.canvas,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: ListView(
+              controller: controller,
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: DesignTokens.hairline,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(child: Text('Stories', style: V3Type.title(25))),
+                    V3Pressable(
+                      key: const ValueKey('learn.stories.close'),
+                      label: 'Close Stories',
+                      onTap: () => Navigator.of(context).pop(),
+                      child: SizedBox(
+                        width: 44,
+                        height: 44,
+                        child: Icon(
+                          CupertinoIcons.xmark,
+                          color: DesignTokens.inkSoft,
+                          size: 19,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text('Read or listen at your level.', style: V3Type.body(14)),
+                const SizedBox(height: 18),
+                V3StoriesPanel(key: const ValueKey('learn.stories')),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    if (mounted) unawaited(_load());
   }
 
   Widget _quickPracticeCard({
@@ -737,8 +988,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     label: label,
     onTap: onTap,
     child: Container(
-      constraints: const BoxConstraints(minHeight: 92),
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
+      constraints: const BoxConstraints(minHeight: 80),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: DesignTokens.surface,
         borderRadius: BorderRadius.circular(19),
@@ -748,14 +999,14 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
       child: Row(
         children: [
           Container(
-            width: 50,
-            height: 50,
+            width: 44,
+            height: 44,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: tint,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, size: 24, color: accent),
+            child: Icon(icon, size: 22, color: accent),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -800,77 +1051,104 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     );
   }
 
-  Widget _streakStrip() => V3Pressable(
-    key: const ValueKey('learn.streak'),
-    label:
-        'Open streak calendar, $_streakDays day streak, $_activeWeekDays days this week',
-    onTap: _openStreakCalendar,
-    child: Container(
-      constraints: const BoxConstraints(minHeight: 62),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: DesignTokens.hairline),
-        boxShadow: DesignTokens.surfaceShadow,
-      ),
-      child: Row(
-        children: [
-          Icon(
-            CupertinoIcons.flame_fill,
-            size: 24,
-            color: DesignTokens.homeFlame,
-          ),
-          const SizedBox(width: 9),
-          Text('$_streakDays day streak', style: V3Type.strong(14.5)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Row(
-              children: [
-                for (var day = 0; day < 7; day++)
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: _weekActivity[day]
-                                ? DesignTokens.primary
-                                : DesignTokens.canvasDim,
-                            shape: BoxShape.circle,
-                            border: Border.all(
+  Widget _streakStrip() {
+    if (!_loaded) {
+      return Container(
+        constraints: const BoxConstraints(minHeight: 56),
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: DesignTokens.hairline),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: DesignTokens.primary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text('Loading your weekly activity', style: V3Type.body(13)),
+          ],
+        ),
+      );
+    }
+    return V3Pressable(
+      key: const ValueKey('learn.streak'),
+      label:
+          'Open streak calendar, $_streakDays day streak, $_activeWeekDays days this week',
+      onTap: _openStreakCalendar,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 56),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: DesignTokens.hairline),
+          boxShadow: DesignTokens.surfaceShadow,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              CupertinoIcons.flame_fill,
+              size: 24,
+              color: DesignTokens.homeFlame,
+            ),
+            const SizedBox(width: 9),
+            Text('$_streakDays day streak', style: V3Type.strong(14.5)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Row(
+                children: [
+                  for (var day = 0; day < 7; day++)
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
                               color: _weekActivity[day]
                                   ? DesignTokens.primary
-                                  : DesignTokens.hairline,
+                                  : DesignTokens.canvasDim,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: _weekActivity[day]
+                                    ? DesignTokens.primary
+                                    : DesignTokens.hairline,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          const [
-                            'Mon',
-                            'Tue',
-                            'Wed',
-                            'Thu',
-                            'Fri',
-                            'Sat',
-                            'Sun',
-                          ][day],
-                          maxLines: 1,
-                          style: V3Type.body(8.5, DesignTokens.inkSoft),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Text(
+                            const [
+                              'Mon',
+                              'Tue',
+                              'Wed',
+                              'Thu',
+                              'Fri',
+                              'Sat',
+                              'Sun',
+                            ][day],
+                            maxLines: 1,
+                            style: V3Type.body(8.5, DesignTokens.inkSoft),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   Future<void> _tapDailyChallenge(V3DailyChallenge? challenge) async {
     if (challenge == null) {
@@ -928,17 +1206,17 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   }
 
   Widget _continuePathCard() {
-    final next = _next;
+    final next = _loaded ? _next : null;
     return V3Pressable(
       key: const ValueKey('learn.continuePath'),
-      label: next == null
+      label: !_loaded || next == null
           ? 'Open course path'
           : 'Continue lesson, ${next.title}',
-      onTap: next == null
-          ? () => setState(() => _showPath = true)
+      onTap: !_loaded || next == null
+          ? _showCoursePath
           : () => _openLesson(next),
       child: Container(
-        constraints: const BoxConstraints(minHeight: 210),
+        constraints: const BoxConstraints(minHeight: 184),
         decoration: BoxDecoration(
           gradient: DesignTokens.homeHeroGradient,
           borderRadius: BorderRadius.circular(26),
@@ -950,19 +1228,19 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
           child: Stack(
             children: [
               Positioned(
-                right: -20,
+                right: -16,
                 bottom: -25,
                 child: Image.asset(
                   'assets/images/learn_home_hero.png',
-                  width: 270,
-                  height: 170,
+                  width: 245,
+                  height: 158,
                   fit: BoxFit.contain,
                   alignment: Alignment.bottomRight,
                   excludeFromSemantics: true,
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -970,12 +1248,14 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                       'CONTINUE YOUR COURSE',
                       style: V3Type.eyebrow(DesignTokens.primary),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.only(right: 70),
                       child: Text(
                         next?.title ??
-                            (_course.isEmpty
+                            (!_loaded
+                                ? 'Preparing your next step'
+                                : _course.isEmpty
                                 ? 'No lessons found'
                                 : 'Path complete'),
                         maxLines: 2,
@@ -987,15 +1267,17 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                     Padding(
                       padding: const EdgeInsets.only(right: 70),
                       child: Text(
-                        next == null
+                        !_loaded
+                            ? 'Your saved course is loading'
+                            : next == null
                             ? 'Explore your course path'
                             : '${_levelOf(next)} · ${next.minutes} min',
                         style: V3Type.body(14),
                       ),
                     ),
-                    const SizedBox(height: 17),
+                    const SizedBox(height: 14),
                     Container(
-                      constraints: const BoxConstraints(minHeight: 50),
+                      constraints: const BoxConstraints(minHeight: 46),
                       padding: const EdgeInsets.symmetric(horizontal: 17),
                       decoration: BoxDecoration(
                         color: DesignTokens.primary,
@@ -1005,7 +1287,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            next == null
+                            !_loaded || next == null
                                 ? 'View course path'
                                 : 'Continue lesson',
                             style: V3Type.strong(15, DesignTokens.onPrimary),
@@ -1032,12 +1314,9 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
   Widget _coursePathCard() => V3Pressable(
     key: const ValueKey('learn.viewPath'),
     label: 'View course path',
-    onTap: () => setState(() {
-      _tab = 0;
-      _showPath = true;
-    }),
+    onTap: _showCoursePath,
     child: Container(
-      constraints: const BoxConstraints(minHeight: 86),
+      constraints: const BoxConstraints(minHeight: 74),
       decoration: BoxDecoration(
         color: DesignTokens.homePathCanvas,
         borderRadius: BorderRadius.circular(22),
@@ -1053,8 +1332,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
               bottom: -25,
               child: Image.asset(
                 'assets/images/learn_home_path.png',
-                width: 205,
-                height: 126,
+                width: 190,
+                height: 116,
                 fit: BoxFit.contain,
                 alignment: Alignment.bottomRight,
                 excludeFromSemantics: true,
@@ -1065,8 +1344,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
               child: Row(
                 children: [
                   Container(
-                    width: 54,
-                    height: 54,
+                    width: 48,
+                    height: 48,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: DesignTokens.primarySoft,
@@ -1096,25 +1375,14 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen> {
     ),
   );
 
-  Future<void> _openPracticeLibrary() async {
-    await AppRouter.push<void>(context, (_) => const LabsScreen());
-    if (mounted) unawaited(_load());
-  }
-
   // ---- Path --------------------------------------------------------------
 
-  List<Widget> _path() {
+  List<MapEntry<String, List<V3Lesson>>> _lessonGroups(List<V3Lesson> lessons) {
     final groups = <String, List<V3Lesson>>{};
-    for (final l in _course) {
+    for (final l in lessons) {
       groups.putIfAbsent(l.unit, () => []).add(l);
     }
-    final nextUnit = _next?.unit;
-    return [
-      for (final entry in groups.entries) ...[
-        _unitCard(entry.key, entry.value, entry.key == (_openUnit ?? nextUnit)),
-        const SizedBox(height: 10),
-      ],
-    ];
+    return groups.entries.toList();
   }
 
   Widget _unitCard(String unit, List<V3Lesson> lessons, bool open) {

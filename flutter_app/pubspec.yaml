@@ -26,6 +26,7 @@ dependencies:
   flutter_timezone: ^5.1.0
   timezone: ^0.11.1
   flutter_sound: ^9.30.0
+  web: ^1.1.0
   google_fonts: ^6.2.1
   flutter_animate: ^4.5.2
   flutter_svg: ^2.0.17
@@ -52,12 +53,11 @@ dependencies:
   # behavior on iOS, Android, and web.
   tutorial_coach_mark: ^1.2.13
   package_info_plus: ^8.1.2
-  # Live Vision Scan: camera capture, gallery/PDF import, on-device OCR, and
-  # Gemini image understanding for reading signs/menus/documents on the go.
+  # Media input packages are kept for the V4 Photo Tutor source. V3 has no
+  # active Photo Tutor route; its OCR dependency is intentionally excluded.
   camera: ^0.11.1
   image_picker: ^1.1.2
   file_picker: ^10.3.8
-  google_mlkit_text_recognition: ^0.15.0
   pdfx: ^2.9.1
   image: ^4.9.1
 
@@ -72,6 +72,12 @@ dev_dependencies:
   drift_dev: ^2.22.1
   # personalized_test_verification/ report generation only — never shipped.
   pdf: ^3.11.1
+
+dependency_overrides:
+  # 2.6.0 uses an Objective-C native asset that fails to load in this iOS
+  # CocoaPods build. Keep the last method-channel implementation until the
+  # native-assets loader works reliably in this app.
+  path_provider_foundation: 2.5.1
 
 flutter:
   uses-material-design: true

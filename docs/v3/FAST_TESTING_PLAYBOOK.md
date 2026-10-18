@@ -13,8 +13,10 @@ look at the screenshot, and never rerun a test that already passed.**
 1. Plan: write the screen contract or the rule in one paragraph (what must be true).
 2. Prove on the Mac first: `tool/check.sh --quick` (about 10 s), then the one
    focused `flutter test` file.
-3. Only if the change is about a real phone (taps, layout, audio route, build):
-   one device test on the wired iPhone, one at a time.
+3. If the change needs an app launch, run one Debug simulator test with
+   `tool/simulator.sh test integration_test/smoke_test.dart` when a physical
+   phone is unavailable. The script enforces one booted simulator. Use the
+   wired iPhone only when the behavior requires physical hardware.
 4. Look at the screenshots. A green test with a wrong picture is a failed test.
 5. Commit in small pieces. Push only when asked.
 
@@ -39,6 +41,11 @@ Rules that come from this checklist:
   - iPad (7th generation) `51a217780d70704c1f8e62e8000df51be95376a4` (the owner's study device)
   - A cable is much faster and more reliable than Wi-Fi. Builds and installs drop on Wi-Fi.
   - Prefer the iPhone for tests. The iPad has the learner's app: install over it only on purpose.
+- Simulator development uses the dedicated iPhone 17 Pro (ID and recovery
+  commands are in `BUILD_STRUCTURE.md`); keep only one simulator booted and use
+  Debug builds. On runtime instability or lag, the owner authorized erasing
+  that simulator with `tool/simulator.sh reset`. Reset does not fix compile or
+  test assertion failures.
 
 ## 2. The ladder: which test for which change
 
@@ -49,6 +56,11 @@ Rules that come from this checklist:
 | 1+ | `tool/check.sh` | about 40 to 100 s (684 tests) | the whole Mac suite; fails only on NEW failures vs the baseline files |
 | 2 | `tool/e2e.sh integration_test/<name>_test.dart <device-id> <max-seconds>` | 110 to 290 s wired | one real-device flow, with screenshots |
 | 3 | release build and install | 343 s (cold) | handing a build to the owner. Never an iteration loop |
+
+For a simulator build/launch proof, use `tool/simulator.sh test` (Debug only,
+one booted simulator, unique artifacts under `artifacts/simulator/`). Use
+`tool/simulator.sh run` for interactive development. Do not use Profile or
+Release for simulator iteration.
 
 Choose by the question you are asking:
 - "Is my logic right?" Tier 1, a pure function, no widgets. (Example: the review queue and the pledge copy are pure and have 12 and 11 tests that run in under a second.)
@@ -81,7 +93,9 @@ something a Tier 1 test can prove.
 
 Examples seen here: the old onboarding test waited for text that no longer exists (test wrong); skipping reminders threw `NOT NULL constraint failed: profiles.preferred_days` (app wrong, and a new user would have been stuck); `unit_two_authored_content_test.dart` asserts `lessThan(500)` ms and fails only when the Mac is busy (flaky).
 
-**Stop after two failed attempts at the same problem.** Write down the facts and ask the owner. Do not loop.
+**There is no fixed retry cap.** Read the latest evidence and change the
+diagnosis or test method on each run. Continue until the requested result works
+or progress requires owner-only access.
 
 ## 4. The machine: one heavy job at a time
 

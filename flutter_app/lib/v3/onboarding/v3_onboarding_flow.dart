@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
@@ -20,17 +21,20 @@ import '../../services/notification_permission_service.dart';
 import '../../services/notification_scheduler_service.dart';
 import '../../services/product_analytics.dart';
 import '../../services/trial_call_gate.dart';
+import '../tutors/v3_tutor_picker_sheet.dart';
 import '../ui/v3_ui.dart';
 
 /// Screen: V3 onboarding. Key prefix: onboarding.
 /// User arrived to: a fresh install of the TCF Canada course.
-/// They must understand: one course, one TCF goal, four skills, and Marie.
-/// Primary action: continue through the short value story, give a name, choose
-/// a level, and finish on a personal pledge.
-/// Secondary action: skip the optional name, exam date or reminder setup.
+/// They must understand: one guided French course, one TCF Canada goal, four
+/// exam skills, and personal speaking practice with the learner's chosen tutor.
+/// Primary action: continue through three concise value screens, then choose a
+/// level or keep the A1 default and continue through optional study details.
+/// Secondary action: skip the optional name, exam date or reminder step from
+/// the top-right header.
 /// Success state: preferences saved, then consent and account gates.
 /// Must not contain: extra profile questions, unsupported community claims,
-/// fake data, subtitles beyond one short line, or boxes where a row will do.
+/// fake data, static decorative motion, nested input outlines, or bottom skips.
 /// States: default, loading during reminder save, interrupted, completed.
 /// The words on the last onboarding screen. Pure, so every combination of
 /// name, exam date and reminder can be tested. It never promises a result: it
@@ -110,6 +114,25 @@ class OnboardingPledgeCopy {
   }
 }
 
+ThemeData _onboardingPalette(ThemeData theme) => theme.copyWith(
+  brightness: Brightness.light,
+  primaryColor: AppearanceColors.blueLight,
+  scaffoldBackgroundColor: AppearanceColors.lightSurface,
+  colorScheme: theme.colorScheme.copyWith(
+    brightness: Brightness.light,
+    primary: AppearanceColors.blueLight,
+    onPrimary: Colors.white,
+    secondary: AppearanceColors.blueLight,
+    onSecondary: Colors.white,
+    surface: AppearanceColors.lightSurface,
+    onSurface: AppearanceColors.lightText,
+  ),
+  textTheme: theme.textTheme.apply(
+    bodyColor: AppearanceColors.lightText,
+    displayColor: AppearanceColors.lightText,
+  ),
+);
+
 class V3OnboardingFlow extends ConsumerStatefulWidget {
   const V3OnboardingFlow({super.key, required this.onFinished});
 
@@ -119,7 +142,8 @@ class V3OnboardingFlow extends ConsumerStatefulWidget {
   ConsumerState<V3OnboardingFlow> createState() => _V3OnboardingFlowState();
 }
 
-class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
+class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow>
+    with TickerProviderStateMixin {
   static const _greetingPage = 0;
   static const _coursePage = 1;
   static const _practicePage = 3;
@@ -141,30 +165,132 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
   ];
 
   final _nameController = TextEditingController();
+  final _nameFocusNode = FocusNode();
+  late final AnimationController _roadmapMotion;
+  late final AnimationController _voiceWaveMotion;
   var _page = _greetingPage;
   var _finishing = false;
+  var _nameFocused = false;
   String? _level;
   DateTime? _examDate;
   TimeOfDay? _reminderTime;
   final _preferredDays = <String>{};
   var _notificationPermissionState = 'not_requested';
   var _savingReminders = false;
-  final _tutor = TutorPersona.defaultPersona;
+  late TutorPersona _tutor;
+
+  @override
+  void initState() {
+    super.initState();
+    _tutor = ActiveTutor.current;
+    _roadmapMotion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 7600),
+    );
+    _voiceWaveMotion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    );
+    _nameFocusNode.addListener(_nameFocusChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncMotionForPage(
+      _page,
+      reduceMotion: MediaQuery.of(context).disableAnimations,
+    );
+  }
+
+  void _nameFocusChanged() {
+    if (!mounted || _nameFocused == _nameFocusNode.hasFocus) return;
+    setState(() => _nameFocused = _nameFocusNode.hasFocus);
+  }
+
+  void _syncMotionForPage(int page, {required bool reduceMotion}) {
+    void sync(
+      AnimationController controller,
+      bool active, {
+      bool reverse = false,
+    }) {
+      if (!active || reduceMotion) {
+        controller.stop();
+        controller.value = 0;
+      } else if (!controller.isAnimating) {
+        controller.repeat(reverse: reverse);
+      }
+    }
+
+    sync(_roadmapMotion, page == _coursePage);
+    sync(_voiceWaveMotion, page == _practicePage, reverse: true);
+  }
 
   @override
   void dispose() {
+    _nameFocusNode.removeListener(_nameFocusChanged);
+    _nameFocusNode.dispose();
     _nameController.dispose();
+    _roadmapMotion.dispose();
+    _voiceWaveMotion.dispose();
     super.dispose();
   }
 
   void _go(int page) {
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() => _page = page.clamp(0, _pageCount - 1));
+    final nextPage = page.clamp(0, _pageCount - 1);
+    if (nextPage == _page) return;
+    _syncMotionForPage(
+      nextPage,
+      reduceMotion: MediaQuery.of(context).disableAnimations,
+    );
+    setState(() => _page = nextPage);
   }
 
   void _back() => _go(_page - 1);
 
   void _next() => _go(_page + 1);
+
+  Future<void> _chooseTutor() async {
+    final picked = await showV3TutorPickerSheet(
+      context: context,
+      selected: _tutor,
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _tutor = picked);
+  }
+
+  void _skipName() {
+    _nameController.clear();
+    _next();
+  }
+
+  void _skipExamDate() {
+    _examDate = null;
+    _next();
+  }
+
+  void _skipReminders() {
+    if (_savingReminders) return;
+    _reminderTime = null;
+    _preferredDays.clear();
+    _notificationPermissionState = 'not_requested';
+    _go(_pledgePage);
+  }
+
+  VoidCallback? _skipActionFor(int page) => switch (page) {
+    4 => _skipName,
+    5 => _skipExamDate,
+    7 => _savingReminders ? null : _skipReminders,
+    _ => null,
+  };
+
+  ValueKey<String>? _skipKeyFor(int page) => switch (page) {
+    4 => const ValueKey('onboarding.nameSkip'),
+    5 => const ValueKey('onboarding.examDateSkip'),
+    7 when !_savingReminders => const ValueKey('onboarding.remindersSkip'),
+    _ => null,
+  };
 
   Profile _profile() {
     return ref.read(learningStoreProvider).profile()
@@ -173,6 +299,7 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
       ..reminderTime = _reminderTime == null
           ? null
           : _wireReminderTime(_reminderTime!)
+      ..tcfExamDate = _examDate
       ..preferredDays = [
         for (final day in _weekdays)
           if (_preferredDays.contains(day.$1)) day.$1,
@@ -212,6 +339,7 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
         'has_exam_date': _examDate != null,
         'preferred_days_count': profile.preferredDays.length,
         'notification_permission_state': profile.notificationPermissionState,
+        'tutor_id': _tutor.id,
       },
     );
     await ActiveTutor.set(_tutor);
@@ -228,6 +356,8 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
       initialDate: _examDate ?? today.add(const Duration(days: 60)),
       firstDate: today,
       lastDate: today.add(const Duration(days: 730)),
+      builder: (context, child) =>
+          Theme(data: _onboardingPalette(Theme.of(context)), child: child!),
     );
     if (picked != null && mounted) setState(() => _examDate = picked);
   }
@@ -236,6 +366,8 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     final picked = await showTimePicker(
       context: context,
       initialTime: _reminderTime ?? const TimeOfDay(hour: 19, minute: 0),
+      builder: (context, child) =>
+          Theme(data: _onboardingPalette(Theme.of(context)), child: child!),
     );
     if (picked != null && mounted) setState(() => _reminderTime = picked);
   }
@@ -289,60 +421,63 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     final reduce = MediaQuery.of(context).disableAnimations;
     final fade = reduce ? Duration.zero : const Duration(milliseconds: 460);
     final ink = blue ? Colors.white : AppearanceColors.blueDeep;
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: (blue || DesignTokens.isDark)
-          ? SystemUiOverlayStyle.light
-          : SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        backgroundColor: AppearanceColors.lightSurface,
-        resizeToAvoidBottomInset: false,
-        body: AnimatedContainer(
-          duration: fade,
-          curve: Curves.easeOutCubic,
-          color: blue
-              ? AppearanceColors.blueLight
-              : AppearanceColors.lightSurface,
-          child: V3Width(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: AnimatedSwitcher(
-                    duration: fade,
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, animation) => FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(0.03, 0),
-                          end: Offset.zero,
-                        ).animate(animation),
-                        child: child,
+    return Theme(
+      data: _onboardingPalette(Theme.of(context)),
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: blue ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        child: Scaffold(
+          backgroundColor: AppearanceColors.lightSurface,
+          resizeToAvoidBottomInset: false,
+          body: AnimatedContainer(
+            duration: fade,
+            curve: Curves.easeOutCubic,
+            color: blue
+                ? AppearanceColors.blueLight
+                : AppearanceColors.lightSurface,
+            child: V3Width(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: AnimatedSwitcher(
+                      duration: fade,
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.03, 0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      ),
+                      child: KeyedSubtree(
+                        key: ValueKey(_page),
+                        child: _pageFor(_page),
                       ),
                     ),
-                    child: KeyedSubtree(
-                      key: ValueKey(_page),
-                      child: _pageFor(_page),
+                  ),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(
+                      bottom: false,
+                      child: _OnboardingChrome(
+                        progress: _page == _greetingPage
+                            ? 0
+                            : (_page + 1) / _pageCount,
+                        color: ink,
+                        onBack: _page > _greetingPage ? _back : null,
+                        onSkip: _skipActionFor(_page),
+                        skipKey: _skipKeyFor(_page),
+                        showMark: true,
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: SafeArea(
-                    bottom: false,
-                    child: _OnboardingChrome(
-                      progress: _page == _greetingPage
-                          ? 0
-                          : (_page + 1) / _pageCount,
-                      color: ink,
-                      onBack: _page > _greetingPage ? _back : null,
-                      showMark: true,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -363,11 +498,20 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Spacer(),
+          const Spacer(flex: 5),
           V3FadeIn(
-            child: Text(
-              'One clear course.',
-              style: V3Type.hero(46, color: Colors.white),
+            child: SizedBox(
+              width: double.infinity,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'One clear course.',
+                  maxLines: 1,
+                  softWrap: false,
+                  style: V3Type.hero(46, color: Colors.white),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -378,15 +522,18 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
               style: V3Type.body(19, Colors.white.withValues(alpha: 0.9)),
             ),
           ),
-          const Spacer(),
-          _courseLevelPath(),
-          const Spacer(),
+          const Spacer(flex: 2),
+          Transform.translate(
+            offset: const Offset(0, -10),
+            child: _courseLevelPath(),
+          ),
+          const Spacer(flex: 3),
           _OnboardingCTA(
             key: const ValueKey('onboarding.courseContinue'),
             label: 'Continue',
             onTap: _next,
-            background: AppearanceColors.blueLight,
-            foreground: Colors.white,
+            background: Colors.white,
+            foreground: AppearanceColors.blueDeep,
           ),
         ],
       ),
@@ -395,59 +542,67 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
 
   Widget _courseLevelPath() {
     const levels = ['A1', 'A2', 'B1', 'B2'];
+    final pathHeight = MediaQuery.of(context).size.height < 700 ? 245.0 : 338.0;
     return SizedBox(
-      height: 70,
+      height: pathHeight,
       child: LayoutBuilder(
         builder: (context, box) {
-          final slot = box.maxWidth / levels.length;
-          return Stack(
-            children: [
-              Positioned(
-                left: slot / 2,
-                right: slot / 2,
-                top: 13,
-                child: Container(
-                  height: 3,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              Row(
+          final size = Size(box.maxWidth, box.maxHeight);
+          final points = _courseWaypoints(size);
+          const labelOffsets = [
+            Offset(12, 11),
+            Offset(14, 10),
+            Offset(-28, -31),
+            Offset(13, 10),
+          ];
+          return AnimatedBuilder(
+            animation: _roadmapMotion,
+            child: SizedBox.expand(
+              child: Stack(
+                clipBehavior: Clip.hardEdge,
                 children: [
-                  for (final level in levels)
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(level, style: V3Type.strong(17, Colors.white)),
-                        ],
+                  for (var i = 0; i < levels.length; i++)
+                    Positioned(
+                      left: (points[i].dx + labelOffsets[i].dx)
+                          .clamp(0.0, size.width - 36)
+                          .toDouble(),
+                      top: (points[i].dy + labelOffsets[i].dy)
+                          .clamp(0.0, size.height - 24)
+                          .toDouble(),
+                      child: Text(
+                        levels[i],
+                        style: V3Type.strong(15, Colors.white),
                       ),
                     ),
                 ],
               ),
-            ],
+            ),
+            builder: (context, child) => CustomPaint(
+              painter: _CourseRoadmapPainter(
+                points: points,
+                progress: _roadmapMotion.value,
+              ),
+              child: child,
+            ),
           );
         },
       ),
     );
   }
 
+  List<Offset> _courseWaypoints(Size size) => [
+    Offset(size.width * 0.1, size.height * 0.82),
+    Offset(size.width * 0.63, size.height * 0.69),
+    Offset(size.width * 0.37, size.height * 0.35),
+    Offset(size.width * 0.88, size.height * 0.22),
+  ];
+
   // ---- 3 One goal: TCF Canada ------------------------------------------
 
   Widget _goalScreen() {
     const skills = [
-      (Icons.hearing_rounded, 'Listening'),
-      (Icons.record_voice_over_rounded, 'Speaking'),
+      (Icons.headphones_rounded, 'Listening'),
+      (Icons.mic_none_rounded, 'Speaking'),
       (Icons.menu_book_rounded, 'Reading'),
       (Icons.edit_note_rounded, 'Writing'),
     ];
@@ -465,14 +620,21 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
             ),
           ),
           const SizedBox(height: 28),
-          for (var i = 0; i < skills.length; i++)
-            _skillRow(
-              icon: skills[i].$1,
-              label: skills[i].$2,
-              color: AppearanceColors.blueDeep,
-              divider: i != skills.length - 1,
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                for (var i = 0; i < skills.length; i++)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: i == skills.length - 1 ? 0 : 10,
+                    ),
+                    child: _skillRow(icon: skills[i].$1, label: skills[i].$2),
+                  ),
+              ],
             ),
-          const Spacer(),
+          ),
+          const SizedBox(height: 16),
           _OnboardingCTA(
             key: const ValueKey('onboarding.goalContinue'),
             label: 'Continue',
@@ -485,7 +647,7 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     );
   }
 
-  // ---- 4 Practice with Marie -------------------------------------------
+  // ---- 4 Choose a tutor -------------------------------------------------
 
   Widget _practiceScreen() {
     return V3Screen(
@@ -494,12 +656,10 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Spacer(),
-          const Center(child: _VoiceWave(color: Colors.white)),
-          const SizedBox(height: 40),
+          const Spacer(flex: 3),
           V3FadeIn(
             child: Text(
-              'Practice every lesson with Marie.',
+              'Practice every lesson with ${_tutor.displayName}.',
               style: V3Type.hero(42, color: Colors.white),
             ),
           ),
@@ -507,10 +667,76 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
           V3FadeIn(
             delayMs: 100,
             child: Text(
-              'Learn with confidence, guided by Marie.',
+              'Pick a voice for your French practice.',
               style: V3Type.body(19, Colors.white.withValues(alpha: 0.9)),
             ),
           ),
+          const Spacer(flex: 2),
+          V3Pressable(
+            key: const ValueKey('onboarding.tutor.choose'),
+            label:
+                'Choose tutor. Current choice: ${_tutor.displayName}, ${_tutor.accent.label}.',
+            onTap: _chooseTutor,
+            child: AnimatedContainer(
+              duration: DesignTokens.durationFast,
+              constraints: const BoxConstraints(minHeight: 76),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.24)),
+              ),
+              child: Row(
+                children: [
+                  ClipOval(
+                    child: Image.asset(
+                      _tutor.portraitAsset,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _tutor.displayName,
+                          style: V3Type.strong(16, Colors.white),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${_tutor.tagline} · ${_tutor.accent.label}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: V3Type.body(
+                            12,
+                            Colors.white.withValues(alpha: 0.82),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.chevron_right_rounded, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+          const Spacer(),
+          AnimatedBuilder(
+            animation: _voiceWaveMotion,
+            builder: (context, _) => Center(
+              child: _VoiceWave(
+                color: Colors.white,
+                phase: Curves.easeInOutSine.transform(_voiceWaveMotion.value),
+              ),
+            ),
+          ),
+          const Spacer(flex: 2),
           const Spacer(),
           _OnboardingCTA(
             key: const ValueKey('onboarding.practiceContinue'),
@@ -524,23 +750,19 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
     );
   }
 
-  Widget _skillRow({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required bool divider,
-  }) {
+  Widget _skillRow({required IconData icon, required String label}) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 54),
+      width: double.infinity,
+      constraints: const BoxConstraints(minHeight: 60),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       decoration: BoxDecoration(
-        border: divider
-            ? Border(bottom: BorderSide(color: AppearanceColors.lightHairline))
-            : null,
+        color: AppearanceColors.blueSoftLight,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 21, color: color),
-          const SizedBox(width: 12),
+          Icon(icon, size: 22, color: AppearanceColors.blueDeep),
+          const SizedBox(width: 14),
           Expanded(
             child: Text(
               label,
@@ -567,7 +789,7 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
             style: V3Type.title(34, color: AppearanceColors.lightText),
           ),
           const SizedBox(height: 20),
-          V3OptionCard(
+          _OnboardingChoice(
             key: const ValueKey('onboarding.examDate'),
             title: _examDate == null
                 ? 'Choose an estimated date'
@@ -576,20 +798,17 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
                   ).formatMediumDate(_examDate!),
             selected: _examDate != null,
             onTap: _pickExamDate,
+            trailingIcon: _examDate == null
+                ? Icons.calendar_today_rounded
+                : Icons.check_rounded,
           ),
           const Spacer(),
-          V3Button(
+          _OnboardingCTA(
             key: const ValueKey('onboarding.examDateContinue'),
             label: 'Continue',
             onTap: _next,
-          ),
-          V3TextAction(
-            key: const ValueKey('onboarding.examDateSkip'),
-            label: 'Skip for now',
-            onTap: () {
-              setState(() => _examDate = null);
-              _next();
-            },
+            background: AppearanceColors.blueLight,
+            foreground: Colors.white,
           ),
         ],
       ),
@@ -617,7 +836,7 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
               padding: EdgeInsets.zero,
               children: [
                 for (final level in levels) ...[
-                  V3OptionCard(
+                  _OnboardingChoice(
                     key: ValueKey('onboarding.level.${level.$1}'),
                     title: level.$2,
                     selected: _level == level.$1,
@@ -629,10 +848,13 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
             ),
           ),
           const SizedBox(height: 8),
-          V3Button(
+          _OnboardingCTA(
             key: const ValueKey('onboarding.levelContinue'),
             label: 'Continue',
-            onTap: _level == null ? null : _next,
+            // A learner who is unsure can continue; their course starts at A1.
+            onTap: _next,
+            background: AppearanceColors.blueLight,
+            foreground: Colors.white,
           ),
         ],
       ),
@@ -642,6 +864,8 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
   // ---- 7 Learning reminders --------------------------------------------
 
   Widget _remindersStep() {
+    final hasCompleteReminder =
+        _reminderTime != null && _preferredDays.isNotEmpty;
     return V3Screen(
       background: Colors.transparent,
       padding: _pagePadding,
@@ -671,34 +895,23 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
           const SizedBox(height: 24),
           Text('TIME', style: V3Type.eyebrow(AppearanceColors.lightMuted)),
           const SizedBox(height: 10),
-          V3OptionCard(
+          _OnboardingChoice(
             key: const ValueKey('onboarding.reminderTime'),
             title: _reminderTime?.format(context) ?? 'Choose a time',
             selected: _reminderTime != null,
             onTap: _pickReminderTime,
+            trailingIcon: Icons.schedule_rounded,
           ),
           const Spacer(),
-          V3Button(
+          _OnboardingCTA(
             key: const ValueKey('onboarding.remindersSave'),
-            label: 'Save reminders',
-            onTap: _reminderTime == null || _preferredDays.isEmpty
-                ? null
-                : _saveReminders,
+            label: hasCompleteReminder ? 'Save reminders' : 'Continue',
+            // Reminders are optional. Incomplete selections are discarded so
+            // no partial schedule is persisted and no permission is requested.
+            onTap: hasCompleteReminder ? _saveReminders : _skipReminders,
+            background: AppearanceColors.blueLight,
+            foreground: Colors.white,
             loading: _savingReminders,
-          ),
-          V3TextAction(
-            key: const ValueKey('onboarding.remindersSkip'),
-            label: 'Skip for now',
-            onTap: _savingReminders
-                ? null
-                : () {
-                    setState(() {
-                      _reminderTime = null;
-                      _preferredDays.clear();
-                      _notificationPermissionState = 'not_requested';
-                    });
-                    _go(_pledgePage);
-                  },
           ),
         ],
       ),
@@ -745,7 +958,6 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
   // ---- Name -------------------------------------------------------------
 
   Widget _nameStep() {
-    final hasName = _nameController.text.trim().isNotEmpty;
     return V3Screen(
       background: Colors.transparent,
       padding: _pagePadding,
@@ -758,47 +970,56 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
             style: V3Type.title(34, color: AppearanceColors.lightText),
           ),
           const SizedBox(height: 22),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            constraints: const BoxConstraints(minHeight: 58),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            constraints: const BoxConstraints(minHeight: 64),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppearanceColors.lightHairline),
+              color: AppearanceColors.lightCanvas,
+              borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
+              border: Border.all(
+                color: _nameFocused
+                    ? AppearanceColors.blueLight
+                    : AppearanceColors.lightHairline,
+                width: _nameFocused ? 1.6 : 1,
+              ),
             ),
             child: TextField(
               key: const ValueKey('onboarding.name'),
               controller: _nameController,
+              focusNode: _nameFocusNode,
               textCapitalization: TextCapitalization.words,
               textInputAction: TextInputAction.done,
               autofillHints: const [AutofillHints.givenName],
               inputFormatters: [LengthLimitingTextInputFormatter(30)],
               onChanged: (_) => setState(() {}),
-              onSubmitted: (_) {
-                if (_nameController.text.trim().isNotEmpty) _next();
-              },
+              onSubmitted: (_) => _next(),
               style: V3Type.strong(18, AppearanceColors.lightText),
               cursorColor: AppearanceColors.blueLight,
-              decoration: InputDecoration.collapsed(
+              decoration: InputDecoration(
                 hintText: 'First name',
                 hintStyle: V3Type.body(18, AppearanceColors.lightMuted),
+                // AppTheme fills text fields by default. Keep the decoration
+                // transparent so it does not draw a second rectangle inside
+                // the rounded onboarding field.
+                filled: false,
+                fillColor: Colors.transparent,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isCollapsed: true,
               ),
             ),
           ),
           const Spacer(),
-          V3Button(
+          _OnboardingCTA(
             key: const ValueKey('onboarding.nameContinue'),
             label: 'Continue',
-            onTap: hasName ? _next : null,
-          ),
-          V3TextAction(
-            key: const ValueKey('onboarding.nameSkip'),
-            label: 'Skip for now',
-            onTap: () {
-              _nameController.clear();
-              _next();
-            },
+            onTap: _next,
+            background: AppearanceColors.blueLight,
+            foreground: Colors.white,
           ),
         ],
       ),
@@ -856,6 +1077,188 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow> {
       ),
     );
   }
+}
+
+class _CourseRoadmapPainter extends CustomPainter {
+  const _CourseRoadmapPainter({required this.points, required this.progress});
+
+  static const _roadEdge = AppearanceColors.lightSurface;
+  static const _roadSurface = AppearanceColors.lightRaised;
+  static const _roadDash = AppearanceColors.lightSurface;
+
+  final List<Offset> points;
+
+  /// Raw, forward-only cycle progress. The traveler reaches B2, fades, then
+  /// starts again at A1; it never travels backwards down the course.
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    // Build a Catmull–Rom style spline through the milestone centers. Each
+    // segment derives its handles from the neighboring points, so the curve
+    // changes direction gradually instead of forming hand-tuned corners.
+    for (var i = 0; i < points.length - 1; i++) {
+      final start = points[i];
+      final end = points[i + 1];
+      final before = i == 0 ? start - (end - start) : points[i - 1];
+      final after = i + 2 == points.length
+          ? end + (end - start)
+          : points[i + 2];
+      final control1 = start + (end - before) * (1 / 6);
+      final control2 = end - (after - start) * (1 / 6);
+      path.cubicTo(
+        control1.dx,
+        control1.dy,
+        control2.dx,
+        control2.dy,
+        end.dx,
+        end.dy,
+      );
+    }
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+
+    final metrics = path.computeMetrics().toList();
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = _roadEdge.withValues(alpha: 0.86)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 14
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = _roadSurface.withValues(alpha: 0.88)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 10
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+
+    // The fine center marks keep the route legible without making it read as
+    // a wide, heavy pavement graphic.
+    for (final metric in metrics) {
+      for (var offset = 0.0; offset < metric.length; offset += 13) {
+        final end = math.min(offset + 5.5, metric.length);
+        canvas.drawPath(
+          metric.extractPath(offset, end),
+          Paint()
+            ..color = _roadDash.withValues(alpha: 0.72)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5
+            ..strokeCap = StrokeCap.round,
+        );
+      }
+    }
+
+    final finish = points.last;
+    canvas.drawLine(
+      Offset(finish.dx, finish.dy - 8),
+      Offset(finish.dx, finish.dy - 28),
+      Paint()
+        ..color = Colors.white
+        ..strokeWidth = 2
+        ..strokeCap = StrokeCap.round,
+    );
+    final flag = Path()
+      ..moveTo(finish.dx + 1, finish.dy - 27)
+      ..lineTo(finish.dx + 16, finish.dy - 23)
+      ..lineTo(finish.dx + 1, finish.dy - 19)
+      ..close();
+    canvas.drawPath(flag, Paint()..color = Colors.white);
+
+    for (final point in points) {
+      canvas.drawCircle(point, 11, Paint()..color = Colors.white);
+    }
+
+    if (metrics.isNotEmpty) {
+      final metric = metrics.first;
+      final travelProgress = Curves.easeInOutCubic.transform(
+        (progress / 0.84).clamp(0.0, 1.0).toDouble(),
+      );
+      final traveler = metric.getTangentForOffset(
+        metric.length * travelProgress,
+      );
+      if (traveler != null) {
+        final green = AppearanceColors.successDark;
+        final travelerOpacity = (1 - ((progress - 0.86) / 0.1).clamp(0.0, 1.0))
+            .toDouble();
+        canvas.drawCircle(
+          traveler.position,
+          13,
+          Paint()..color = green.withValues(alpha: 0.16 * travelerOpacity),
+        );
+        canvas.drawCircle(
+          traveler.position,
+          7.5,
+          Paint()..color = green.withValues(alpha: travelerOpacity),
+        );
+        canvas.drawCircle(
+          traveler.position,
+          7.5,
+          Paint()
+            ..color = Colors.white.withValues(alpha: travelerOpacity)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5,
+        );
+        canvas.drawCircle(
+          traveler.position,
+          2.2,
+          Paint()..color = Colors.white.withValues(alpha: travelerOpacity),
+        );
+      }
+    }
+
+    final burstProgress = ((progress - 0.84) / 0.14).clamp(0.0, 1.0).toDouble();
+    final burstOpacity = math.sin(math.pi * burstProgress);
+    if (burstOpacity > 0) {
+      // A small radial sparkle around the finish flag. Round points and fine
+      // strokes feel celebratory while staying quiet against the blue screen.
+      const rays = [
+        (-2.85, 9.0, 5.0),
+        (-2.35, 15.0, 6.0),
+        (-1.92, 11.0, 4.0),
+        (-1.48, 18.0, 6.0),
+        (-1.05, 12.0, 5.0),
+        (-0.62, 20.0, 6.0),
+        (-0.16, 10.0, 4.0),
+        (0.38, 16.0, 5.0),
+      ];
+      final origin = Offset(finish.dx + 1, finish.dy - 25);
+      final spread = Curves.easeOutCubic.transform(burstProgress);
+      for (var i = 0; i < rays.length; i++) {
+        final (angle, baseRadius, baseLength) = rays[i];
+        final startRadius = 2 + baseRadius * spread;
+        final endRadius = startRadius + baseLength * spread;
+        final direction = Offset(math.cos(angle), math.sin(angle));
+        final start = origin + direction * startRadius;
+        final end = origin + direction * endRadius;
+        final color = i.isEven ? Colors.white : AppearanceColors.successDark;
+        canvas.drawLine(
+          start,
+          end,
+          Paint()
+            ..color = color.withValues(alpha: 0.78 * burstOpacity)
+            ..strokeWidth = 1.6
+            ..strokeCap = StrokeCap.round,
+        );
+        canvas.drawCircle(
+          end,
+          1.4,
+          Paint()..color = color.withValues(alpha: burstOpacity),
+        );
+      }
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _CourseRoadmapPainter oldDelegate) =>
+      oldDelegate.points != points || oldDelegate.progress != progress;
 }
 
 /// First screen, as approved: a white page, the big blue greeting with the
@@ -938,7 +1341,7 @@ class _GreetingIntroState extends State<_GreetingIntro> {
           V3FadeIn(
             delayMs: 520,
             child: Text(
-              'Your French, ready for TCF Canada.',
+              'Let’s build your French for TCF Canada.',
               style: V3Type.title(26, color: blue),
             ),
           ),
@@ -964,12 +1367,16 @@ class _OnboardingChrome extends StatelessWidget {
     required this.progress,
     required this.color,
     required this.onBack,
+    required this.onSkip,
+    required this.skipKey,
     required this.showMark,
   });
 
   final double progress;
   final Color color;
   final VoidCallback? onBack;
+  final VoidCallback? onSkip;
+  final Key? skipKey;
   final bool showMark;
 
   @override
@@ -1018,6 +1425,23 @@ class _OnboardingChrome extends StatelessWidget {
                 const SizedBox(width: 9),
                 Text('ParleSprint', style: V3Type.strong(15, color)),
               ],
+              if (onSkip != null) ...[
+                const Spacer(),
+                V3Pressable(
+                  key: skipKey,
+                  label: 'Skip',
+                  onTap: onSkip,
+                  child: SizedBox(
+                    height: 44,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Center(
+                        child: Text('Skip', style: V3Type.strong(15, color)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -1062,29 +1486,130 @@ class _OnboardingCTA extends StatelessWidget {
     required this.onTap,
     required this.background,
     required this.foreground,
+    this.loading = false,
   });
 
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Color background;
   final Color foreground;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null && !loading;
+    final contentColor = enabled
+        ? foreground
+        : foreground.withValues(alpha: 0.72);
+    return V3Pressable(
+      label: label,
+      onTap: enabled ? onTap : null,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 62),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                loading ? 'One moment' : label,
+                style: V3Type.strong(16, contentColor),
+              ),
+            ),
+            if (loading)
+              SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: contentColor,
+                ),
+              )
+            else
+              Icon(Icons.arrow_forward_rounded, size: 22, color: contentColor),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OnboardingChoice extends StatelessWidget {
+  const _OnboardingChoice({
+    super.key,
+    required this.title,
+    required this.selected,
+    required this.onTap,
+    this.trailingIcon,
+  });
+
+  final String title;
+  final bool selected;
+  final VoidCallback? onTap;
+  final IconData? trailingIcon;
 
   @override
   Widget build(BuildContext context) {
     return V3Pressable(
-      label: label,
+      label: title,
       onTap: onTap,
-      child: Container(
-        constraints: const BoxConstraints(minHeight: 58),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        constraints: const BoxConstraints(minHeight: 60),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
-          color: background,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: selected
+                ? AppearanceColors.blueLight
+                : AppearanceColors.lightHairline,
+            width: selected ? 1.5 : 1,
+          ),
         ),
         child: Row(
           children: [
-            Expanded(child: Text(label, style: V3Type.strong(16, foreground))),
-            Icon(Icons.arrow_forward_rounded, size: 22, color: foreground),
+            Expanded(
+              child: Text(
+                title,
+                style: V3Type.strong(17, AppearanceColors.lightText),
+              ),
+            ),
+            if (trailingIcon != null)
+              Icon(
+                trailingIcon,
+                size: 21,
+                color: selected
+                    ? AppearanceColors.blueDeep
+                    : AppearanceColors.blueLight,
+              )
+            else
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: selected ? AppearanceColors.blueLight : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected
+                        ? AppearanceColors.blueLight
+                        : AppearanceColors.lightHairline,
+                    width: 1.5,
+                  ),
+                ),
+                child: selected
+                    ? const Icon(
+                        Icons.check_rounded,
+                        size: 15,
+                        color: Colors.white,
+                      )
+                    : null,
+              ),
           ],
         ),
       ),
@@ -1093,42 +1618,88 @@ class _OnboardingCTA extends StatelessWidget {
 }
 
 class _VoiceWave extends StatelessWidget {
-  const _VoiceWave({required this.color});
+  const _VoiceWave({required this.color, required this.phase});
 
   final Color color;
+  final double phase;
 
   @override
   Widget build(BuildContext context) {
-    const heights = [18.0, 30.0, 42.0, 26.0, 36.0, 20.0, 32.0];
     return ExcludeSemantics(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          for (final height in heights)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: Container(
-                width: 4,
-                height: height,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-        ],
+      child: SizedBox(
+        width: math.min(MediaQuery.sizeOf(context).width - 88, 390).toDouble(),
+        height: 132,
+        child: CustomPaint(
+          painter: _VoiceWavePainter(color: color, phase: phase),
+        ),
       ),
     );
   }
 }
 
-/// Screen: post-sign-in Marie practice. Key prefix: onboarding.trial.
-/// User arrived to: a new account after TCF onboarding and AI consent.
-/// They must understand: a short voice practice is optional and uses audio.
-/// Primary action: start the three-minute practice with Marie.
-/// Secondary action: continue to the course without the practice.
-/// Success state: trial ends and the learner enters the course.
+class _VoiceWavePainter extends CustomPainter {
+  const _VoiceWavePainter({required this.color, required this.phase});
+
+  final Color color;
+  final double phase;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const barCount = 27;
+    final step = size.width / barCount;
+    final barWidth = math.min(5.0, step * 0.34).toDouble();
+    final centerY = size.height / 2;
+    final peaks = [
+      (0.12, 0.42),
+      (0.29, 0.78),
+      (0.47, 0.57),
+      (0.67, 1.0),
+      (0.86, 0.48),
+    ];
+
+    for (var i = 0; i < barCount; i++) {
+      final x = (i + 0.5) / barCount;
+      var envelope = 0.0;
+      for (final peak in peaks) {
+        final width = peak.$1 == 0.67 ? 0.095 : 0.085;
+        final distance = (x - peak.$1) / width;
+        final shape = peak.$2 * math.exp(-distance * distance * 0.5);
+        envelope = math.max(envelope, shape).toDouble();
+      }
+      final syllable =
+          0.56 +
+          0.44 *
+              (0.5 +
+                  0.5 *
+                      math.sin((phase * math.pi * 2.6) - (x * math.pi * 2.2)));
+      final height = 5 + 78 * envelope * syllable;
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: Offset(step * (i + 0.5), centerY),
+          width: barWidth,
+          height: height,
+        ),
+        Radius.circular(barWidth / 2),
+      );
+      canvas.drawRRect(rect, Paint()..color = color);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _VoiceWavePainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.phase != phase;
+}
+
+/// Screen: onboarding tutor practice. Key prefix: onboarding.trial.
+/// User arrived to: finish onboarding after choosing a tutor and accepting
+/// the AI audio consent.
+/// They must understand: the optional voice practice lasts three minutes and
+/// sends audio to Google.
+/// Primary action: start the three-minute practice with the chosen tutor.
+/// Secondary action: skip practice and continue to save progress with an
+/// account.
+/// Success state: practice ends and an unsigned learner is asked to create an
+/// account before entering the course.
 /// Must not contain: score promises, pressure, or hidden audio use.
 /// States: default, connecting, interrupted, completed.
 class V3OnboardingTrialOffer extends ConsumerStatefulWidget {
@@ -1141,14 +1712,53 @@ class V3OnboardingTrialOffer extends ConsumerStatefulWidget {
       _V3OnboardingTrialOfferState();
 }
 
-class _V3OnboardingTrialOfferState
-    extends ConsumerState<V3OnboardingTrialOffer> {
-  final _tutor = TutorPersona.defaultPersona;
+class _V3OnboardingTrialOfferState extends ConsumerState<V3OnboardingTrialOffer>
+    with SingleTickerProviderStateMixin {
+  late final TutorPersona _tutor;
+  late final AnimationController _waveMotion;
   var _starting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tutor = ActiveTutor.current;
+    _waveMotion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncWaveMotion();
+  }
+
+  void _syncWaveMotion() {
+    if (_starting || MediaQuery.of(context).disableAnimations) {
+      _waveMotion.stop();
+      _waveMotion.value = 0;
+    } else if (!_waveMotion.isAnimating) {
+      _waveMotion.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _waveMotion.dispose();
+    super.dispose();
+  }
+
+  void _skipPractice() {
+    if (_starting) return;
+    _waveMotion.stop();
+    widget.onComplete();
+  }
 
   Future<void> _startPractice() async {
     if (_starting) return;
     setState(() => _starting = true);
+    _syncWaveMotion();
     final profile = ref.read(learningStoreProvider).profile();
     final level = profile.level;
     final goal = profile.goal;
@@ -1194,7 +1804,10 @@ class _V3OnboardingTrialOfferState
       );
     } catch (_) {
       await TrialCallGate.releaseIfNeverConnected(connected: false);
-      if (mounted) setState(() => _starting = false);
+      if (mounted) {
+        setState(() => _starting = false);
+        _syncWaveMotion();
+      }
       return;
     }
 
@@ -1207,65 +1820,96 @@ class _V3OnboardingTrialOfferState
     if (result == null || !result.connected) {
       await TrialCallGate.releaseIfNeverConnected(connected: false);
     }
-    if (mounted) widget.onComplete();
+    if (mounted) {
+      _waveMotion.stop();
+      widget.onComplete();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return V3Screen(
-      background: AppearanceColors.lightSurface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Theme(
+      data: _onboardingPalette(Theme.of(context)),
+      child: V3Width(
+        child: V3Screen(
+          background: AppearanceColors.lightSurface,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Image.asset(
-                  'assets/images/parlesprint_app_icon.png',
-                  excludeFromSemantics: true,
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Image.asset(
+                      'assets/images/parlesprint_app_icon.png',
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'ParleSprint',
+                    style: V3Type.strong(16, AppearanceColors.blueDeep),
+                  ),
+                  const Spacer(),
+                  V3Pressable(
+                    key: const ValueKey('onboarding.trial.skip'),
+                    label: 'Skip practice',
+                    onTap: _starting ? null : _skipPractice,
+                    child: SizedBox(
+                      height: 48,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Center(
+                          child: Text(
+                            'Skip practice',
+                            style: V3Type.strong(14, AppearanceColors.blueDeep),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              AnimatedBuilder(
+                animation: _waveMotion,
+                builder: (context, _) => Center(
+                  child: _VoiceWave(
+                    color: AppearanceColors.blueLight,
+                    phase: Curves.easeInOutSine.transform(_waveMotion.value),
+                  ),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(height: 36),
               Text(
-                'ParleSprint',
-                style: V3Type.strong(16, AppearanceColors.blueDeep),
+                'Try ${_tutor.displayName} for 3 minutes.',
+                style: V3Type.title(36, color: AppearanceColors.lightText),
+              ),
+              const SizedBox(height: 10),
+              Text('Speak with confidence.', style: V3Type.body(18)),
+              const SizedBox(height: 22),
+              Text(
+                'Your voice is sent to Google for this practice.',
+                style: V3Type.body(13, AppearanceColors.lightMuted),
+              ),
+              const Spacer(),
+              _OnboardingCTA(
+                key: const ValueKey('onboarding.trial.start'),
+                label: 'Start 3-minute practice',
+                loading: _starting,
+                onTap: _starting ? null : _startPractice,
+                background: AppearanceColors.blueLight,
+                foreground: Colors.white,
               ),
             ],
           ),
-          const Spacer(),
-          const Center(child: _VoiceWave(color: AppearanceColors.blueLight)),
-          const SizedBox(height: 36),
-          Text(
-            'Try Marie for 3 minutes.',
-            style: V3Type.title(36, color: AppearanceColors.lightText),
-          ),
-          const SizedBox(height: 10),
-          Text('Speak with confidence.', style: V3Type.body(18)),
-          const SizedBox(height: 22),
-          Text(
-            'Your voice is sent to Google for this practice.',
-            style: V3Type.body(13, AppearanceColors.lightMuted),
-          ),
-          const Spacer(),
-          V3Button(
-            key: const ValueKey('onboarding.trial.start'),
-            label: 'Start 3-minute practice',
-            loading: _starting,
-            onTap: _starting ? null : _startPractice,
-          ),
-          V3TextAction(
-            key: const ValueKey('onboarding.trial.skip'),
-            label: 'Start learning',
-            onTap: _starting ? null : widget.onComplete,
-          ),
-        ],
+        ),
       ),
     );
   }

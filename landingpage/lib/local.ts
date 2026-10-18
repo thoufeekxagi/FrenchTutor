@@ -1,0 +1,7 @@
+export type SavedWord = { id: string; text: string; meaning: string; sentence: string; updatedAt: string; deleted?: boolean };
+export type Preferences = { level: "A1" | "A2" | "B1" | "B2"; largeText: boolean; reducedMotion: boolean; analytics: boolean };
+export const defaultPreferences: Preferences = { level: "A1", largeText: false, reducedMotion: false, analytics: false };
+export function readLocal<T>(key: string, fallback: T): T { try { const value = localStorage.getItem(key); return value ? JSON.parse(value) : fallback; } catch { return fallback; } }
+export function writeLocal(key: string, value: unknown) { localStorage.setItem(key, JSON.stringify(value)); }
+export function mergeWords(local: SavedWord[], remote: SavedWord[]) { const map = new Map<string, SavedWord>(); for (const w of [...remote, ...local]) { if (!w || typeof w.id !== "string" || typeof w.text !== "string" || typeof w.meaning !== "string" || typeof w.sentence !== "string" || !Number.isFinite(Date.parse(w.updatedAt))) continue; const old=map.get(w.id); if(!old || Date.parse(w.updatedAt)>Date.parse(old.updatedAt)) map.set(w.id,w); } return [...map.values()].slice(-2000); }
+export function wordsToCsv(words: SavedWord[]) { const field=(s:string)=>'"'+s.replace(/"/g,'""')+'"'; return "\uFEFFFrench,Meaning,Context\r\n"+words.filter(w=>!w.deleted).map(w=>[w.text,w.meaning,w.sentence].map(field).join(",")).join("\r\n"); }

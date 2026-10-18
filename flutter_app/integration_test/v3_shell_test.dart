@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart' show ValueKey;
 import 'package:french_tutor/main.dart' as app;
+import 'package:french_tutor/v3/v3_prefs.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,6 +27,14 @@ void main() {
     await prefs.setBool('dev_force_pro_unlock', true);
     await prefs.setBool('app_dark_mode_v3_choice', true);
     await prefs.setBool('app_dark_mode', false);
+    for (final key in [
+      'v3_completed_lessons',
+      'v3_lesson_position',
+      'v3_last_active_lesson',
+      'v3_last_completed_lesson',
+    ]) {
+      await prefs.remove(v3Key(key));
+    }
     await prefs.setString(
       'tcf_exam_date',
       DateTime.now().add(const Duration(days: 64)).toIso8601String(),
@@ -95,6 +105,10 @@ void main() {
     await probe.tapLabel(tester, 'Marie');
     await tester.pump(const Duration(milliseconds: 600));
     await probe.capture(tester, '03_marie');
+    final marieTexts = probe.describe(tester)['texts']! as List;
+    expect(marieTexts, contains('TCF CANADA PRACTICE'));
+    expect(marieTexts, contains('Practise French with Marie'));
+    expect(marieTexts, isNot(contains('Ask anything.')));
     expect(await labels(tester), contains('TCF speaking practice'));
 
     // Tests tab: real TCF format numbers.
@@ -112,7 +126,65 @@ void main() {
     await probe.tapLabel(tester, 'Me');
     await tester.pump(const Duration(milliseconds: 600));
     await probe.capture(tester, '05_me_light');
+    final meTexts = probe.describe(tester)['texts']! as List;
+    expect(meTexts, contains('TCF Canada'));
+    expect(meTexts, isNot(contains('NCLC 7')));
     final lightPrint = probe.fingerprint(tester);
+
+    // Settings and the purchase surface use the same TCF-focused V3 system.
+    await probe.tapLabel(tester, 'Settings');
+    await probe.settle(tester, timeout: const Duration(seconds: 8));
+    await probe.capture(tester, '05b_settings');
+    var settingsTexts = probe.describe(tester)['texts']! as List;
+    expect(settingsTexts, contains('TCF Canada'));
+    expect(settingsTexts, contains('Study reminder'));
+    expect(settingsTexts, isNot(contains('Everyday French')));
+    expect(settingsTexts, isNot(contains('TEF Canada')));
+
+    await probe.waitForLabel(tester, 'Study reminder', startsWith: true);
+    expect(
+      await probe.tapLabel(tester, 'Study reminder', startsWith: true),
+      isTrue,
+      reason: 'study reminder row is not accessible',
+    );
+    await probe.waitFor(tester, find.text('Remind me to practise'));
+    await probe.settle(tester, timeout: const Duration(seconds: 5));
+    await probe.capture(tester, '05c_reminder_editor');
+    settingsTexts = probe.describe(tester)['texts']! as List;
+    expect(settingsTexts, contains('Remind me to practise'));
+    expect(settingsTexts, contains('Save'));
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('Study reminders'), findsNothing);
+    await probe.settle(tester, timeout: const Duration(seconds: 5));
+
+    await probe.waitForLabel(tester, 'Membership', startsWith: true);
+    expect(
+      await probe.tapLabel(tester, 'Membership', startsWith: true),
+      isTrue,
+      reason: 'membership row is not accessible',
+    );
+    await probe.waitFor(
+      tester,
+      find.text('One goal: TCF Canada.'),
+      timeout: const Duration(seconds: 30),
+    );
+    await probe.settle(tester, timeout: const Duration(seconds: 20));
+    await probe.capture(tester, '05d_tcf_paywall');
+    settingsTexts = probe.describe(tester)['texts']! as List;
+    expect(settingsTexts, contains('One goal: TCF Canada.'));
+    expect(
+      settingsTexts,
+      containsAll(['Listening', 'Speaking with Marie', 'Reading', 'Writing']),
+    );
+    expect(await labels(tester), contains('Restore purchase'));
+    await tester.tap(find.byKey(const ValueKey('paywall.back')));
+    await probe.waitFor(tester, find.text('Study reminder'));
+    await probe.settle(tester, timeout: const Duration(seconds: 8));
+    await tester.tap(find.byKey(const ValueKey('settings.back')));
+    await probe.waitForLabel(tester, 'Me');
+    await probe.settle(tester, timeout: const Duration(seconds: 8));
+
     await probe.tapLabel(tester, 'Dark mode');
     await probe.settle(tester, timeout: const Duration(seconds: 10));
     await probe.waitForLabel(tester, 'Me');

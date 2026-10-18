@@ -10,11 +10,9 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const categories = useMemo(() => Array.from(new Set(posts.map((p) => p.category))), [posts]);
-  const [featured, ...rest] = posts;
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return rest.filter((post) => {
+    return posts.filter((post) => {
       const matchesCategory = !activeCategory || post.category === activeCategory;
       const matchesQuery =
         !q ||
@@ -23,32 +21,33 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
         post.keywords.some((k) => k.toLowerCase().includes(q));
       return matchesCategory && matchesQuery;
     });
-  }, [rest, query, activeCategory]);
+  }, [posts, query, activeCategory]);
 
-  const showFeatured = !query.trim() && !activeCategory;
+  const featured = filtered[0];
+  const showFeatured = Boolean(featured && !query.trim() && !activeCategory);
+  const visiblePosts = showFeatured ? filtered.slice(1) : filtered;
+  const formatDate = (date: string) => new Intl.DateTimeFormat("en-CA", { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${date}T12:00:00`));
 
   return (
-    <>
-      <div className="flex flex-col sm:flex-row gap-4 mb-10">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9ca3af]" />
+    <div className="journal-feed">
+      <div className="journal-controls">
+        <label className="journal-search">
+          <Search aria-hidden="true" />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search articles (TEF, Quebec, speaking practice...)"
-            className="w-full rounded-full border border-[#e5e7eb] bg-white pl-12 pr-5 py-3.5 text-[#1C1E21] font-medium outline-none focus:border-[#007BFF] focus:ring-2 focus:ring-[#007BFF]/15 placeholder:text-[#9ca3af]"
+            aria-label="Search the ParleSprint journal"
+            placeholder="Search French, TCF Canada, speaking…"
           />
-        </div>
+        </label>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-14">
+      <div className="journal-topics" role="group" aria-label="Filter journal by topic">
         <button
           type="button"
           onClick={() => setActiveCategory(null)}
-          className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-            activeCategory === null ? "bg-[#1C1E21] text-white" : "bg-white border border-[#e5e7eb] text-[#33383F] hover:border-[#007BFF]/40"
-          }`}
+          aria-pressed={activeCategory === null}
         >
           All topics
         </button>
@@ -57,9 +56,7 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
             key={cat}
             type="button"
             onClick={() => setActiveCategory(cat)}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
-              activeCategory === cat ? "bg-[#1C1E21] text-white" : "bg-white border border-[#e5e7eb] text-[#33383F] hover:border-[#007BFF]/40"
-            }`}
+            aria-pressed={activeCategory === cat}
           >
             {cat}
           </button>
@@ -69,52 +66,38 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
       {showFeatured && featured && (
         <Link
           href={`/blog/${featured.slug}`}
-          className="group block rounded-3xl bg-white border border-[#e5e7eb] p-8 md:p-10 mb-10 hover:border-[#007BFF]/40 hover:shadow-md transition-all"
+          className="journal-featured"
         >
-          <div className="flex flex-wrap items-center gap-3 mb-4 text-xs font-bold uppercase tracking-widest">
-            <span className="rounded-full bg-[#e5f1ff] text-[#007BFF] px-3 py-1">Latest</span>
-            <span className="text-[#007BFF]">{featured.category}</span>
-            <span className="text-[#9ca3af]">&middot;</span>
-            <span className="text-[#9ca3af]">{featured.readingTime}</span>
+          <div className="journal-featured-copy">
+            <div className="journal-meta"><span className="journal-latest">Latest article</span><span>{featured.category}</span><span>{formatDate(featured.date)}</span><span>{featured.readingTime}</span></div>
+            <h2>{featured.title}</h2>
+            <p>{featured.description}</p>
+            <span className="journal-read-link">Read the article <ArrowRight aria-hidden="true" /></span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-[#1C1E21] tracking-tight mb-3 group-hover:text-[#007BFF] transition-colors max-w-2xl">
-            {featured.title}
-          </h2>
-          <p className="text-lg text-[#6b7280] leading-relaxed mb-4 max-w-2xl">{featured.description}</p>
-          <span className="inline-flex items-center gap-2 text-sm font-bold text-[#007BFF]">
-            Read the article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </span>
+          <div className="journal-featured-note" aria-hidden="true"><span>PARLESPRINT<br />JOURNAL</span><strong>French for<br />real life.</strong><small>Ideas you can use today</small></div>
         </Link>
       )}
 
-      {(showFeatured ? rest : filtered).length === 0 ? (
-        <p className="text-center text-lg text-[#6b7280] py-16">
+      {visiblePosts.length === 0 ? (
+        <p className="journal-empty">
           No articles match that search yet. Try a different word, or clear the filter.
         </p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
-          {(showFeatured ? rest : filtered).map((post) => (
+        <div className="journal-post-grid">
+          {visiblePosts.map((post) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="group flex flex-col rounded-3xl bg-white border border-[#e5e7eb] p-7 hover:border-[#007BFF]/40 hover:shadow-md transition-all"
+              className="journal-card"
             >
-              <div className="flex flex-wrap items-center gap-2 mb-4 text-xs font-bold uppercase tracking-widest">
-                <span className="text-[#007BFF]">{post.category}</span>
-                <span className="text-[#9ca3af]">&middot;</span>
-                <span className="text-[#9ca3af]">{post.readingTime}</span>
-              </div>
-              <h3 className="text-lg font-extrabold text-[#1C1E21] tracking-tight mb-3 group-hover:text-[#007BFF] transition-colors">
-                {post.title}
-              </h3>
-              <p className="text-[#6b7280] leading-relaxed mb-4 flex-1">{post.description}</p>
-              <span className="inline-flex items-center gap-2 text-sm font-bold text-[#007BFF]">
-                Read the article <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </span>
+              <div className="journal-meta"><span>{post.category}</span><span>{formatDate(post.date)}</span><span>{post.readingTime}</span></div>
+              <h3>{post.title}</h3>
+              <p>{post.description}</p>
+              <span className="journal-read-link">Read the article <ArrowRight aria-hidden="true" /></span>
             </Link>
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 }

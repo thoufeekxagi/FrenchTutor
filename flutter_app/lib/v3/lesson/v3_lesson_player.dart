@@ -244,7 +244,12 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     if (now.difference(_lastAdvance) < V3LessonPlayer.advanceGuard) return;
     _lastAdvance = now;
     if (_index == _lesson.steps.length - 1) {
-      if (widget.savePathProgress) unawaited(V3Progress.markDone(_lesson.id));
+      if (widget.savePathProgress) {
+        await V3Progress.markDone(
+          _lesson.id,
+          store: ref.read(learningStoreProvider),
+        );
+      }
       _recorder?.finish(
         summary: widget.savePathProgress
             ? 'Completed the course lesson.'
@@ -268,8 +273,13 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
       _restoreStepState();
     });
     if (widget.savePathProgress) {
-      unawaited(V3Progress.advanceFrontier(_lesson.id, _index));
+      await V3Progress.advanceFrontier(
+        _lesson.id,
+        _index,
+        store: ref.read(learningStoreProvider),
+      );
     }
+    if (!mounted) return;
     if (changed != null) {
       try {
         await changed(_index);

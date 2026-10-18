@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: { type: "website", url: "/privacy", siteName: "ParleSprint", title, description },
 };
 
-const LAST_UPDATED = "September 9, 2026";
+const LAST_UPDATED = "October 17, 2026";
 const CONTACT_EMAIL = "thoufeek@agiventures.ca";
 
 function H2({ children }: { children: React.ReactNode }) {
@@ -56,7 +56,7 @@ export default function PrivacyPolicyPage() {
         <Ul>
           <Li>We use your account, learning activity, and selected practice content to provide and personalize ParleSprint.</Li>
           <Li>When you choose voice, text, photo, document, or generated-image features, the relevant content is sent to the provider needed for that feature.</Li>
-          <Li>We use service analytics and diagnostics to understand reliability and feature use, not to sell advertising profiles.</Li>
+          <Li>Optional website analytics are disabled until you switch them on in Learning settings. We do not load Google Analytics on your private account, feedback, notebook, or sign-in routes.</Li>
           <Li>You can delete your account in the app or contact us. We will complete the request within 30 days, subject to limited legal or security retention.</Li>
         </Ul>
 
@@ -65,7 +65,9 @@ export default function PrivacyPolicyPage() {
         <P><strong>Learning activity.</strong> We save lessons, answers, written work, vocabulary and grammar progress, review history, transcripts, feedback, generated lesson content, streaks, and related completion details so ParleSprint can remember what you have studied and make future practice relevant.</P>
         <P><strong>Voice, photos, and documents.</strong> If you use speaking or live tutor features, microphone audio is sent during the session to provide the requested response and may be transcribed into a practice record. If you choose a photo, scan, or PDF, we process that item only to provide the explanation or exercise you requested. We do not access your photo library or microphone without the relevant device permission and your action.</P>
         <P><strong>Generated media.</strong> Some lessons may include generated illustrations or audio. The lesson instructions and limited context needed to create that media may be sent to an image or audio-generation provider. We do not send your entire account or unrelated history for media generation.</P>
-        <P><strong>Device, usage, and diagnostics.</strong> We may receive basic device, app-version, crash, security, and feature-use information. The app may use product analytics when configured, and the website may use optional analytics measurement. These tools help us improve reliability and understand which features are useful; they are not used to create advertising profiles.</P>
+        <P><strong>Website practice, drafts, and vocabulary.</strong> You can use daily practice, write a draft, and save words without creating an account. In guest mode, your level, saved words, answers, drafts, and preferences remain in this browser&apos;s local storage. When you sign in, words are synced to a separate website table in your ParleSprint account. Website drafts remain in your browser. The app&apos;s course progress and purchases are not changed by website practice.</P>
+        <P><strong>Feedback you send us.</strong> If you use the feedback form, we send your selected topic and note to our support team using Resend. You can omit your email. If you provide an email and select the separate permission box, we use it to reply. The note then appears in the team&apos;s email inbox. Please do not include passwords or sensitive account or learning content. Contact us to request removal.</P>
+        <P><strong>Device, usage, and diagnostics.</strong> Optional Google Analytics on public website pages is off by default and loads only if you switch on anonymous usage sharing in Learning settings. Your choice is saved in this browser. Analytics is excluded from private account, sign-in, notebook, feedback, and auth-callback pages. It does not receive drafts, notebook words, or feedback. The app may use product diagnostics when configured.</P>
 
         <H2>How we use information</H2>
         <Ul>
@@ -84,6 +86,7 @@ export default function PrivacyPolicyPage() {
           <Li><strong>ElevenLabs</strong> may provide selected narration or audio-generation features when those features are enabled.</Li>
           <Li><strong>MiniMax or another designated image-generation provider</strong> may receive a short lesson description or image prompt to create an illustration requested by the app.</Li>
           <Li><strong>Supabase</strong> provides account authentication, secure storage, and synchronization of account and learning data.</Li>
+          <Li><strong>Resend</strong> delivers feedback notes to the ParleSprint team and may carry your reply address only when you expressly ask for a reply.</Li>
           <Li><strong>Apple, Google, and billing providers such as RevenueCat when enabled</strong> help with sign-in, subscriptions, payments, and purchase restoration.</Li>
           <Li><strong>PostHog and optional website analytics</strong> may receive limited app interaction and technical data when enabled, to measure performance and improve the product.</Li>
         </Ul>

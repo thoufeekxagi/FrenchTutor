@@ -1,46 +1,17 @@
 # ParleSprint brand spec
 
-## Existing source assets
+## Official mark
 
-- `/Users/thoufeekx/Desktop/FrenchTutor/design/logo-wordmark.svg` — existing Parle/French Tutor wordmark and microphone mark.
-- `/Users/thoufeekx/Desktop/FrenchTutor/design/app-icon-flat.svg` — existing app mark.
+Use the current v3 iOS app icon from `flutter_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png` as the source of truth. The website keeps a deployment-ready copy at `public/icon-512.png`; its header mark, browser icons, account confirmation, structured data, and install manifest use that same artwork. `public/parle-mark.svg` remains as a compatibility alias to the current PNG.
 
-The landing page copies the app mark into `public/parle-mark.svg` so the marketing project is independently deployable.
+Keep the ParleSprint wordmark as text beside the app icon. Do not redraw the mark or use retired black-and-gold bolt artwork.
 
-## Design read
+## Design direction
 
-- Artifact: pre-launch conversion landing page
-- Audience: English-speaking French beginners pursuing TCF/TEF readiness for Canadian immigration
-- Visual language: editorial study desk + passport route map
-- Mode: greenfield marketing page, preserving the existing violet identity
-- Visual variance: 7/10
-- Motion intensity: 4/10
-- Information density: 5/10
-- Asset dependence: 5/10
-- Brand fidelity: 8/10
+The website is a free daily French practice destination for adult A1–B2 learners, with a clear route into the iOS app and Chrome extension. Its visual language is calm, minimal, warm, and product-led: soft neutral surfaces, dark readable text, restrained blue actions, crisp Inter typography, subtle depth, and motion that respects reduced-motion settings.
 
-## Domain vocabulary
+## Brand use
 
-Route, niveau, passport, practice loop, listening, speaking, writing, milestone, destination, daily sprint.
-
-## Color world
-
-- Ink navy — trustworthy, legible study notes
-- Paper — workbook pages and calm focus
-- Violet — existing Parle identity and progress
-- Orange — route marker and forward momentum
-- Blue — language notes and cool digital feedback
-- Green — completed milestones
-
-## Signature
-
-A visible niveau route from A1 through A2 and B1 toward B2 / NCLC 7, used as the hero product preview and not as decorative background art.
-
-## Type
-
-Display: serif italic thesis treatment for warmth and memorability.
-Body/UI: system sans stack for clarity, speed, and dependable rendering.
-
-## Depth and shape
-
-Use quiet borders, paper layers, small 12–24px radii, and restrained shadows. Avoid floating glass cards, neon gradients, and excessive rounded pills.
+- Use the exact official app icon for the site header, browser and install icons, account confirmation, and organization metadata.
+- Keep promotional interface examples grounded in the current app and website. Do not use generated promotional images.
+- Keep the real learner experience and free tools visible before account creation.

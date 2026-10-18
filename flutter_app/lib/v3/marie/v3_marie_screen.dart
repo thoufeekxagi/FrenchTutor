@@ -9,66 +9,63 @@ import '../../screens/mocks/mocks_screen.dart';
 import '../../screens/speak/live_tutor_setup_screen.dart';
 import '../ui/v3_ui.dart';
 
-/// Marie tab. Screen contract:
+/// Tutor tab. Screen contract:
 ///
 /// User arrived to: talk to the tutor.
-/// They must understand: what Marie can do for the exam, in three clear modes.
+/// They must understand: what their selected tutor can do for the exam.
 /// Primary action: pick one mode.
 /// Must not contain: a mascot carousel, settings sprawl, fake transcripts.
 ///
-/// Each mode opens an existing, tested live screen. The Marie lesson-contract
+/// Each mode opens an existing, tested live screen. The tutor lesson-contract
 /// session and the TCF examiner mode are built on these entries next.
 class V3MarieScreen extends ConsumerWidget {
   const V3MarieScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tutor = ActiveTutor.current;
     final level = ref.watch(learningStoreProvider).profile().level;
     final band = const {'a1', 'a2', 'b1', 'b2'}.contains(level.toLowerCase())
         ? level.toUpperCase()
         : 'A1';
-    return SafeArea(
-      bottom: false,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
-        children: [
-          Text('YOUR TUTOR', style: V3Type.eyebrow()),
-          const SizedBox(height: 6),
-          Text(tutor.displayName, style: V3Type.hero(44)),
-          const SizedBox(height: 10),
-          Text(
-            'Speak out loud. ${tutor.displayName} listens, answers and corrects you.',
-            style: V3Type.body(16),
-          ),
-          const SizedBox(height: 26),
-          _mode(
-            context,
-            id: 'talk',
-            title: 'Talk with ${tutor.displayName}',
-            subtitle: 'Free conversation at your level. Ask anything.',
-            icon: Icons.chat_bubble_outline_rounded,
-            onTap: () =>
-                AppRouter.push(context, (_) => const LiveTutorSetupScreen()),
-          ),
-          const SizedBox(height: 12),
-          _mode(
-            context,
-            id: 'speaking',
-            title: 'TCF speaking practice',
-            subtitle: 'The three speaking tasks, timed like the exam.',
-            icon: Icons.record_voice_over_outlined,
-            onTap: () => AppRouter.push(
+    return ValueListenableBuilder<TutorPersona>(
+      valueListenable: ActiveTutor.notifier,
+      builder: (context, tutor, _) => SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
+          children: [
+            Text('TCF CANADA PRACTICE', style: V3Type.eyebrow()),
+            const SizedBox(height: 6),
+            Text(tutor.displayName, style: V3Type.hero(44)),
+            const SizedBox(height: 22),
+            _mode(
               context,
-              (_) => MocksScreen(
-                examName: 'TCF Canada',
-                levelBand: band,
-                includeReadingWarmup: false,
-              ),
-              fullscreenDialog: true,
+              id: 'talk',
+              title: 'Practise French with ${tutor.displayName}',
+              subtitle: 'Speak naturally and get helpful corrections.',
+              icon: Icons.chat_bubble_outline_rounded,
+              onTap: () =>
+                  AppRouter.push(context, (_) => const LiveTutorSetupScreen()),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            _mode(
+              context,
+              id: 'speaking',
+              title: 'TCF speaking practice',
+              subtitle: 'The three speaking tasks, timed like the exam.',
+              icon: Icons.record_voice_over_outlined,
+              onTap: () => AppRouter.push(
+                context,
+                (_) => MocksScreen(
+                  examName: 'TCF Canada',
+                  levelBand: band,
+                  includeReadingWarmup: false,
+                ),
+                fullscreenDialog: true,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

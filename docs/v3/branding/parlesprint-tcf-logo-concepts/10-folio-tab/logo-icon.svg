@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">ParleSprint Folio Tab app icon</title>
+  <desc id="desc">A crisp document-tab detail makes the study purpose legible without a book cliché. TCF appears at the bottom of the icon.</desc>
+  <rect width="1024" height="1024" fill="#FFFFFF"/>
+  <path d="M278 230H584C716 230 794 308 794 425S716 620 584 620H432V754H278V230ZM432 348V504H579C644 504 680 475 680 425S644 348 579 348H432Z" fill="#1D4ED8" fill-rule="evenodd"/><path d="M622 230H742V350H622Z" fill="#2563EB"/><path d="M652 268H712V328H652Z" fill="#FFFFFF"/>
+  <text x="512" y="910" text-anchor="middle" fill="#1D4ED8" font-family="'Helvetica Neue', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="13">TCF</text>
+</svg>

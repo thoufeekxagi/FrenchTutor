@@ -1,6 +1,7 @@
 "use client";
 
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { useLearner } from "../components/learner-provider";
 import { usePathname } from "next/navigation";
 
 /**
@@ -10,6 +11,7 @@ import { usePathname } from "next/navigation";
  */
 export function SiteAnalytics({ gaId }: { gaId: string }) {
   const pathname = usePathname();
-  if (pathname === "/confirm-signup") return null;
+  const { prefs } = useLearner();
+  if (!prefs.analytics || ["/confirm-signup", "/auth/callback", "/account", "/words", "/feedback"].includes(pathname)) return null;
   return <GoogleAnalytics gaId={gaId} />;
 }

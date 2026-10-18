@@ -9,6 +9,7 @@ BUNDLE_ID="com.thoufeekx.frenchtutor"
 # never echoed.
 load_defines() {
   DEFINE_ARGS=()
+  DEFINE_ARGS_PRESENT=0
   local file="$APP_DIR/secrets.local.properties"
   [[ -f "$file" ]] || file="$APP_DIR/../.env"
   [[ -f "$file" ]] || return 0
@@ -16,15 +17,16 @@ load_defines() {
   for key in SUPABASE_URL SUPABASE_ANON_KEY GOOGLE_IOS_CLIENT_ID GOOGLE_WEB_CLIENT_ID \
              REVENUECAT_IOS_KEY REVENUECAT_ANDROID_KEY POSTHOG_API_KEY POSTHOG_HOST; do
     value=$(awk -v key="$key" 'index($0, key "=") == 1 { sub(/^[^=]*=/, ""); print; exit }' "$file")
-    [[ -n "$value" ]] && DEFINE_ARGS+=("--dart-define=$key=$value")
+    if [[ -n "$value" ]]; then
+      DEFINE_ARGS+=("--dart-define=$key=$value")
+      DEFINE_ARGS_PRESENT=1
+    fi
   done
   return 0
 }
 
-# Refuses to start a heavy job when another one is already running, or when
-# the machine is overloaded. Rule from the machine safety policy: one build at
-# a time, never in parallel.
-guard_machine() {
+# Refuses to start when another heavy build/drive is active.
+guard_no_competing_build() {
   local busy
   busy=$(ps -axo pid,etime,command | grep -E "xcodebuild|flutter_tools.snapshot (run|drive|test)|gradlew|dart-sdk/bin/dartvm.*drive" | grep -v grep | grep -v "tool/" || true)
   if [[ -n "$busy" ]]; then
@@ -32,6 +34,14 @@ guard_machine() {
     echo "$busy" | cut -c1-160 >&2
     exit 3
   fi
+}
+
+# Refuses a normal heavy job when another build is active or the machine is
+# overloaded. Simulator reset uses only guard_no_competing_build so it remains
+# available as the recovery action when simulator startup itself overloads the
+# host.
+guard_machine() {
+  guard_no_competing_build
   local load
   load=$(sysctl -n vm.loadavg | awk '{print int($2)}')
   if (( load > 12 )); then
@@ -43,9 +53,11 @@ guard_machine() {
 # Fast device presence check (about 1s). `flutter devices` takes about 6s.
 require_device() {
   local id="$1"
-  if ! xcrun devicectl list devices 2>/dev/null | grep -F "$id" | grep -q "connected"; then
+  local devices
+  devices=$(xcrun devicectl list devices 2>/dev/null || true)
+  if ! printf '%s\n' "$devices" | grep -F "$id" | grep -Eq 'connected|available \(paired\)'; then
     echo "DEVICE NOT CONNECTED: $id" >&2
-    xcrun devicectl list devices 2>&1 | sed -n 1,8p >&2
+    printf '%s\n' "$devices" | sed -n 1,8p >&2
     echo "Unlock the phone, trust this Mac, and replug if needed." >&2
     exit 4
   fi

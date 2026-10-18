@@ -17,6 +17,8 @@ class SpeakAuthScreen extends StatefulWidget {
 class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
   late var _signUp = widget.initialSignUp;
   var _loading = false;
   var _awaitingEmailConfirmation = false;
@@ -26,6 +28,8 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -241,6 +245,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
               const SizedBox(height: 18),
               _field(
                 _email,
+                _emailFocusNode,
                 'Email address',
                 CupertinoIcons.mail,
                 key: const ValueKey('auth.email'),
@@ -248,6 +253,7 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
               const SizedBox(height: 10),
               _field(
                 _password,
+                _passwordFocusNode,
                 'Password',
                 CupertinoIcons.lock,
                 obscure: true,
@@ -350,43 +356,62 @@ class _SpeakAuthScreenState extends State<SpeakAuthScreen> {
   /// A row, like every other choice in the app: white, rounded, hairline.
   Widget _field(
     TextEditingController controller,
+    FocusNode focusNode,
     String hint,
     IconData icon, {
     bool obscure = false,
     Key? key,
   }) {
-    return Container(
-      constraints: const BoxConstraints(minHeight: 58),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: DesignTokens.hairline),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: DesignTokens.inkSoft, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              key: key,
-              controller: controller,
-              obscureText: obscure,
-              autocorrect: false,
-              keyboardType: obscure
-                  ? TextInputType.visiblePassword
-                  : TextInputType.emailAddress,
-              cursorColor: DesignTokens.primary,
-              style: V3Type.strong(16, DesignTokens.ink),
-              decoration: InputDecoration.collapsed(
-                hintText: hint,
-                hintStyle: V3Type.body(16, DesignTokens.inkSoft),
-              ),
+    return AnimatedBuilder(
+      animation: focusNode,
+      builder: (context, _) {
+        final focused = focusNode.hasFocus;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          constraints: const BoxConstraints(minHeight: 64),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: DesignTokens.surface,
+            borderRadius: BorderRadius.circular(DesignTokens.radiusLarge),
+            border: Border.all(
+              color: focused ? DesignTokens.primary : DesignTokens.hairline,
+              width: focused ? 1.6 : 1,
             ),
           ),
-        ],
-      ),
+          child: Row(
+            children: [
+              Icon(icon, color: DesignTokens.inkSoft, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  key: key,
+                  controller: controller,
+                  focusNode: focusNode,
+                  obscureText: obscure,
+                  autocorrect: false,
+                  keyboardType: obscure
+                      ? TextInputType.visiblePassword
+                      : TextInputType.emailAddress,
+                  cursorColor: DesignTokens.primary,
+                  style: V3Type.strong(18, DesignTokens.ink),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: V3Type.body(18, DesignTokens.inkSoft),
+                    filled: false,
+                    fillColor: Colors.transparent,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    isCollapsed: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" role="img" aria-labelledby="title desc">
+  <title id="title">ParleSprint Pace Cut logo</title>
+  <desc id="desc">ParleSprint. TCF Canada preparation. A forward-cut terminal gives the P motion without using a lightning bolt.</desc>
+  <g transform="translate(40 40) scale(0.390625)">
+    <rect width="1024" height="1024" fill="#1D4ED8"/>
+    <path d="M272 198H568C713 198 798 283 798 420S713 642 568 642H426V776H272V198ZM426 322V518H560C637 518 674 482 674 420S637 322 560 322H426Z" fill="#FFFFFF" fill-rule="evenodd"/><path d="M612 614H790L706 700H612Z" fill="#1D4ED8"/>
+    <text x="512" y="910" text-anchor="middle" fill="#FFFFFF" font-family="'Helvetica Neue', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="13">TCF</text>
+  </g>
+  <text x="540" y="222" fill="#14171C" font-family="'Helvetica Neue', Arial, sans-serif" font-size="112" font-weight="650" letter-spacing="-4">ParleSprint</text>
+  <text x="545" y="304" fill="#1D4ED8" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="6">TCF CANADA PREP</text>
+</svg>

@@ -41,7 +41,12 @@ the curriculum is authored and validated.
    (`MARIE_TUTOR.md`)
 5. **Marie is inline**: phone button, panel, response pill, Mute, Skip. Never a
    full-screen route. She listens first and is not fenced to the card.
-6. **The tutor never hears herself** (hard rule). `MicEchoGate`.
+6. **The lesson tutor is full duplex when platform AEC/NS is active.** iOS uses
+   one VoiceProcessingIO engine for mic and output; Android uses communication
+   capture effects. Local speech VAD reduces noise and billable silence. Known
+   app clips still use a 150 ms tail. If processing fails, fall back to
+   half-duplex before sending raw audio. (`AGENT_RULES.md` section 7,
+   `MARIE_VOICE_ARCHITECTURE.md`)
 7. **One progress rule.** `V3Progress` keeps the furthest step reached
    (frontier), which only moves forward. Going back, reviewing and replaying
    never lower it. Resume means "where I really got to". (`AGENT_RULES.md` s9)
@@ -57,7 +62,7 @@ the curriculum is authored and validated.
 content/tcf/                      course source (book chapters, checkers, exporter), REVIEW_NEEDED.md
 docs/v3/                          all v3 docs, the PDF, design mockups
 flutter_app/lib/v3/
-  onboarding/                     animated blue/white greeting, split TCF value screens, optional date/reminders, level, account gate, optional post-sign-in Marie practice
+  onboarding/                     animated blue/white greeting, split TCF value screens, optional date/reminders, level, consent, optional pre-signup practice with the chosen tutor, save-progress account gate
   shell/                          four-tab shell: Learn, Marie, Tests, Me
   learn/                          Learn tab: Today, Path, Stories
   lesson/                         lesson model, course loader, V3Progress, lesson player, V3Speaker
@@ -86,9 +91,10 @@ what the screen must not contain. Then build from existing primitives.
 exact steps): the native blue logo launch is followed by a white/blue animated
 greeting, then separate course, TCF goal/skills, and Marie screens. The short
 setup asks for an optional exam date, the current A1–B2 level, and optional
-reminder days/time. Consent and account gates follow; after sign-in, learners
-can try the optional three-minute Marie practice. No extra profile questions,
-fake progress, or scores. The existing onboarding device test still targets
+reminder days/time. After AI consent, learners can try the optional three-
+minute practice with their chosen tutor. Completing or skipping it leads to
+the account screen to save progress. No extra profile questions, fake progress,
+or scores. The existing onboarding device test still targets
 the former screen order and needs a probe-based update before it can verify
 this flow.
 
@@ -138,7 +144,8 @@ Evidence-based rules and the screen list: `UI_STRUCTURE.md`.
    read dialogues for continuity.
 5. Be honest in reports: say what was not run (for example the device tests
    that failed to launch) and why.
-6. Two failed attempts at the same problem: stop and report facts.
+6. Keep diagnosing failures from fresh evidence and change the approach on each
+   run until the requested result works or owner-only access is required.
 7. Do not reformat unrelated files. Never push unless asked. Never commit
    secrets.
 

@@ -17,7 +17,7 @@ export function PostFeedback({ slug }: { slug: string }) {
 
   useEffect(() => {
     const stored = typeof window !== "undefined" ? window.localStorage.getItem(storageKey(slug)) : null;
-    if (stored === "up" || stored === "down") setMyVote(stored);
+    if (stored === "up" || stored === "down") queueMicrotask(() => setMyVote(stored));
 
     fetch(`/api/blog-feedback?slug=${encodeURIComponent(slug)}`)
       .then((res) => res.json())

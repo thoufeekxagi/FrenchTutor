@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/main.dart' as app;
 import 'package:french_tutor/v3/lesson/v3_course.dart';
 import 'package:french_tutor/v3/lesson/v3_lesson.dart';
+import 'package:french_tutor/v3/marie/v3_marie_session.dart';
 import 'package:french_tutor/v3/v3_prefs.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,20 +54,14 @@ void main() {
     await prefs.setBool('dev_force_pro_unlock', true);
     await prefs.setBool('app_dark_mode_v3_choice', true);
     await prefs.setBool('app_dark_mode', false);
-    // E2E_ONLY=s0-01,a1-u02 limits the walk to lessons whose id starts with
-    // one of the prefixes. Everything else is marked done, so the Learn hero
-    // walks the chosen lessons in order. No filter walks every lesson.
+    // E2E_ONLY=s0-01,a1-u02 limits both the app and this walk to lessons whose
+    // ids start with one of the prefixes. No filter walks every lesson.
     const only = String.fromEnvironment('E2E_ONLY');
-    final all = await V3Course.load();
     final prefixes = only.isEmpty ? <String>[] : only.split(',');
-    final lessons = prefixes.isEmpty
-        ? all
-        : all.where((l) => prefixes.any(l.id.startsWith)).toList();
+    final lessons = await V3Course.load(idPrefixes: prefixes);
     expect(lessons, isNotEmpty);
-    await prefs.setStringList(
-      v3Key('v3_completed_lessons'),
-      all.where((l) => !lessons.contains(l)).map((l) => l.id).toList(),
-    );
+    V3MarieSession.debugLog.clear();
+    await prefs.setStringList(v3Key('v3_completed_lessons'), const []);
     await prefs.remove(v3Key('v3_lesson_position'));
 
     app.main();
@@ -97,9 +92,7 @@ void main() {
         switch (step) {
           case V3ChooseStep s:
             await probe.waitForLabel(tester, s.options[s.answer]);
-            if (step == lesson.steps.first) {
-              await probe.capture(tester, '${tag}_question');
-            }
+            await probe.capture(tester, '${tag}_question');
             await scrollToLabel(tester, s.options[s.answer]);
             await press(tester, s.options[s.answer]);
             await press(tester, 'Check');
@@ -108,11 +101,15 @@ void main() {
               contains('Correct'),
               reason: '$tag: the keyed answer was not accepted',
             );
+            expect(
+              V3MarieSession.debugLog,
+              contains('feedback-mic-blocked'),
+              reason: '$tag: correct-answer sound did not close Marie’s mic',
+            );
+            await probe.capture(tester, '${tag}_feedback');
           case V3ListenStep s:
             await probe.waitForLabel(tester, s.options[s.answer]);
-            if (step == lesson.steps.first) {
-              await probe.capture(tester, '${tag}_question');
-            }
+            await probe.capture(tester, '${tag}_question');
             await scrollToLabel(tester, s.options[s.answer]);
             await press(tester, s.options[s.answer]);
             await press(tester, 'Check');
@@ -121,11 +118,15 @@ void main() {
               contains('Correct'),
               reason: '$tag: the keyed answer was not accepted',
             );
+            expect(
+              V3MarieSession.debugLog,
+              contains('feedback-mic-blocked'),
+              reason: '$tag: correct-answer sound did not close Marie’s mic',
+            );
+            await probe.capture(tester, '${tag}_feedback');
           default:
             await probe.waitForLabel(tester, 'Continue');
-            if (step == lesson.steps.first || step == lesson.steps.last) {
-              await probe.capture(tester, tag);
-            }
+            await probe.capture(tester, tag);
         }
         await press(tester, 'Continue');
       }

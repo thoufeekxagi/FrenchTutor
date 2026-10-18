@@ -24,7 +24,8 @@ listed in `AGENT_RULES.md` sections 7 to 9; this file explains why.
   pill of at most three lines; tapping it shows the whole conversation.
 - Cheap and stable: small prompt, small context, no repeated resets, no
   introducing herself again after a reconnect.
-- She must **never hear herself**, on speaker, earpiece, AirPods or a headset.
+- The learner can interrupt on supported AEC/NS routes; app-owned clips still
+  close the mic for their measured length and short output tail.
 - The speaker buttons use the same tutor voice, so changing tutor changes every
   voice.
 
@@ -56,8 +57,9 @@ Engine (shared with the old app, extended additively)
   AudioStreamingService lib/services/audio_streaming_service.dart + mic_echo_gate.dart
 ```
 
-Model: `models/gemini-3.1-flash-live-preview` (comment in the service: 2.5
-native audio was cheaper but unreliable on a real device, quality won).
+Both the in-lesson tutor and full-screen Live Tutor use
+`models/gemini-3.8-live` over the v1beta ephemeral-token path. Other established
+speaking modes retain their tested Gemini 3.1 contract.
 
 ## 3. Two ways a call starts
 
@@ -70,8 +72,8 @@ native audio was cheaper but unreliable on a real device, quality won).
 
 The speaker command is deliberately tiny: "say only the exact French text
 below once, clearly ... EXACT TEXT: ...". It is sent with `promptTutor`, which
-queues behind her current speech and uses the realtime-text path that Gemini
-3.1 accepts mid-call.
+queues behind her current speech and uses the realtime-text path supported by
+Gemini 3.8 Live.
 
 An unanswered listening question is spoken with `reveal: false`: heard, never
 shown in the pill or the conversation sheet, so the text cannot give the
@@ -82,19 +84,21 @@ answer away.
 | Setting | Value | Why |
 |---|---|---|
 | Prompt | `compactLessonCoach` (about 450 words, plus the persona and content-safety blocks) | small fixed cost; re-billed every turn |
-| Context window compression | trigger 3,000 tokens, target 1,500 | about a minute of back and forth, then summarised |
-| End-of-speech wait | 1,300 ms (default elsewhere 2,500) | feels present without cutting a learner off |
-| `maxOutputTokens` | 1,000 (a ceiling, not a target) | about 40 seconds of speech; never cuts a sentence |
-| Thinking | minimal | lower latency and cost |
+| Context window compression | trigger 4,000 tokens, target 2,000 | preserves useful recent turns and keeps repeated context bounded |
+| End-of-speech wait | 850 ms for lesson coach, 900 ms for Live Tutor; both use a 700 ms local endpoint | server setting is a fallback after the local endpoint |
+| `maxOutputTokens` | 1,000 for lesson coach; 2,000 for Live Tutor | a ceiling, not a target; billing follows generated audio tokens |
+| Thinking | model default; `thinkingLevel` omitted | required by the Gemini 3.8 Live setup contract |
+| Proactive audio | enabled for both tutor sessions | lets the model stay quiet on irrelevant input; it does not replace local VAD or AEC |
 | Reconnects | up to 3 with 1, 2, 4 s back-off (others: 1) | one blip must not kill the call |
 | Server connection reset (about every 10 min) | wait for her to finish the sentence, then reconnect | never swap mid-sentence |
 | Idle | 90 s (talk) / 270 s (audio only) | no billing for a forgotten call |
 
-Facts to keep in mind (verify before relying on them): Gemini Live audio is
-about 25 tokens per second; every turn re-bills the whole active context, so a
-short context is the real saving; Gemini audio list prices were about $3 in and
-$12 out per million tokens, roughly ten times cheaper than OpenAI's realtime
-audio ($32 in, $64 out). Cost events go through `AiCostTracker`.
+Google's current Gemini Live price page lists audio at about $0.005 per input
+minute and $0.018 per generated minute for these Live models. Active session
+context is billed again on later turns, and enabling input/output transcription
+adds text-token charges. The local speech gate keeps silence off the socket;
+context compression bounds repeat input. `AiCostTracker` records usage for
+comparison against the provider dashboard.
 
 ## 5. Context: what she knows and how it stays right
 
@@ -115,18 +119,24 @@ audio ($32 in, $64 out). Cost events go through `AiCostTracker`.
   (drops buffered audio and the transcript) and clears the pill.
 - We do **not** send the whole lesson or the whole transcript each time.
 
-## 6. The echo rule (hard, everywhere)
+## 6. Echo control and full-duplex interruption
 
-The microphone must send nothing to the model while the phone is making sound:
-her voice, the buffered tail after it (900 ms), and any clip the app plays
-itself. It does not depend on the route. Implementation: `MicEchoGate`
-(`lib/services/mic_echo_gate.dart`, unit tested), used by
-`AudioStreamingService`; `LessonSpeechService.playBytes` publishes
-`clipEndsAt` and every open `InlineCallController` closes the mic until then.
-Prompt wording is a second line of defence only. Bug that taught it: she
-reviewed her own voice ("good pronunciation") because the old gate had a 350 ms
-tail and the lesson's speaker button used a different player the gate did not
-know about. Cost of the rule: no talking over her; Skip is the escape.
+The V3 lesson route keeps capture active during tutor playback only when a
+platform AEC/NS path is active. On iOS, `VoiceProcessingAudioPlugin` shares one
+`AVAudioEngine` between mic and tutor output. On Android, the recorder uses the
+communication source with AEC/NS. `VoiceActivityGate` filters silence and short
+bursts, preserves speech pre-roll, and closes each learner segment with
+`audioStreamEnd`; Gemini server VAD remains enabled too. On confirmed learner
+speech, the app stops local playback and drops stale generated audio until
+Gemini acknowledges interruption.
+
+Known app-owned clips still use `MicEchoGate` and `blockMicUntil` for the clip's
+measured duration plus a 150 ms tail. If full-duplex voice processing cannot
+start or recover, the call falls back to half duplex before forwarding raw
+audio. Unit coverage for the local gate is in `voice_activity_gate_test.dart`
+and `mic_echo_gate_test.dart`; `integration_test/voice_processing_test.dart`
+checks the service's iPhone capture/playback path without opening a billable
+Gemini session.
 
 ## 7. Bugs and what fixed them
 
@@ -134,25 +144,22 @@ know about. Cost of the rule: no talking over her; Skip is the escape.
 |---|---|---|
 | "Ask Marie" opened a full-screen legacy call | `V3LessonPlayer._askMarie` pushed `SpeakingPracticeScreen` | inline `V3MarieSession`, dock and pill; no route |
 | She replied with long generic speeches | free-talk prompt, A1 word-by-word glosses, a kickoff that said "help with this step" | `compactLessonCoach`, listen-first rules, hello only on connect |
-| She praised her own voice | echo (above) | `MicEchoGate`, 900 ms tail, clip gating, prompt rule |
+| She praised her own voice | echo entered the learner stream | shared iOS voice-processing engine, platform AEC/NS, local VAD, explicit clip gating |
 | Speaker said "Played" but nothing played, then "Check your connection" | speaker generated a clip live on tap and locked the one-shot button before success | speakers ask the tutor on the warm call; lock only after she was reached |
 | She talked about the previous word, restarted, introduced herself | context frozen at connect, no memory on reconnect, server reset mid-sentence | builder per setup, call memory, graceful goAway, 3 reconnects |
 | Pill could reveal a listening answer | transcript shown | `reveal: false` |
 
 ## 8. Known uncertainties and next options
 
-1. **Mid-call silent context updates on Gemini 3.1.** Google's current docs say
-   `send_client_content` works throughout a session. LiveKit and ADK reports for
-   the 3.1 preview say it is only accepted for initial history and errors
-   (1007) mid-session. The old vocabulary screen used the same pattern and was
-   reliable, so we kept it. If wrong-screen answers return, check
-   `live_reconnect_scheduled` reasons first. Fallback design: on step change
-   reconnect quietly with the new snapshot and the call memory in the system
-   prompt (about a second, silent, always correct).
-2. **Gemini 3.8 Live** (Sept 2026 docs): full client-content updates, proactive
-   audio always on (the model may stay silent on irrelevant audio), affective
-   dialogue removed, interleaved reasoning. A candidate upgrade; needs a device
-   test of tone, latency and cost before switching.
+1. **Mid-call silent context updates on Gemini 3.8 Live.** Google's current
+   Live API guide supports client content updates during a session. Keep the
+   existing protocol test and verify updates in the device call; if wrong-step
+   answers return, inspect `live_reconnect_scheduled` reasons first. A quiet
+   reconnect with the latest snapshot and call memory remains the fallback.
+2. **Gemini 3.8 Live behavior**: both tutor surfaces now use the current model
+   and v1beta token path. Its proactive audio can stay quiet on irrelevant
+   input, but physical testing still needs to measure tone, latency, false
+   starts, interruptions, and cost before we claim a quality improvement.
 3. **Story reader** has no inline Marie yet (it has live narration only). Reuse
    `V3MarieSession`, but the narration and the call must share one socket; use
    the controller's external-playback bridge.

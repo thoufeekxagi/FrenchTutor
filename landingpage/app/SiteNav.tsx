@@ -1,36 +1,50 @@
-import Link from "next/link";
-import { Logo } from "./logo";
+"use client";
 
-/**
- * Shared site navigation, used on every page (homepage, blog, stories) so the chrome
- * never differs between pages. The anchor links point at "/#section" rather than a bare
- * "#section" so they resolve correctly from any page, not just the homepage.
- */
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { Menu, MessageSquare, X } from "lucide-react";
+import { Logo } from "./logo";
+import { useLearner } from "../components/learner-provider";
+
+const nav = [
+  ["/today", "Daily practice"],
+  ["/learn", "Learn"],
+  ["/tools", "Free tools"],
+  ["/extension", "Extension"],
+  ["/app", "The app"],
+] as const;
+
 export function SiteNav() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const { user } = useLearner();
+  const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
   return (
-    <nav className="sticky top-0 w-full glass-nav z-50 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-6 h-[72px] flex items-center justify-between">
-        <Link href="/" className="group">
-          <Logo size={34} />
-        </Link>
-        <div className="flex items-center gap-4 sm:gap-8 text-[15px] font-medium text-[#6b7280]">
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/#how-it-works" className="hover:text-[#1C1E21] transition-colors">The Loop</Link>
-            <Link href="/#experience" className="hover:text-[#1C1E21] transition-colors">Experience</Link>
-            <Link href="/#vs-tutor" className="hover:text-[#1C1E21] transition-colors">vs. a tutor</Link>
-            <Link href="/#pricing" className="hover:text-[#1C1E21] transition-colors">Pricing</Link>
-            <Link href="/#for-canada" className="hover:text-[#1C1E21] transition-colors">For Canada</Link>
+    <>
+      <a className="skip-link" href="#main-content">Skip to content</a>
+      <header className="site-header">
+        <div className="header-inner">
+          <Link href="/" aria-label="ParleSprint home"><Logo size={30} /></Link>
+          <nav className="desktop-nav" aria-label="Main navigation">
+            {nav.map(([href, label]) => <Link key={href} href={href} aria-current={isCurrent(href) ? "page" : undefined}>{label}</Link>)}
+          </nav>
+          <div className="header-actions">
+            <Link className="word-link" href="/words">My words</Link>
+            <Link className="icon-button feedback-nav" href="/feedback" aria-label="Send feedback"><MessageSquare size={19} /></Link>
+            <Link className="button button-small button-dark" href="/account">{user ? "My account" : "Sign in"}</Link>
+            <button className="icon-button menu-toggle" type="button" aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open} onClick={() => setOpen(!open)}>
+              {open ? <X size={21} /> : <Menu size={21} />}
+            </button>
           </div>
-          <Link href="/blog" className="font-bold text-[#F2C14E] hover:text-[#F7CE68] transition-colors">Blog</Link>
-          <Link href="/stories" className="font-bold text-[#F2C14E] hover:text-[#F7CE68] transition-colors">Stories</Link>
         </div>
-        <Link
-          href="/#join"
-          className="bg-[#F2C14E] text-[#090B0E] px-5 py-2.5 rounded-full font-semibold text-sm hover:bg-[#F7CE68] hover:scale-105 transition-all shadow-md"
-        >
-          Join Waitlist
-        </Link>
-      </div>
-    </nav>
+        {open && <nav className="mobile-nav" aria-label="Mobile navigation">
+          {nav.map(([href, label]) => <Link key={href} onClick={() => setOpen(false)} href={href} aria-current={isCurrent(href) ? "page" : undefined}>{label}</Link>)}
+          <Link href="/words" onClick={() => setOpen(false)}>My words</Link>
+          <Link href="/feedback" onClick={() => setOpen(false)}>Send feedback</Link>
+        </nav>}
+      </header>
+    </>
   );
 }

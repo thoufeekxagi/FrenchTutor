@@ -1,3 +1,11 @@
+/// Screen: TCF Canada subscription offer. Key prefix: paywall.
+/// User arrived to choose premium access from a feature gate or settings.
+/// They must understand the course value, available plans, and total price.
+/// Primary action: purchase the selected App Store subscription.
+/// Secondary actions: choose a plan, restore, return, or open legal links.
+/// Success state: the active entitlement is saved and this screen closes.
+/// Must not contain: non-TCF goals, unsupported outcomes, or hard-coded prices.
+/// States: loading, available, unavailable, purchase error, restore result.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -9,7 +17,7 @@ import '../../providers/database_provider.dart';
 import '../../services/product_analytics.dart';
 import '../../services/revenue_cat_service.dart';
 import '../../widgets/subscription_marketing_sections.dart';
-import '../speak/speak_ui.dart';
+import '../../v3/ui/v3_ui.dart';
 
 const _termsUrl = 'https://parlesprint.com/terms';
 const _privacyUrl = 'https://parlesprint.com/privacy';
@@ -191,174 +199,192 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     // re-resolve its semantic colors immediately.
     Theme.of(context);
     return Scaffold(
-      backgroundColor: SpeakColors.background,
+      backgroundColor: DesignTokens.canvas,
       body: SafeArea(
-        child: Stack(
-          children: [
-            _loading
-                ? Center(
-                    child: CircularProgressIndicator(color: SpeakColors.accent),
-                  )
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: _loading
+            ? Center(
+                child: CircularProgressIndicator(color: DesignTokens.primary),
+              )
+            : Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: DesignTokens.contentMaxWidth,
+                  ),
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 22),
                     children: [
-                      // Reserve a real header zone for the back control. The
-                      // old overlay sat on top of the title on narrow phones.
-                      const SizedBox(height: 48),
-                      Text(
-                        'Unlock full French access',
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        style: DesignTokens.display(28),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          key: const ValueKey('paywall.back'),
+                          tooltip: 'Back',
+                          onPressed: () {
+                            ProductAnalytics.capture(
+                              'paywall_closed',
+                              properties: {'source': widget.source},
+                            );
+                            Navigator.of(context).pop(false);
+                          },
+                          icon: const Icon(Icons.arrow_back_rounded),
+                        ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 8),
+                      Text(
+                        'ONE CLEAR COURSE',
+                        textAlign: TextAlign.center,
+                        style: DesignTokens.label(11).copyWith(
+                          color: DesignTokens.primary,
+                          letterSpacing: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'One goal: TCF Canada.',
+                        textAlign: TextAlign.center,
+                        style: DesignTokens.display(29),
+                      ),
+                      const SizedBox(height: 7),
+                      Text(
+                        'A focused French course from A1 to B2.',
+                        textAlign: TextAlign.center,
+                        style: DesignTokens.body(
+                          14,
+                        ).copyWith(color: DesignTokens.muted, height: 1.35),
+                      ),
+                      const SizedBox(height: 22),
                       _benefit(
-                        'A course shaped around you',
+                        'Guided French course from A1 to B2',
                         Icons.route_rounded,
                       ),
+                      _benefit('Listening practice', Icons.headphones_rounded),
                       _benefit(
-                        'Live speaking with your tutor',
-                        Icons.mic_rounded,
+                        'Speaking with your tutor',
+                        Icons.mic_none_rounded,
                       ),
+                      _benefit('Reading practice', Icons.menu_book_outlined),
+                      _benefit('Writing practice', Icons.edit_note_rounded),
                       _benefit(
-                        'Reading and listening that teach',
-                        Icons.menu_book_rounded,
+                        'Vocabulary review as you learn',
+                        Icons.refresh_rounded,
                       ),
-                      _benefit(
-                        'Writing and grammar feedback',
-                        Icons.edit_note_rounded,
-                      ),
-                      _benefit('TEF and TCF practice', Icons.verified_rounded),
-                      _benefit(
-                        'Smart review that remembers',
-                        Icons.bolt_rounded,
-                      ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       _plans(),
-                      const SizedBox(height: 8),
-                      if (_message != null)
+                      if (_message != null) ...[
+                        const SizedBox(height: 10),
                         Text(
                           _message!,
                           textAlign: TextAlign.center,
                           style: DesignTokens.body(
                             12,
-                          ).copyWith(color: SpeakColors.inkSoft),
+                          ).copyWith(color: DesignTokens.inkSoft),
                         ),
-                      const SizedBox(height: 8),
-                      SpeakPrimaryButton(
+                      ],
+                      const SizedBox(height: 12),
+                      V3Button(
+                        key: const ValueKey('paywall.purchase.primary'),
                         label: _purchasing ? 'Processing…' : _ctaLabel(),
-                        icon: Icons.workspace_premium_rounded,
-                        onTap: _purchasing ? () {} : _purchase,
-                      ),
-                      // Keep the first viewport focused on the purchase
-                      // decision. The value story remains in the same
-                      // scrollable page, but starts below the normal phone
-                      // viewport instead of peeking beneath the CTA.
-                      const SizedBox(height: 192),
-                      const SubscriptionMarketingSections(),
-                      const SizedBox(height: 24),
-                      SubscriptionBottomOffer(
-                        price: _bottomPriceLine(),
-                        terms: _selected == null
-                            ? 'Select a subscription above to continue.'
-                            : _bottomTerms(_selected!),
-                        ctaLabel: _ctaLabel(),
-                        loading: _purchasing,
                         onTap: _purchasing || _selected == null
                             ? null
                             : _purchase,
+                        loading: _purchasing,
+                        trailingArrow: false,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
+                      Text(
+                        _selected == null
+                            ? 'Plans are currently unavailable.'
+                            : _bottomTerms(_selected!),
+                        textAlign: TextAlign.center,
+                        style: DesignTokens.body(
+                          11,
+                        ).copyWith(color: DesignTokens.muted, height: 1.35),
+                      ),
+                      const SizedBox(height: 30),
+                      const SubscriptionMarketingSections(),
+                      if (_selected != null) ...[
+                        const SizedBox(height: 24),
+                        SubscriptionBottomOffer(
+                          price: _selected!.storeProduct.priceString,
+                          terms: _bottomTerms(_selected!),
+                          ctaLabel: _ctaLabel(),
+                          loading: _purchasing,
+                          onTap: _purchasing ? null : _purchase,
+                        ),
+                      ],
+                      const SizedBox(height: 16),
                       Center(
                         child: TextButton(
+                          key: const ValueKey('paywall.restore'),
                           onPressed: _restore,
+                          style: TextButton.styleFrom(
+                            minimumSize: const Size(48, 48),
+                          ),
                           child: Text(
                             'Restore purchase',
                             style: DesignTokens.body(
                               12,
                               weight: FontWeight.w700,
-                            ).copyWith(color: SpeakColors.accent),
+                            ).copyWith(color: DesignTokens.primary),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 6),
                       Text(
-                        'Cancel anytime in your App Store account. By continuing, you agree to the Terms and Privacy Policy.',
+                        'Subscriptions renew automatically and can be cancelled in your App Store account.',
                         textAlign: TextAlign.center,
                         style: DesignTokens.body(
                           10.5,
-                        ).copyWith(color: SpeakColors.inkSoft, height: 1.35),
+                        ).copyWith(color: DesignTokens.muted, height: 1.35),
                       ),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      const SizedBox(height: 7),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 2,
                         children: [
-                          _legal('Terms of Use (EULA)', _termsUrl),
+                          _legal(
+                            'Terms of Use (EULA)',
+                            _termsUrl,
+                            'paywall.legal.terms',
+                          ),
                           const Text('  ·  '),
-                          _legal('Privacy', _privacyUrl),
+                          _legal(
+                            'Privacy',
+                            _privacyUrl,
+                            'paywall.legal.privacy',
+                          ),
                         ],
                       ),
                     ],
                   ),
-            Positioned(
-              top: 12,
-              left: 12,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    ProductAnalytics.capture(
-                      'paywall_closed',
-                      properties: {'source': widget.source},
-                    );
-                    Navigator.of(context).pop(false);
-                  },
-                  customBorder: const CircleBorder(),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: SpeakColors.surface,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: SpeakColors.line),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      color: DesignTokens.ink,
-                    ),
-                  ),
                 ),
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
 
   Widget _benefit(String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 7),
+      padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: SpeakColors.accentSoft,
+              color: DesignTokens.primarySoft,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: SpeakColors.accent, size: 17),
+            alignment: Alignment.center,
+            child: Icon(icon, color: DesignTokens.primary, size: 19),
           ),
-          const SizedBox(width: 9),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               title,
               style: DesignTokens.body(14.5, weight: FontWeight.w700),
             ),
           ),
+          Icon(Icons.check_rounded, color: DesignTokens.success, size: 19),
         ],
       ),
     );
@@ -368,10 +394,16 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     final packages =
         _offerings?.current?.availablePackages ?? const <Package>[];
     if (packages.isEmpty) {
-      return SpeakCard(
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
+          border: Border.all(color: DesignTokens.hairline),
+        ),
         child: Text(
           'Subscriptions are temporarily unavailable on this device. Please try again later or contact support.',
-          style: DesignTokens.body(13).copyWith(color: SpeakColors.inkSoft),
+          style: DesignTokens.body(13).copyWith(color: DesignTokens.inkSoft),
         ),
       );
     }
@@ -389,7 +421,12 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     final selected = package.identifier == _selected?.identifier;
     final annual = package.packageType == PackageType.annual;
     final trialSummary = _trialSummary(package);
-    return GestureDetector(
+    return V3Pressable(
+      key: ValueKey('paywall.plan.${package.identifier}'),
+      label:
+          '${_planTitle(package)}, ${package.storeProduct.priceString}, '
+          '${_billingTerms(package)}${selected ? ', selected' : ''}',
+      selected: selected,
       onTap: () {
         setState(() => _selected = package);
         ProductAnalytics.capture(
@@ -402,12 +439,12 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
         decoration: BoxDecoration(
-          color: SpeakColors.surface,
-          borderRadius: BorderRadius.circular(16),
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusCard),
           border: Border.all(
-            color: selected ? SpeakColors.accent : SpeakColors.line,
+            color: selected ? DesignTokens.primary : DesignTokens.hairline,
             width: selected ? 2 : 1,
           ),
         ),
@@ -417,7 +454,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
               selected
                   ? Icons.check_circle_rounded
                   : Icons.radio_button_unchecked_rounded,
-              color: selected ? SpeakColors.accent : SpeakColors.line,
+              color: selected ? DesignTokens.primary : DesignTokens.muted,
               size: 21,
             ),
             const SizedBox(width: 9),
@@ -442,7 +479,7 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                     style: DesignTokens.body(
                       11.5,
                       weight: FontWeight.w600,
-                    ).copyWith(color: SpeakColors.inkSoft),
+                    ).copyWith(color: DesignTokens.inkSoft),
                   ),
                   if (trialSummary != null) ...[
                     const SizedBox(height: 1),
@@ -457,15 +494,16 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
                                 maxLines: 1,
                                 style: DesignTokens.body(
                                   11.5,
-                                ).copyWith(color: SpeakColors.inkSoft),
+                                ).copyWith(color: DesignTokens.inkSoft),
                               ),
                             ),
                           )
                         : Text(
                             trialSummary,
-                            style: DesignTokens.body(
-                              11.5,
-                            ).copyWith(color: SpeakColors.inkSoft, height: 1.3),
+                            style: DesignTokens.body(11.5).copyWith(
+                              color: DesignTokens.inkSoft,
+                              height: 1.3,
+                            ),
                           ),
                   ],
                 ],
@@ -473,7 +511,23 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
             ),
             if (annual) ...[
               const SizedBox(width: 10),
-              const SpeakPill(label: 'BEST VALUE', selected: true),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: DesignTokens.primarySoft,
+                  borderRadius: BorderRadius.circular(DesignTokens.radiusPill),
+                ),
+                child: Text(
+                  'BEST VALUE',
+                  style: DesignTokens.label(
+                    10,
+                    weight: FontWeight.w800,
+                  ).copyWith(color: DesignTokens.primary),
+                ),
+              ),
             ],
           ],
         ),
@@ -483,13 +537,15 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
 
   String _ctaLabel() {
     final price = _selected?.storeProduct.priceString;
-    return price == null ? 'Subscribe' : 'Subscribe for $price';
-  }
-
-  String _bottomPriceLine() {
-    final selected = _selected;
-    if (selected == null) return 'Choose a plan';
-    return selected.storeProduct.priceString;
+    if (price == null) return 'Continue';
+    final period = switch (_selected?.packageType) {
+      PackageType.annual => 'year',
+      PackageType.threeMonth => '3 months',
+      PackageType.monthly => 'month',
+      PackageType.weekly => 'week',
+      _ => null,
+    };
+    return period == null ? 'Continue · $price' : 'Continue · $price / $period';
   }
 
   String _bottomTerms(Package package) {
@@ -544,14 +600,19 @@ class _SpeakPaywallScreenState extends ConsumerState<SpeakPaywallScreen> {
     _ => 'billed each period',
   };
 
-  Widget _legal(String label, String url) => GestureDetector(
-    onTap: () => launchUrl(Uri.parse(url)),
+  Widget _legal(String label, String url, String key) => TextButton(
+    key: ValueKey(key),
+    onPressed: () => launchUrl(Uri.parse(url)),
+    style: TextButton.styleFrom(
+      minimumSize: const Size(44, 48),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+    ),
     child: Text(
       label,
       style: DesignTokens.body(
         10.5,
         weight: FontWeight.w700,
-      ).copyWith(color: SpeakColors.accent),
+      ).copyWith(color: DesignTokens.primary),
     ),
   );
 }

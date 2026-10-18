@@ -50,6 +50,15 @@ enum CallStatus {
 /// Free-form (or context-seeded) live voice call with Marie. Ported from SessionView.swift.
 /// `stage` is null for the unstructured "Just talk to Marie" call, or e.g. "speaking" for the
 /// Daily Pathway's closing roleplay stage — it only affects how the saved session is tagged.
+///
+/// Live tutor screen contract. Key prefix: liveTutor.
+/// User arrived to practise French with the tutor selected for this lesson.
+/// They must understand the current lesson, connection state, and Marie's
+/// latest spoken words. Primary action: speak to Marie. Secondary actions:
+/// mute or end the session. Success state: the session is saved and its recap
+/// is shown. Must not contain: competing actions, decorative cards, or fake
+/// connection/audio states. States: connecting, listening, speaking, muted,
+/// interrupted/reconnecting, error, and completed.
 class SessionScreen extends ConsumerStatefulWidget {
   const SessionScreen({
     super.key,
@@ -130,13 +139,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   String _liveTutorTranscriptBuffer = '';
   bool _liveTutorScolding = false;
   bool _liveTutorResponseStarted = false;
-  double _liveTutorVoiceLevel = 0;
+  final ValueNotifier<double> _liveTutorVoiceLevel = ValueNotifier(0);
   int _liveTutorDisplayedCharacters = 0;
   bool _liveTutorAudioStarted = false;
   bool _liveTutorTurnComplete = false;
   bool _liveTutorFinalizing = false;
   Timer? _liveTutorTranscriptTimer;
   bool _sessionSaved = false;
+  bool _awaitingMicrophonePermissionSettings = false;
+  bool _microphonePermissionRecoveryInFlight = false;
   int _callDuration = 0;
   bool _isSpeakerOn = true;
 
@@ -203,10 +214,28 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       ref.read(notetakerStateProvider).currentContext = 'Speaking';
     });
     _audio = AudioStreamingService();
-    // Keep the proven Live API automatic-VAD path for hands-free conversation.
-    // Local speech gating combined with audioStreamEnd at every pause caused
-    // the Live socket to treat ordinary pauses like the end of its audio stream.
+    // The Live Tutor uses the processed full-duplex route so a learner can
+    // interrupt naturally. Other speaking surfaces keep their existing
+    // automatic-VAD route until their turn controls are migrated separately.
     _audio.allowBargeIn = false;
+    _audio.preferFullDuplexVoiceProcessing = _isLiveTutor;
+    _audio.speechGateEnabled = _isLiveTutor;
+    _audio.onSpeechStarted = () {
+      if (!_isLiveTutor || !_audio.fullDuplexActive) return;
+      if (_audio.hasPendingPlayback) {
+        if (_gemini.isModelGenerating) _gemini.suppressCurrentReply();
+        _liveTutorTurnComplete = false;
+        _commitInterruptedLiveTutorTranscript();
+        unawaited(_audio.stopPlayback());
+        _audio.isOutputActive = false;
+        if (mounted && _callStatus != CallStatus.muted) {
+          setState(() => _callStatus = CallStatus.listening);
+        }
+      }
+    };
+    _audio.onSpeechEnded = () {
+      if (_isLiveTutor) _closeLiveTutorInputTurn();
+    };
     _audio.onPlaybackChunk = _handleLiveTutorPlaybackChunk;
     _gemini = GeminiLiveService(
       apiKey: widget.apiKey,
@@ -258,6 +287,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _liveTutorTranscriptTimer?.cancel();
     _endCall();
     _scrollController.dispose();
+    _liveTutorVoiceLevel.dispose();
     super.dispose();
   }
 
@@ -278,9 +308,38 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       // call instead of leaving Gemini connected behind the lock screen.
       _gemini.disconnect();
     } else if (state == AppLifecycleState.resumed) {
-      _mic.onAppResumed().catchError((e) {
-        if (mounted) setState(() => _errorMessage = 'Mic error: $e');
+      unawaited(_handleAppResumed());
+    }
+  }
+
+  Future<void> _handleAppResumed() async {
+    try {
+      await _mic.onAppResumed();
+    } catch (e) {
+      if (mounted) setState(() => _errorMessage = 'Mic error: $e');
+      return;
+    }
+
+    if (!_awaitingMicrophonePermissionSettings ||
+        _microphonePermissionRecoveryInFlight) {
+      return;
+    }
+    _microphonePermissionRecoveryInFlight = true;
+    try {
+      if (!mounted ||
+          _sessionSaved ||
+          !await _audio.microphonePermissionGranted) {
+        return;
+      }
+
+      _awaitingMicrophonePermissionSettings = false;
+      setState(() {
+        _errorMessage = '';
+        _callStatus = CallStatus.connecting;
       });
+      await _startCall();
+    } finally {
+      _microphonePermissionRecoveryInFlight = false;
     }
   }
 
@@ -315,8 +374,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     }
     if (!mounted || _sessionSaved) return;
     if (!microphoneReady) {
-      _endedReason = 'microphone_permission_denied';
-      _endCall();
+      _awaitingMicrophonePermissionSettings = true;
+      setState(() {
+        _errorMessage =
+            'Microphone permission is required to start a voice session.';
+        _callStatus = CallStatus.connecting;
+      });
       return;
     }
 
@@ -641,7 +704,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       // without them touching anything.
       if (mounted) {
         setState(() {
-          _liveTutorVoiceLevel = 0;
+          _liveTutorVoiceLevel.value = 0;
           if (_callStatus != CallStatus.muted) {
             _callStatus = CallStatus.listening;
           }
@@ -663,7 +726,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       }
       if (mounted) {
         setState(() {
-          _liveTutorVoiceLevel = 0;
+          _liveTutorVoiceLevel.value = 0;
           _liveTutorAudioStarted = false;
           if (_callStatus != CallStatus.muted) {
             _callStatus = CallStatus.listening;
@@ -674,10 +737,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   void _handleLiveTutorPlaybackChunk(List<int> audioData) {
-    if (!_showLiveTutorUi || !mounted) return;
+    if (!_showLiveTutorUi || !mounted || _sessionSaved) return;
     final level = _liveTutorPcmLevel(audioData);
-    if ((level - _liveTutorVoiceLevel).abs() <= 0.01) return;
-    setState(() => _liveTutorVoiceLevel = level);
+    // Notify only the mascot so each PCM frame does not rebuild the streamed
+    // transcript and the rest of the call screen.
+    _liveTutorVoiceLevel.value = level;
   }
 
   void _startLiveTutorTranscriptTicker() {
@@ -755,7 +819,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _liveTutorAudioStarted = false;
     _liveTutorTurnComplete = false;
     _liveTutorFinalizing = false;
-    _liveTutorVoiceLevel = 0;
+    _liveTutorVoiceLevel.value = 0;
 
     if (finalText.isNotEmpty) {
       _appendMessage(ChatMessage(role: 'tutor', content: finalText));
@@ -1135,9 +1199,26 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     return LiveTutorMascotMood.listening;
   }
 
+  String get _liveTutorHeaderStatus {
+    switch (_callStatus) {
+      case CallStatus.connecting:
+        return 'Connecting';
+      case CallStatus.reconnecting:
+        return 'Reconnecting';
+      case CallStatus.listening:
+        return 'Listening';
+      case CallStatus.tutorSpeaking:
+        return 'Marie is speaking';
+      case CallStatus.muted:
+        return 'Microphone off';
+      case CallStatus.ended:
+        return 'Ended';
+    }
+  }
+
   /// Gemini Live sends the tutor voice as little-endian, 16-bit mono PCM at
-  /// 24 kHz. Use the actual outgoing samples to drive the mascot's two
-  /// existing mouth states, so silence closes it and voiced sound opens it.
+  /// 24 kHz. Use the actual outgoing samples to shape the mascot's jaw, so
+  /// silence closes it and voiced sound opens it.
   /// This deliberately measures the tutor output, not the learner's mic.
   double _liveTutorPcmLevel(List<int> bytes) {
     var sumSquares = 0.0;
@@ -1288,22 +1369,19 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  LiveTutorMascot(
-                    size: 188,
-                    mood: _liveTutorMascotMood,
-                    voiceLevel: _liveTutorVoiceLevel,
+                  ValueListenableBuilder<double>(
+                    valueListenable: _liveTutorVoiceLevel,
+                    builder: (context, voiceLevel, _) => LiveTutorMascot(
+                      size: 204,
+                      mood: _liveTutorMascotMood,
+                      voiceLevel: voiceLevel,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   _liveTutorTranscript(),
                   if (_errorMessage.isNotEmpty) ...[
                     const SizedBox(height: 18),
-                    Text(
-                      _errorMessage,
-                      textAlign: TextAlign.center,
-                      style: DesignTokens.body(
-                        12,
-                      ).copyWith(color: DesignTokens.danger),
-                    ),
+                    ErrorNotice(message: _errorMessage),
                   ],
                 ],
               ),
@@ -1329,12 +1407,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           KeyedSubtree(
             key: AppTour.micButtonKey,
             child: _controlButton(
+              key: const ValueKey('liveTutor.mute'),
               icon: _callStatus == CallStatus.muted
                   ? CupertinoIcons.mic_slash_fill
                   : CupertinoIcons.mic_fill,
               label: _callStatus == CallStatus.muted ? 'Unmute' : 'Mute',
               color: DesignTokens.primary,
-              iconColor: Colors.black,
+              iconColor: DesignTokens.onPrimary,
               onTap: enabled ? _toggleMute : null,
             ),
           ),
@@ -1342,10 +1421,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           KeyedSubtree(
             key: AppTour.endCallKey,
             child: _controlButton(
+              key: const ValueKey('liveTutor.end'),
               icon: CupertinoIcons.phone_down_fill,
               label: 'End',
               color: DesignTokens.primary,
-              iconColor: Colors.black,
+              iconColor: DesignTokens.onPrimary,
               onTap: enabled ? _confirmEnd : null,
             ),
           ),
@@ -1355,8 +1435,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   Widget _liveTutorHeader() {
+    final textScale = MediaQuery.textScalerOf(context).scale(1);
     return SizedBox(
-      height: 62,
+      height: math.max(62.0, 36 + textScale * 30).toDouble(),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 4, 16, 0),
         child: Row(
@@ -1384,24 +1465,38 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                   const SizedBox(height: 3),
                   Text(
                     'Lesson · ${widget.liveTutorLessonTitle}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: DesignTokens.body(
                       11,
                     ).copyWith(color: DesignTokens.nightMuted),
                   ),
-                  const SizedBox(height: 3),
                   Semantics(
-                    label: _liveTutorIsConnected
-                        ? 'Live connection active'
-                        : _statusText,
-                    child: Container(
-                      width: 7,
-                      height: 7,
-                      decoration: BoxDecoration(
-                        color: _liveTutorIsConnected
-                            ? DesignTokens.success
-                            : DesignTokens.warning,
-                        shape: BoxShape.circle,
-                      ),
+                    label: _liveTutorHeaderStatus,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: _liveTutorIsConnected
+                                ? DesignTokens.success
+                                : DesignTokens.warning,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          _liveTutorHeaderStatus,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: DesignTokens.body(
+                            10.5,
+                            weight: FontWeight.w500,
+                          ).copyWith(color: DesignTokens.nightMuted),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -1418,6 +1513,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   Widget _liveTutorTranscript() {
+    final textScaler = MediaQuery.textScalerOf(context);
+    final slotHeight = math
+        .max(48.0, textScaler.scale(18) * 1.18 * 2 + 4)
+        .toDouble();
+    final transcriptHeight = slotHeight * 2 + textScaler.scale(8);
     final visible = _messages.length <= 2
         ? List<ChatMessage>.of(_messages)
         : _messages.sublist(_messages.length - 2);
@@ -1434,7 +1534,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       }
     }
 
-    if (visible.isEmpty) return const SizedBox(height: 96);
+    if (visible.isEmpty) return SizedBox(height: transcriptHeight);
 
     // Keep two fixed-height slots so a streamed word never changes the
     // transcript column's height or its vertical anchor. A single visible
@@ -1447,7 +1547,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     ];
     return SizedBox(
       width: double.infinity,
-      height: 96,
+      height: transcriptHeight,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final textWidth = math.min(
@@ -1457,9 +1557,19 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              _liveTutorTranscriptSlot(slots[0], textWidth),
-              const SizedBox(height: 8),
-              _liveTutorTranscriptSlot(slots[1], textWidth),
+              _liveTutorTranscriptSlot(
+                slots[0],
+                textWidth,
+                slotHeight,
+                textScaler,
+              ),
+              SizedBox(height: textScaler.scale(8)),
+              _liveTutorTranscriptSlot(
+                slots[1],
+                textWidth,
+                slotHeight,
+                textScaler,
+              ),
             ],
           );
         },
@@ -1467,8 +1577,13 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     );
   }
 
-  Widget _liveTutorTranscriptSlot(ChatMessage? message, double textWidth) {
-    if (message == null) return const SizedBox(height: 44);
+  Widget _liveTutorTranscriptSlot(
+    ChatMessage? message,
+    double textWidth,
+    double slotHeight,
+    TextScaler textScaler,
+  ) {
+    if (message == null) return SizedBox(height: slotHeight);
 
     final style =
         DesignTokens.body(
@@ -1482,14 +1597,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         );
 
     return SizedBox(
-      height: 44,
+      height: slotHeight,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 22),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 350),
           child: Center(
             child: Text(
-              _tailForTwoLines(message.content, style, textWidth),
+              _tailForTwoLines(message.content, style, textWidth, textScaler),
               textAlign: TextAlign.center,
               maxLines: 2,
               // The rolling window already removes the older words. Never
@@ -1507,7 +1622,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   /// Returns the longest suffix that fits in two rendered lines. The suffix
   /// is chosen by words rather than characters, so the newest word is always
   /// preserved and the visible window reads naturally from left to right.
-  String _tailForTwoLines(String text, TextStyle style, double maxWidth) {
+  String _tailForTwoLines(
+    String text,
+    TextStyle style,
+    double maxWidth,
+    TextScaler textScaler,
+  ) {
     final normalized = text.replaceAll(RegExp(r'\s+'), ' ').trim();
     if (normalized.isEmpty) return normalized;
 
@@ -1519,6 +1639,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         text: TextSpan(text: candidate, style: style),
         textDirection: TextDirection.ltr,
         maxLines: 2,
+        textScaler: textScaler,
       )..layout(maxWidth: maxWidth);
       if (painter.didExceedMaxLines) break;
       best = candidate;
@@ -1800,6 +1921,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   Widget _controlButton({
+    Key? key,
     required IconData icon,
     required String label,
     required Color color,
@@ -1807,6 +1929,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     required VoidCallback? onTap,
   }) {
     return Semantics(
+      key: key,
       button: true,
       enabled: onTap != null,
       label: label,

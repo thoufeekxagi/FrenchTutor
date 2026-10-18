@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" role="img" aria-labelledby="title desc">
+  <title id="title">ParleSprint Counterform logo</title>
+  <desc id="desc">ParleSprint. TCF Canada preparation. A white aperture holds a blue P, designed to read clearly at small sizes.</desc>
+  <g transform="translate(40 40) scale(0.390625)">
+    <rect width="1024" height="1024" fill="#1D4ED8"/>
+    <circle cx="512" cy="468" r="352" fill="#FFFFFF"/><path d="M342 206H562C690 206 768 284 768 408S690 610 562 610H454V726H342V206ZM454 318V500H557C622 500 656 468 656 408S622 318 557 318H454Z" fill="#1D4ED8" fill-rule="evenodd"/>
+    <text x="512" y="910" text-anchor="middle" fill="#FFFFFF" font-family="'Helvetica Neue', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="13">TCF</text>
+  </g>
+  <text x="540" y="222" fill="#14171C" font-family="'Helvetica Neue', Arial, sans-serif" font-size="112" font-weight="650" letter-spacing="-4">ParleSprint</text>
+  <text x="545" y="304" fill="#1D4ED8" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="6">TCF CANADA PREP</text>
+</svg>

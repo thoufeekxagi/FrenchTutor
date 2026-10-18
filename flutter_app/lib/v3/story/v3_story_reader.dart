@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/tokens.dart';
+import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../services/session_settings.dart';
 import '../../widgets/adaptive/adaptive.dart' show PSHaptics;
@@ -27,13 +28,19 @@ import 'v3_story_word_popover.dart';
 /// text, anything centered.
 ///
 /// A tapped word shows a small card just above it (never a sheet) and, when
-/// "Hear words when tapped" is on, Marie says the word. Narration is live
-/// Marie, as in the legacy reader.
+/// "Hear words when tapped" is on, the selected tutor says the word.
+/// Narration stays live, as in the legacy reader.
 class V3StoryReader extends ConsumerStatefulWidget {
-  const V3StoryReader({super.key, required this.story, this.startAt = 0});
+  const V3StoryReader({
+    super.key,
+    required this.story,
+    this.startAt = 0,
+    this.listenFirst = false,
+  });
 
   final V3Story story;
   final int startAt;
+  final bool listenFirst;
 
   @override
   ConsumerState<V3StoryReader> createState() => _V3StoryReaderState();
@@ -52,6 +59,7 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
   );
   var _playing = false;
   var _loading = false;
+  late var _transcriptUnlocked = !widget.listenFirst;
   int? _rawWord;
 
   final _sentenceKeys = <int, GlobalKey>{};
@@ -413,9 +421,7 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
       children: [
         const SizedBox(height: 6),
         Text(_story.title, style: V3Type.title(34)),
-        const SizedBox(height: 6),
-        Text(_story.titleEn, style: V3Type.body(15)),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         Row(
           children: [
             Container(
@@ -430,10 +436,7 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              '${_story.minutes} min  ·  ${_story.sentences.length} sentences',
-              style: V3Type.body(13),
-            ),
+            Text('${_story.minutes} min', style: V3Type.body(13)),
           ],
         ),
         const SizedBox(height: 18),
@@ -442,7 +445,7 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
   }
 
   Widget _tabs() {
-    const names = ['Story', 'Quiz', 'Words'];
+    final names = [widget.listenFirst ? 'Listen' : 'Story', 'Quiz', 'Words'];
     return Container(
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: DesignTokens.hairline)),
@@ -491,6 +494,50 @@ class _V3StoryReaderState extends ConsumerState<V3StoryReader>
   // ---- Story tab -------------------------------------------------------
 
   List<Widget> _storyTab() {
+    if (widget.listenFirst && !_transcriptUnlocked) {
+      return [
+        const SizedBox(height: 20),
+        Container(
+          key: const ValueKey('story.listen.first'),
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: DesignTokens.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: DesignTokens.hairline),
+            boxShadow: DesignTokens.surfaceShadow,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: DesignTokens.primarySoft,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  CupertinoIcons.headphones,
+                  color: DesignTokens.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text('Listen first', style: V3Type.title(24)),
+              const SizedBox(height: 18),
+              V3Button(
+                key: const ValueKey('story.listen.showTranscript'),
+                label: 'Show transcript',
+                kind: V3ButtonKind.ghost,
+                trailingArrow: false,
+                onTap: () => setState(() => _transcriptUnlocked = true),
+              ),
+            ],
+          ),
+        ),
+      ];
+    }
     return [for (var i = 0; i < _story.sentences.length; i++) _sentence(i)];
   }
 
@@ -1101,7 +1148,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             builder: (_, on, _) => _toggle(
               'hearWords',
               'Hear words when tapped',
-              'Marie says the word you tap',
+              '${ActiveTutor.current.displayName} says the word you tap',
               on,
               V3StoryProgress.setHearWords,
             ),
@@ -1109,7 +1156,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           _toggle(
             'highlight',
             'Highlight the spoken word',
-            'Follows Marie while she reads',
+            'Follows ${ActiveTutor.current.displayName} while they read',
             s.highlightWords,
             s.setHighlightWords,
           ),

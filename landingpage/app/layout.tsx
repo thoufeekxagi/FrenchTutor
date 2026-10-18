@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { faqs } from "./faq-data";
+import { LearnerProvider } from "../components/learner-provider";
 import { SiteAnalytics } from "./site-analytics";
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-const title = "ParleSprint | The French Tutor That Remembers You";
-const description = "Speak French every day with Marie, a personal tutor who remembers every mistake and rebuilds tomorrow's lesson around it. Vocabulary, grammar, listening, writing, and real conversation in one daily loop, built toward TEF/TCF Canada readiness.";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://parlesprint.com";
+const title = "ParleSprint | Free French practice for your everyday";
+const description = "Free daily French practice, useful writing tools, verb exercises and your own vocabulary notebook. Start without an account. Build confidence for everyday life in Canada.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#090b0e", colorScheme: "dark" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#f5f6f8", colorScheme: "light" };
 
 const structuredData = [
   {
@@ -59,7 +59,7 @@ const structuredData = [
     "@type": "Organization",
     name: "ParleSprint",
     url: siteUrl,
-    logo: `${siteUrl}/parle-mark.svg`,
+    logo: `${siteUrl}/icon-512.png`,
     description,
   },
   {
@@ -67,28 +67,20 @@ const structuredData = [
     "@type": "SoftwareApplication",
     name: "ParleSprint",
     applicationCategory: "EducationalApplication",
-    operatingSystem: "iOS, Android, and Web",
+    operatingSystem: "iOS, Web, Chrome",
     url: siteUrl,
     description,
     featureList: [
-      "Personalized daily French pathway",
+      "Free daily French practice",
       "Live French speaking practice",
-      "Spaced-repetition vocabulary",
-      "Voice-led grammar practice",
+      "Personal vocabulary notebook",
+      "Essential verb practice",
       "French reading and listening practice",
       "Writing practice with feedback",
       "TEF and TCF Canada-oriented preparation",
     ],
   },
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  },
+
 ];
 
 const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
@@ -96,10 +88,11 @@ const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-CA" className={inter.variable}>
-      <body className="theme-gold font-sans antialiased">
-        {children}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
+      <body className="font-sans antialiased">
+        <LearnerProvider>{children}
         {gaId && <SiteAnalytics gaId={gaId} />}
+        </LearnerProvider>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       </body>
     </html>
   );

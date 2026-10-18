@@ -182,6 +182,7 @@ class V3Card extends StatelessWidget {
   final VoidCallback? onTap;
   final Color? borderColor;
   final bool leadingAccent;
+
   /// Draw the accent rail against the card edge instead of inside its padding.
   /// This matches the attached-border treatment used by the Review surface.
   final bool leadingAccentAttached;
@@ -189,9 +190,7 @@ class V3Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final card = Container(
-      clipBehavior: leadingAccentAttached
-          ? Clip.hardEdge
-          : Clip.none,
+      clipBehavior: leadingAccentAttached ? Clip.hardEdge : Clip.none,
       padding: leadingAccentAttached ? EdgeInsets.zero : padding,
       decoration: BoxDecoration(
         color: raised
@@ -230,7 +229,7 @@ class V3Row extends StatelessWidget {
     super.key,
     required this.icon,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     this.value,
     this.onTap,
     this.accent,
@@ -239,7 +238,7 @@ class V3Row extends StatelessWidget {
 
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final String? value;
   final VoidCallback? onTap;
   final Color? accent;
@@ -266,15 +265,17 @@ class V3Row extends StatelessWidget {
                     weight: FontWeight.w700,
                   ).copyWith(color: DesignTokens.nightText),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: DesignTokens.body(
-                    12,
-                  ).copyWith(color: DesignTokens.nightMuted),
-                ),
+                if (subtitle != null && subtitle!.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle!,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: DesignTokens.body(
+                      12,
+                    ).copyWith(color: DesignTokens.nightMuted),
+                  ),
+                ],
               ],
             ),
           ),

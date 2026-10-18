@@ -1,14 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:french_tutor/data/database/learning_store.dart';
+import 'package:french_tutor/providers/database_provider.dart';
 import 'package:french_tutor/v3/lesson/v3_course.dart';
 import 'package:french_tutor/v3/lesson/v3_lesson.dart';
 import 'package:french_tutor/v3/lesson/v3_lesson_player.dart';
 import 'package:french_tutor/v3/marie/v3_marie_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 /// Going back inside a lesson, replaying a finished one, and the rule that
 /// real progress (Resume) never moves backwards.
@@ -38,20 +42,28 @@ void main() {
     int startAt = 0,
     int frontier = 0,
     bool reviewAll = false,
+    bool savePathProgress = true,
+    Future<void> Function(int step)? onStepChanged,
   }) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final marie = V3FakeMarieSession();
     addTearDown(marie.dispose);
+    final db = sqlite3.openInMemory();
+    addTearDown(db.dispose);
+    final learningStore = LearningStore(db);
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [learningStoreProvider.overrideWithValue(learningStore)],
         child: MaterialApp(
           home: V3LessonPlayer(
             lesson: lesson,
             startAt: startAt,
             frontier: frontier,
             reviewAll: reviewAll,
+            savePathProgress: savePathProgress,
+            onStepChanged: onStepChanged,
             marie: marie,
           ),
         ),
@@ -79,6 +91,7 @@ void main() {
   );
   setUp(() {
     V3Progress.resetQueueForTest();
+    V3MarieSession.debugLog.clear();
     SharedPreferences.setMockInitialValues({});
   });
 
@@ -151,6 +164,61 @@ void main() {
     );
   });
 
+  testWidgets('waits for daily progress before enabling the next step', (
+    tester,
+  ) async {
+    final saved = Completer<void>();
+    var saveCalls = 0;
+    await pump(
+      tester,
+      startAt: plain,
+      frontier: plain,
+      savePathProgress: false,
+      onStepChanged: (step) {
+        saveCalls += 1;
+        expect(step, plain + saveCalls);
+        return saved.future;
+      },
+    );
+
+    await tester.tap(find.byKey(const ValueKey('lesson.continue')));
+    await tester.pump();
+    expect(onStep(plain + 1), findsOneWidget);
+    expect(find.text('Saving…'), findsOneWidget);
+    expect(saveCalls, 1);
+
+    await tester.tap(find.byKey(const ValueKey('lesson.continue')));
+    await tester.pump();
+    expect(onStep(plain + 1), findsOneWidget);
+    expect(saveCalls, 1, reason: 'the next action must wait for the save');
+
+    saved.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('Saving…'), findsNothing);
+    await tapKey(tester, 'lesson.continue');
+    expect(onStep(plain + 2), findsOneWidget);
+    expect(saveCalls, 2);
+  });
+
+  testWidgets('failed daily progress save returns to the retryable step', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      startAt: plain,
+      frontier: plain,
+      savePathProgress: false,
+      onStepChanged: (_) async => throw StateError('offline'),
+    );
+
+    await tapKey(tester, 'lesson.continue');
+    expect(onStep(plain), findsOneWidget);
+    expect(
+      find.text('Progress could not be saved. Try continuing again.'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('a finished lesson replays from the top and changes nothing', (
     tester,
   ) async {
@@ -178,6 +246,11 @@ void main() {
     await tapKey(tester, 'lesson.option.$answer');
     await tapKey(tester, 'lesson.check');
     expect(find.text('Correct'), findsOneWidget);
+    expect(
+      V3MarieSession.debugLog,
+      contains('feedback-mic-blocked'),
+      reason: 'the success click must close Marie’s mic before playback',
+    );
     await tapKey(tester, 'lesson.continue');
     await tapKey(tester, 'lesson.back');
     expect(onStep(q), findsOneWidget);

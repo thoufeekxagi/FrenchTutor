@@ -28,7 +28,7 @@ export default function StoriesIndexPage() {
           Real people, learning French, in public.
         </h1>
         <p className="text-xl text-[#6b7280] leading-relaxed max-w-2xl">
-          Ongoing, dated progress from real learners, including ParleSprint's own founder, updated as it happens, not
+          Ongoing, dated progress from real learners, including ParleSprint&apos;s own founder, updated as it happens, not
           polished after the fact.
         </p>
       </section>

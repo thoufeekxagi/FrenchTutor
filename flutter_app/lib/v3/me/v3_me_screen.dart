@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
@@ -16,31 +15,15 @@ import '../ui/v3_ui.dart';
 /// Me tab. Screen contract:
 ///
 /// User arrived to: check progress and change settings.
-/// They must understand: where they are, their target, and where settings live.
+/// They must understand: their starting level, their goal, and where settings live.
 /// Primary action: none; a calm list.
 /// Must not contain: invented per-skill levels. Until a real mock exists the
 /// card says so and points to Tests.
-class V3MeScreen extends ConsumerStatefulWidget {
+class V3MeScreen extends ConsumerWidget {
   const V3MeScreen({super.key});
 
   @override
-  ConsumerState<V3MeScreen> createState() => _V3MeScreenState();
-}
-
-class _V3MeScreenState extends ConsumerState<V3MeScreen> {
-  int _target = 7;
-
-  @override
-  void initState() {
-    super.initState();
-    SharedPreferences.getInstance().then((prefs) {
-      if (!mounted) return;
-      setState(() => _target = prefs.getInt('tcf_target_nclc') ?? 7);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(learningStoreProvider).profile();
     final dark = ref.watch(appearanceSettingsProvider).darkMode;
     final tutor = ActiveTutor.current;
@@ -86,13 +69,13 @@ class _V3MeScreenState extends ConsumerState<V3MeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'TARGET',
+                          'GOAL',
                           style: V3Type.eyebrow(DesignTokens.inkSoft),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'NCLC $_target',
-                          style: V3Type.title(30, color: DesignTokens.mastery),
+                          'TCF Canada',
+                          style: V3Type.title(24, color: DesignTokens.primary),
                         ),
                       ],
                     ),
@@ -100,7 +83,7 @@ class _V3MeScreenState extends ConsumerState<V3MeScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Your estimated level for listening, reading, writing and speaking appears after your first mock test.',
+                  'Your level estimate appears after your first mock test.',
                   style: V3Type.body(14.5),
                 ),
               ],

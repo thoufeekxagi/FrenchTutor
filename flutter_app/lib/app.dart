@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +11,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'design/app_theme.dart';
 import 'design/appearance_colors.dart';
+import 'design/tokens.dart';
 import 'models/pilot_access.dart';
 import 'providers/appearance_provider.dart';
 import 'providers/database_provider.dart';
@@ -51,9 +54,11 @@ class FrenchTutorApp extends ConsumerWidget {
 ///   2. onboarded, AI data-use not yet accepted -> [AiConsentScreen] (must
 ///      run before any feature can call the AI provider — Apple Guideline
 ///      5.1.2(i))
-///   3. onboarded + consented but no session -> [SpeakAuthScreen] ("create an
-///      account to save your progress" — the natural close of onboarding)
-///   4. signed in -> optional three-minute Marie practice -> [MainTabScreen]
+///   3. onboarded + consented with practice pending -> the three-minute
+///      practice with the tutor chosen during onboarding
+///   4. practice completed or skipped, no session -> [SpeakAuthScreen] (save
+///      progress by creating an account)
+///   5. signed in -> [MainTabScreen]
 ///
 /// Everything renders INSIDE this gate (no pushReplacement out of it) so a
 /// later sign-out from Settings always lands back on the sign-in screen —
@@ -86,10 +91,11 @@ class _AuthGateState extends ConsumerState<AuthGate>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // A tester build (`--dart-define=REVIEW_BUILD=true`) shows onboarding on
-    // every launch so it can be reviewed in depth. False in every normal build.
+    // REVIEW_BUILD also opens paid areas. ONBOARDING_PREVIEW replays only the
+    // onboarding flow, without changing subscription access.
     _requiresInstallOnboarding =
         const bool.fromEnvironment('REVIEW_BUILD') ||
+        const bool.fromEnvironment('ONBOARDING_PREVIEW') ||
         !ref.read(learningStoreProvider).profile().isOnboarded;
     SharedPreferences.getInstance().then((prefs) {
       if (!mounted) return;
@@ -331,10 +337,10 @@ class _AuthGateState extends ConsumerState<AuthGate>
       final restoreReady =
           hydration?.profileFetchSucceeded == true &&
           hydration?.adaptiveCourseFetchSucceeded == true;
-      // Older onboarding versions allowed the optional trial before account
-      // creation, so claim any learner-owned rows from that path. New installs
-      // now offer the practice after sign-in. This remains background work:
-      // local course creation must not wait on a network timeout after signup.
+      // Claim any learner-owned rows from onboarding practice, including
+      // older installs that recorded the optional trial before account
+      // creation. This remains background work: local course creation must
+      // not wait on a network timeout after signup.
       unawaited(
         ref.read(syncServiceProvider).syncAdoptedOnboardingTrials().catchError((
           error,
@@ -463,50 +469,271 @@ class _AuthGateState extends ConsumerState<AuthGate>
         onAccepted: () => setState(() => _aiConsented = true),
       );
     }
-    if (!_hasSession) return const SpeakAuthScreen();
     if (!_onboardingTrialLoaded) return const _RestoringProgressView();
     if (_onboardingTrialPending) {
       return V3OnboardingTrialOffer(onComplete: _completeOnboardingTrial);
     }
+    if (!_hasSession) return const SpeakAuthScreen();
     return const V3Shell();
   }
 }
 
-/// Shown while a signed-in account restores its profile and course route.
-/// This keeps every startup route read behind the same hydration boundary.
-class _RestoringProgressView extends StatelessWidget {
+/// Screen: Account restore   Key prefix: auth.restore.
+/// User arrived to: signed in while their saved profile and course are loading.
+/// They must understand: their course is being prepared.
+/// Primary action: allow the local restore to finish.
+/// Secondary action: retry only when the restore failed.
+/// Success state: the gate opens the learner's course.
+/// Must not contain: a boxed app icon, fake progress, or distracting copy.
+/// States: default/loading, error (retry available), completed (gate advances).
+class _RestoringProgressView extends StatefulWidget {
   const _RestoringProgressView({this.onRetry});
 
   final VoidCallback? onRetry;
 
   @override
+  State<_RestoringProgressView> createState() => _RestoringProgressViewState();
+}
+
+class _RestoringProgressViewState extends State<_RestoringProgressView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _motion = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1500),
+  );
+  bool? _reduceMotion;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    if (_reduceMotion == reduceMotion) return;
+    _reduceMotion = reduceMotion;
+    if (reduceMotion) {
+      _motion.stop(canceled: false);
+    } else {
+      _motion.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _motion.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppearanceColors.blueLight,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              'assets/images/parlesprint_app_icon.png',
-              width: 88,
-              height: 88,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 22),
-            const CircularProgressIndicator(color: Colors.white),
-            const SizedBox(height: 14),
-            const Text(
-              'Getting your course ready',
-              style: TextStyle(color: Colors.white, fontSize: 15),
-            ),
-            if (onRetry != null) ...[
-              const SizedBox(height: 8),
-              TextButton(onPressed: onRetry, child: const Text('Try again')),
+    final reduceMotion = _reduceMotion ?? false;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: AppearanceColors.blueLight,
+        systemNavigationBarColor: AppearanceColors.blueLight,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: AppearanceColors.blueLight,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: AnimatedBuilder(
+                    animation: _motion,
+                    builder: (context, _) {
+                      final phase = reduceMotion ? 0.5 : _motion.value;
+                      final dotCount = (phase * 3).floor() % 3 + 1;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Transform.scale(
+                              scale: reduceMotion
+                                  ? 1
+                                  : 1 + 0.018 * math.sin(phase * math.pi * 2),
+                              child: Image.asset(
+                                'assets/images/logo_mark.png',
+                                width: 82,
+                                height: 100,
+                                fit: BoxFit.contain,
+                                semanticLabel: 'ParleSprint',
+                              ),
+                            ),
+                            const SizedBox(height: DesignTokens.space7),
+                            Semantics(
+                              label: 'Loading your course',
+                              liveRegion: true,
+                              child: ExcludeSemantics(
+                                child: SizedBox.square(
+                                  dimension: 38,
+                                  child: CustomPaint(
+                                    painter: _RestoreSpinnerPainter(
+                                      phase: phase,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: DesignTokens.space5),
+                            Semantics(
+                              liveRegion: true,
+                              label: 'Getting your course ready',
+                              child: ExcludeSemantics(
+                                child: Text.rich(
+                                  TextSpan(
+                                    text: 'Getting your course ready',
+                                    style:
+                                        DesignTokens.body(
+                                          15,
+                                          weight: FontWeight.w500,
+                                        ).copyWith(
+                                          color: AppearanceColors.onBlueLight,
+                                        ),
+                                    children: [
+                                      TextSpan(
+                                        text: '.' * dotCount,
+                                        style:
+                                            DesignTokens.body(
+                                              17,
+                                              weight: FontWeight.w700,
+                                            ).copyWith(
+                                              color:
+                                                  AppearanceColors.onBlueLight,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            if (widget.onRetry != null) ...[
+                              const SizedBox(height: DesignTokens.space3),
+                              TextButton(
+                                key: const ValueKey('auth.restore.retry'),
+                                onPressed: widget.onRetry,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppearanceColors.onBlueLight,
+                                ),
+                                child: Text(
+                                  'Try again',
+                                  style:
+                                      DesignTokens.body(
+                                        15,
+                                        weight: FontWeight.w600,
+                                      ).copyWith(
+                                        color: AppearanceColors.onBlueLight,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: DesignTokens.space3),
+                  child: AnimatedBuilder(
+                    animation: _motion,
+                    builder: (context, _) => ExcludeSemantics(
+                      child: SizedBox(
+                        width: 96,
+                        height: 28,
+                        child: CustomPaint(
+                          painter: _RestorePulsePainter(
+                            phase: reduceMotion ? 0.5 : _motion.value,
+                            isStatic: reduceMotion,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
-          ],
+          ),
         ),
       ),
     );
   }
+}
+
+class _RestoreSpinnerPainter extends CustomPainter {
+  const _RestoreSpinnerPainter({required this.phase});
+
+  final double phase;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = math.min(size.width, size.height) / 2 - 2;
+    final track = Paint()
+      ..color = AppearanceColors.onBlueLight.withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+    final arc = Paint()
+      ..color = AppearanceColors.onBlueLight
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(center, radius, track);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2 + phase * math.pi * 2,
+      math.pi * 1.3,
+      false,
+      arc,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _RestoreSpinnerPainter oldDelegate) =>
+      oldDelegate.phase != phase;
+}
+
+class _RestorePulsePainter extends CustomPainter {
+  const _RestorePulsePainter({required this.phase, required this.isStatic});
+
+  final double phase;
+  final bool isStatic;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const heights = [6.0, 10.0, 16.0, 23.0, 16.0, 10.0, 6.0];
+    const barWidth = 3.0;
+    const gap = 7.0;
+    final totalWidth = heights.length * barWidth + (heights.length - 1) * gap;
+    final startX = (size.width - totalWidth) / 2;
+    for (var i = 0; i < heights.length; i++) {
+      final wave = isStatic
+          ? 0.55
+          : (math.sin(phase * math.pi * 2 - i * 0.72) + 1) / 2;
+      final height = 4 + heights[i] * (0.38 + wave * 0.62);
+      final alpha = 0.28 + wave * 0.56;
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          startX + i * (barWidth + gap),
+          (size.height - height) / 2,
+          barWidth,
+          height,
+        ),
+        const Radius.circular(2),
+      );
+      canvas.drawRRect(
+        rect,
+        Paint()..color = AppearanceColors.onBlueLight.withValues(alpha: alpha),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _RestorePulsePainter oldDelegate) =>
+      oldDelegate.phase != phase || oldDelegate.isStatic != isStatic;
 }

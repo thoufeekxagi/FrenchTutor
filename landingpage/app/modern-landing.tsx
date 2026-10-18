@@ -2,9 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, BookOpen, Brain, Check, Clock, GraduationCap, Headphones, MapPin, MessageCircle, Mic, PenLine, Briefcase, Repeat, RotateCcw, Smartphone, Monitor, X } from "lucide-react";
-import { Logo, LogoMark } from "./logo";
+import { LogoMark } from "./logo";
 import { SiteNav } from "./SiteNav";
 import { SiteFooter } from "./SiteFooter";
 import { ProblemSection } from "./problem-section";
@@ -425,27 +424,6 @@ export function ModernLanding() {
           </div>
         </Reveal>
 
-        {/* The current app preview keeps the marketing page visually anchored to the product. */}
-        <Reveal delay={0.2} className="relative hidden lg:block">
-          <div className="relative mx-auto w-[min(100%,430px)] rotate-[2deg] rounded-[2.4rem] border border-[#2d3037] bg-[#111317] p-3 shadow-[0_28px_80px_rgba(0,0,0,0.45)]">
-            <div className="absolute -left-10 top-20 rounded-2xl border border-[#f2c14e]/25 bg-[#17191e] px-4 py-3 text-left shadow-xl">
-              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#f2c14e]">Today&apos;s loop</div>
-              <div className="mt-1 text-sm font-semibold text-[#f6f4ee]">Speak with confidence</div>
-            </div>
-            <Image
-              src="/app-speaking-preview.png"
-              alt="ParleSprint speaking practice screen"
-              width={1284}
-              height={2778}
-              priority
-              className="h-auto w-full rounded-[2rem]"
-            />
-            <div className="absolute -bottom-5 -right-8 rounded-2xl border border-[#f2c14e]/25 bg-[#17191e] px-4 py-3 text-left shadow-xl">
-              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9b9ea7]">Tutor memory</div>
-              <div className="mt-1 text-sm font-semibold text-[#f6f4ee]">Every mistake remembered</div>
-            </div>
-          </div>
-        </Reveal>
       </section>
 
       {/* Problem: mirror the visitor's failed history with other apps */}

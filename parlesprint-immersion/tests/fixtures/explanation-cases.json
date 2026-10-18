@@ -1,0 +1,22 @@
+[
+ {"id":"a1-greeting","text":"Bonjour","sentence":"Bonjour, je m'appelle Léa.","level":"A1","focus":"Basic greeting"},
+ {"id":"a1-negation","text":"ne parle pas","sentence":"Je ne parle pas anglais.","level":"A1","focus":"Present tense negation"},
+ {"id":"a1-contraction","text":"au","sentence":"Je vais au marché.","level":"A1","focus":"Contraction à + le"},
+ {"id":"a1-gender","text":"une amie","sentence":"C'est une amie française.","level":"A1","focus":"Feminine noun and adjective"},
+ {"id":"a2-perfect","text":"suis allée","sentence":"Hier, je suis allée au cinéma.","level":"A2","focus":"Passé composé with être and agreement"},
+ {"id":"a2-imperfect","text":"faisait","sentence":"Quand j'étais petit, il faisait froid en hiver.","level":"A2","focus":"Imperfect background description"},
+ {"id":"a2-future","text":"vais partir","sentence":"Je vais partir demain matin.","level":"A2","focus":"Near future"},
+ {"id":"a2-reflexive","text":"me suis levé","sentence":"Je me suis levé tôt ce matin.","level":"A2","focus":"Reflexive passé composé"},
+ {"id":"a2-idiom","text":"avoir le cafard","sentence":"Il dit avoir le cafard depuis son départ.","level":"A2","focus":"Feeling down, not literal cockroach"},
+ {"id":"a2-informal-negation","text":"j'sais pas","sentence":"Franchement, j'sais pas quoi faire.","level":"A2","focus":"Spoken contraction and omitted ne"},
+ {"id":"b1-slang","text":"c'est ouf","sentence":"Ce concert, c'est ouf !","level":"B1","focus":"Verlan slang and register"},
+ {"id":"b1-quebec","text":"c'est plate","sentence":"Le film était long, c'est plate.","level":"B1","focus":"Québécois boring or disappointing context"},
+ {"id":"b1-pronoun","text":"j'en ai marre","sentence":"J'en ai marre de rater le bus.","level":"B1","focus":"Idiomatic fed up, not literal pronoun translation"},
+ {"id":"b1-pronoun-y","text":"j'y tiens","sentence":"Cette bague vient de ma mère et j'y tiens beaucoup.","level":"B1","focus":"Tenir à and pronoun y"},
+ {"id":"b1-subjunctive","text":"que tu viennes","sentence":"Il faut que tu viennes avant midi.","level":"B1","focus":"Necessity + present subjunctive venir"},
+ {"id":"b2-counterfactual","text":"j'aurais su","sentence":"Si j'avais demandé, j'aurais su la vérité.","level":"B2","focus":"Past conditional with pluperfect condition"},
+ {"id":"b2-concession","text":"bien qu'il soit","sentence":"Bien qu'il soit fatigué, il continue à travailler.","level":"B2","focus":"Concession and subjunctive"},
+ {"id":"b2-idiom","text":"poser un lapin","sentence":"Elle m'a posé un lapin au restaurant hier soir.","level":"B2","focus":"Standing someone up, not rabbit"},
+ {"id":"b1-caption-error","text":"sa va","sentence":"sa va je sui la demain","level":"B1","focus":"Malformed subtitles: likely ça va / suis; mark reconstruction uncertainty"},
+ {"id":"b2-caption-ambiguity","text":"ver vert verre","sentence":"Il a dit ver vert verre puis le sous-titre s'est coupé.","level":"B2","focus":"Homophones, truncated context; do not invent certainty"}
+]

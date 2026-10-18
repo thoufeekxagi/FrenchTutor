@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">ParleSprint Focus Frame app icon</title>
+  <desc id="desc">A focused P surrounded by four light crop marks, with no extra ornament. TCF appears at the bottom of the icon.</desc>
+  <rect width="1024" height="1024" fill="#FFFFFF"/>
+  <path d="M256 174H563C723 174 816 267 816 414S723 654 563 654H416V790H256V174ZM416 304V524H559C628 524 666 487 666 414S628 304 559 304H416Z" fill="#1D4ED8" fill-rule="evenodd"/><path d="M220 308V220H308M716 220H804V308M220 610V698H308M716 698H804V610" fill="none" stroke="#2563EB" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="512" y="910" text-anchor="middle" fill="#1D4ED8" font-family="'Helvetica Neue', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="13">TCF</text>
+</svg>

@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 
 // Gemini fallback for callers that explicitly request Gemini. Course lesson
 // authoring uses the same OpenRouter route as Practice; it must not silently
@@ -266,6 +267,38 @@ Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response("ok", { headers });
   if (request.method !== "POST") return json({ error: "POST required" }, 405);
 
+  // The Supabase gateway accepts the public anonymous key as a valid JWT for
+  // function invocation. That is useful for public endpoints, but this one
+  // spends provider credits. Require either a real user session or the exact
+  // service-role credentials used by prepare-course-lesson for its internal
+  // server-to-server call.
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !anonKey || !serviceRoleKey) {
+    return json({ error: "AI authentication is not configured" }, 503);
+  }
+  const authorization = request.headers.get("Authorization") ?? "";
+  const token = authorization.startsWith("Bearer ")
+    ? authorization.slice("Bearer ".length).trim()
+    : "";
+  const isInternalServiceCall = token === serviceRoleKey &&
+    request.headers.get("apikey") === serviceRoleKey;
+  if (!isInternalServiceCall) {
+    if (!token) return json({ error: "Authentication required" }, 401);
+    try {
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authorization } },
+      });
+      const { data, error } = await userClient.auth.getUser(token);
+      if (error || !data.user) {
+        return json({ error: "A valid signed-in account is required" }, 401);
+      }
+    } catch {
+      return json({ error: "A valid signed-in account is required" }, 401);
+    }
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -319,14 +352,18 @@ Deno.serve(async (request) => {
       (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES)) {
     return json({ error: "Invalid messages" }, 400);
   }
-  const contents = rawContents === undefined ? buildGeminiContents(messages) : rawContents;
+  const contents = rawContents === undefined
+    ? Array.isArray(messages) ? buildGeminiContents(messages) : null
+    : rawContents;
   if (!validateContents(contents)) return json({ error: "Invalid Gemini contents" }, 400);
   const generationConfig = { temperature, maxOutputTokens: maxTokens };
   const geminiBody: Record<string, unknown> = {
     contents: normalizeGeminiContents(contents),
     generationConfig,
   };
-  const instruction = body.systemInstruction ?? systemInstruction(messages);
+  const instruction = body.systemInstruction ?? systemInstruction(
+    Array.isArray(messages) ? messages : [],
+  );
   if (instruction !== undefined) geminiBody.systemInstruction = instruction;
   return await callGemini(geminiBody, {
     traceFeature: body.traceFeature,

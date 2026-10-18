@@ -57,6 +57,19 @@ void main() {
       expect(prompt, contains('START THE CALL WITH A WARM GREETING'));
     });
 
+    test('lesson coach has a short, learner-controlled reply contract', () {
+      final prompt = LivePrompts.compactLessonCoach(
+        persona: TutorPersona.marie,
+      );
+      expect(prompt, contains('ANSWER THE LATEST REQUEST FIRST'));
+      expect(prompt, contains('usually 8 to 25 words'));
+      expect(prompt, contains('that pace until the learner changes it'));
+      expect(prompt, contains('If they say stop,'));
+      expect(prompt, contains('TEACH, DON\'T CHATTER'));
+      expect(prompt, contains('stop your answer immediately'));
+      expect(prompt, contains('INTERRUPTIONS AND NOISE'));
+    });
+
     test(
       'Live tutor follows the learner and treats course context as optional',
       () {
@@ -100,7 +113,7 @@ void main() {
     });
 
     test(
-      'compact Live Tutor adapts reply length under a hard output ceiling',
+      'compact Live Tutor keeps normal replies short but can teach in depth',
       () {
         final prompt = LivePrompts.compactLiveTutor(
           persona: TutorPersona.marie,
@@ -111,7 +124,7 @@ void main() {
         expect(prompt, contains('one or two concise sentences'));
         expect(prompt, contains('If they ask for an explanation'));
         expect(prompt, contains('Never pad, repeat an old French word'));
-        expect(prompt, contains('hard maximum, not a target'));
+        expect(prompt, contains('complete, step-by-step explanation'));
       },
     );
 

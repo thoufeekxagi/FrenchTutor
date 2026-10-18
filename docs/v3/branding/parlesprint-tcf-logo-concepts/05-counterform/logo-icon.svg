@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">ParleSprint Counterform app icon</title>
+  <desc id="desc">A white aperture holds a blue P, designed to read clearly at small sizes. TCF appears at the bottom of the icon.</desc>
+  <rect width="1024" height="1024" fill="#1D4ED8"/>
+  <circle cx="512" cy="468" r="352" fill="#FFFFFF"/><path d="M342 206H562C690 206 768 284 768 408S690 610 562 610H454V726H342V206ZM454 318V500H557C622 500 656 468 656 408S622 318 557 318H454Z" fill="#1D4ED8" fill-rule="evenodd"/>
+  <text x="512" y="910" text-anchor="middle" fill="#FFFFFF" font-family="'Helvetica Neue', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="13">TCF</text>
+</svg>

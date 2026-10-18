@@ -53,12 +53,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     datePublished: post.date,
     dateModified: post.date,
     author: { "@type": "Organization", name: "ParleSprint", url: siteUrl },
-    publisher: { "@type": "Organization", name: "ParleSprint", url: siteUrl, logo: `${siteUrl}/parle-mark.svg` },
+    publisher: { "@type": "Organization", name: "ParleSprint", url: siteUrl, logo: `${siteUrl}/icon-512.png` },
     mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F9FA] font-sans">
+    <main id="main-content" className="journal-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
@@ -66,7 +66,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       <SiteNav />
 
-      <article className="px-6 max-w-3xl mx-auto pt-12 pb-10">
+      <article className="journal-article">
         <Link
           href="/blog"
           className="inline-flex items-center gap-2 text-sm font-bold text-[#007BFF] mb-8 hover:gap-3 transition-all"
@@ -74,27 +74,25 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <ArrowLeft className="w-4 h-4" /> Back to the blog
         </Link>
 
-        <div className="flex flex-wrap items-center gap-3 mb-6 text-xs font-bold uppercase tracking-widest">
+        <div className="journal-meta">
           <span className="text-[#007BFF]">{post.category}</span>
-          <span className="text-[#9ca3af]">&middot;</span>
-          <span className="text-[#9ca3af]">{post.readingTime}</span>
+          <span>{new Intl.DateTimeFormat("en-CA", { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${post.date}T12:00:00`))}</span>
+          <span>{post.readingTime}</span>
         </div>
 
-        <h1 className="text-3xl md:text-5xl font-extrabold text-[#1C1E21] tracking-tight leading-tight mb-8">
-          {post.title}
-        </h1>
+        <h1>{post.title}</h1>
 
         <BlogProse content={post.content} />
 
-        <div className="mt-14 rounded-3xl bg-[#1C1E21] text-white p-8 md:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="journal-article-cta mt-14 rounded-3xl p-8 md:p-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <p className="text-lg font-medium text-[#d1d5db] max-w-md">
-            Ready to actually practise speaking, every day, with a tutor who remembers where you left off?
+            Ready to put one useful French idea into practice today?
           </p>
           <Link
-            href="/#join"
+            href="/today"
             className="shrink-0 bg-[#007BFF] hover:bg-[#0062CC] text-white px-6 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2"
           >
-            Join the early list <ArrowRight className="w-4 h-4" />
+            Try free practice <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 

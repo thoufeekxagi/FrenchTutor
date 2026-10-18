@@ -1,0 +1,20 @@
+export const GEMINI_AUTH_TOKEN_URL =
+  "https://generativelanguage.googleapis.com/v1beta/auth_tokens";
+
+export function buildAuthTokenRequest(apiKey: string, now: number): RequestInit {
+  return {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
+    },
+    body: JSON.stringify({
+      uses: 1,
+      expireTime: new Date(now + 30 * 60 * 1000).toISOString(),
+      newSessionExpireTime: new Date(now + 60 * 1000).toISOString(),
+      liveConnectConstraints: {
+        model: "models/gemini-3.8-live",
+      },
+    }),
+  };
+}

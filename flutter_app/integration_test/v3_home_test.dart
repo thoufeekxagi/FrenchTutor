@@ -98,7 +98,8 @@ void main() {
     await probe.settle(tester, timeout: const Duration(seconds: 10));
 
     final homeTexts = await texts(tester);
-    expect(homeTexts, contains('Bonjour!'));
+    expect(homeTexts, contains('Home'));
+    expect(homeTexts, contains('Path'));
     expect(homeTexts, contains('CONTINUE YOUR COURSE'));
     expect(homeTexts, contains('Your practice'));
     expect(homeTexts, contains('Your TCF path'));
@@ -178,8 +179,7 @@ void main() {
     await probe.tapLabel(tester, 'Done');
     await probe.waitFor(tester, find.text('Completed today'));
 
-    // The home practice tiles open Marie, review, and the fuller practice
-    // destination without a Course/Practice segment on the approved screen.
+    // The home practice tiles open Marie, review, and Stories from the home.
     await probe.tapLabel(tester, 'Talk with Marie. Conversation practice.');
     await probe.waitForLabel(tester, 'Back');
     await tester.pageBack();
@@ -193,16 +193,15 @@ void main() {
     final practiceLabels = await labels(tester);
     expect(practiceLabels, contains('Read stories'));
     expect(practiceLabels, contains('Listen stories'));
-    expect(practiceLabels, contains('Explore practice library'));
     await probe.capture(tester, '04_practice');
 
     // The streak calendar opens from the home and refreshes the challenge
     // state after the local walkthrough finishes.
-    await probe.tapLabel(tester, 'Back home');
+    await probe.tapLabel(tester, 'Close Stories');
     await probe.tapLabel(tester, 'View course path');
     await probe.waitFor(tester, find.text('Your course path'));
     await probe.capture(tester, '05_course_path');
-    await probe.tapLabel(tester, 'Back home');
+    await probe.tapLabel(tester, 'Home');
     await prefs.remove('$challengeKey.step');
     await prefs.remove('$challengeKey.completed');
     final courseLabels = await labels(tester);

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../models/tutor_persona.dart';
 import 'audio_streaming_service.dart';
 import 'gemini_live_audio_service.dart';
+import 'mic_echo_gate.dart';
 
 /// Plays each tutor's [TutorPersona.sampleLine] in their own voice, for the
 /// pickers in onboarding and Settings (P2.2).
@@ -111,6 +112,9 @@ class TutorVoicePreviewer extends ChangeNotifier {
     _playingDurationMs = playbackMs;
     notifyListeners();
     _startAnalysis(bytes, generation);
+    _audio.blockMicUntil(
+      DateTime.now().add(Duration(milliseconds: playbackMs) + MicEchoGate.tail),
+    );
     try {
       await _audio.playAudioChunk(bytes);
     } catch (_) {

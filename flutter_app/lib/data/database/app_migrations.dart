@@ -109,6 +109,8 @@ final Map<int, void Function(CommonDatabase)> _migrations = {
   43: _migrationV43,
   44: _migrationV44,
   45: _migrationV45,
+  46: _migrationV46,
+  47: _migrationV47,
 };
 
 void _migrationV1(CommonDatabase db) {
@@ -1206,6 +1208,34 @@ void _migrationV45(CommonDatabase db) {
   if (_tableExists(db, 'mistake_tags') &&
       !_columnExists(db, 'mistake_tags', 'updated_at')) {
     db.execute('ALTER TABLE mistake_tags ADD COLUMN updated_at TEXT');
+  }
+}
+
+/// V3 authored-course progress must survive app reinstalls and account changes,
+/// so the durable local snapshot lives with the learner's SQLite data and is
+/// mirrored by SyncService when an account is signed in.
+void _migrationV46(CommonDatabase db) {
+  db.execute('''
+    CREATE TABLE IF NOT EXISTS v3_course_progress (
+      lesson_id TEXT PRIMARY KEY,
+      status TEXT NOT NULL CHECK (status IN ('in_progress', 'completed')),
+      current_step INTEGER NOT NULL DEFAULT 0 CHECK (current_step >= 0),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  ''');
+  db.execute(
+    'CREATE INDEX IF NOT EXISTS idx_v3_course_progress_status_updated '
+    'ON v3_course_progress (status, updated_at DESC)',
+  );
+}
+
+/// The exam target date belongs to the learner profile so it follows their
+/// account across devices instead of living only in SharedPreferences.
+void _migrationV47(CommonDatabase db) {
+  if (_tableExists(db, 'profiles') &&
+      !_columnExists(db, 'profiles', 'tcf_exam_date')) {
+    db.execute('ALTER TABLE profiles ADD COLUMN tcf_exam_date TEXT');
   }
 }
 

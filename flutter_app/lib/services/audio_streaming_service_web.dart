@@ -85,6 +85,9 @@ class WebAudioStreamingService implements AudioStreamingService {
   bool _isStreaming = false;
   bool _starting = false;
 
+  @override
+  bool isAwaitingTutorResponse = false;
+
   DateTime? _playbackTimelineStart;
   Duration _playbackTimelineDuration = Duration.zero;
 
@@ -136,9 +139,16 @@ class WebAudioStreamingService implements AudioStreamingService {
   bool isOutputActive = false;
 
   @override
+  bool preferFullDuplexVoiceProcessing = false;
+
+  @override
+  bool get fullDuplexActive => false;
+
+  @override
   /// The web build keeps its own simple gate. Present so shared code can call it.
   void blockMicUntil(DateTime time) {}
 
+  @override
   bool allowBargeIn = false;
 
   @override
@@ -146,6 +156,18 @@ class WebAudioStreamingService implements AudioStreamingService {
 
   @override
   void Function()? onSpeechEnded;
+
+  @override
+  void Function()? onSpeechStarted;
+
+  @override
+  void handleMicChunkForTest(
+    Uint8List chunk,
+    void Function(List<int> chunk) onChunk, {
+    bool fullDuplexActive = false,
+  }) {
+    // The PCM dispatch test targets the native lesson call implementation.
+  }
 
   @override
   void Function(List<int> chunk)? onPlaybackChunk;
@@ -258,6 +280,11 @@ class WebAudioStreamingService implements AudioStreamingService {
     }
   }
 
+  @override
+  Future<void> preparePlayback() async {
+    _ensureOutputContext();
+  }
+
   Future<void> _startWorkletCapture(web.AudioContext ctx) async {
     final blob = web.Blob(
       [_captureWorkletSource.toJS].toJS,
@@ -325,6 +352,7 @@ class WebAudioStreamingService implements AudioStreamingService {
   }
 
   void _handleMicFloatFrame(Float32List frame) {
+    if (isAwaitingTutorResponse) return;
     final onChunk = _onChunk;
     if (!_isStreaming || onChunk == null) return;
 

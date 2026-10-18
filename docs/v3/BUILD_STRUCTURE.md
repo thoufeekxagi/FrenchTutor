@@ -58,6 +58,20 @@ speaker button resolves: local file, then shared catalog, then (miss only) live
 generation and upload to the shared catalog. Cache key includes text, voice and
 a version prefix so a changed script never plays stale audio.
 
+The interactive lesson tutor and Live Tutor are Gemini-first. On iOS,
+`VoiceProcessingAudioPlugin` captures 16 kHz PCM and plays Gemini's 24 kHz PCM
+through the same `AVAudioEngine` with VoiceProcessingIO enabled, so the system
+echo canceller has the tutor's actual render signal while the learner can
+interrupt. Android uses flutter_sound's `voice_communication` source with
+platform AEC/NS. A local speech gate drops silence and short noise bursts,
+preserves pre-roll, and sends `audioStreamEnd`; Gemini's Live VAD stays enabled
+as a second boundary check. Live Tutor retains a 2,000-token rolling context
+and compresses at 4,000 tokens. If voice processing cannot start or recover,
+the app uses half-duplex capture. App-owned lesson clips still mute the model
+input for their measured duration plus a 150 ms tail. See `AGENT_RULES.md`
+section 7 and `MARIE_VOICE_ARCHITECTURE.md` for implementation and test
+evidence.
+
 ## Entitlements and review safety
 
 - Free: Stage 0 sounds, A1 Unit 1, one short TCF listening set, first level
@@ -69,13 +83,32 @@ a version prefix so a changed script never plays stale audio.
 - No `TCF` or `FEI` in the app name. Add "independent, not affiliated with FEI
   or IRCC".
 
-## Simulator unlock (planned)
+## Simulator iteration and deferred Photo Tutor
 
-`google_mlkit_text_recognition` and `google_mlkit_commons` have no arm64
-simulator slice, so the app cannot build for the iOS simulator today. Photo
-tutor is out of scope for v3. Removing those two packages and the scan screens
-lets Xcode's MCP `DeviceInteraction*` tools (tap, swipe, screenshot,
-hierarchy on iOS 27+ simulator) drive the app without a phone.
+Photo Tutor and OCR are disabled in V3 and deferred until V4. The V3 OCR
+service returns an empty result, and `google_mlkit_text_recognition` is removed
+from the Flutter dependencies and iOS Pods so it cannot block simulator
+builds. The former native adapter is preserved at
+`docs/v4_deferred/photo_tutor/ocr_service_native.dart`; it is reference code,
+not part of the V3 build. Restore and review it only when Photo Tutor is
+scheduled for V4.
+
+Use `flutter_app/tool/simulator.sh` for simulator development. It defaults to
+the iPhone 17 Pro (iOS 27.0, UDID
+`EC2456A5-91A6-47DA-9B47-03E6F3E08F58`), shuts down other booted simulators,
+and enforces one booted simulator at a time. All simulator builds and launches
+are Debug developer builds. `test` defaults to the app boot smoke test and
+stores each run in a unique `artifacts/simulator/e2e-*` folder. If the selected
+simulator runtime becomes unstable or laggy, `reset` erases that simulator's
+local data and starts it fresh; this is not a remedy for compile or test
+assertion errors. Reset remains available during high host load but refuses to
+run while another Flutter or Xcode build/test is active.
+If Xcode's `Simulator.app` GUI is installed, the script opens it; otherwise it
+uses the booted CoreSimulator device headlessly and still captures screenshots.
+
+Commands (from `flutter_app/`): `tool/simulator.sh list|boot|build|test|run|
+screenshot|reset|shutdown`. Set `FLUTTER_SIMULATOR_ID` only when deliberately
+choosing another available iOS simulator.
 
 ## Build and release
 

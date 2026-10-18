@@ -1,7 +1,8 @@
-/// On-device OCR leaf service. Native (iOS/Android) resolves to ML Kit text
-/// recognition (Apple's Vision framework under the hood on iOS, Google's ML
-/// Kit on Android) — free, fast, private, no network round trip. There is no
-/// web branch yet: `master` predates the web app shell (see CLAUDE.md).
+/// OCR seam retained for the deferred V4 Photo Tutor.
+///
+/// V3 intentionally ships without an OCR engine. The native ML Kit adapter is
+/// preserved outside the Flutter app at `docs/v4_deferred/photo_tutor/ocr_service_native.dart`;
+/// this adapter returns an empty result until that feature is restored in V4.
 library;
 
 export 'ocr_service_unsupported.dart'

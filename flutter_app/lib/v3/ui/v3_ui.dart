@@ -57,12 +57,14 @@ class V3Pressable extends StatefulWidget {
     required this.onTap,
     required this.child,
     this.haptic = true,
+    this.selected,
   });
 
   final String label;
   final VoidCallback? onTap;
   final Widget child;
   final bool haptic;
+  final bool? selected;
 
   @override
   State<V3Pressable> createState() => _V3PressableState();
@@ -79,6 +81,7 @@ class _V3PressableState extends State<V3Pressable> {
       button: true,
       enabled: enabled,
       label: widget.label,
+      selected: widget.selected,
       excludeSemantics: true,
       onTap: widget.onTap,
       child: GestureDetector(

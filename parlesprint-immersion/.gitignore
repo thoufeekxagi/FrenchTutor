@@ -1,0 +1,10 @@
+node_modules/
+.wxt/
+.output/
+.env*
+!.env.example
+artifacts/
+.local-browser/
+.local-browser-live/
+release/
+backend/supabase/.temp/

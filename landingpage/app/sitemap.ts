@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getSortedPosts } from "./blog/data";
 import { stories, getStoryUpdatesSorted } from "./stories/data";
+import { lessons, getLessonRoute } from "./learn/lesson-data";
+import { tools } from "../lib/practice";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -8,6 +10,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getSortedPosts();
   return [
     { url: siteUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
+    { url: `${siteUrl}/today`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+    { url: `${siteUrl}/learn`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    ...lessons.map((lesson) => ({ url: `${siteUrl}${getLessonRoute(lesson.slug)}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.75 })),
+    { url: `${siteUrl}/tools`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    ...tools.map(({ slug }) => ({ url: `${siteUrl}/tools/${slug}`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.75 })),
+    { url: `${siteUrl}/extension`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${siteUrl}/app`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${siteUrl}/feedback`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },
     { url: `${siteUrl}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.8 },
     ...posts.map((post) => ({
       url: `${siteUrl}/blog/${post.slug}`,

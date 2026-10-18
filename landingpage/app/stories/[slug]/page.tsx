@@ -105,10 +105,10 @@ export default async function StoryPage({ params }: { params: Promise<{ slug: st
             Want to learn alongside a story like this one, instead of just reading about it?
           </p>
           <Link
-            href="/#join"
+            href="/today"
             className="shrink-0 bg-[#007BFF] hover:bg-[#0062CC] text-white px-6 py-3 rounded-full font-bold text-sm transition-all flex items-center gap-2"
           >
-            Join the early list <ArrowRight className="w-4 h-4" />
+            Try daily practice <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </article>

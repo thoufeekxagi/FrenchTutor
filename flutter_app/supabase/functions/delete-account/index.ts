@@ -85,6 +85,7 @@ const USER_DATA_TABLES: Array<[string, string]> = [
   ["learner_competency_state", "user_id"],
   ["learner_events", "user_id"],
   ["credit_usage_state", "user_id"],
+  ["v3_course_progress_state", "user_id"],
   ["lesson_progress_state", "user_id"],
   ["mistake_tag_state", "user_id"],
 ];

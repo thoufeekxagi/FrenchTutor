@@ -38,7 +38,7 @@ Put the contract as a comment at the top of the screen file.
 
 | Screen | Intent | Pattern source |
 |---|---|---|
-| Onboarding | animated greeting, three concise TCF value screens, optional exam date, single-row level choices, optional reminders, consent/account gates, then optional Marie practice | Babbel greeting/value slides; single-column choice rows |
+| Onboarding | animated greeting, three concise TCF value screens, optional name and exam date, level choice with an A1 default, optional reminders, AI consent, optional three-minute practice with the chosen tutor, then an account gate to save progress | Babbel greeting/value slides; single-column choice rows |
 | Learn home | Bonjour greeting, level and exam date, weekly activity, a vivid course continuation, four compact practice actions, and the TCF path | approved home reference, 2026-10-18 |
 | Daily challenge | one short, authored TCF-style task sequence, one step at a time, clear feedback and a useful next step | Speak practice, Babbel review |
 | Path | stage and unit list with states, what each unit lets you do | Babbel course list |

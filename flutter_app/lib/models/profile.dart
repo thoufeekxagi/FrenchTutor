@@ -8,6 +8,7 @@ class Profile {
         'zero', // CEFR 'a1'|'a2'|'b1'|'b2', or legacy values (see LearnerLevel)
     this.sessionLength = 'standard', // quick | standard | deep
     this.reminderTime,
+    this.tcfExamDate,
     this.preferredDays = const ['mon', 'tue', 'wed', 'thu', 'fri'],
     this.timeZone,
     this.notificationPermissionState = 'not_requested',
@@ -21,6 +22,7 @@ class Profile {
   String level;
   String sessionLength;
   String? reminderTime; // 'HH:mm'
+  DateTime? tcfExamDate;
   List<String> preferredDays; // mon | tue | wed | thu | fri | sat | sun
   String? timeZone; // local zone label plus offset, e.g. EDT|UTC-04:00
   String notificationPermissionState;

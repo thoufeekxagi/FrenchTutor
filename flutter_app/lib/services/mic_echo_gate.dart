@@ -1,20 +1,11 @@
-/// The one rule that stops a tutor from hearing herself.
-///
-/// While the phone is making sound, the microphone must send nothing to the
-/// model. Sound includes the tutor's voice, the short tail after it (audio is
-/// buffered and keeps playing after the last chunk is queued), and any clip the
-/// app plays itself, such as a lesson's speaker button. This holds for the
-/// loudspeaker, the earpiece, AirPods and wired headsets alike, because it does
-/// not depend on the route.
-///
-/// Anything that plays audio while a call can be open must go through here
-/// (see AudioStreamingService.blockMicUntil). Never let the model answer its
-/// own voice.
+/// Local mute window for app-owned lesson clips on the conservative audio
+/// route. The V3 tutor uses platform AEC for the tutor's own output so learners
+/// can interrupt; this gate remains for short app clips where the exact end is
+/// known. Full-duplex paths add only a small device/output tail.
 class MicEchoGate {
-  /// How long the mic stays closed after playback is scheduled to end. The
-  /// native player and the speaker keep sounding after the last chunk, so a
-  /// short margin lets the tail of her voice back in as "the learner".
-  static const tail = Duration(milliseconds: 900);
+  /// App clips already carry their measured playback duration. This margin
+  /// covers the output route's short acoustic tail without adding a long pause.
+  static const tail = Duration(milliseconds: 150);
 
   DateTime _blockedUntil = DateTime.fromMillisecondsSinceEpoch(0);
 

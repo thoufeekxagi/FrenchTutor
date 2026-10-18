@@ -1,4 +1,4 @@
-# google_mlkit_text_recognition (Live Vision Scan's OCR) requires iOS 15.5+.
+# The app currently targets iOS 15.5+.
 platform :ios, '15.5'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.

@@ -14,6 +14,8 @@ Rule: read this, then read the file. Never assume a key, label or route.
 ## `lib/screens/auth/speak_auth_screen.dart`
 - widgets: SpeakAuthScreen
 - tap handlers: 5
+- keys: `auth.apple`, `auth.email`, `auth.forgot`, `auth.google`, `auth.password`, `auth.resend`, `auth.submit`, `auth.toggle`
+- labels: 'Forgot password?'
 
 ## `lib/screens/exam/exam_practice_screen.dart`
 - widgets: ExamPracticeScreen, _ExamHeader, _QuestionBlock, _OptionRow, _ReviewAnswerLine, _ExamSurface
@@ -139,8 +141,9 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/screens/labs/vocabulary_flashcards_screen.dart`
 - widgets: VocabularyFlashcardsScreen
-- tap handlers: 14
-- labels: 'Done', 'Go back', 'Meaning shown', 'Practice more', 'Replay word'
+- tap handlers: 17
+- keys: `flashcards.daily.back`, `flashcards.daily.card.$_index`, `flashcards.daily.done`, `flashcards.daily.speaker.${entry.id}`
+- labels: 'Back', 'Done', 'Go back', 'Meaning shown', 'Practice more', 'Replay word'
 
 ## `lib/screens/labs/writing_course_home_screen.dart`
 - widgets: WritingCourseHomeScreen, _LevelBadge, _WritingLessonCard
@@ -214,6 +217,8 @@ Rule: read this, then read the file. Never assume a key, label or route.
 ## `lib/screens/onboarding/ai_consent_screen.dart`
 - widgets: AiConsentScreen
 - tap handlers: 2
+- keys: `consent.agree`, `consent.privacy`
+- labels: 'Agree and continue', 'See the full privacy policy'
 
 ## `lib/screens/onboarding/onboarding_screen.dart`
 - widgets: OnboardingScreen, _RecapMetric, _RecapWordsMetric, _BrandWordmark, _PreparingPane, _PromiseRow, _HeaderGutter
@@ -312,6 +317,7 @@ Rule: read this, then read the file. Never assume a key, label or route.
 ## `lib/screens/session/session_screen.dart`
 - widgets: SessionScreen
 - tap handlers: 9
+- keys: `liveTutor.end`, `liveTutor.mute`
 - labels: 'End', 'End session'
 
 ## `lib/screens/settings/orchestration_lab_screen.dart`
@@ -473,28 +479,29 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/screens/speak/v3_settings_screen.dart`
 - widgets: V3SettingsScreen
-- opens: PrivacyAiScreen, SpeakPaywallScreen
-- tap handlers: 10
-- keys: `settings.darkMode`
-- labels: 'A1', 'A2', 'B1', 'B2', 'Dark mode', 'Deep', 'Everyday French', 'Explore first', 'Quick', 'Standard', 'TEF Canada'
+- opens: PrivacyAiScreen, SpeakPaywallScreen, V3FrenchFingerprintScreen, V3StreakCalendarScreen
+- tap handlers: 15
+- keys: `settings.back`, `settings.darkMode`, `settings.fingerprint`, `settings.streak`, `settings.tutor`
+- labels: 'A1', 'A2', 'B1', 'B2', 'Close', 'Dark mode', 'Deep', 'Quick', 'Standard'
 
 ## `lib/screens/subscription/speak_paywall_screen.dart`
 - widgets: SpeakPaywallScreen
 - tap handlers: 6
-- labels: 'BEST VALUE'
+- keys: `paywall.back`, `paywall.plan.${package.identifier}`, `paywall.purchase.primary`, `paywall.restore`
+- labels: 'Back'
 
 ## `lib/v3/learn/v3_learn_screen.dart`
 - widgets: V3LearnScreen
-- opens: V3LessonPlayer, V3StoryReader
-- tap handlers: 8
-- keys: `learn.lesson.${l.id}`, `learn.readStory`, `learn.segment.${label.toLowerCase()}`, `learn.sheet`, `learn.sheet.resume`, `learn.sheet.review`, `learn.startLesson`, `learn.story.${s.id}`, `learn.unit.$unit`
-- labels: 'Read a story', 'Review from the start'
+- opens: LabsScreen, LiveTutorSetupScreen, V3LessonPlayer, V3StreakCalendarScreen, VocabularyFlashcardsScreen
+- tap handlers: 20
+- keys: `learn.backToCourse`, `learn.continuePath`, `learn.examDate`, `learn.lesson.${l.id}`, `learn.level`, `learn.level.${level.toUpperCase()}`, `learn.practiceBack`, `learn.practiceLibrary`, `learn.quick.challenge`, `learn.quick.marie`, `learn.quick.review`, `learn.quick.stories`, `learn.review`, `learn.sheet`, `learn.sheet.resume`, `learn.sheet.review`, `learn.stories`, `learn.streak`, `learn.unit.$unit`, `learn.viewPath`
+- labels: 'Back home', 'Explore practice library', 'Open Stories. Read or listen.', 'Review flashcards', 'Review from the start', 'Talk with Marie. Conversation practice.', 'View course path'
 
 ## `lib/v3/lesson/v3_lesson_player.dart`
 - widgets: V3LessonPlayer, V3Speaker
 - tap handlers: 11
 - keys: `lesson.back`, `lesson.check`, `lesson.close`, `lesson.continue`, `lesson.done`, `lesson.jumpToFrontier`, `lesson.option.$i`, `lesson.skipQuestion`, `step-${_step.id}`
-- labels: 'Check', 'Close lesson', 'Continue', 'Done', 'Previous step', 'Skip this question'
+- labels: 'Close lesson', 'Done', 'Previous step', 'Skip this question'
 
 ## `lib/v3/marie/v3_marie_dock.dart`
 - widgets: V3MarieCallButton, V3MarieDock
@@ -516,11 +523,19 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - labels: 'Dark mode', 'Settings'
 
 ## `lib/v3/onboarding/v3_onboarding_flow.dart`
-- widgets: V3OnboardingFlow, _GreetingIntro, _OnboardingHeader, _OnboardingCTA, _VoiceWave, V3OnboardingTrialOffer
+- widgets: V3OnboardingFlow, _GreetingIntro, _OnboardingChrome, _OnboardingCTA, _OnboardingChoice, _VoiceWave, V3OnboardingTrialOffer
 - opens: SpeakingPracticeScreen
-- tap handlers: 16
-- keys: `onboarding.courseContinue`, `onboarding.examDate`, `onboarding.examDateContinue`, `onboarding.examDateSkip`, `onboarding.goalContinue`, `onboarding.helloContinue`, `onboarding.level.${level.$1}`, `onboarding.levelContinue`, `onboarding.practiceContinue`, `onboarding.reminderDay.$value`, `onboarding.reminderTime`, `onboarding.remindersSave`, `onboarding.remindersSkip`, `onboarding.trial.skip`, `onboarding.trial.start`
-- labels: 'Continue', 'Save reminders', 'Skip for now', 'Start 3-minute practice', 'Start learning'
+- tap handlers: 23
+- keys: `onboarding.back`, `onboarding.courseContinue`, `onboarding.examDate`, `onboarding.examDateContinue`, `onboarding.examDateSkip`, `onboarding.goalContinue`, `onboarding.helloContinue`, `onboarding.level.${level.$1}`, `onboarding.levelContinue`, `onboarding.name`, `onboarding.nameContinue`, `onboarding.nameSkip`, `onboarding.pledgeContinue`, `onboarding.pledgeTitle`, `onboarding.practiceContinue`, `onboarding.reminderDay.$value`, `onboarding.reminderTime`, `onboarding.remindersSave`, `onboarding.remindersSkip`, `onboarding.trial.skip`, `onboarding.trial.start`, `onboarding.tutor.choose`
+- labels: 'Back', 'Continue', 'Skip', 'Skip practice', 'Start 3-minute practice'
+
+## `lib/v3/progress/v3_french_fingerprint_screen.dart`
+- widgets: V3FrenchFingerprintScreen
+- tap handlers: 0
+
+## `lib/v3/progress/v3_streak_calendar_screen.dart`
+- widgets: V3StreakCalendarScreen
+- tap handlers: 0
 
 ## `lib/v3/shell/v3_shell.dart`
 - widgets: V3Shell
@@ -529,15 +544,15 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/v3/story/v3_stories_panel.dart`
 - widgets: V3StoriesPanel
-- opens: ListeningPracticeScreen, V3StoryReader
+- opens: V3StoryReader
 - tap handlers: 4
 - keys: `stories.card.${s.id}`, `stories.featured`, `stories.level.$level`, `stories.mode.$id`
 
 ## `lib/v3/story/v3_story_reader.dart`
 - widgets: V3StoryReader, _SettingsSheet
-- tap handlers: 17
-- keys: `story.back`, `story.dock.play`, `story.dock.rate`, `story.dock.replay`, `story.dock.stop`, `story.finish`, `story.quiz.check`, `story.quiz.next`, `story.quiz.option.$i`, `story.settings`, `story.settings.$id`, `story.settings.$id.${it.$2}`, `story.tab.${names[i].toLowerCase()}`, `story.textSize`, `story.translate`, `story.words.hear.$key`, `story.words.save.$key`
-- labels: 'Check', 'Done'
+- tap handlers: 18
+- keys: `story.back`, `story.dock.play`, `story.dock.rate`, `story.dock.replay`, `story.dock.stop`, `story.finish`, `story.listen.first`, `story.listen.showTranscript`, `story.quiz.check`, `story.quiz.next`, `story.quiz.option.$i`, `story.settings`, `story.settings.$id`, `story.settings.$id.${it.$2}`, `story.tab.${names[i].toLowerCase()}`, `story.textSize`, `story.translate`, `story.words.hear.$key`, `story.words.save.$key`
+- labels: 'Check', 'Done', 'Show transcript'
 
 ## `lib/v3/story/v3_story_word_popover.dart`
 - widgets: V3StoryWordPopover
@@ -550,6 +565,12 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - opens: ExamReadinessScreen
 - tap handlers: 1
 - keys: `tests.section.${s.$1.toLowerCase()}`
+
+## `lib/v3/tutors/v3_tutor_picker_sheet.dart`
+- widgets: V3TutorPickerSheet
+- tap handlers: 4
+- keys: `tutor.close`, `tutor.confirm`, `tutor.option.${tutor.id}`, `tutor.preview.${tutor.id}`
+- labels: 'Close tutor choices'
 
 ## `lib/v3/ui/v3_ui.dart`
 - widgets: V3Pressable, V3Button, V3TextAction, V3OptionCard, V3Segments, V3FadeIn, V3Screen, V3Width
@@ -605,6 +626,7 @@ Rule: read this, then read the file. Never assume a key, label or route.
 ## `lib/widgets/live_tutor_mascot.dart`
 - widgets: LiveTutorMascot
 - tap handlers: 0
+- keys: `liveTutor.mascotMouth`
 
 ## `lib/widgets/mic_mode_bar.dart`
 - widgets: MicModeBar, MicPrimaryButton
@@ -666,8 +688,9 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - tap handlers: 0
 
 ## `lib/widgets/subscription_marketing_sections.dart`
-- widgets: SubscriptionMarketingSections, _LearningRouteCard, _LevelTag, _PersonalizationComparisonCard, _ComparisonColumn, _ContextLearningCard, _MiniTag, _ContextFeature, SubscriptionBottomOffer
+- widgets: SubscriptionMarketingSections, _FeatureRow, SubscriptionBottomOffer
 - tap handlers: 1
+- keys: `paywall.purchase.bottom`
 
 ## `lib/widgets/tts_play_button.dart`
 - widgets: TtsPlayButton

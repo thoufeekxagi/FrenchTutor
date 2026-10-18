@@ -1,0 +1,71 @@
+{
+  "title": "Un voyage au Québec",
+  "language": "fr",
+  "duration": 41.24,
+  "disclosure": "Original French practice text. Voice synthesized with Google Gemini; not a human speaker.",
+  "source": {
+    "provider": "Google Gemini",
+    "model": "gemini-3.8-flash-lite-tts",
+    "voice": "Kore",
+    "documentation": "https://ai.google.dev/gemini-api/docs/speech-generation",
+    "visual": "Original ParleSprint SVG artwork, rendered locally with FFmpeg"
+  },
+  "cues": [
+    {
+      "id": "practice-1",
+      "start": 0,
+      "end": 6.88,
+      "text": "Bonjour ! Aujourd'hui, je prépare mon premier voyage au Québec.",
+      "translation": "Hello! Today, I am preparing for my first trip to Quebec.",
+      "grammar": "Aujourd'hui means today. Je prépare uses the present tense of préparer."
+    },
+    {
+      "id": "practice-2",
+      "start": 7.28,
+      "end": 13.2,
+      "text": "Je voudrais réserver une chambre pour deux nuits, s'il vous plaît.",
+      "translation": "I would like to book a room for two nights, please.",
+      "grammar": "Je voudrais is a polite way to say I would like. Pour deux nuits gives the duration."
+    },
+    {
+      "id": "practice-3",
+      "start": 13.6,
+      "end": 17.52,
+      "text": "Est-ce que le petit déjeuner est compris dans le prix ?",
+      "translation": "Is breakfast included in the price?",
+      "grammar": "Est-ce que turns a statement into a question. Compris means included here."
+    },
+    {
+      "id": "practice-4",
+      "start": 17.92,
+      "end": 23.04,
+      "text": "Hier, j'ai oublié mon billet dans le train.",
+      "translation": "Yesterday, I forgot my ticket on the train.",
+      "grammar": "J'ai oublié is the passé composé: avoir plus a past participle."
+    },
+    {
+      "id": "practice-5",
+      "start": 23.44,
+      "end": 28.36,
+      "text": "Heureusement, une personne l'a retrouvé et me l'a rendu.",
+      "translation": "Fortunately, someone found it and gave it back to me.",
+      "grammar": "L' stands for le billet. Me means to me in me l'a rendu."
+    },
+    {
+      "id": "practice-6",
+      "start": 28.76,
+      "end": 34.24,
+      "text": "Même si je fais des erreurs, je continue à parler français.",
+      "translation": "Even if I make mistakes, I keep speaking French.",
+      "grammar": "Même si means even if. Continuer à is followed by an infinitive."
+    },
+    {
+      "id": "practice-7",
+      "start": 34.64,
+      "end": 40.84,
+      "text": "À force de pratiquer un peu chaque jour, je prends confiance.",
+      "translation": "By practising a little every day, I am gaining confidence.",
+      "grammar": "À force de plus an infinitive expresses a result from repeated effort."
+    }
+  ]
+}

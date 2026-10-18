@@ -1,0 +1,4 @@
+import type {Metadata} from "next";
+import {SiteNav} from "../SiteNav";import {SiteFooter} from "../SiteFooter";import {PageIntro} from "../../components/site-ui";import {ExtensionDetails} from "./extension-details";
+export const metadata:Metadata={title:"ParleSprint Immersion for Chrome | Learn from YouTube subtitles",description:"A free early-access Chrome companion for learning from synchronized French YouTube subtitles, repeating sentences, and saving words.",alternates:{canonical:"/extension"}};
+export default function ExtensionPage(){return <><SiteNav/><main id="main-content" className="page-shell site-container"><PageIntro eyebrow="MAKE THE VIDEOS YOU WATCH PART OF YOUR FRENCH" title="That French video can do a little more for you." description="Follow a sentence. Tap a word. Replay the moment. Save what you want to remember."/><ExtensionDetails/></main><SiteFooter/></>;}

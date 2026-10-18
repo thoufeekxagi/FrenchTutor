@@ -6,17 +6,18 @@ import 'dart:typed_data';
 import 'package:audio_session/audio_session.dart';
 import 'mic_echo_gate.dart';
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, debugPrint, defaultTargetPlatform;
+    show TargetPlatform, debugPrint, defaultTargetPlatform, visibleForTesting;
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:permission_handler/permission_handler.dart';
 
-/// Ported from AudioStreamingService.swift — bidirectional PCM streaming for the live
-/// Gemini call: 16kHz mono PCM16 captured from the mic, 24kHz mono PCM16 played back for
-/// Marie's voice. Unlike the iOS original (which does its own AVAudioEngine sample-rate
-/// conversion), flutter_sound's recorder/player do the native-format <-> PCM conversion for
-/// us at the given `sampleRate`, so there's no manual `AVAudioConverter` equivalent needed
-/// here.
+import 'native_voice_audio.dart';
+import 'voice_activity_gate.dart';
+
+/// Bidirectional PCM transport for Gemini Live. The V3 lesson route uses one
+/// AVAudioEngine with iOS VoiceProcessingIO or Android communication capture
+/// so echo cancellation sees tutor playback and the learner can interrupt.
+/// Other Live surfaces retain the flutter_sound half-duplex implementation.
 ///
 /// flutter_sound's own `setAudioFocus`/speaker-toggle is unreliable on iOS (a known upstream
 /// bug), so routing is configured once via the `audio_session` package instead — mirroring
@@ -31,6 +32,12 @@ class AudioStreamingService {
     logLevel: Level.error,
   );
   final FlutterSoundPlayer _player = FlutterSoundPlayer(logLevel: Level.error);
+  NativeVoiceAudio? _nativeVoiceAudio;
+  StreamSubscription<Uint8List>? _nativeMicSub;
+  bool preferFullDuplexVoiceProcessing = false;
+  bool _fullDuplexActive = false;
+  bool get fullDuplexActive => _fullDuplexActive;
+  final VoiceActivityGate _voiceActivityGate = VoiceActivityGate();
 
   StreamController<Uint8List>? _micStreamController;
   StreamSubscription<Uint8List>? _micSub;
@@ -101,10 +108,8 @@ class AudioStreamingService {
   /// misaligned buffer to the player.
   Uint8List? _pendingOddByte;
 
-  /// While true, captured mic audio is not forwarded via the chunk callback. Used to
-  /// prevent the mic from picking up the tutor's own speaker output and feeding it back to
-  /// Gemini as an echo, since we don't use platform echo-cancellation (which would degrade
-  /// output audio quality).
+  /// Tutor audio is in progress. The half-duplex route uses this for its local
+  /// echo gate; the V3 full-duplex route relies on platform AEC and VAD.
   bool isOutputActive = false;
 
   /// After local VAD closes the learner turn, hold further mic frames until
@@ -136,7 +141,11 @@ class AudioStreamingService {
   /// it pick up the tail of the tutor's own still-playing voice as if it were fresh user
   /// speech. This tracks the real end of the scheduled playback queue as an independent gate.
   DateTime _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
-  final _echoGate = MicEchoGate();
+  // A physical microphone is shared across app routes and audio service
+  // instances. Keep the echo window global so a preview started in Settings
+  // also pauses an already-open tutor call.
+  static final MicEchoGate _sharedEchoGate = MicEchoGate();
+  final MicEchoGate _echoGate = _sharedEchoGate;
 
   /// Closes the microphone until [time]. Used for sound the app plays itself
   /// through the speaker while a call is open (a lesson's speaker button), so
@@ -144,6 +153,11 @@ class AudioStreamingService {
   void blockMicUntil(DateTime time) {
     _echoGate.blockUntil(time);
     _resetBargeInDetector();
+    if (_voiceActivityGate.isSpeechActive || _speechGateActive) {
+      onSpeechEnded?.call();
+    }
+    _speechGateActive = false;
+    _voiceActivityGate.reset();
   }
 
   /// Timeline for the currently queued output utterance. Gemini delivers PCM
@@ -258,17 +272,13 @@ class AudioStreamingService {
         // Muting to zero for a duck event made a notification sound like the
         // tutor had stopped mid-sentence. Preserve intelligibility at reduced
         // volume; only fully mute events that actually pause/interrupt audio.
-        try {
-          await _player.setVolume(
-            event.type == AudioInterruptionType.duck ? 0.35 : 0.0,
-          );
-        } catch (_) {}
+        await _setOutputVolume(
+          event.type == AudioInterruptionType.duck ? 0.35 : 0.0,
+        );
         // An end event may have arrived while the native volume call was in
         // flight. Do not let that late call leave the player muted/ducked.
         if (generation != _audioInterruptionGeneration) {
-          try {
-            await _player.setVolume(1.0);
-          } catch (_) {}
+          await _setOutputVolume(1.0);
         }
       } else {
         ++_audioInterruptionGeneration;
@@ -282,7 +292,10 @@ class AudioStreamingService {
     _devicesChangedSub = session.devicesChangedEventStream.listen((event) {
       // A Bluetooth device connecting mid-call (e.g. AirPods reconnecting after a phone-call
       // interruption) doesn't retroactively move already-flowing audio over on its own.
-      if (event.devicesAdded.isNotEmpty) _reclaimPreferredRoute();
+      if (event.devicesAdded.isNotEmpty || event.devicesRemoved.isNotEmpty) {
+        unawaited(_reclaimPreferredRoute());
+        unawaited(_recoverFromInterruptionIfNeeded());
+      }
     });
   }
 
@@ -294,6 +307,27 @@ class AudioStreamingService {
   /// restore volume regardless, since the mute above must never get stuck.
   Future<void> _recoverFromInterruptionIfNeeded() async {
     try {
+      if (_fullDuplexActive && _nativeVoiceAudio != null) {
+        if (_isStreaming) {
+          try {
+            await _nativeVoiceAudio!.recover();
+            await _nativeVoiceAudio!.setMicEnabled(true);
+          } catch (error) {
+            debugPrint(
+              'Voice processing could not recover; switching to half-duplex: $error',
+            );
+            await _nativeMicSub?.cancel();
+            _nativeMicSub = null;
+            await _nativeVoiceAudio!.dispose();
+            _nativeVoiceAudio = null;
+            _fullDuplexActive = false;
+            _isStreaming = false;
+            _voiceActivityGate.reset();
+            await _startFlutterSoundCapture();
+          }
+        }
+        return;
+      }
       if (_isStreaming && _recorder.isStopped) {
         await _ensureRecorderOpen();
         await _recorder.startRecorder(
@@ -301,15 +335,18 @@ class AudioStreamingService {
           toStream: _micStreamController!.sink,
           sampleRate: _inputSampleRate,
           numChannels: 1,
+          audioSource: _fullDuplexActive
+              ? AudioSource.voice_communication
+              : AudioSource.defaultSource,
+          enableNoiseSuppression: _fullDuplexActive,
+          enableEchoCancellation: _fullDuplexActive,
         );
       }
     } catch (_) {
       // Best-effort — if this fails the call continues audio-out-only rather
       // than crashing; the user can still end/restart the call normally.
     } finally {
-      try {
-        await _player.setVolume(1.0);
-      } catch (_) {}
+      await _setOutputVolume(1.0);
     }
   }
 
@@ -332,36 +369,108 @@ class AudioStreamingService {
     if (_isStreaming) return;
     _audioChunkCallback = onChunk;
     _resetSpeechGate();
+    _voiceActivityGate.reset();
     await _configureSessionIfNeeded();
     _listenForRouteChanges(await AudioSession.instance);
 
-    if (!_recorder.isStopped) {
-      await _recorder.stopRecorder();
+    if (_nativeVoiceAudio?.isStarted == true) {
+      try {
+        await _nativeVoiceAudio!.ensureRunning();
+        _fullDuplexActive = true;
+        _isStreaming = true;
+        await _nativeVoiceAudio!.setMicEnabled(true);
+        return;
+      } catch (error) {
+        debugPrint(
+          'Native voice engine restart failed; using half-duplex fallback: $error',
+        );
+        await _nativeMicSub?.cancel();
+        _nativeMicSub = null;
+        await _nativeVoiceAudio!.dispose();
+        _nativeVoiceAudio = null;
+        _fullDuplexActive = false;
+      }
     }
-    await _ensureRecorderOpen();
 
+    if (preferFullDuplexVoiceProcessing &&
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      final nativeAudio = NativeVoiceAudio();
+      _nativeVoiceAudio = nativeAudio;
+      _nativeMicSub = nativeAudio.micFrames.listen(
+        (chunk) {
+          if (_isStreaming) _handleMicChunk(chunk);
+        },
+        onError: (Object error, StackTrace stack) {
+          debugPrint('Native voice input stream failed: $error');
+        },
+      );
+      try {
+        if (_isPlayerStarted) {
+          if (!_player.isStopped) await _player.stopPlayer();
+          await _player.closePlayer();
+          _isPlayerStarted = false;
+        }
+        await nativeAudio.start();
+        _fullDuplexActive = true;
+        _isStreaming = true;
+        return;
+      } catch (error) {
+        debugPrint(
+          'Native full-duplex audio unavailable; using half-duplex fallback: $error',
+        );
+        await _nativeMicSub?.cancel();
+        _nativeMicSub = null;
+        await nativeAudio.dispose();
+        _nativeVoiceAudio = null;
+      }
+    }
+
+    // Android's communication capture source provides platform echo and noise
+    // processing for PCM streams. iOS uses the shared AVAudioEngine above; if
+    // it cannot start, the conservative half-duplex route remains active.
+    _fullDuplexActive =
+        preferFullDuplexVoiceProcessing &&
+        defaultTargetPlatform == TargetPlatform.android;
+
+    await _startFlutterSoundCapture();
+  }
+
+  Future<void> _startFlutterSoundCapture() async {
+    if (!_recorder.isStopped) await _recorder.stopRecorder();
+    await _ensureRecorderOpen();
     _micStreamController = StreamController<Uint8List>();
     _micSub = _micStreamController!.stream.listen(_handleMicChunk);
-
     await _recorder.startRecorder(
       codec: Codec.pcm16,
       toStream: _micStreamController!.sink,
       sampleRate: _inputSampleRate,
       numChannels: 1,
+      audioSource: _fullDuplexActive
+          ? AudioSource.voice_communication
+          : AudioSource.defaultSource,
+      enableNoiseSuppression: _fullDuplexActive,
+      enableEchoCancellation: _fullDuplexActive,
     );
-
     await _ensurePlayerStarted();
-
     _isStreaming = true;
   }
 
   Future<void> stopStreaming() async {
     if (!_isStreaming) return;
+    if (_voiceActivityGate.isSpeechActive || _speechGateActive) {
+      onSpeechEnded?.call();
+    }
     _isStreaming = false;
     _audioChunkCallback = null;
     _resetBargeInDetector();
     _resetSpeechGate();
+    _voiceActivityGate.reset();
     _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
+
+    if (_nativeVoiceAudio?.isStarted == true) {
+      await _nativeVoiceAudio!.setMicEnabled(false);
+      return;
+    }
 
     try {
       if (!_recorder.isStopped) await _recorder.stopRecorder();
@@ -372,23 +481,17 @@ class AudioStreamingService {
     _micStreamController = null;
   }
 
-  /// Barge-in (mic open while Marie speaks) was tried and REJECTED after device testing:
-  /// Gemini Live's server-side VAD treats ANY sound during her generation — background
-  /// noise, friends talking, a cough — as the student interrupting, killing her audio
-  /// mid-word and making her stutter and restart. Unmanageably ugly. So the mic stays
-  /// gated while she talks: she always finishes her sentence, and the student replies in
-  /// the natural gap. Voice navigation stays fast anyway — the student's transcript
-  /// flushes to the intent judge on its own debounce (see GeminiLiveService), never
-  /// waiting on Marie — and the on-screen Back/Next buttons work mid-speech for anyone
-  /// who truly can't wait.
-  /// Live Tutor enables this so a learner can naturally interrupt the tutor.
-  /// Structured speaking surfaces keep it disabled so their planned turns can
-  /// finish before accepting the next answer.
+  /// Legacy raw-PCM barge-in detector for routes without a platform AEC path.
+  /// V3 lesson calls use VoiceActivityGate after platform processing instead.
   bool allowBargeIn = false;
 
-  /// When enabled, Live Tutor forwards only speech-like PCM instead of an
-  /// always-open stream of silence and room noise. This is deliberately opt-in
-  /// so the deterministic lesson surfaces keep their existing audio behavior.
+  /// Fired when the local full-duplex gate confirms a learner interruption.
+  /// The controller cuts local playback immediately; Gemini receives the same
+  /// speech so its Live VAD can cancel generation.
+  void Function()? onSpeechStarted;
+
+  /// When enabled, learner turns are locally gated so silence/noise stays off
+  /// the billable Live socket. Gemini still confirms/handles the turn boundary.
   bool speechGateEnabled = false;
 
   /// Called once the local speech gate sees a natural end to a spoken phrase.
@@ -411,7 +514,7 @@ class AudioStreamingService {
   static const _speechGateStartMs = 200.0;
   // Learners often pause between French words or clauses. Keep the turn open
   // for the full natural pause window before asking Gemini to answer.
-  static const _speechGateEndSilenceMs = 1800.0;
+  static const _speechGateEndSilenceMs = 720.0;
   static const _speechGatePreRollMs = 280.0;
   double _speechNoiseFloor = 0.035;
   double _speechCandidateMs = 0;
@@ -421,10 +524,39 @@ class AudioStreamingService {
   int _speechPreRollBytes = 0;
 
   void _handleMicChunk(Uint8List chunk) {
-    if (isAwaitingTutorResponse) return;
-    // Sound the app itself is playing (a lesson clip) is never the learner.
-    if (_echoGate.clipBlocks()) {
+    // Half-duplex routes must stay quiet while Marie is answering. The
+    // full-duplex routes keep the processed mic open so a learner can barge in;
+    // platform AEC/NS plus local VAD decide what reaches Gemini.
+    if (isAwaitingTutorResponse && !_fullDuplexActive) return;
+    if (_fullDuplexActive) {
+      // Tutor output remains interruptible only when platform AEC/NS is active.
+      // App-owned lesson clips still use an exact local mute interval.
+      if (_echoGate.clipBlocks()) {
+        if (_voiceActivityGate.isSpeechActive) onSpeechEnded?.call();
+        _voiceActivityGate.reset();
+        return;
+      }
+      if (!speechGateEnabled) {
+        _audioChunkCallback?.call(chunk);
+        return;
+      }
+      final update = _voiceActivityGate.add(chunk);
+      if (update.speechStarted) onSpeechStarted?.call();
+      for (final frame in update.frames) {
+        _audioChunkCallback?.call(frame);
+      }
+      if (update.speechEnded) onSpeechEnded?.call();
+      return;
+    }
+    // This check must precede every input mode, including local speech gating
+    // and the optional barge-in detector. A loud echo can look like speech to
+    // either detector. Route and headset choice never weaken this invariant.
+    if (_echoGate.blocks(
+      outputActive: isOutputActive,
+      playbackEnd: _scheduledPlaybackEndTime,
+    )) {
       _resetBargeInDetector();
+      _resetSpeechGate();
       return;
     }
     // While tutor audio is pending, use the conservative barge-in detector
@@ -438,13 +570,6 @@ class AudioStreamingService {
       return;
     }
     if (!allowBargeIn) {
-      if (_echoGate.blocks(
-        outputActive: isOutputActive,
-        playbackEnd: _scheduledPlaybackEndTime,
-      )) {
-        _resetBargeInDetector();
-        return;
-      }
       _resetBargeInDetector();
       _audioChunkCallback?.call(chunk);
       return;
@@ -485,6 +610,25 @@ class AudioStreamingService {
     _bargeInSpeechDetected = true;
     while (_bargeInPreRoll.isNotEmpty) {
       _audioChunkCallback?.call(_bargeInPreRoll.removeFirst());
+    }
+  }
+
+  /// Exercises the real mic dispatch without opening a platform recorder.
+  /// Tests pass synthetic PCM through the same echo and speech gates used by
+  /// the recorder subscription.
+  @visibleForTesting
+  void handleMicChunkForTest(
+    Uint8List chunk,
+    void Function(List<int> chunk) onChunk, {
+    bool fullDuplexActive = false,
+  }) {
+    _audioChunkCallback = onChunk;
+    final previousFullDuplexState = _fullDuplexActive;
+    _fullDuplexActive = fullDuplexActive;
+    try {
+      _handleMicChunk(chunk);
+    } finally {
+      _fullDuplexActive = previousFullDuplexState;
     }
   }
 
@@ -582,6 +726,7 @@ class AudioStreamingService {
   Future<void>? _playerStartLatch;
 
   Future<void> _ensurePlayerStarted() {
+    if (_nativeVoiceAudio?.isStarted == true) return Future.value();
     if (_isPlayerStarted) return Future.value();
     return _playerStartLatch ??= _startPlayer().whenComplete(
       () => _playerStartLatch = null,
@@ -603,6 +748,7 @@ class AudioStreamingService {
   }
 
   Future<void> _startPlayer() async {
+    if (_nativeVoiceAudio?.isStarted == true) return;
     if (_isPlayerStarted) return;
     await _configureSessionIfNeeded();
     if (!_player.isStopped) {
@@ -707,7 +853,7 @@ class AudioStreamingService {
     // the new bytes in while still muted from cutting the old one, and the
     // new clip stayed silent until the old mute timer eventually expired.
     _muteGeneration++;
-    unawaited(_player.setVolume(1.0).catchError((_) {}));
+    unawaited(_setOutputVolume(1.0));
 
     await _ensurePlayerStarted();
     await setPlaybackSpeed(activeSpeed);
@@ -738,6 +884,7 @@ class AudioStreamingService {
     final nextSpeed = speed.clamp(0.5, 1.5).toDouble();
     _retimePlaybackTimeline(_playbackSpeed, nextSpeed);
     _playbackSpeed = nextSpeed;
+    if (_nativeVoiceAudio?.isStarted == true) return;
     if (!_isPlayerStarted) return;
     try {
       await _player.setSpeed(_playbackSpeed);
@@ -816,7 +963,12 @@ class AudioStreamingService {
               'AudioStreamingService: playback observer failed: $error',
             );
           }
-          await _player.feedUint8FromStream(bytes);
+          final nativeAudio = _nativeVoiceAudio;
+          if (_fullDuplexActive && nativeAudio?.isStarted == true) {
+            await nativeAudio!.playPcm(bytes);
+          } else {
+            await _player.feedUint8FromStream(bytes);
+          }
         } catch (error, stackTrace) {
           // Keep the live call alive on a transient chunk failure, but expose
           // the native error in device logs instead of making a silent spinner
@@ -838,6 +990,10 @@ class AudioStreamingService {
     bool waitForSilence = false,
     Duration fadeOutDuration = Duration.zero,
   }) async {
+    // A cancellation can reset the scheduled playback clock while native
+    // buffers are still draining or the device's speaker has an audible tail.
+    // Keep the hard network-mic gate closed across that transition.
+    _echoGate.blockUntil(DateTime.now().add(MicEchoGate.tail));
     _playbackGeneration++;
     _resetBargeInDetector();
     // Discard anything not yet fed to the player — otherwise queued chunks from before the
@@ -850,6 +1006,21 @@ class AudioStreamingService {
     // A carried-over stray byte belonged to the utterance being cut — letting
     // it prepend to whatever plays next would misalign that unrelated audio.
     _pendingOddByte = null;
+
+    final nativeAudio = _nativeVoiceAudio;
+    if (_fullDuplexActive && nativeAudio?.isStarted == true) {
+      _muteGeneration++;
+      await nativeAudio!.stopPlayback();
+      _scheduledPlaybackEndTime = DateTime.fromMillisecondsSinceEpoch(0);
+      resetPlaybackTimeline();
+      return;
+    }
+
+    // A cancellation on the conservative route keeps input closed through the
+    // short physical speaker tail. Full duplex relies on platform AEC instead.
+    if (!_fullDuplexActive) {
+      _echoGate.blockUntil(DateTime.now().add(MicEchoGate.tail));
+    }
 
     if (hardStop) {
       // Voice previews are single buffers. Stopping the native stream and
@@ -906,18 +1077,14 @@ class AudioStreamingService {
     if (fadeOutDuration > Duration.zero) {
       await _fadePlayerToSilence(generation, fadeOutDuration);
     } else {
-      try {
-        await _player.setVolume(0);
-      } catch (_) {}
+      await _setOutputVolume(0);
     }
     // A new chunk can arrive while setVolume is awaiting the native player.
     // Its generation owns both volume and timeline from this point onward.
     if (generation != _muteGeneration) return;
     Future.delayed(Duration(milliseconds: muteMs), () async {
       if (generation != _muteGeneration) return;
-      try {
-        await _player.setVolume(1.0);
-      } catch (_) {}
+      await _setOutputVolume(1.0);
     });
     // The tracked timeline is now stale — without this reset the mic gate would keep
     // blocking uploads until a time that no longer corresponds to any audio actually playing.
@@ -939,14 +1106,12 @@ class AudioStreamingService {
       final remainingLevel = 1 - (step / steps);
       final easedVolume = remainingLevel * remainingLevel;
       try {
-        await _player.setVolume(easedVolume);
+        await _setOutputVolume(easedVolume);
       } catch (_) {
         // If the native volume transition fails, prefer silencing the stale
         // tutor tail over opening the mic while it is still audible.
         if (generation == _muteGeneration) {
-          try {
-            await _player.setVolume(0);
-          } catch (_) {}
+          await _setOutputVolume(0);
         }
         return;
       }
@@ -962,6 +1127,17 @@ class AudioStreamingService {
   /// without touching call sites.
   void setSpeakerEnabled(bool enabled) {}
 
+  Future<void> _setOutputVolume(double volume) async {
+    final nativeAudio = _nativeVoiceAudio;
+    if (_fullDuplexActive && nativeAudio?.isStarted == true) {
+      await nativeAudio!.setOutputVolume(volume);
+      return;
+    }
+    try {
+      await _player.setVolume(volume);
+    } catch (_) {}
+  }
+
   Future<void> dispose() async {
     onPlaybackChunk = null;
     await _interruptionSub?.cancel();
@@ -970,6 +1146,11 @@ class AudioStreamingService {
     _devicesChangedSub = null;
     await stopStreaming();
     await stopPlayback();
+    await _nativeMicSub?.cancel();
+    _nativeMicSub = null;
+    await _nativeVoiceAudio?.dispose();
+    _nativeVoiceAudio = null;
+    _fullDuplexActive = false;
     try {
       if (!_recorder.isStopped) await _recorder.stopRecorder();
       await _recorder.closeRecorder();

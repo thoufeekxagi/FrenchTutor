@@ -673,9 +673,7 @@ class GeminiLiveAudioService {
       return null;
     }
     final channel = WebSocketChannel.connect(
-      Uri.parse(
-        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
-      ),
+      GeminiLiveTokenService.socketUri(token),
     );
     final setupComplete = Completer<void>();
     final turnComplete = Completer<void>();

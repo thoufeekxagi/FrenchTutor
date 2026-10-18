@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../data/database/learning_store.dart';
+import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/audio_streaming_service.dart';
 import '../../services/inline_call_controller.dart';
@@ -30,7 +31,7 @@ class V3StoryAudioEvents {
   final void Function(String message) onError;
 }
 
-/// The story's voice. Production uses live Marie (Gemini Live), exactly like
+/// The story's voice. Production uses the selected tutor (Gemini Live), exactly like
 /// the legacy reader. Tests use [V3FakeStoryAudio], which makes no network or
 /// billing calls and records what was asked of it.
 abstract class V3StoryAudio {
@@ -98,7 +99,7 @@ class V3FakeStoryAudio implements V3StoryAudio {
   void dispose() => _generation++;
 }
 
-/// Live Marie narration, ported from the legacy story reader: one Gemini Live
+/// Live tutor narration, ported from the legacy story reader: one Gemini Live
 /// connection, opened on the first play or word tap, speaks each sentence
 /// exactly once on command. Nothing is cached or generated ahead of time.
 class V3LiveStoryAudio implements V3StoryAudio {
@@ -148,22 +149,25 @@ class V3LiveStoryAudio implements V3StoryAudio {
 
   String _friendly(Object error) {
     final raw = error.toString().toLowerCase();
+    final tutor = ActiveTutor.current.displayName;
     if (error is TimeoutException || raw.contains('timeout')) {
-      return 'Marie took too long to start. Tap play to try again.';
+      return '$tutor took too long to start. Tap play to try again.';
     }
     if (raw.contains('still finishing')) {
-      return 'Marie is finishing the previous line. Tap play again in a moment.';
+      return '$tutor is finishing the previous line. Tap play again in a moment.';
     }
     if (raw.contains('disconnected') || raw.contains('not connected')) {
-      return 'Marie lost the connection. Tap play to reconnect.';
+      return '$tutor lost the connection. Tap play to reconnect.';
     }
-    return 'Marie could not read this story. Tap play to try again.';
+    return '$tutor could not read this story. Tap play to try again.';
   }
 
   @override
   Future<void> playSentences(int from, {bool only = false}) async {
     if (!await _ensureReady()) {
-      events.onError('Marie is not connected yet. Tap play to reconnect.');
+      events.onError(
+        '${ActiveTutor.current.displayName} is not connected yet. Tap play to reconnect.',
+      );
       events.onFinished();
       return;
     }
@@ -278,12 +282,16 @@ class V3LiveStoryAudio implements V3StoryAudio {
       try {
         await _call.start(ctx, sendOpeningPrompt: false);
       } catch (_) {
-        events.onError('Marie could not connect. Tap the word again to retry.');
+        events.onError(
+          '${ActiveTutor.current.displayName} could not connect. Tap the word again to retry.',
+        );
         return;
       }
     }
     if (!_call.active) {
-      events.onError('Marie is still connecting. Tap the word again.');
+      events.onError(
+        '${ActiveTutor.current.displayName} is still connecting. Tap the word again.',
+      );
       return;
     }
     _call.promptTutor(

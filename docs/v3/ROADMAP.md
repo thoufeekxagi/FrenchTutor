@@ -4,6 +4,11 @@ Owner decisions are in bold. This file is the single place for the plan. Update 
 
 ## Where we are
 
+**Photo Tutor/OCR:** disabled in V3 and deferred until V4. The active OCR
+service is a no-op, and Google ML Kit is removed from V3 dependencies and iOS
+Pods. The prior native adapter is preserved under `docs/v4_deferred/` for a
+future V4 implementation.
+
 | Area | Status |
 |---|---|
 | A1 master chapters | **Stage 0 and all 14 A1 units are authored and exported.** The PDF remains a reference and was not rebuilt in this pass. |

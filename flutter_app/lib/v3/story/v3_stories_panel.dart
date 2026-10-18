@@ -6,14 +6,12 @@ import 'package:flutter/material.dart';
 import '../../design/app_router.dart';
 import '../../design/appearance_colors.dart';
 import '../../design/tokens.dart';
-import '../../models/content_models.dart';
-import '../../screens/lessons/listening_practice_screen.dart';
 import '../ui/v3_ui.dart';
 import 'v3_story.dart';
 import 'v3_story_reader.dart';
 import 'v3_story_store.dart';
 
-/// Stories list, shown as the third segment of the Learn tab. Screen contract:
+/// Stories list, shown in the Practice area of the Learn tab. Screen contract:
 ///
 /// User arrived to: practise French through a short story.
 /// They must understand: reading and listening stories are separate modes,
@@ -25,7 +23,7 @@ import 'v3_story_store.dart';
 class V3StoriesPanel extends StatefulWidget {
   const V3StoriesPanel({super.key, this.initialListening = false});
 
-  /// Open on the Listen stories mode (the Listening tile on Today).
+  /// Open on the Listen stories mode when a caller needs that starting state.
   final bool initialListening;
 
   @override
@@ -69,74 +67,15 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
   }
 
   Future<void> _open(V3Story story) async {
-    if (_listening) {
-      await AppRouter.push<bool>(
-        context,
-        (_) => ListeningPracticeScreen(story: _asListeningStory(story)),
-      );
-    } else {
-      await AppRouter.push<bool>(
-        context,
-        (_) => V3StoryReader(story: story, startAt: _pos[story.id] ?? 0),
-      );
-    }
+    await AppRouter.push<bool>(
+      context,
+      (_) => V3StoryReader(
+        story: story,
+        startAt: _pos[story.id] ?? 0,
+        listenFirst: _listening,
+      ),
+    );
     if (mounted) unawaited(_load());
-  }
-
-  GeneratedStory _asListeningStory(V3Story story) {
-    VocabEntry entry(String key, V3Word word) => VocabEntry(
-      id: key,
-      fr: key,
-      en: word.en,
-      phonetic: word.sound,
-      partOfSpeech: word.pos,
-      gender: word.gender,
-      number: word.number,
-      lemma: word.lemma,
-      contextNote: word.note,
-    );
-
-    final words = {
-      for (final key in story.words.keys) key: entry(key, story.words[key]!),
-    };
-    final passage = ReadingPassage(
-      id: story.id,
-      title: story.title,
-      titleEn: story.titleEn,
-      segments: [
-        for (final sentence in story.sentences)
-          ReadingSegment(
-            fr: sentence.fr,
-            en: sentence.en,
-            grammarNote: sentence.note,
-            pronunciationTip: '',
-          ),
-      ],
-      fullText: story.sentences.map((sentence) => sentence.fr).join(' '),
-      wordDetails: words,
-    );
-    return GeneratedStory(
-      id: story.id,
-      passage: passage,
-      quiz: [
-        for (final question in story.quiz)
-          MultipleChoiceQuestion(
-            q: question.prompt,
-            choices: question.options,
-            answerIndex: question.answer,
-          ),
-      ],
-      keywords: [
-        for (final key in story.keywords)
-          if (words.containsKey(key)) words[key]!,
-      ],
-      createdAt: DateTime.now(),
-      levelBand: story.level,
-      summary: story.summary,
-      topic: story.unit,
-      readTimeMinutes: story.minutes,
-      practiceMode: 'listening',
-    );
   }
 
   V3Story? _featured(List<V3Story> atLevel) {
@@ -165,15 +104,8 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          _listening
-              ? 'Listen first. Open the transcript when you want to study a word or line.'
-              : 'Short stories at your level. Tap any word, hear any line.',
-          style: V3Type.body(15),
-        ),
-        const SizedBox(height: 16),
         _modePicker(),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         Row(
           children: [
             for (final l in _levels) ...[_chip(l), const SizedBox(width: 8)],
@@ -188,7 +120,7 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
         ],
         if (rest.isNotEmpty) ...[
           Text(
-            featured == null ? 'ALL $_level STORIES' : 'MORE $_level STORIES',
+            featured == null ? 'Stories' : 'More stories',
             style: V3Type.eyebrow(DesignTokens.inkSoft),
           ),
           const SizedBox(height: 10),
@@ -309,8 +241,6 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
             ),
             const SizedBox(height: 12),
             Text(s.title, style: V3Type.title(30, color: onBlue)),
-            const SizedBox(height: 6),
-            Text(s.titleEn, style: V3Type.body(15, dim)),
             if (started) ...[
               const SizedBox(height: 16),
               ClipRRect(
@@ -397,11 +327,9 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(s.title, style: V3Type.strong(18)),
-                  const SizedBox(height: 2),
-                  Text(s.titleEn, style: V3Type.body(14)),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 5),
                   Text(
-                    '${s.level}  ·  ${s.minutes} min  ·  ${s.sentences.length} lines',
+                    '${s.level}  ·  ${s.minutes} min',
                     style: V3Type.body(12.5),
                   ),
                 ],

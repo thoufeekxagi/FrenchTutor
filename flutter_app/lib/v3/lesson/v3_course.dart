@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../data/database/learning_store.dart';
 import '../v3_prefs.dart';
 import 'v3_lesson.dart';
 
@@ -64,16 +65,45 @@ abstract final class V3Course {
 /// - **lastCompleted**: the lesson finished most recently, so the path carries
 ///   on from there.
 ///
-/// Local to this device. This is the single place that knows where Resume goes.
+/// SQLite is the local source of truth and SyncService mirrors it to the
+/// signed-in learner. SharedPreferences remain a compatibility import for
+/// progress written by earlier V3 builds and an isolated E2E sandbox.
 abstract final class V3Progress {
   static String get _doneKey => v3Key('v3_completed_lessons');
   static String get _posKey => v3Key('v3_lesson_position');
   static String get _activeKey => v3Key('v3_last_active_lesson');
   static String get _lastDoneKey => v3Key('v3_last_completed_lesson');
 
-  static Future<Set<String>> completed() async {
+  static bool get _isolatedE2E =>
+      kDebugMode && const bool.fromEnvironment('E2E_SHELL');
+
+  static Future<void> importLegacyPreferences(LearningStore store) async {
+    if (_isolatedE2E) return;
     final prefs = await SharedPreferences.getInstance();
-    return (prefs.getStringList(_doneKey) ?? const []).toSet();
+    final completed = (prefs.getStringList(_doneKey) ?? const []).toSet();
+    final positions = await _readPreferencePositions(prefs);
+    for (final lessonId in completed) {
+      store.saveV3CourseProgress(lessonId, currentStep: 0, completed: true);
+    }
+    for (final entry in positions.entries) {
+      if (completed.contains(entry.key)) continue;
+      store.saveV3CourseProgress(
+        entry.key,
+        currentStep: entry.value,
+        completed: false,
+      );
+    }
+  }
+
+  static Future<Set<String>> completed({LearningStore? store}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final result = (prefs.getStringList(_doneKey) ?? const []).toSet();
+    if (store != null && !_isolatedE2E) {
+      for (final entry in store.v3CourseProgress().values) {
+        if (entry.status == 'completed') result.add(entry.lessonId);
+      }
+    }
+    return result;
   }
 
   // Every change is a read, change, write. Two quick ones must never
@@ -90,26 +120,58 @@ abstract final class V3Progress {
   @visibleForTesting
   static void resetQueueForTest() => _tail = Future<void>.value();
 
-  static Future<String?> lastActive() async =>
-      (await SharedPreferences.getInstance()).getString(_activeKey);
+  static Future<String?> lastActive({LearningStore? store}) async {
+    if (store != null && !_isolatedE2E) {
+      final saved = store.lastV3ActiveLesson();
+      if (saved != null) return saved;
+    }
+    return (await SharedPreferences.getInstance()).getString(_activeKey);
+  }
 
-  static Future<String?> lastCompleted() async =>
-      (await SharedPreferences.getInstance()).getString(_lastDoneKey);
+  static Future<String?> lastCompleted({LearningStore? store}) async {
+    if (store != null && !_isolatedE2E) {
+      final saved = store.lastV3CompletedLesson();
+      if (saved != null) return saved;
+    }
+    return (await SharedPreferences.getInstance()).getString(_lastDoneKey);
+  }
 
-  static Future<void> markDone(String lessonId) => _serial(() async {
-    final prefs = await SharedPreferences.getInstance();
-    final set = (prefs.getStringList(_doneKey) ?? const []).toSet();
-    final firstTime = set.add(lessonId);
-    await prefs.setStringList(_doneKey, set.toList());
-    await _savePosition(lessonId, 0);
-    // Replaying a finished lesson must not move the path.
-    if (firstTime) await prefs.setString(_lastDoneKey, lessonId);
-    if (prefs.getString(_activeKey) == lessonId) await prefs.remove(_activeKey);
-  });
+  static Future<void> markDone(String lessonId, {LearningStore? store}) =>
+      _serial(() async {
+        final prefs = await SharedPreferences.getInstance();
+        final set = (prefs.getStringList(_doneKey) ?? const []).toSet();
+        final firstTime = set.add(lessonId);
+        await prefs.setStringList(_doneKey, set.toList());
+        await _savePosition(lessonId, 0);
+        if (store != null && !_isolatedE2E) {
+          store.saveV3CourseProgress(lessonId, currentStep: 0, completed: true);
+        }
+        // Replaying a finished lesson must not move the path.
+        if (firstTime) await prefs.setString(_lastDoneKey, lessonId);
+        if (prefs.getString(_activeKey) == lessonId) {
+          await prefs.remove(_activeKey);
+        }
+      });
 
   /// Furthest step reached, by lesson id. Missing means nothing real yet.
-  static Future<Map<String, int>> positions() async {
+  static Future<Map<String, int>> positions({LearningStore? store}) async {
     final prefs = await SharedPreferences.getInstance();
+    final out = await _readPreferencePositions(prefs);
+    if (store != null && !_isolatedE2E) {
+      for (final entry in store.v3CourseProgress().values) {
+        if (entry.status == 'completed') {
+          out.remove(entry.lessonId);
+        } else if (entry.currentStep > (out[entry.lessonId] ?? 0)) {
+          out[entry.lessonId] = entry.currentStep;
+        }
+      }
+    }
+    return out;
+  }
+
+  static Future<Map<String, int>> _readPreferencePositions(
+    SharedPreferences prefs,
+  ) async {
     final out = <String, int>{};
     for (final entry in prefs.getStringList(_posKey) ?? const <String>[]) {
       final i = entry.lastIndexOf(':');
@@ -122,27 +184,45 @@ abstract final class V3Progress {
 
   /// The learner moved forward to [step]. Only moves progress forward, never
   /// for a finished lesson (a replay is practice, not progress).
-  static Future<void> advanceFrontier(String lessonId, int step) =>
-      _serial(() async {
-        if (step <= 0) return;
-        final prefs = await SharedPreferences.getInstance();
-        if ((prefs.getStringList(_doneKey) ?? const []).contains(lessonId)) {
-          return;
-        }
-        final map = await positions();
-        if ((map[lessonId] ?? 0) < step) {
-          map[lessonId] = step;
-          await _write(prefs, map);
-        }
-        await prefs.setString(_activeKey, lessonId);
-      });
+  static Future<void> advanceFrontier(
+    String lessonId,
+    int step, {
+    LearningStore? store,
+  }) => _serial(() async {
+    if (step <= 0) return;
+    final prefs = await SharedPreferences.getInstance();
+    if ((prefs.getStringList(_doneKey) ?? const []).contains(lessonId)) {
+      return;
+    }
+    if (store != null &&
+        !_isolatedE2E &&
+        store.v3CourseProgress()[lessonId]?.status == 'completed') {
+      return;
+    }
+    final map = await positions();
+    if ((map[lessonId] ?? 0) < step) {
+      map[lessonId] = step;
+      await _write(prefs, map);
+    }
+    await prefs.setString(_activeKey, lessonId);
+    if (store != null && !_isolatedE2E) {
+      store.saveV3CourseProgress(lessonId, currentStep: step, completed: false);
+    }
+  });
 
   /// Raw write. Prefer [advanceFrontier]; this exists so finishing a lesson can
   /// clear its position.
-  static Future<void> savePosition(String lessonId, int step) =>
-      _serial(() => _savePosition(lessonId, step));
+  static Future<void> savePosition(
+    String lessonId,
+    int step, {
+    LearningStore? store,
+  }) => _serial(() => _savePosition(lessonId, step, store: store));
 
-  static Future<void> _savePosition(String lessonId, int step) async {
+  static Future<void> _savePosition(
+    String lessonId,
+    int step, {
+    LearningStore? store,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     final map = await positions();
     if (step > 0) {
@@ -151,6 +231,9 @@ abstract final class V3Progress {
       map.remove(lessonId);
     }
     await _write(prefs, map);
+    if (step > 0 && store != null && !_isolatedE2E) {
+      store.saveV3CourseProgress(lessonId, currentStep: step, completed: false);
+    }
   }
 
   static Future<void> _write(SharedPreferences prefs, Map<String, int> map) =>

@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:04,000
+Bonjour ! Aujourd'hui, je prépare mon premier voyage au Québec.
+
+2
+00:00:04,000 --> 00:00:08,000
+Je voudrais réserver une chambre pour deux nuits, s'il vous plaît.
+
+3
+00:00:08,000 --> 00:00:12,000
+Est-ce que le petit déjeuner est compris dans le prix ?
+
+4
+00:00:12,000 --> 00:00:16,000
+Hier, j'ai oublié mon billet dans le train.
+
+5
+00:00:16,000 --> 00:00:20,000
+Heureusement, une personne l'a retrouvé et me l'a rendu.
+
+6
+00:00:20,000 --> 00:00:25,000
+Même si je fais des erreurs, je continue à parler français.
+
+7
+00:00:25,000 --> 00:00:30,000
+À force de pratiquer un peu chaque jour, je prends confiance.

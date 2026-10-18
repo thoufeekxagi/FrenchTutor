@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">ParleSprint Open Gate app icon</title>
+  <desc id="desc">An open, architectural P made from one confident continuous stroke. TCF appears at the bottom of the icon.</desc>
+  <rect width="1024" height="1024" fill="#FFFFFF"/>
+  <path d="M286 774V248H568A170 170 0 1 1 568 588H430" fill="none" stroke="#1D4ED8" stroke-width="92" stroke-linecap="square" stroke-linejoin="round"/>
+  <text x="512" y="910" text-anchor="middle" fill="#1D4ED8" font-family="'Helvetica Neue', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="13">TCF</text>
+</svg>

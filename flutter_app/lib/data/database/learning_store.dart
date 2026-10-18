@@ -18,6 +18,20 @@ class LessonProgress {
   final double? score;
 }
 
+class V3CourseProgressEntry {
+  const V3CourseProgressEntry({
+    required this.lessonId,
+    required this.status,
+    required this.currentStep,
+    required this.updatedAt,
+  });
+
+  final String lessonId;
+  final String status;
+  final int currentStep;
+  final String updatedAt;
+}
+
 class HabitEntry {
   HabitEntry({required this.done, required this.minutes});
   final bool done;
@@ -141,6 +155,9 @@ class LearningStore {
         level: r['level'] as String,
         sessionLength: r['session_length'] as String,
         reminderTime: r['reminder_time'] as String?,
+        tcfExamDate: r['tcf_exam_date'] is String
+            ? DateTime.tryParse(r['tcf_exam_date'] as String)
+            : null,
         preferredDays: preferredDaysRaw == null || preferredDaysRaw.isEmpty
             ? const ['mon', 'tue', 'wed', 'thu', 'fri']
             : preferredDaysRaw.split(',').where((s) => s.isNotEmpty).toList(),
@@ -227,7 +244,7 @@ class LearningStore {
     _db.execute(
       '''
       UPDATE profiles SET goal = ?, level = ?, session_length = ?, reminder_time = ?,
-        preferred_days = ?, time_zone = ?, notification_permission_state = ?,
+        tcf_exam_date = ?, preferred_days = ?, time_zone = ?, notification_permission_state = ?,
         onboarding_version = ?, onboarded_at = ?, interests = ?, updated_at = ?
       WHERE id = ?
     ''',
@@ -236,6 +253,7 @@ class LearningStore {
         p.level,
         p.sessionLength,
         p.reminderTime,
+        p.tcfExamDate?.toIso8601String(),
         // The column is NOT NULL. No chosen days is saved as an empty string
         // (read back as the default plan), never as NULL.
         p.preferredDays.join(','),
@@ -654,6 +672,76 @@ class LearningStore {
   }
 
   // --- Lesson progress ---
+
+  Map<String, V3CourseProgressEntry> v3CourseProgress() {
+    final rows = _db.select(
+      'SELECT lesson_id, status, current_step, updated_at '
+      'FROM v3_course_progress',
+    );
+    return {
+      for (final row in rows)
+        row['lesson_id'] as String: V3CourseProgressEntry(
+          lessonId: row['lesson_id'] as String,
+          status: row['status'] as String,
+          currentStep: row['current_step'] as int,
+          updatedAt: row['updated_at'] as String,
+        ),
+    };
+  }
+
+  String? lastV3ActiveLesson() {
+    final rows = _db.select(
+      "SELECT lesson_id FROM v3_course_progress "
+      "WHERE status = 'in_progress' AND current_step > 0 "
+      'ORDER BY updated_at DESC LIMIT 1',
+    );
+    return rows.isEmpty ? null : rows.first['lesson_id'] as String;
+  }
+
+  String? lastV3CompletedLesson() {
+    final rows = _db.select(
+      "SELECT lesson_id FROM v3_course_progress "
+      "WHERE status = 'completed' ORDER BY updated_at DESC LIMIT 1",
+    );
+    return rows.isEmpty ? null : rows.first['lesson_id'] as String;
+  }
+
+  /// Persists V3 course progress locally first, then syncs it for the signed-in
+  /// learner. A completed lesson is sticky and cannot be demoted by replay.
+  void saveV3CourseProgress(
+    String lessonId, {
+    required int currentStep,
+    required bool completed,
+  }) {
+    final existingRows = _db.select(
+      'SELECT status, current_step, created_at FROM v3_course_progress '
+      'WHERE lesson_id = ?',
+      [lessonId],
+    );
+    final existing = existingRows.isEmpty ? null : existingRows.first;
+    if (existing?['status'] == 'completed') return;
+
+    final oldStep = existing?['current_step'] as int? ?? 0;
+    final step = completed
+        ? 0
+        : (currentStep > oldStep ? currentStep : oldStep);
+    final status = completed ? 'completed' : 'in_progress';
+    if (!completed && step == oldStep) return;
+    final now = _now();
+    _db.execute(
+      '''INSERT INTO v3_course_progress
+           (lesson_id, status, current_step, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?)
+         ON CONFLICT(lesson_id) DO UPDATE SET
+           status = excluded.status,
+           current_step = excluded.current_step,
+           updated_at = excluded.updated_at''',
+      [lessonId, status, step, existing?['created_at'] ?? now, now],
+    );
+    unawaited(
+      _sync?.syncV3CourseProgress(lessonId, status: status, currentStep: step),
+    );
+  }
 
   LessonProgress lessonStatus(String lessonId) {
     final rows = _db.select(

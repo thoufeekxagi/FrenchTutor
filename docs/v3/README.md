@@ -13,7 +13,7 @@ Branch: `tcf-v3`. Bundle id: `com.thoufeekx.frenchtutor` (never change).
 | # | Doc | Read it for |
 |---|---|---|
 | 1 | `HANDOFF.md` | the mission, decisions already made, how the UI is designed, ordered backlog, current state, and a copy-paste prompt for another agent |
-| 2 | `AGENT_RULES.md` | the operating rules (evidence before action, stop after two failures, echo rule, progress rule) |
+| 2 | `AGENT_RULES.md` | the operating rules (evidence before action, persistent diagnosis, voice processing, progress rule) |
 | 3 | `FAST_TESTING_PLAYBOOK.md` | **the one-stop guide**: plan, code, unit and end-to-end tests, connected devices, one-process rule, stale processes, edge cases, builds, commit and push |
 | 3b | `FAST_ITERATION_TESTING.md` | how to prove changes quickly on the Mac and on iPhone and iPad, test patterns, traps, device install steps |
 | 4 | `LESSON_PIPELINE.md` | how units are written, checked, exported and turned into the PDF; style card; sources; the plan for Units 6 to 14 and beyond |
@@ -28,6 +28,11 @@ and `UI_STRUCTURE.md` (look and screens), `LESSON_FORMAT.md` and
 `BUILD_STRUCTURE.md` (repo layout, release), `ROADMAP.md` (what is done and next),
 `SCREEN_MAP.md` (generated, every screen and key), and
 `A2_REVIEW_AND_DEVICE_QA.md` (A2 review status and exact on-device recipes).
+
+The Gemini-first lesson voice architecture, cost controls and public reference
+links are in [`MARIE_VOICE_ARCHITECTURE.md`](MARIE_VOICE_ARCHITECTURE.md).
+`MARIE_VOICE_RESEARCH_2026-10-15.md` is a historical snapshot; its audio gate
+and tail decisions were replaced on 18 October.
 
 ## First ten minutes in the repo
 
@@ -45,8 +50,9 @@ python3 ../content/tcf/book/check_book.py     # the course checks
 | Job | Commands |
 |---|---|
 | Write a unit | edit `content/tcf/book/chapters/NN_*.py`, then `check_book.py`, the stage-scoped `export_app.py`, and `content/tcf/tools/validate.py`. Build the matching reference PDF after the stage is complete; A2 uses `build_a2_review.py` (see `LESSON_PIPELINE.md`) |
-| Change the app | `tool/check.sh --quick`, then `flutter test --no-pub test/<file>`, then one device test if behaviour needs it |
+| Change the app | `tool/check.sh --quick`, then `flutter test --no-pub test/<file>`, then `tool/simulator.sh test` if a launch proof is needed and no physical phone is available |
 | Test on a device | `E2E_DEFINES='--dart-define=E2E_SHELL=true' tool/e2e.sh integration_test/<name>_test.dart <device-id> 600` |
+| Test in iOS Simulator | `tool/simulator.sh test [integration_test/file.dart] [max-seconds]` (Debug, one simulator only) |
 | Deliver a build to the iPad | release build and `xcrun devicectl device install app` (exact steps in `FAST_ITERATION_TESTING.md` section 7) |
 
 ## Who takes over what
@@ -67,6 +73,8 @@ One agent per area at a time.
 1. Hand-authored course, cumulative vocabulary, every word has an example, Canadian context.
 2. The book is the source; never edit generated files in `flutter_app/assets/content/tcf/`.
 3. Cheapest test first; fakes for anything that costs money; size matrix for layouts.
-4. The tutor never hears herself. Speakers ask the tutor. Progress only moves forward.
+4. The tutor hears acoustic-echo-cancelled input; learner interruption stays live. Speakers ask the tutor. Progress only moves forward.
 5. One design: Inter, V3 primitives, tokens, no gamification, no em dashes in UI copy.
-6. Two failed attempts: stop and report. Never push unless asked. Never commit secrets.
+6. Keep diagnosing failures with fresh evidence until the requested result
+   works or owner-only access is required. Never push unless asked. Never
+   commit secrets.

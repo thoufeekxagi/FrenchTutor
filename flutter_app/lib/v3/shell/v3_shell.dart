@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 
 import '../../design/tokens.dart';
+import '../../models/tutor_persona.dart';
 import '../learn/v3_learn_screen.dart';
 import '../marie/v3_marie_screen.dart';
 import '../me/v3_me_screen.dart';
@@ -11,7 +12,7 @@ import '../ui/v3_ui.dart';
 /// V3 main shell. Screen contract:
 ///
 /// User arrived to: the app after onboarding, consent and sign-in.
-/// They must understand: four places only (Learn, Marie, Tests, Me).
+/// They must understand: four places only (Learn, their tutor, Tests, Me).
 /// Primary action: whatever the selected tab offers.
 /// Must not contain: a fifth tab, floating navigation, tour overlays.
 class V3Shell extends StatefulWidget {
@@ -44,8 +45,8 @@ class _V3ShellState extends State<V3Shell> {
         maxWidth: _index == 0 ? 1120 : 680,
         child: IndexedStack(
           index: _index,
-          children: const [
-            V3LearnScreen(),
+          children: [
+            V3LearnScreen(isActive: _index == 0),
             V3MarieScreen(),
             V3TestsScreen(),
             V3MeScreen(),
@@ -74,30 +75,36 @@ class _V3ShellState extends State<V3Shell> {
   }
 
   Widget _item(int i) {
-    final (icon, activeIcon, label, id) = _tabs[i];
+    final (icon, activeIcon, defaultLabel, id) = _tabs[i];
     final selected = _index == i;
     final color = selected ? DesignTokens.primary : DesignTokens.inkSoft;
-    return V3Pressable(
-      key: ValueKey('shell.tab.$id'),
-      label: label,
-      onTap: () => setState(() => _index = i),
-      child: Container(
-        color: Colors.transparent,
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(selected ? activeIcon : icon, size: 24, color: color),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: V3Type.strong(11, color).copyWith(
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              ),
+    return ValueListenableBuilder<TutorPersona>(
+      valueListenable: ActiveTutor.notifier,
+      builder: (context, tutor, _) {
+        final label = id == 'marie' ? tutor.displayName : defaultLabel;
+        return V3Pressable(
+          key: ValueKey('shell.tab.$id'),
+          label: label,
+          onTap: () => setState(() => _index = i),
+          child: Container(
+            color: Colors.transparent,
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(selected ? activeIcon : icon, size: 24, color: color),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  style: V3Type.strong(11, color).copyWith(
+                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

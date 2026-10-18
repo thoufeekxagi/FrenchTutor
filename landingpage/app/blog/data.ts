@@ -6,6 +6,10 @@ export type ContentBlock =
   | { type: "ol"; items: string[] }
   | { type: "quote"; text: string; attribution?: string }
   | { type: "callout"; text: string }
+  | { type: "takeaway"; label: string; title: string; items: string[] }
+  | { type: "table"; headers: string[]; rows: string[][]; caption?: string }
+  | { type: "comparison"; left: { title: string; items: string[] }; right: { title: string; items: string[] } }
+  | { type: "practice"; label: string; prompt: string; steps: string[]; answer?: string }
   | { type: "image"; src: string; alt: string; caption?: string }
   | { type: "carousel"; images: { src: string; alt: string; caption?: string }[] }
   | { type: "video"; src: string; caption?: string; poster?: string };

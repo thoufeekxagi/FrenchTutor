@@ -155,6 +155,33 @@ void main() {
       reason: 'second story card missing',
     );
 
+    // ---- Listen-first stories use the same compact V3 reader ---------
+    final listeningStories = await V3Stories.loadListening();
+    expect(listeningStories, isNotEmpty, reason: 'listening stories missing');
+    final listeningStory = listeningStories.first;
+    await press(tester, 'Listen stories');
+    await probe.waitForLabel(tester, 'Start ${listeningStory.title}');
+    await probe.capture(tester, '01b_listen_stories_list');
+    await press(tester, 'Start ${listeningStory.title}');
+    await probe.waitForLabel(tester, 'Show transcript');
+    expect(await texts(tester), contains('Listen first'));
+    expect(
+      await texts(tester),
+      isNot(contains(listeningStory.sentences.first.fr)),
+    );
+    l = await labels(tester);
+    expect(l, containsAll(['Listen', 'Quiz', 'Words', 'Play story']));
+    expect(
+      l,
+      isNot(contains('Tune your ear')),
+      reason: 'legacy listening stage controls leaked into the V3 route',
+    );
+    await probe.capture(tester, '02b_listen_first');
+    await press(tester, 'Show transcript');
+    expect(await texts(tester), contains(listeningStory.sentences.first.fr));
+    await press(tester, 'Back');
+    await press(tester, 'Read stories');
+
     // ---- Reader ------------------------------------------------------
     await openStory(tester, first);
     await probe.settle(tester, timeout: const Duration(seconds: 6));

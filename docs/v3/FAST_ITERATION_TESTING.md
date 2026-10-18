@@ -180,9 +180,11 @@ Two causes seen:
 1. A previous interrupted run left the app running under a debugger (see the
    table in `TESTING.md`).
 2. Xcode.app is open on the Mac. Flutter then drives Xcode and the launch
-   times out. Quit Xcode and retry once.
+   times out. Quit Xcode and retry. If it still fails, use the device logs and
+   switch transport or test method based on the observed error.
 
-Two failed attempts: stop and report the facts. Do not loop.
+Keep diagnosing from each run's logs, probe and screenshot until the device
+test works or it requires an action only the owner can take.
 
 ## 7. Installing a production build (release) on iPad or iPhone
 

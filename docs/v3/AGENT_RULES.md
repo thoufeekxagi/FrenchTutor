@@ -18,10 +18,21 @@ rules replace guessing with evidence.
 
 ## 2. Loop discipline
 
-- Two failed attempts at the same problem: stop, summarize the facts, ask.
+- Persist until the user's requested outcome is complete. A failed attempt is
+  evidence for changing the diagnosis or implementation, not a reason to stop.
+  Ask only when progress depends on information or access the user must provide.
 - One heavy job at a time (`flutter run`, `flutter drive`, `xcodebuild`,
   Gradle). The scripts refuse to start a second one. Machine has 16GB.
-- At most one simulator booted. Prefer the connected iPhone.
+- At most one simulator booted. For simulator work, use the dedicated iPhone
+  17 Pro through `flutter_app/tool/simulator.sh`; its commands shut down other
+  booted simulators and verify that only the selected simulator remains.
+- Simulator iteration is Debug/developer builds only. Do not use Profile or
+  Release in this workflow.
+- If the simulator runtime or app launch becomes unstable or noticeably laggy,
+  `tool/simulator.sh reset` may erase and restart the dedicated simulator. The
+  owner explicitly authorized wiping simulator-local data for this recovery.
+  Use reset for simulator runtime/device problems, not compile or assertion
+  failures.
 - Never kill a process you did not start without the user's say. Orphaned
   `flutter drive` and `lldb` from aborted runs may be stopped on request.
 - Dev data is disposable: reset instead of debugging local state.
@@ -59,24 +70,32 @@ dominant on the paywall. See BUILD_STRUCTURE.md.
 - Old design skill `parlesprint-product-design` predates v3. Where it
   conflicts with `UI_STRUCTURE.md` (palette), v3 wins.
 
-## 7. A tutor must never hear herself (hard rule, everywhere)
+## 7. Echo control and learner interruption
 
-The microphone must send **nothing** to a model while the phone is making sound:
-the tutor's voice, the tail after it, and any clip the app plays itself (a
-lesson speaker button, story narration). This holds on the loudspeaker, the
-earpiece, AirPods and wired headsets alike. Do not rely on the route or on the
-model to notice. A tutor that praises her own voice is a bug.
+The model must not receive tutor echo as learner speech. The interactive
+lesson and Live Tutor support natural interruption through an audio path with
+acoustic echo cancellation and noise suppression:
 
-- All of it goes through `lib/services/mic_echo_gate.dart` (`MicEchoGate`, tail
-  900 ms) and `AudioStreamingService.blockMicUntil`.
-- Anything that plays audio while a call can be open must close the mic for the
-  clip's length plus the tail. `LessonSpeechService.playBytes` already does, and
-  `InlineCallController` listens (`LessonSpeechService.clipEndsAt`). A new audio
-  path must do the same, or use the controller's external-playback bridge.
-- Prompts say it too (`compactLessonCoach`: "your own voice is not the learner").
-  That is a second line of defence, never the first.
-- Keep `test/mic_echo_gate_test.dart` green. Do not shorten the tail to make the
-  app feel faster. Learners get a Skip button instead.
+- On iOS, capture and tutor playback share the `VoiceProcessingIO` audio unit in
+  `ios/Runner/VoiceProcessingAudioPlugin.swift`. Full duplex is active only if
+  the native engine confirms voice processing. If it fails, fall back to the
+  existing half-duplex route.
+- On Android, these calls use `AudioSource.voice_communication` with the
+  platform's echo-cancellation and noise-suppression effects. Do not assume a
+  route has AEC if the platform path is unavailable.
+- `VoiceActivityGate` adds client-side speech confirmation and a short pre-roll,
+  then sends the utterance endpoint. Gemini Live VAD remains enabled as a
+  second decision layer. Silence and short clicks stay off the billable stream.
+- The V3 route does **not** mute the mic for tutor output. A confirmed learner
+  interruption stops local playback and is sent to Gemini. A known app-owned
+  clip still uses `AudioStreamingService.blockMicUntil` for its measured length
+  plus the 150 ms output tail.
+- If AEC/NS cannot start or recover, disable full duplex before any mic frames
+  are sent; use the half-duplex fallback. Do not send raw unprocessed speaker
+  audio in an attempt to preserve barge-in.
+- Run `test/voice_activity_gate_test.dart`, `test/mic_echo_gate_test.dart`,
+  and the device `integration_test/voice_processing_test.dart`. The fake Marie
+  test validates lesson UI only; it is not evidence of acoustic quality.
 
 ## 8. Speaker buttons and Marie's memory (how the old app did it, and why)
 

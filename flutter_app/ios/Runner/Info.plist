@@ -26,6 +26,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Allow Flutter tools on your Mac to connect to ParleSprint while debugging and running device tests.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartVmService._tcp</string>
+	</array>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>ParleSprint needs microphone access so you can practice speaking French with your AI tutor.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

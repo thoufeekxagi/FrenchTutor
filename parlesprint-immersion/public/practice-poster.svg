@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Un voyage au Québec</title>
+  <desc id="desc">Original ParleSprint listening practice cover, forty-one seconds of French. Original geometric headphone illustration.</desc>
+  <defs>
+    <style>@font-face{font-family:Inter;src:url('fonts/inter-latin.woff2')}text{font-family:Inter,Arial,sans-serif}</style>
+  </defs>
+  <rect width="1600" height="900" fill="#F5F6F8"/>
+  <rect x="80" y="76" width="52" height="52" rx="16" fill="#2563EB"/>
+  <path d="M95 93h21a8 8 0 0 1 8 8v5a8 8 0 0 1-8 8h-9l-8 7v-7h-4a8 8 0 0 1-8-8v-5a8 8 0 0 1 8-8Z" fill="none" stroke="white" stroke-width="3" transform="translate(5 -2) scale(.94)"/>
+  <text x="150" y="111" font-size="30" font-weight="650" fill="#14171C" letter-spacing="-.7">ParleSprint</text>
+  <text x="82" y="288" font-size="24" font-weight="600" letter-spacing="3" fill="#2563EB">ÉCOUTER ET COMPRENDRE</text>
+  <text x="76" y="414" font-size="100" font-weight="650" letter-spacing="-5" fill="#14171C">Un voyage</text>
+  <text x="76" y="532" font-size="100" font-weight="650" letter-spacing="-5" fill="#14171C">au Québec</text>
+  <text x="82" y="606" font-size="30" font-weight="400" fill="#505A69">Original listening practice</text>
+  <rect x="82" y="656" width="230" height="54" rx="27" fill="#E8EFFE"/>
+  <circle cx="111" cy="683" r="5" fill="#2563EB"/>
+  <text x="132" y="692" font-size="23" font-weight="550" fill="#2563EB">41 sec / French</text>
+  <circle cx="1245" cy="430" r="211" fill="#E8EFFE"/>
+  <g fill="none" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1116 455v-59a129 129 0 0 1 258 0v59"/>
+    <rect x="1100" y="421" width="52" height="112" rx="22" fill="#F5F6F8"/>
+    <rect x="1338" y="421" width="52" height="112" rx="22" fill="#F5F6F8"/>
+    <path d="M1203 434v37m28-57v77m28-91v105m28-82v59" stroke-width="8"/>
+  </g>
+  <path d="M84 792h1432" stroke="#DDE2EA" stroke-width="2"/>
+  <text x="82" y="838" font-size="21" fill="#505A69">A short story. A little French. Every day.</text>
+  <text x="1518" y="838" text-anchor="end" font-size="21" fill="#505A69">IMMERSION</text>
+</svg>

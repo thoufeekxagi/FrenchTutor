@@ -1,0 +1,7 @@
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getBrowserClient } from "../../../lib/auth";
+let exchange:Promise<string>|undefined;
+function finishAuth(){if(!exchange)exchange=(async()=>{const u=new URL(window.location.href),code=u.searchParams.get("code"),recovery=u.searchParams.get("next")==="recovery";window.history.replaceState(null,"","/auth/callback");if(!code)throw Error("This link is incomplete or has already been used. Request a fresh link from your account page.");const c=await getBrowserClient();const {error}=await c.auth.exchangeCodeForSession(code);if(error)throw Error("This link expired or was opened in a different browser. Request a new link and open it here.");return recovery?"/account?mode=recovery":"/account";})();return exchange;}
+export default function AuthCallback(){const [message,setMessage]=useState("Finishing your sign-in…"),[failed,setFailed]=useState(false);useEffect(()=>{let active=true;finishAuth().then(path=>window.location.replace(path)).catch(e=>{if(active){setMessage(e.message);setFailed(true);}});return()=>{active=false;};},[]);return <main id="main-content" className="narrow-container page-shell"><div className="panel" style={{marginTop:80}}><p className="eyebrow">PARLESPRINT ACCOUNT</p><h1 style={{fontSize:28}}>A moment for your account.</h1><p role="status" className="notice">{message}</p>{failed&&<Link className="button button-primary" href="/account">Return to sign in</Link>}</div></main>;}

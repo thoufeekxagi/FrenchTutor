@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:french_tutor/services/mic_echo_gate.dart';
 
-/// The rule: the microphone never hears the phone's own sound.
+/// App-owned clips have a measured mute window plus a short output tail.
 void main() {
   final t0 = DateTime(2026, 1, 1, 12);
   final longAgo = DateTime.fromMillisecondsSinceEpoch(0);
@@ -24,30 +24,26 @@ void main() {
     );
   });
 
-  test(
-    'stays closed for the tail after playback ends (buffered speaker audio)',
-    () {
-      final g = MicEchoGate();
-      final end = t0;
-      expect(
-        g.blocks(
-          outputActive: false,
-          playbackEnd: end,
-          now: t0.add(const Duration(milliseconds: 400)),
-        ),
-        isTrue,
-        reason: 'the old 350 ms margin let the end of her voice back in',
-      );
-      expect(
-        g.blocks(
-          outputActive: false,
-          playbackEnd: end,
-          now: t0.add(const Duration(milliseconds: 850)),
-        ),
-        isTrue,
-      );
-    },
-  );
+  test('uses a short tail after playback ends', () {
+    final g = MicEchoGate();
+    final end = t0;
+    expect(
+      g.blocks(
+        outputActive: false,
+        playbackEnd: end,
+        now: t0.add(const Duration(milliseconds: 100)),
+      ),
+      isTrue,
+    );
+    expect(
+      g.blocks(
+        outputActive: false,
+        playbackEnd: end,
+        now: t0.add(const Duration(milliseconds: 150)),
+      ),
+      isFalse,
+    );
+  });
 
   test('opens after the tail, so the learner can answer', () {
     final g = MicEchoGate();
@@ -55,23 +51,20 @@ void main() {
       g.blocks(
         outputActive: false,
         playbackEnd: t0,
-        now: t0.add(const Duration(milliseconds: 950)),
+        now: t0.add(const Duration(milliseconds: 200)),
       ),
       isFalse,
     );
   });
 
-  test('the tail is long enough to cover buffered audio', () {
-    expect(
-      MicEchoGate.tail,
-      greaterThanOrEqualTo(const Duration(milliseconds: 800)),
-    );
+  test('the tail is short because clips already carry measured duration', () {
+    expect(MicEchoGate.tail, const Duration(milliseconds: 150));
   });
 
   test('a lesson clip closes the mic for its whole length and the tail', () {
     final g = MicEchoGate();
     g.clipStarted(const Duration(seconds: 2), now: t0);
-    for (final ms in [0, 500, 1900, 2000, 2800]) {
+    for (final ms in [0, 500, 1900, 2000, 2149]) {
       expect(
         g.blocks(
           outputActive: false,
@@ -86,7 +79,7 @@ void main() {
       g.blocks(
         outputActive: false,
         playbackEnd: longAgo,
-        now: t0.add(const Duration(milliseconds: 2950)),
+        now: t0.add(const Duration(milliseconds: 2150)),
       ),
       isFalse,
     );
@@ -107,6 +100,36 @@ void main() {
       ),
       isTrue,
     );
+  });
+
+  test('playback always blocks even when a speech detector hears a voice', () {
+    final g = MicEchoGate();
+    final playbackEnd = t0.add(const Duration(seconds: 3));
+    for (final route in ['speaker', 'earpiece', 'wired', 'AirPods']) {
+      expect(
+        g.blocks(outputActive: true, playbackEnd: playbackEnd, now: t0),
+        isTrue,
+        reason: '$route must not forward sound made by the app',
+      );
+      expect(
+        g.blocks(
+          outputActive: false,
+          playbackEnd: playbackEnd,
+          now: playbackEnd.add(const Duration(milliseconds: 149)),
+        ),
+        isTrue,
+        reason: '$route must retain the playback tail',
+      );
+      expect(
+        g.blocks(
+          outputActive: false,
+          playbackEnd: playbackEnd,
+          now: playbackEnd.add(const Duration(milliseconds: 150)),
+        ),
+        isFalse,
+        reason: '$route can accept the learner after the tail',
+      );
+    }
   });
 
   test('reset opens the mic again', () {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../data/database/learning_store.dart';
@@ -103,10 +104,14 @@ class GeminiLiveService {
     _activeOwner?.disconnect();
   }
 
-  // Reverted from 2.5 Native Audio back to 3.1 Live: 2.5 was cheaper on
-  // paper, but real-device testing showed it not responding reliably.
-  // Quality/reliability wins over cost here.
-  static const _model = 'models/gemini-3.1-flash-live-preview';
+  // Both tutor experiences use Google's current Live model. Other established
+  // call types retain their tested model until their tool contracts are
+  // evaluated separately.
+  bool get _usesGemini38Live => _isLessonCoach || liveTutorMode;
+
+  String get _model => _usesGemini38Live
+      ? 'models/gemini-3.8-live'
+      : 'models/gemini-3.1-flash-live-preview';
 
   // Keep only recent conversational turns that can affect the current
   // exercise. Speaking needs enough room for a natural back-and-forth, while
@@ -127,12 +132,12 @@ class GeminiLiveService {
   // intact while remaining much smaller than a full conversation window.
   static const _compactWritingCompressionTriggerTokens = 2200;
   static const _compactWritingCompressionTargetTokens = 1100;
-  // Live Tutor is intentionally the cheapest conversational profile. The Live
-  // API re-processes active context on later turns, so a small compression
-  // window matters more than the WebSocket itself. This keeps roughly the
-  // latest couple of short exchanges plus a compact summary.
-  static const _liveTutorCompressionTriggerTokens = 800;
-  static const _liveTutorCompressionTargetTokens = 400;
+  // Live Tutor needs enough rolling history to remember the learner's goal,
+  // recent corrections, and the current conversational thread. The Live API
+  // re-processes active context on later turns, so cap it at 2k tokens and
+  // compress at 4k instead of allowing unbounded transcript growth.
+  static const _liveTutorCompressionTriggerTokens = 4000;
+  static const _liveTutorCompressionTargetTokens = 2000;
   // The onboarding trial now uses the same cost discipline as Live Tutor. It
   // is still a separate session type for analytics and the three-minute timer,
   // but it does not need a large calibration history to answer the current turn.
@@ -146,16 +151,16 @@ class GeminiLiveService {
   // Keep short pauses inside one learner turn. The local PCM gate already
   // removes long silence; this server fallback should not answer on a breath,
   // click, or the gap between two words.
-  static const _liveTutorSilenceDurationMs = 1800;
+  static const _liveTutorSilenceDurationMs = 900;
 
   // Lesson coach: enough room for a short back-and-forth about the current
   // card (a minute or so of speech), small enough that later turns stay cheap.
-  static const _lessonCoachCompressionTriggerTokens = 3000;
-  static const _lessonCoachCompressionTargetTokens = 1500;
-  // Google's default end-of-speech wait is tuned for fast assistants. A learner
-  // forming a French sentence pauses longer, but this app's old 2.5 second
-  // default makes the tutor feel slow and absent.
-  static const _lessonCoachSilenceDurationMs = 1300;
+  static const _lessonCoachCompressionTriggerTokens = 4000;
+  static const _lessonCoachCompressionTargetTokens = 2000;
+  // The lesson route locally closes a speech segment after 700ms of silence
+  // and sends audioStreamEnd. Keep Gemini's own VAD close behind that client
+  // boundary so a small local timing difference does not add a long wait.
+  static const _lessonCoachSilenceDurationMs = 850;
 
   bool get _isLessonCoach => sessionType == LiveSessionType.lessonCoach;
 
@@ -327,14 +332,15 @@ class GeminiLiveService {
     final ownerGeneration = ++_ownerGeneration;
     late final Uri uri;
     try {
-      final token = await GeminiLiveTokenService.fetch(trial: isTrial);
+      final token = await GeminiLiveTokenService.fetch(
+        trial: isTrial,
+        modern: _usesGemini38Live,
+      );
       if (!identical(_activeOwner, this) ||
           ownerGeneration != _ownerGeneration) {
         return;
       }
-      uri = Uri.parse(
-        'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
-      );
+      uri = GeminiLiveTokenService.socketUri(token, modern: _usesGemini38Live);
     } catch (_) {
       if (identical(_activeOwner, this)) _activeOwner = null;
       unawaited(
@@ -456,6 +462,13 @@ class GeminiLiveService {
         outputAudioSeconds: _usageOutputPcmBytes / 2 / 24000,
         inputTokens: _usagePromptTokens,
         outputTokens: _usageResponseTokens,
+        // Provider totals include audio/context tokens. Pricing those totals
+        // again as text on top of PCM seconds would double-count them. This
+        // is the direct-audio floor until modality-level billing is available.
+        estimatedUsd: AiCostTracker.estimateGeminiLiveAudio(
+          inputSeconds: _usageInputPcmBytes / 2 / 16000,
+          outputSeconds: _usageOutputPcmBytes / 2 / 24000,
+        ),
         extra: {
           'input_pcm_bytes': _usageInputPcmBytes,
           'output_pcm_bytes': _usageOutputPcmBytes,
@@ -464,6 +477,7 @@ class GeminiLiveService {
           'provider_response_tokens': _usageResponseTokens,
           'provider_total_tokens': _usageTotalTokens,
           'cost_estimate_scope': 'direct_audio_only',
+          'estimated_usd_is_lower_bound': true,
           'context_and_transcription_tokens_are_provider_reported': true,
         },
       ),
@@ -892,6 +906,34 @@ class GeminiLiveService {
 
   Future<void> _sendSetup() async {
     final systemPrompt = await _fullSystemPrompt();
+    final setupBody = buildSetupBody(systemPrompt);
+    unawaited(
+      AiCostTracker.event(
+        feature: sessionType.name,
+        event: 'live_setup_policy',
+        extra: {
+          'model': _model,
+          'compact_guided_context': compactGuidedContext,
+          'live_tutor_mode': liveTutorMode,
+          'prompt_chars': systemPrompt.length,
+          'context_window_compression_trigger_tokens':
+              _contextCompressionTriggerTokens,
+          'context_window_compression_target_tokens':
+              _contextCompressionTargetTokens,
+          'input_audio_transcription': true,
+          'output_audio_transcription': true,
+          'resumed': _isReconnecting && _resumptionHandle != null,
+        },
+      ),
+    );
+    _resumedWithHandle = _isReconnecting && _resumptionHandle != null;
+    _send({'setup': setupBody});
+  }
+
+  /// Pure setup builder shared by production and protocol tests. A malformed
+  /// model-specific field must be caught before opening a billable socket.
+  @visibleForTesting
+  Map<String, dynamic> buildSetupBody(String systemPrompt) {
     final generationConfig = <String, dynamic>{
       'responseModalities': ['AUDIO'],
       'speechConfig': {
@@ -907,21 +949,13 @@ class GeminiLiveService {
     if (tools.isNotEmpty) {
       generationConfig['temperature'] = 0.65;
     }
-    if (_isLessonCoach) {
+    if (_usesGemini38Live) {
       // A safety ceiling, not a target: the prompt decides how long a reply
-      // is. 1000 audio tokens is about 40 seconds of speech, enough for a full
-      // spoken explanation without ever cutting her off mid-sentence.
-      generationConfig['maxOutputTokens'] = 1000;
-      generationConfig['thinkingConfig'] = {'thinkingLevel': 'minimal'};
-    } else if (liveTutorMode) {
-      // Live API setup config cannot change on an open socket. Keep a hard
-      // safety ceiling high enough for a complete spoken explanation (audio
-      // output is tokenized over time); the prompt keeps ordinary replies short
-      // and uses more only when the learner asks for detail.
-      generationConfig['maxOutputTokens'] = 400;
-      // Gemini 3.1 supports minimal thinking. Make the low-cost setting
-      // explicit so a future model default cannot silently increase spend.
-      generationConfig['thinkingConfig'] = {'thinkingLevel': 'minimal'};
+      // is. Audio is billed by tokens actually generated, not by this ceiling.
+      // Live Tutor gets room for a complete requested explanation; the prompt
+      // keeps ordinary voice turns brief.
+      generationConfig['maxOutputTokens'] = liveTutorMode ? 2000 : 1000;
+      // gemini-3.8-live does not accept thinkingLevel in setup.
     } else if (isTrial) {
       // Do not hard-truncate the short onboarding call: the old 64-token cap
       // could cut the opening or a useful answer off mid-sentence. Its compact
@@ -957,38 +991,19 @@ class GeminiLiveService {
               : 2500,
         },
       },
+      if (_usesGemini38Live) 'proactivity': {'proactiveAudio': true},
       // Always request resumption handles; on reconnect, present the last handle so
       // the SAME conversation continues (Marie keeps her context) on the new socket.
       'sessionResumption': _resumptionHandle == null
           ? <String, dynamic>{}
           : {'handle': _resumptionHandle},
     };
-    unawaited(
-      AiCostTracker.event(
-        feature: sessionType.name,
-        event: 'live_setup_policy',
-        extra: {
-          'model': _model,
-          'compact_guided_context': compactGuidedContext,
-          'live_tutor_mode': liveTutorMode,
-          'prompt_chars': systemPrompt.length,
-          'context_window_compression_trigger_tokens':
-              _contextCompressionTriggerTokens,
-          'context_window_compression_target_tokens':
-              _contextCompressionTargetTokens,
-          'input_audio_transcription': true,
-          'output_audio_transcription': true,
-          'resumed': _isReconnecting && _resumptionHandle != null,
-        },
-      ),
-    );
-    _resumedWithHandle = _isReconnecting && _resumptionHandle != null;
     if (tools.isNotEmpty) {
       setupBody['tools'] = [
         {'functionDeclarations': tools.map((t) => t.declaration).toList()},
       ];
     }
-    _send({'setup': setupBody});
+    return setupBody;
   }
 
   /// Answers a tool call the model made via [onToolCall]. Must be sent for every call, even
@@ -1262,6 +1277,13 @@ class GeminiLiveService {
       _deliverPendingSpokenContext();
       if (_goAwayPending) _finishGoAway();
     }
+  }
+
+  /// Drives the production Live event parser with captured-shape server events
+  /// without a socket or paid call.
+  @visibleForTesting
+  void receiveServerMessageForTest(Map<String, dynamic> message) {
+    _handleMessage(jsonEncode(message));
   }
 
   Timer? _inputFlushTimer;

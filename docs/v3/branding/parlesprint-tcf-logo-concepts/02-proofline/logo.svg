@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" role="img" aria-labelledby="title desc">
+  <title id="title">ParleSprint Proofline logo</title>
+  <desc id="desc">ParleSprint. TCF Canada preparation. A clean P whose counter carries a quiet exam-check gesture.</desc>
+  <g transform="translate(40 40) scale(0.390625)">
+    <rect width="1024" height="1024" fill="#FFFFFF"/>
+    <path d="M256 174H563C723 174 816 267 816 414S723 654 563 654H416V790H256V174ZM416 304V524H559C628 524 666 487 666 414S628 304 559 304H416Z" fill="#1D4ED8" fill-rule="evenodd"/><path d="M472 410L518 456L611 360" fill="none" stroke="#2563EB" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="512" y="910" text-anchor="middle" fill="#1D4ED8" font-family="'Helvetica Neue', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="13">TCF</text>
+  </g>
+  <text x="540" y="222" fill="#14171C" font-family="'Helvetica Neue', Arial, sans-serif" font-size="112" font-weight="650" letter-spacing="-4">ParleSprint</text>
+  <text x="545" y="304" fill="#1D4ED8" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="6">TCF CANADA PREP</text>
+</svg>

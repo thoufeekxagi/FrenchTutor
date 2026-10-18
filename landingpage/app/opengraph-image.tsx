@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { openGraphMark } from "./opengraph-mark";
 
 export const alt = "ParleSprint, a guided French learning path for beginners";
 export const size = { width: 1200, height: 630 };
@@ -9,7 +10,7 @@ export default function OpenGraphImage() {
     <div style={{ width: "100%", height: "100%", display: "flex", color: "#1c1e21", background: "#f8f9fa", fontFamily: "Arial, sans-serif", padding: 68 }}>
       <div style={{ width: "58%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 28, fontWeight: 800 }}>
-          <div style={{ width: 48, height: 48, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 12, color: "white", background: "#007bff" }}>P</div>
+          <img src={openGraphMark} width={48} height={48} alt="" style={{ borderRadius: 12 }} />
           <span style={{ display: "flex" }}>Parle<span style={{ color: "#007bff" }}>Sprint</span></span>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>

@@ -1,3 +1,12 @@
+/// Screen: vocabulary learning and daily review. Key prefix: flashcards.
+/// User arrived after choosing a word set or the Learn review shortcut.
+/// They must understand the French word, its meaning, its sound guide, and the
+/// daily-review swipe outcomes.
+/// Primary action: practise and continue, or swipe right when a review word is known.
+/// Secondary action: hear the word, review again with a left swipe, or close.
+/// Success state: the real review grade is saved and the learner can continue.
+/// Must not contain: a direction/colour mismatch or invented pronunciation.
+/// States: preparing, studying, reviewing, saving, completed, unavailable.
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -26,9 +35,9 @@ enum VocabularyStudyDepth { wordsOnly, wordsAndSentences }
 /// surface so the learner never gets a multi-word quiz or a cold content wait.
 ///
 /// Daily review contract: the learner arrives from Learn's review shortcut,
-/// sees one colorful word-and-meaning card, hears the word if desired, then
-/// swipes left to mark it known or right to review it once more. The regular
-/// guided vocabulary flow is unchanged.
+/// sees the French word, meaning, and phonetic guide, hears it if desired,
+/// then swipes right when known or left to review it again. The regular guided
+/// vocabulary flow is unchanged.
 class VocabularyFlashcardsScreen extends ConsumerStatefulWidget {
   const VocabularyFlashcardsScreen({
     super.key,
@@ -227,7 +236,7 @@ class _VocabularyFlashcardsScreenState
     final example = _examples[entry.id];
     final total = widget.dailyReviewMode ? _dailyQueue.length : _entries.length;
     final interaction = widget.dailyReviewMode
-        ? 'The learner sees the word and meaning together. Left marks it known; right asks for one later review.'
+        ? 'The learner sees the word, meaning, and phonetic guide. Right marks it known; left asks for one later review.'
         : 'The app controls reveal, record, practice, and next.';
     return 'Vocabulary card ${_index + 1}/$total. '
         'Word: "${entry.fr}". Meaning: "${entry.en}".'
@@ -365,7 +374,7 @@ class _VocabularyFlashcardsScreenState
         entries: _entries,
         contextExamples: _examples,
         focusNote: widget.dailyReviewMode
-            ? 'Swipe left when the learner knows the word; swipe right to review it again.'
+            ? 'Swipe right when the learner knows the word; swipe left to review it again.'
             : 'Review each word, repeat it, then optionally review its sentence.',
       );
       _sessionCreated = true;
@@ -637,7 +646,7 @@ class _VocabularyFlashcardsScreenState
     unawaited(_murray.interruptTutorReply());
     setState(() {
       _dailySwiping = true;
-      _dailyDragX = known ? -screenWidth : screenWidth;
+      _dailyDragX = known ? screenWidth : -screenWidth;
     });
 
     try {
@@ -893,7 +902,7 @@ class _VocabularyFlashcardsScreenState
                                         (_dailyDragX.abs() <= 82 &&
                                             velocity > 520);
                                     if (left || right) {
-                                      unawaited(_rateDailyCard(known: left));
+                                      unawaited(_rateDailyCard(known: right));
                                     } else {
                                       setState(() => _dailyDragX = 0);
                                     }
@@ -901,7 +910,7 @@ class _VocabularyFlashcardsScreenState
                             child: Semantics(
                               container: true,
                               label:
-                                  '${current.fr}${_shortGender(current.gender).isEmpty ? '' : ' (${_shortGender(current.gender)})'}, ${current.en}. Swipe left when you know it; swipe right to review it again.',
+                                  '${current.fr}${_shortGender(current.gender).isEmpty ? '' : ' (${_shortGender(current.gender)})'}, ${current.en}. Pronunciation: ${current.phonetic}. Swipe right when you know it; swipe left to review it again.',
                               child: AnimatedSlide(
                                 offset: Offset(_dailyDragX / cardWidth, 0),
                                 duration: _dailySwiping
@@ -953,12 +962,17 @@ class _VocabularyFlashcardsScreenState
     required double dragX,
   }) {
     final cardBlue = DesignTokens.flashcardBlue;
-    final foreground = isBlue ? DesignTokens.onFlashcardBlue : DesignTokens.ink;
+    final foreground = isBlue
+        ? Colors.white
+        : DesignTokens.isDark
+        ? DesignTokens.ink
+        : DesignTokens.primary;
     final secondary = isBlue
         ? DesignTokens.onFlashcardBlue.withValues(alpha: 0.78)
         : DesignTokens.muted;
     final dragProgress = (dragX.abs() / 140).clamp(0.0, 1.0).toDouble();
-    final swipeColor = dragX < 0 ? DesignTokens.success : DesignTokens.muted;
+    final learned = dragX > 0;
+    final swipeColor = learned ? DesignTokens.success : DesignTokens.muted;
     final gender = _shortGender(entry.gender);
 
     return AnimatedContainer(
@@ -1055,25 +1069,39 @@ class _VocabularyFlashcardsScreenState
                       27,
                     ).copyWith(color: foreground, height: 1.18),
                   ),
+                  if (entry.phonetic.trim().isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      'PRONUNCIATION',
+                      textAlign: TextAlign.center,
+                      style: DesignTokens.label(
+                        10,
+                        weight: FontWeight.w700,
+                      ).copyWith(color: secondary, letterSpacing: 1.2),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '(${entry.phonetic.trim()})',
+                      textAlign: TextAlign.center,
+                      style: DesignTokens.body(
+                        15,
+                        weight: FontWeight.w600,
+                      ).copyWith(color: secondary, letterSpacing: 0.2),
+                    ),
+                  ],
                   const Spacer(flex: 3),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _swipeArrow(
                         Icons.arrow_back_rounded,
-                        DesignTokens.success,
-                        DesignTokens.successSoft,
+                        DesignTokens.muted,
+                        isBlue ? Colors.white : DesignTokens.canvasDim,
                       ),
                       _swipeArrow(
                         Icons.arrow_forward_rounded,
-                        isBlue
-                            ? DesignTokens.onFlashcardBlue.withValues(
-                                alpha: 0.7,
-                              )
-                            : DesignTokens.muted,
-                        isBlue
-                            ? Colors.white.withValues(alpha: 0.12)
-                            : DesignTokens.canvasDim,
+                        DesignTokens.success,
+                        isBlue ? Colors.white : DesignTokens.successSoft,
                       ),
                     ],
                   ),
@@ -1083,26 +1111,64 @@ class _VocabularyFlashcardsScreenState
             if (dragX.abs() > 8)
               Positioned.fill(
                 child: IgnorePointer(
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 100),
-                    color: swipeColor.withValues(
-                      alpha: 0.05 + dragProgress * 0.20,
-                    ),
-                    child: Align(
-                      alignment: dragX < 0
-                          ? Alignment.topLeft
-                          : Alignment.topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.all(22),
-                        child: Icon(
-                          dragX < 0
-                              ? Icons.check_rounded
-                              : Icons.replay_rounded,
-                          color: swipeColor,
-                          size: 38,
+                  child: Stack(
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 100),
+                        color: isBlue
+                            ? Colors.transparent
+                            : swipeColor.withValues(
+                                alpha: 0.04 + dragProgress * 0.11,
+                              ),
+                      ),
+                      Align(
+                        alignment: learned
+                            ? Alignment.topRight
+                            : Alignment.topLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 9,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isBlue
+                                  ? Colors.white
+                                  : learned
+                                  ? DesignTokens.successSoft
+                                  : DesignTokens.canvasDim,
+                              borderRadius: BorderRadius.circular(99),
+                              border: isBlue
+                                  ? Border.all(
+                                      color: swipeColor.withValues(alpha: 0.28),
+                                    )
+                                  : null,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  learned
+                                      ? Icons.check_rounded
+                                      : Icons.replay_rounded,
+                                  color: swipeColor,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  learned ? 'I know this' : 'Review again',
+                                  style: DesignTokens.body(
+                                    13,
+                                    weight: FontWeight.w700,
+                                  ).copyWith(color: swipeColor),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

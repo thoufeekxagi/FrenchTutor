@@ -133,6 +133,14 @@ class SyncService {
 
   Future<void> syncProfile(Profile p) => _guarded(
     (uid) async {
+      final examDate = p.tcfExamDate;
+      final examDateValue = examDate == null
+          ? null
+          : DateTime(
+              examDate.year,
+              examDate.month,
+              examDate.day,
+            ).toIso8601String().split('T').first;
       await _client
           .from('profiles')
           .update({
@@ -140,6 +148,7 @@ class SyncService {
             'level': p.level,
             'session_length': p.sessionLength,
             'reminder_time': p.reminderTime,
+            'tcf_exam_date': examDateValue,
             'preferred_days': p.preferredDays.isEmpty
                 ? null
                 : p.preferredDays.join(','),
@@ -1287,6 +1296,50 @@ class SyncService {
     queueRowId: lessonId,
   );
 
+  Future<void> syncV3CourseProgress(
+    String lessonId, {
+    required String status,
+    required int currentStep,
+  }) => _guarded(
+    (uid) async {
+      await _client.from('v3_course_progress_state').upsert({
+        'user_id': uid,
+        'lesson_id': lessonId,
+        'status': status,
+        'current_step': currentStep,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      }, onConflict: 'user_id,lesson_id');
+    },
+    queueTable: 'v3_course_progress_state',
+    queueRowId: lessonId,
+  );
+
+  Future<void> _syncV3CourseProgressSnapshot() => _guarded(
+    (uid) async {
+      final rows = _db.select(
+        'SELECT lesson_id, status, current_step, created_at, updated_at '
+        'FROM v3_course_progress ORDER BY updated_at',
+      );
+      const batchSize = 200;
+      for (var start = 0; start < rows.length; start += batchSize) {
+        final end = (start + batchSize).clamp(0, rows.length).toInt();
+        await _client.from('v3_course_progress_state').upsert([
+          for (final row in rows.sublist(start, end))
+            {
+              'user_id': uid,
+              'lesson_id': row['lesson_id'],
+              'status': row['status'],
+              'current_step': row['current_step'],
+              'created_at': row['created_at'],
+              'updated_at': row['updated_at'],
+            },
+        ], onConflict: 'user_id,lesson_id');
+      }
+    },
+    queueTable: 'v3_course_progress_state',
+    queueRowId: '*',
+  );
+
   Future<void> logHabit({
     required String habitId,
     required bool done,
@@ -1614,6 +1667,10 @@ class SyncService {
   Future<bool> _retryOne(String tableName, String rowId) async {
     try {
       switch (tableName) {
+        case 'profiles':
+          final profile = LearningStore(_db, this).profile();
+          await syncProfile(profile);
+          return true;
         case 'onboarding_trial_adoption':
           await syncAdoptedOnboardingTrials();
           return true;
@@ -1649,6 +1706,24 @@ class SyncService {
           );
           if (rows.isEmpty) return true;
           await syncDailySession(_dailySessionFromRow(rows.first));
+          return true;
+        case 'v3_course_progress_state':
+          if (rowId == '*') {
+            await _syncV3CourseProgressSnapshot();
+            return true;
+          }
+          final rows = _db.select(
+            'SELECT lesson_id, status, current_step FROM v3_course_progress '
+            'WHERE lesson_id = ?',
+            [rowId],
+          );
+          if (rows.isEmpty) return true;
+          final row = rows.first;
+          await syncV3CourseProgress(
+            row['lesson_id'] as String,
+            status: row['status'] as String,
+            currentStep: row['current_step'] as int,
+          );
           return true;
         case 'generated_stories':
           final story = GeneratedStoryStore(
@@ -1809,6 +1884,7 @@ class SyncService {
       'competencyStates': () => _hydrateCompetencyStates(uid),
       'learningPlans': () => _hydrateLearningPlans(uid),
       'lessonProgress': () => _hydrateLessonProgress(uid),
+      'v3CourseProgress': () => _hydrateV3CourseProgress(uid),
       'mistakeTags': () => _hydrateMistakeTags(uid),
       'events': () => _hydrateEvents(uid),
       'generatedStories': () => _hydrateGeneratedStories(uid),
@@ -1830,6 +1906,7 @@ class SyncService {
         }),
       ),
     );
+    unawaited(_syncV3CourseProgressSnapshot());
     // This is intentionally outside the critical hydration path. The bundled
     // catalog is already available locally, so publishing it cannot delay the
     // first screen after sign-in.
@@ -1839,6 +1916,26 @@ class SyncService {
       profileFound: profileFound,
       adaptiveCourseFetchSucceeded: adaptiveCourseFetchSucceeded,
     );
+  }
+
+  /// Refreshes the profile and authored-course progress used by Learn when
+  /// that screen becomes visible. The screen renders its SQLite cache first,
+  /// then calls this in the background and repaints from the merged rows.
+  Future<void> refreshLearnHomeFromAccount() async {
+    final uid = _userId;
+    if (uid == null) return;
+    try {
+      await _hydrateProfile(uid);
+    } catch (error) {
+      debugPrint('refreshLearnHomeFromAccount: profile failed: $error');
+    }
+    try {
+      await _hydrateV3CourseProgress(uid);
+    } catch (error) {
+      debugPrint('refreshLearnHomeFromAccount: course progress failed: $error');
+      return;
+    }
+    if (_userId == uid) await _syncV3CourseProgressSnapshot();
   }
 
   /// Pulls the public, validated Speaking catalog into SQLite. It is safe to
@@ -1890,7 +1987,7 @@ class SyncService {
   }
 
   /// The general profile fields (goal/level/session_length/reminder_time/
-  /// study-plan preferences/onboarded_at) — previously push-only, never pulled back on sign-in, so
+  /// exam date/study-plan preferences/onboarded_at) — previously push-only, never pulled back on sign-in, so
   /// a reinstalled device kept whatever onboarding defaults it was given
   /// locally instead of the real remote profile.
   Future<bool> _hydrateProfile(String uid) async {
@@ -1931,7 +2028,7 @@ class SyncService {
     _db.execute(
       '''
       UPDATE profiles SET
-        goal = ?, level = ?, session_length = ?, reminder_time = ?,
+        goal = ?, level = ?, session_length = ?, reminder_time = ?, tcf_exam_date = ?,
         preferred_days = ?, interests = ?, time_zone = ?, notification_permission_state = ?,
         onboarding_version = ?, onboarded_at = ?, updated_at = ?
       WHERE user_id = ? AND
@@ -1942,6 +2039,7 @@ class SyncService {
         r['level'],
         r['session_length'],
         r['reminder_time'],
+        r['tcf_exam_date']?.toString(),
         r['preferred_days'],
         r['interests'],
         r['time_zone'],
@@ -2953,6 +3051,57 @@ class SyncService {
       _db.execute(
         'INSERT OR REPLACE INTO lesson_progress (lesson_id, status, score) VALUES (?, ?, ?)',
         [r['lesson_id'], r['status'], null],
+      );
+    }
+  }
+
+  Future<void> _hydrateV3CourseProgress(String uid) async {
+    final rows = await _client
+        .from('v3_course_progress_state')
+        .select('lesson_id, status, current_step, created_at, updated_at')
+        .eq('user_id', uid);
+    for (final remote in rows) {
+      final lessonId = remote['lesson_id'] as String;
+      final localRows = _db.select(
+        'SELECT status, current_step, created_at, updated_at '
+        'FROM v3_course_progress WHERE lesson_id = ?',
+        [lessonId],
+      );
+      final local = localRows.isEmpty ? null : localRows.first;
+      final completed =
+          local?['status'] == 'completed' || remote['status'] == 'completed';
+      final localStep = local?['current_step'] as int? ?? 0;
+      final remoteStep = remote['current_step'] as int? ?? 0;
+      final currentStep = completed
+          ? 0
+          : (localStep > remoteStep ? localStep : remoteStep);
+      final localUpdatedAt = local?['updated_at'] as String?;
+      final remoteUpdatedAt = remote['updated_at'] as String?;
+      final updatedAt =
+          localUpdatedAt != null &&
+              remoteUpdatedAt != null &&
+              localUpdatedAt.compareTo(remoteUpdatedAt) > 0
+          ? localUpdatedAt
+          : (remoteUpdatedAt ?? DateTime.now().toUtc().toIso8601String());
+      final createdAt =
+          local?['created_at'] as String? ??
+          remote['created_at'] as String? ??
+          updatedAt;
+      _db.execute(
+        '''INSERT INTO v3_course_progress
+             (lesson_id, status, current_step, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?)
+           ON CONFLICT(lesson_id) DO UPDATE SET
+             status = excluded.status,
+             current_step = excluded.current_step,
+             updated_at = excluded.updated_at''',
+        [
+          lessonId,
+          completed ? 'completed' : 'in_progress',
+          currentStep,
+          createdAt,
+          updatedAt,
+        ],
       );
     }
   }

@@ -47,7 +47,7 @@ export function ConfirmSignupClient() {
       <section className={styles.card} aria-labelledby="confirm-title">
         <div className={styles.brand}>
           <Image
-            src="/parle-mark.svg"
+            src="/icon-512.png"
             alt=""
             width={48}
             height={48}

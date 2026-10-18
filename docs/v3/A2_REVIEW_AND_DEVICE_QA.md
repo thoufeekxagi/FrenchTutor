@@ -120,7 +120,9 @@ timeout if a batch is still progressing; if a batch fails, inspect its
 `artifacts/e2e/run.log`, `result.txt`, `probe.json` and timeout screenshot
 before retrying. `tool/e2e.sh` replaces `artifacts/e2e` on each run, so save
 the previous batch's evidence elsewhere before starting the next one. Follow
-the two-failed-attempts stop rule in `AGENT_RULES.md`.
+the evidence-based retry process in `AGENT_RULES.md`: change the approach
+after each result and continue until the run succeeds or owner-only access is
+needed.
 
 Then walk the A2 stories through the story reader and quiz:
 

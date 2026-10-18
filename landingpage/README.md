@@ -1,51 +1,49 @@
-# ParleSprint landing page
+# ParleSprint free-learning website
 
-A pre-launch, conversion-focused marketing site for ParleSprint: a structured French-learning path for English-speaking beginners preparing for TCF or TEF and a Canadian immigration goal.
+The public website is a free-first learning funnel for ParleSprint. Visitors can start a short daily exercise, browse authored A1–B2 lessons, and use focused reading, writing, verb, keyboard, and vocabulary tools without an account. The site also explains the Chrome extension and iPhone app, supports optional account sync, and collects learner feedback.
 
-## Stack
+## Local development
 
-- Next.js App Router
-- TypeScript
-- Tailwind CSS v4
-- Bun
-- lucide-react
-
-## Run locally
+Run the canonical source like this:
 
 ```bash
-cd landingpage
-bun install
-bun dev
+cd /Users/thoufeekx/Desktop/Millionaire/FrenchTutor/landingpage
+npm ci
+npm run dev
 ```
 
-Open http://localhost:3000.
-
-## Verify
+Or run the separate Netlify-ready copy:
 
 ```bash
-bun run lint
-bun run build
+cd /Users/thoufeekx/Desktop/Millionaire/ParleSprintWebsite
+npm ci
+npm run dev
 ```
 
-## Environment
+Open <http://localhost:3000>. Validate with:
 
-Copy `.env.example` to `.env.local` before deployment and set `NEXT_PUBLIC_SITE_URL` to the real domain. The default local URL keeps metadata and sitemap generation valid during development.
+```bash
+npm run lint
+npm run build
+```
 
-## Waitlist integration
+The standalone deployment copy is `/Users/thoufeekx/Desktop/Millionaire/ParleSprintWebsite/`. This folder is the canonical source. Sync and test the standalone copy separately before any release; preserve its Netlify configuration, lockfile, references, and other standalone-only files. See `DEPLOYMENT.md` for the two-copy workflow.
 
-The current form validates email and provides a pre-launch demo flow. Before launch, connect `app/api/waitlist/route.ts` to a real provider through `WAITLIST_WEBHOOK_URL` or replace the route with a transactional email/database integration. Do not put provider keys in the client. Without a webhook, the API intentionally returns a preview success and does not persist addresses.
+## Main routes
 
-## Product/marketing decisions
+- `/today` — a three-question daily challenge with authored explanations
+- `/learn` — ten guided lessons
+- `/tools` — ten free entries: daily practice, lessons, seven focused tools, and the local vocabulary notebook
+- `/tools/french-verb-practice`, `/tools/french-writing`, `/tools/french-reading`, `/tools/french-keyboard`, `/tools/french-dictation`, `/tools/french-sentence-builder`, `/tools/french-conversation` — focused A1–B2 practice
+- `/extension` — Chrome extension download and installation guide
+- `/app` — iPhone app overview
+- `/account` — optional sign-in and account settings
+- `/feedback` — private learner feedback form
 
-See:
+## Services and configuration
 
-- `brand-spec.md` for the design read and asset contract
-- `../.devin/skills/parlesprint-landing-page/SKILL.md` for the reusable design, UX, SEO, and quality workflow
-- `../.devin/skills/parlesprint-landing-page/references/marketing-brief.md` for positioning and funnel assumptions
+`NEXT_PUBLIC_SITE_URL` sets canonical links and sitemap metadata. Optional account sync uses the existing ParleSprint Supabase project. Email/password is the common sign-in path across the website, iPhone app and Chrome extension. Apple sign-in is iPhone-only; Apple-only accounts are not linked to web access yet. The web vocabulary notebook syncs between signed-in browsers; mobile and extension learning data remain separate. The public site’s feedback endpoint requires server-only `RESEND_API_KEY`; without it, the form explains that delivery is not configured and shows the support email. `NEXT_PUBLIC_GA_MEASUREMENT_ID` is optional. Keep secret values in ignored local environment files or host settings, never in source or documentation.
 
-## Planned launch evolution
+Core practice is authored and does not require paid model calls. The seven focused tools are verb practice, writing, reading, French accents, dictation, sentence building, and short conversations. The product pages describe actual current behavior and limitations. Generated promotional images are not used; the homepage uses the real app screenshot and CSS-built interface examples.
 
-1. Validate the waitlist and message with real visitors.
-2. Add a welcome email and source attribution only after choosing a privacy-safe provider.
-3. Add real product screenshots or a recorded demo once the Flutter app flow is stable.
-4. Add TCF/TEF SEO pages only when their content is accurate and maintained against current official guidance.
+Research, UX direction, and validation notes are in `../docs/v3/website-research-2026-10-17/PLAN.md` and `../docs/v3/website-rebuild-2026-10-17/WORKLOG.md`.
