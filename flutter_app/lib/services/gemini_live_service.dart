@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -571,6 +572,19 @@ class GeminiLiveService {
     // the model response. Keep a waiter for this exact turn so a Guided
     // retry cannot start a new learner turn in that gap.
     _turnCompletionWaiter ??= Completer<void>();
+    // Gemini's automatic VAD only closes the learner turn after it has
+    // RECEIVED silenceDurationMs of trailing silence, and the local gate stops
+    // uploading after 700 ms. Without this top-up the reply waits for the next
+    // noise burst (measured: 5 to 9 s on the phone, 0.5 s with the top-up).
+    // About 0.9 s of digital silence is roughly 22 input tokens.
+    if (!manualActivityBoundaries && (_isLessonCoach || liveTutorMode)) {
+      final ms =
+          (_isLessonCoach
+              ? _lessonCoachSilenceDurationMs
+              : _liveTutorSilenceDurationMs) +
+          50;
+      sendAudioChunk(Uint8List(ms * 32));
+    }
     _send({
       'realtimeInput': manualActivityBoundaries
           ? {'activityEnd': {}}

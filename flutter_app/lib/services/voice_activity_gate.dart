@@ -31,6 +31,8 @@ class VoiceActivityGate {
 
   bool get isSpeechActive => _active;
   double get noiseFloor => _noiseFloor;
+  double lastLevel = 0;
+  double lastThreshold = 0;
 
   VoiceActivityUpdate add(Uint8List frame) {
     final durationMs = frame.length / 2 / sampleRate * 1000;
@@ -38,6 +40,8 @@ class VoiceActivityGate {
     final level = _speechLevel(frame);
     final threshold = math.max(0.04, _noiseFloor * 2.2 + 0.015).toDouble();
     final speechLike = level >= threshold;
+    lastLevel = level;
+    lastThreshold = threshold;
 
     if (!_active) {
       if (!speechLike) {

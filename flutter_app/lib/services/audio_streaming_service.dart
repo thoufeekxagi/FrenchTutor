@@ -6,7 +6,12 @@ import 'dart:typed_data';
 import 'package:audio_session/audio_session.dart';
 import 'mic_echo_gate.dart';
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, debugPrint, defaultTargetPlatform, visibleForTesting;
+    show
+        TargetPlatform,
+        debugPrint,
+        defaultTargetPlatform,
+        kDebugMode,
+        visibleForTesting;
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:logger/logger.dart' show Level;
 import 'package:permission_handler/permission_handler.dart';
@@ -531,6 +536,9 @@ class AudioStreamingService {
   final Queue<Uint8List> _speechPreRoll = Queue<Uint8List>();
   int _speechPreRollBytes = 0;
 
+  double _dbgMax = 0;
+  int _dbgFrames = 0;
+
   void _handleMicChunk(Uint8List chunk) {
     // Half-duplex routes must stay quiet while Marie is answering. The
     // full-duplex routes keep the processed mic open so a learner can barge in;
@@ -549,6 +557,20 @@ class AudioStreamingService {
         return;
       }
       final update = _voiceActivityGate.add(chunk);
+      if (kDebugMode) {
+        _dbgMax = math.max(_dbgMax, _voiceActivityGate.lastLevel);
+        if (++_dbgFrames % 50 == 0) {
+          debugPrint(
+            'VAD_DBG maxLevel=${_dbgMax.toStringAsFixed(3)} '
+            'thr=${_voiceActivityGate.lastThreshold.toStringAsFixed(3)} '
+            'active=${_voiceActivityGate.isSpeechActive} '
+            'awaiting=$isAwaitingTutorResponse',
+          );
+          _dbgMax = 0;
+        }
+        if (update.speechStarted) debugPrint('VAD_DBG speechStarted');
+        if (update.speechEnded) debugPrint('VAD_DBG speechEnded');
+      }
       if (update.speechStarted) onSpeechStarted?.call();
       for (final frame in update.frames) {
         _audioChunkCallback?.call(frame);

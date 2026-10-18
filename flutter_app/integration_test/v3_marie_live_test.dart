@@ -33,6 +33,28 @@ void main() {
     await t.pump(const Duration(milliseconds: 500));
   }
 
+  String phase(List<String> t) => t.contains('Marie is speaking')
+      ? 'SPEAKING'
+      : t.contains('Listening')
+      ? 'LISTENING'
+      : t.contains('Marie is thinking')
+      ? 'THINKING'
+      : 'OTHER';
+
+  Future<bool> waitPhase(WidgetTester t, String want, int secs) async {
+    var last = '';
+    for (var i = 0; i < secs * 5; i++) {
+      await t.pump(const Duration(milliseconds: 200));
+      final p = phase(await texts(t));
+      if (p != last) {
+        last = p;
+        mark('PHASE $p');
+      }
+      if (p == want) return true;
+    }
+    return false;
+  }
+
   Future<void> waitSecs(WidgetTester t, int s) async {
     for (var i = 0; i < s * 5; i++) {
       await t.pump(const Duration(milliseconds: 200));
@@ -122,8 +144,12 @@ void main() {
     );
 
     // Mac speaks a French question at the phone.
+    await waitPhase(tester, 'LISTENING', 10);
     mark('SAY_Q1');
-    await waitSecs(tester, 22);
+    final heard1 = await waitPhase(tester, 'SPEAKING', 40);
+    mark('Q1_REPLY_STARTED $heard1');
+    await waitPhase(tester, 'LISTENING', 40);
+    mark('Q1_REPLY_DONE');
     final q1 = await transcript(tester, name, '13_q1_sheet');
     expect(
       q1.any((t) => t.contains('YOU (AS HEARD)')),
@@ -131,12 +157,18 @@ void main() {
       reason: 'the learner question must be heard',
     );
 
-    // Ask for a long answer, then interrupt while she talks.
+    // Ask for a long answer, then interrupt as soon as she starts speaking.
     mark('SAY_Q2_LONG');
-    await waitSecs(tester, 5);
+    final started = await waitPhase(tester, 'SPEAKING', 40);
+    mark('Q2_REPLY_STARTED $started');
     mark('SAY_INTERRUPT');
-    await waitSecs(tester, 18);
-    await transcript(tester, name, '14_interrupt_sheet');
+    await waitSecs(tester, 25);
+    final fin = await transcript(tester, name, '14_interrupt_sheet');
+    expect(
+      fin.where((t) => t.contains('YOU (AS HEARD)')).length >= 2,
+      isTrue,
+      reason: 'the interruption must be heard as a second learner turn',
+    );
 
     await press(tester, 'End call with $name');
     await probe.waitForLabel(tester, 'Talk to $name');
