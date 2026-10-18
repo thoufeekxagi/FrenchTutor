@@ -358,6 +358,14 @@ class InlineCallController {
       if (_isCurrentGeneration(generation)) g.endAudioTurn();
     };
 
+    g.onReplyGuarded = (_) {
+      if (!_isCurrentGeneration(generation)) return;
+      unawaited(a.stopPlayback());
+      a.isOutputActive = false;
+      tutorSpeaking = false;
+      _notify();
+    };
+
     g.onConnected = () {
       if (_isCurrentGeneration(generation) && !completer.isCompleted) {
         completer.complete(true);

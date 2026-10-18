@@ -1,3 +1,4 @@
+import 'tutor_reply_guard.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:collection';
@@ -224,6 +225,7 @@ class GeminiLiveService {
   void Function(String text)? onUserTranscript;
   void Function(String text)? onTutorTranscript;
   void Function(List<int> pcmBytes)? onAudioChunk;
+  void Function(String reason)? onReplyGuarded;
   void Function()? onTurnComplete;
   void Function()? onInterrupted;
 
@@ -1195,6 +1197,8 @@ class GeminiLiveService {
 
     final interrupted = serverContent['interrupted'];
     if (interrupted == true) {
+      _guardChecked = false;
+      _turnUserTranscript = '';
       final wasSuppressed = _suppressStaleReply;
       _clearStaleSuppression();
       _completeTurnWaiter();
@@ -1230,6 +1234,8 @@ class GeminiLiveService {
         }
       }
     }
+
+    _applyReplyGuard(serverContent);
 
     final outputTranscription = serverContent['outputTranscription'];
     if (outputTranscription is Map) {
@@ -1270,6 +1276,8 @@ class GeminiLiveService {
 
     final turnComplete = serverContent['turnComplete'];
     if (turnComplete == true) {
+      _guardChecked = false;
+      _turnUserTranscript = '';
       final wasSuppressed = _suppressStaleReply;
       _clearStaleSuppression();
       _completeTurnWaiter();
@@ -1292,6 +1300,43 @@ class GeminiLiveService {
     }
   }
 
+  bool _guardChecked = false;
+  String _turnUserTranscript = '';
+
+  /// The Live model answers every sound it takes for speech. For the lesson
+  /// coach and Live Tutor, silently drop replies to fillers ("hmm, okay",
+  /// "thanks") and cut generic chatbot offers ("let me know if you need
+  /// anything else"), as a human tutor would not say them.
+  void _applyReplyGuard(Map serverContent) {
+    if (!(_isLessonCoach || liveTutorMode) || _suppressStaleReply) return;
+    final out = serverContent['outputTranscription'];
+    final hasReply =
+        serverContent['modelTurn'] is Map ||
+        (out is Map && (out['text'] as String?)?.isNotEmpty == true);
+    if (!hasReply) return;
+    if (!_guardChecked) {
+      _guardChecked = true;
+      if (TutorReplyGuard.isFillerTurn(
+        _turnUserTranscript + _currentUserTranscript,
+      )) {
+        _isModelGenerating = true;
+        suppressCurrentReply();
+        onReplyGuarded?.call('filler');
+        return;
+      }
+    }
+    if (out is Map && !_suppressPreInjection) {
+      final text = _currentTutorTranscript + ((out['text'] as String?) ?? '');
+      final cut = TutorReplyGuard.chatterStart(text);
+      if (cut >= 0) {
+        _currentTutorTranscript = text.substring(0, cut).trimRight();
+        _isModelGenerating = true;
+        suppressCurrentReply();
+        onReplyGuarded?.call('chatter');
+      }
+    }
+  }
+
   /// Drives the production Live event parser with captured-shape server events
   /// without a socket or paid call.
   @visibleForTesting
@@ -1306,6 +1351,7 @@ class GeminiLiveService {
     if (_currentUserTranscript.isEmpty) return;
     final t = _currentUserTranscript;
     _currentUserTranscript = '';
+    _turnUserTranscript += t;
     onUserTranscript?.call(t);
   }
 
