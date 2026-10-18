@@ -1,0 +1,66 @@
+{
+ "id": "exam-b1-writing",
+ "title": "Writing, B1",
+ "subtitle": "Tell an experience",
+ "minutes": 8,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada writing test has three tasks: a message (60 to 120 words), a longer text (120 to 150 words) and an opinion (120 to 180 words). Here you practise the building blocks: greetings, sentences, connectors and structure.",
+   "examples": []
+  },
+  {
+   "type": "explain",
+   "id": "model",
+   "title": "A model text",
+   "body": "Task 2 at B1: tell an experience in order, give a reason, and say what you think or want next.",
+   "examples": [
+    {
+     "fr": "L'été dernier, j'ai visité Québec avec ma famille. Nous avons marché dans le Vieux-Québec et nous avons mangé de la poutine. Ce voyage m'a beaucoup plu parce que les gens étaient accueillants. J'aimerais y retourner l'année prochaine.",
+     "en": "Last summer I visited Quebec City with my family. We walked in Old Quebec and ate poutine. I really enjoyed the trip because people were welcoming. I would like to go back next year."
+    }
+   ]
+  },
+  {
+   "type": "choose",
+   "id": "contrast",
+   "prompt": "Which sentence links two ideas with a contrast?",
+   "options": [
+    "Je suis fatigué parce que je travaille.",
+    "Je suis fatigué et je dors.",
+    "Je suis fatigué, mais je continue à travailler.",
+    "Je suis fatigué, donc je dors."
+   ],
+   "answer": 2,
+   "explain": "Mais introduces a contrast."
+  },
+  {
+   "type": "choose",
+   "id": "pc",
+   "prompt": "Choose the correct form: « Hier soir, nous ... un film. »",
+   "options": [
+    "regarderons",
+    "regardons",
+    "sommes regardé",
+    "avons regardé"
+   ],
+   "answer": 3,
+   "explain": "Regarder uses avoir in the passé composé: nous avons regardé."
+  },
+  {
+   "type": "choose",
+   "id": "formal",
+   "prompt": "Which opening fits a formal email?",
+   "options": [
+    "Madame, Monsieur,",
+    "Salut tout le monde !",
+    "Coucou !",
+    "Hé !"
+   ],
+   "answer": 0,
+   "explain": "Madame, Monsieur is the formal opening."
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "id": "exam-b1-reading",
+ "title": "Reading, B1",
+ "subtitle": "Articles and formal messages",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada reading test you read a short text, such as a notice, a message or an article, and choose the best answer. Look for the exact detail the question asks about. At B1 the texts are short articles and formal messages.",
+   "examples": []
+  },
+  {
+   "type": "choose",
+   "id": "read-1",
+   "prompt": "What downside is mentioned?",
+   "promptFr": "Depuis quelques années, de plus en plus de Canadiens travaillent à domicile au moins deux jours par semaine. Les employés disent gagner du temps et être moins stressés, mais certains se sentent isolés.",
+   "options": [
+    "Offices are closing",
+    "Some people feel isolated",
+    "Salaries are lower",
+    "Commutes are longer"
+   ],
+   "answer": 1,
+   "explain": "Certains se sentent isolés."
+  },
+  {
+   "type": "choose",
+   "id": "read-2",
+   "prompt": "What is Hugo asking for?",
+   "promptFr": "Objet : demande de congé. Madame Roy, je vous écris pour demander un congé du 3 au 7 mars, car je dois me rendre à un mariage en France. Cordialement, Hugo Lemay",
+   "options": [
+    "A transfer to France",
+    "A meeting with Mme Roy",
+    "A week off in March",
+    "A salary increase"
+   ],
+   "answer": 2,
+   "explain": "Un congé du 3 au 7 mars is a leave from March 3 to 7."
+  },
+  {
+   "type": "choose",
+   "id": "read-3",
+   "prompt": "When should the bins be put out?",
+   "promptFr": "Ville de Gatineau. Avis aux résidents : la collecte des déchets aura lieu le jeudi au lieu du mercredi pendant les fêtes. Merci de sortir vos bacs avant 7 h.",
+   "options": [
+    "After 7 a.m. on Wednesday",
+    "Wednesday evening",
+    "Any time on Friday",
+    "Before 7 a.m. on Thursday"
+   ],
+   "answer": 3,
+   "explain": "Le jeudi au lieu du mercredi, avant 7 h."
+  },
+  {
+   "type": "choose",
+   "id": "read-4",
+   "prompt": "How long does processing take?",
+   "promptFr": "Pour obtenir la carte d'assurance maladie, vous devez présenter une pièce d'identité, une preuve de résidence et remplir le formulaire. Le traitement prend environ trois semaines.",
+   "options": [
+    "About three weeks",
+    "About three days",
+    "About three months",
+    "It is immediate"
+   ],
+   "answer": 0,
+   "explain": "Environ trois semaines."
+  },
+  {
+   "type": "choose",
+   "id": "read-5",
+   "prompt": "What are families doing?",
+   "promptFr": "Les loyers ont augmenté de 8 % en un an. Dans les grandes villes, les familles cherchent des logements plus petits ou plus éloignés du centre.",
+   "options": [
+    "Refusing to pay rent",
+    "Looking for smaller or more distant housing",
+    "Buying bigger houses",
+    "Leaving Canada"
+   ],
+   "answer": 1,
+   "explain": "Plus petits ou plus éloignés du centre."
+  }
+ ]
+}

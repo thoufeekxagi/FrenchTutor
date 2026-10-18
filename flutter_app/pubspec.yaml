@@ -99,6 +99,7 @@ flutter:
     - assets/content/tcf/lessons/
     - assets/content/tcf/stories/
     - assets/content/tcf/daily_challenges/
+    - assets/content/tcf/exams/
     - assets/audio/tutor_previews/
     - assets/audio/alphabet/
     # Flutter asset directory entries are not recursive. Keep each tutor

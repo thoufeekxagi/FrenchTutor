@@ -80,13 +80,25 @@ void main() {
     await prefs.setString('tcf_exam_date', examDate.toIso8601String());
 
     app.main();
+    // A fresh install opens on Practice, which is the first tab.
     await probe.waitForLabel(
       tester,
-      'Continue lesson',
+      'Start challenge.',
       startsWith: true,
       timeout: const Duration(seconds: 60),
     );
     await probe.settle(tester, timeout: const Duration(seconds: 15));
+    await probe.capture(tester, '01_practice_default');
+    final landing = await texts(tester);
+    expect(
+      landing.indexOf('Practice'),
+      lessThan(landing.indexOf('Course')),
+      reason: 'Practice must be the first tab',
+    );
+    expect(landing, contains('Your practice'));
+    await probe.tapLabel(tester, 'Course');
+    await probe.waitForLabel(tester, 'Continue lesson', startsWith: true);
+    await probe.settle(tester, timeout: const Duration(seconds: 10));
     await probe.capture(tester, '01_course_tab');
 
     final dispatcher = tester.binding.platformDispatcher;

@@ -1,0 +1,66 @@
+{
+ "id": "exam-a1-writing",
+ "title": "Writing, A1",
+ "subtitle": "A short message",
+ "minutes": 8,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada writing test has three tasks: a message (60 to 120 words), a longer text (120 to 150 words) and an opinion (120 to 180 words). Here you practise the building blocks: greetings, sentences, connectors and structure.",
+   "examples": []
+  },
+  {
+   "type": "explain",
+   "id": "model",
+   "title": "A model message",
+   "body": "Task 1 is a short message. Greet, say what you need in one or two clear sentences, thank, and sign.",
+   "examples": [
+    {
+     "fr": "Salut Marie, je suis malade. Je ne viens pas lundi. Merci ! Karim",
+     "en": "Hi Marie, I am sick. I am not coming on Monday. Thanks! Karim"
+    }
+   ]
+  },
+  {
+   "type": "choose",
+   "id": "greet",
+   "prompt": "Which greeting starts a message to a friend?",
+   "options": [
+    "Cordialement,",
+    "Au revoir madame,",
+    "Salut Marie,",
+    "Monsieur le Directeur,"
+   ],
+   "answer": 2,
+   "explain": "Salut is how you greet a friend."
+  },
+  {
+   "type": "choose",
+   "id": "correct",
+   "prompt": "Choose the correct sentence.",
+   "options": [
+    "Je m'appelle Karim et je suis vingt ans.",
+    "Je appelle Karim et j'ai vingt ans.",
+    "Je m'appelles Karim et j'ai vingt ans.",
+    "Je m'appelle Karim et j'ai vingt ans."
+   ],
+   "answer": 3,
+   "explain": "In French you say j'ai vingt ans (I have twenty years) and je m'appelle."
+  },
+  {
+   "type": "choose",
+   "id": "end",
+   "prompt": "How do you end a short message to a friend?",
+   "options": [
+    "À bientôt !",
+    "Veuillez agréer mes salutations.",
+    "Bonjour !",
+    "Excusez-moi."
+   ],
+   "answer": 0,
+   "explain": "À bientôt means see you soon, a friendly ending."
+  }
+ ]
+}

@@ -1,0 +1,63 @@
+{
+ "id": "exam-a2-speaking",
+ "title": "Speaking, A2",
+ "subtitle": "Everyday situations",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada speaking test has three tasks: a short talk about yourself, a role-play and an opinion. Here you practise useful sentences out loud and choosing the right reply. At A2 you handle everyday situations: appointments, hobbies and simple requests.",
+   "examples": []
+  },
+  {
+   "type": "phrase",
+   "id": "say-1",
+   "fr": "Je voudrais prendre rendez-vous avec le docteur, s'il vous plaît.",
+   "en": "I would like to make an appointment with the doctor, please.",
+   "tip": "Useful in the role-play task."
+  },
+  {
+   "type": "phrase",
+   "id": "say-2",
+   "fr": "Le week-end, j'aime marcher et voir mes amis.",
+   "en": "At the weekend I like to walk and see my friends.",
+   "tip": "Replace the activities with your own."
+  },
+  {
+   "type": "phrase",
+   "id": "say-3",
+   "fr": "Pardon, pouvez-vous répéter, s'il vous plaît ?",
+   "en": "Sorry, could you repeat, please?",
+   "tip": "Ask this when you did not understand. It is always allowed."
+  },
+  {
+   "type": "choose",
+   "id": "weekend",
+   "prompt": "The examiner asks the question below. Which answer fits?",
+   "options": [
+    "Il est midi.",
+    "J'ai deux chats.",
+    "Le week-end, je joue au soccer avec mes amis.",
+    "Je m'appelle Marc."
+   ],
+   "answer": 2,
+   "explain": "The question asks what you do at the weekend.",
+   "promptFr": "Qu'est-ce que vous faites le week-end ?"
+  },
+  {
+   "type": "choose",
+   "id": "restaurant",
+   "prompt": "You phone a restaurant. What do you say first?",
+   "options": [
+    "Au revoir, bonne journée.",
+    "Je suis très fatigué.",
+    "Voici votre addition.",
+    "Bonjour, je voudrais réserver une table pour deux personnes."
+   ],
+   "answer": 3,
+   "explain": "You greet and say what you need."
+  }
+ ]
+}

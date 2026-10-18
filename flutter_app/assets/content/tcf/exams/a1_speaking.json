@@ -1,0 +1,64 @@
+{
+ "id": "exam-a1-speaking",
+ "title": "Speaking, A1",
+ "subtitle": "Introduce yourself",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada speaking test has three tasks: a short talk about yourself, a role-play and an opinion. Here you practise useful sentences out loud and choosing the right reply. At A1 you say your name, where you live and what you do.",
+   "examples": []
+  },
+  {
+   "type": "phrase",
+   "id": "say-1",
+   "fr": "Bonjour, je m'appelle Karim.",
+   "en": "Hello, my name is Karim.",
+   "tip": "Say your own name. Speak slowly and clearly."
+  },
+  {
+   "type": "phrase",
+   "id": "say-2",
+   "fr": "J'habite à Toronto et je travaille dans un magasin.",
+   "en": "I live in Toronto and I work in a shop.",
+   "tip": "Replace the city and the job with your own."
+  },
+  {
+   "type": "phrase",
+   "id": "say-3",
+   "fr": "Je voudrais un café, s'il vous plaît.",
+   "en": "I would like a coffee, please.",
+   "tip": "Je voudrais is a polite way to ask for something."
+  },
+  {
+   "type": "choose",
+   "id": "name",
+   "prompt": "The examiner asks the question below. What do you answer?",
+   "options": [
+    "J'habite à Ottawa.",
+    "Il est huit heures.",
+    "Je m'appelle Amina.",
+    "J'ai trente ans."
+   ],
+   "answer": 2,
+   "explain": "The question asks your name.",
+   "promptFr": "Comment vous appelez-vous ?"
+  },
+  {
+   "type": "choose",
+   "id": "live",
+   "prompt": "The examiner asks the question below. Which answer fits?",
+   "options": [
+    "Je m'appelle Paul.",
+    "Je suis étudiant.",
+    "Merci beaucoup.",
+    "J'habite à Montréal."
+   ],
+   "answer": 3,
+   "explain": "Où habitez-vous asks where you live.",
+   "promptFr": "Où habitez-vous ?"
+  }
+ ]
+}

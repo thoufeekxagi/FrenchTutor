@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
 import '../../design/tokens.dart';
-import '../../screens/exam/exam_readiness_screen.dart';
+import '../../providers/database_provider.dart';
 import '../access/v3_access.dart';
+import '../lesson/v3_lesson_player.dart';
+import 'v3_exam_sets.dart';
 import '../ui/v3_ui.dart';
 
 /// Tests tab. Screen contract:
@@ -17,8 +21,15 @@ import '../ui/v3_ui.dart';
 ///
 /// The format numbers are the published TCF Canada format. Practice opens the
 /// existing exam-readiness flow until the dedicated mock engine replaces it.
-class V3TestsScreen extends ConsumerWidget {
+class V3TestsScreen extends ConsumerStatefulWidget {
   const V3TestsScreen({super.key});
+
+  @override
+  ConsumerState<V3TestsScreen> createState() => _V3TestsScreenState();
+}
+
+class _V3TestsScreenState extends ConsumerState<V3TestsScreen> {
+  String? _level;
 
   static const _sections = [
     ('Listening', '39 questions', '35 min', 'One play. No going back.'),
@@ -37,8 +48,40 @@ class V3TestsScreen extends ConsumerWidget {
     ),
   ];
 
+  Future<void> _open(String skill) async {
+    final level = _level ?? _profileLevel();
+    try {
+      final lesson = await V3ExamSets.load(level, skill);
+      if (!mounted) return;
+      await openV3Exam(
+        context,
+        ref,
+        (_) => V3LessonPlayer(
+          lesson: lesson,
+          savePathProgress: false,
+          completionEyebrow: 'PRACTICE COMPLETE',
+          completionTitle: 'Practice complete',
+        ),
+        fullscreenDialog: true,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This practice could not open. Try again.'),
+        ),
+      );
+    }
+  }
+
+  String _profileLevel() {
+    final level = ref.read(learningStoreProvider).profile().level.toLowerCase();
+    return V3ExamSets.levels.contains(level) ? level : 'a1';
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final level = _level ?? _profileLevel();
     return SafeArea(
       bottom: false,
       child: ListView(
@@ -54,13 +97,52 @@ class V3TestsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           const V3ExamFreeNote(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              for (final l in V3ExamSets.levels) ...[
+                Expanded(
+                  child: V3Pressable(
+                    key: ValueKey('tests.level.$l'),
+                    label: '${l.toUpperCase()} practice level',
+                    selected: l == level,
+                    onTap: () => setState(() => _level = l),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 48),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: l == level
+                            ? DesignTokens.primary
+                            : DesignTokens.surface,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: l == level
+                              ? DesignTokens.primary
+                              : DesignTokens.hairline,
+                        ),
+                      ),
+                      child: Text(
+                        l.toUpperCase(),
+                        style: V3Type.strong(
+                          15,
+                          l == level
+                              ? DesignTokens.onPrimary
+                              : DesignTokens.ink,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                if (l != V3ExamSets.levels.last) const SizedBox(width: 8),
+              ],
+            ],
+          ),
+          const SizedBox(height: 16),
           for (final s in _sections) ...[
             V3Pressable(
               key: ValueKey('tests.section.${s.$1.toLowerCase()}'),
               label: '${s.$1}, ${s.$2}, ${s.$3}',
-              onTap: () =>
-                  openV3Exam(context, ref, (_) => const ExamReadinessScreen()),
+              onTap: () => unawaited(_open(s.$1.toLowerCase())),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(

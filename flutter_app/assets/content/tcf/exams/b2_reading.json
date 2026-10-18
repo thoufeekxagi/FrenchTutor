@@ -1,0 +1,85 @@
+{
+ "id": "exam-b2-reading",
+ "title": "Reading, B2",
+ "subtitle": "Opinion and analysis",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada reading test you read a short text, such as a notice, a message or an article, and choose the best answer. Look for the exact detail the question asks about. At B2 the texts argue a point, so look for the author's position and the reasons.",
+   "examples": []
+  },
+  {
+   "type": "choose",
+   "id": "read-1",
+   "prompt": "What do experts believe?",
+   "promptFr": "Alors que la demande de logements abordables ne cesse de croître, les promoteurs privilégient les condominiums de luxe, plus rentables. Les experts estiment que, sans intervention publique, la crise s'aggravera.",
+   "options": [
+    "Rents will fall soon",
+    "The crisis will worsen without public action",
+    "The market will fix itself",
+    "Luxury condos will become cheaper"
+   ],
+   "answer": 1,
+   "explain": "Sans intervention publique, la crise s'aggravera."
+  },
+  {
+   "type": "choose",
+   "id": "read-2",
+   "prompt": "What does the text say about AI?",
+   "promptFr": "Si l'intelligence artificielle facilite de nombreuses tâches, elle soulève aussi des questions : qui est responsable en cas d'erreur ? Comment protéger les données personnelles ? Le débat est loin d'être clos.",
+   "options": [
+    "It has solved the question of responsibility",
+    "It is only a risk",
+    "It raises questions that are still open",
+    "It has been banned"
+   ],
+   "answer": 2,
+   "explain": "Le débat est loin d'être clos: the debate is far from closed."
+  },
+  {
+   "type": "choose",
+   "id": "read-3",
+   "prompt": "What is the writer's main argument?",
+   "promptFr": "Je m'oppose à la fermeture de la piscine du quartier. Elle ne sert pas seulement aux sportifs : les aînés et les enfants en ont besoin. Une économie à court terme coûtera plus cher à long terme.",
+   "options": [
+    "The pool is too old",
+    "Only athletes use it",
+    "Seniors should pay more",
+    "Closing the pool saves money now but costs more later"
+   ],
+   "answer": 3,
+   "explain": "Une économie à court terme coûtera plus cher à long terme."
+  },
+  {
+   "type": "choose",
+   "id": "read-4",
+   "prompt": "Why do some city dwellers consider moving?",
+   "promptFr": "Bien que la vie en ville offre de nombreux services, un sondage révèle que 40 % des citadins songent à déménager à la campagne, attirés par le calme et des logements moins chers.",
+   "options": [
+    "Quiet and cheaper housing",
+    "Better public transit",
+    "More jobs",
+    "Fewer services in the countryside"
+   ],
+   "answer": 0,
+   "explain": "Attirés par le calme et des logements moins chers."
+  },
+  {
+   "type": "choose",
+   "id": "read-5",
+   "prompt": "Why was the proposal rejected?",
+   "promptFr": "Le comité a rejeté la proposition, non pas parce qu'elle était mauvaise, mais parce que le budget ne permettait pas de la financer cette année.",
+   "options": [
+    "It was submitted late",
+    "There was no budget for it this year",
+    "It was a bad proposal",
+    "The committee disliked the author"
+   ],
+   "answer": 1,
+   "explain": "Non pas parce que... mais parce que le budget ne permettait pas."
+  }
+ ]
+}

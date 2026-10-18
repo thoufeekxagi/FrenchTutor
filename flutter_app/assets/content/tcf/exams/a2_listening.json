@@ -1,0 +1,85 @@
+{
+ "id": "exam-a2-listening",
+ "title": "Listening, A2",
+ "subtitle": "Announcements and messages",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada listening test you hear each recording once, then answer a multiple-choice question. Listen for numbers, times, places and reasons. Do not try to understand every word. At A2 the recordings are announcements and short messages.",
+   "examples": []
+  },
+  {
+   "type": "listen",
+   "id": "listen-1",
+   "fr": "Excusez-moi, le prochain autobus pour le centre-ville part à dix-sept heures quinze, quai numéro quatre.",
+   "question": "When and where does the bus leave?",
+   "options": [
+    "5:15 p.m., platform 4",
+    "5:50 p.m., platform 4",
+    "5:15 p.m., platform 14",
+    "4:15 p.m., platform 4"
+   ],
+   "answer": 0,
+   "explain": "Dix-sept heures quinze is 17:15 and quai numéro quatre is platform 4."
+  },
+  {
+   "type": "listen",
+   "id": "listen-2",
+   "fr": "Ce week-end, il va faire beau samedi, mais dimanche il va pleuvoir toute la journée.",
+   "question": "What will the weather be on Sunday?",
+   "options": [
+    "Cloudy in the morning only",
+    "Rain all day",
+    "Sunny all day",
+    "Snow in the evening"
+   ],
+   "answer": 1,
+   "explain": "Dimanche il va pleuvoir toute la journée: it will rain all day."
+  },
+  {
+   "type": "listen",
+   "id": "listen-3",
+   "fr": "Bonjour, ici la clinique Saint-Louis. Votre rendez-vous de mardi est déplacé à jeudi, à neuf heures trente.",
+   "question": "What changed?",
+   "options": [
+    "The clinic is closed on Thursday",
+    "The appointment moved from Thursday to Tuesday",
+    "The appointment moved from Tuesday to Thursday",
+    "The appointment was cancelled"
+   ],
+   "answer": 2,
+   "explain": "Déplacé à jeudi means moved to Thursday."
+  },
+  {
+   "type": "listen",
+   "id": "listen-4",
+   "fr": "Pour le déjeuner, je prends une soupe et un sandwich. Mon amie prend une salade.",
+   "question": "What does the friend eat?",
+   "options": [
+    "A soup",
+    "A sandwich",
+    "A pizza",
+    "A salad"
+   ],
+   "answer": 3,
+   "explain": "Mon amie prend une salade."
+  },
+  {
+   "type": "listen",
+   "id": "listen-5",
+   "fr": "Le cours de français commence le quinze septembre. Il y a deux cours par semaine, le mardi et le jeudi soir.",
+   "question": "When are the classes?",
+   "options": [
+    "Tuesday and Thursday evenings",
+    "Monday and Wednesday mornings",
+    "Every day",
+    "Saturday afternoons"
+   ],
+   "answer": 0,
+   "explain": "Le mardi et le jeudi soir are Tuesday and Thursday evenings."
+  }
+ ]
+}

@@ -22,6 +22,7 @@ void main() {
     final name = ActiveTutor.current.displayName;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('dev_force_pro_unlock', true);
+    await prefs.setString(v3Key('v3_learn_tab'), 'course');
     final all = await V3Course.load();
     await prefs.setStringList(
       v3Key('v3_completed_lessons'),

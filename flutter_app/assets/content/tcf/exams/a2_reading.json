@@ -1,0 +1,85 @@
+{
+ "id": "exam-a2-reading",
+ "title": "Reading, A2",
+ "subtitle": "Ads, bills and messages",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada reading test you read a short text, such as a notice, a message or an article, and choose the best answer. Look for the exact detail the question asks about. At A2 the texts are job ads, bills and friendly messages.",
+   "examples": []
+  },
+  {
+   "type": "choose",
+   "id": "read-1",
+   "prompt": "What kind of job is it?",
+   "promptFr": "OFFRE D'EMPLOI · Le Café du Parc cherche serveur ou serveuse · Temps partiel · Soirs et fins de semaine · Envoyez votre CV à emploi@cafeduparc.ca",
+   "options": [
+    "Summer only",
+    "Part-time, evenings and weekends",
+    "Full-time on weekdays",
+    "Night shifts only"
+   ],
+   "answer": 1,
+   "explain": "Temps partiel is part-time, soirs et fins de semaine is evenings and weekends."
+  },
+  {
+   "type": "choose",
+   "id": "read-2",
+   "prompt": "What must you do before October 25?",
+   "promptFr": "Madame, Monsieur, votre facture d'électricité de 86 $ est à payer avant le 25 octobre. Vous pouvez payer en ligne ou à la banque.",
+   "options": [
+    "Call the bank for a loan",
+    "Pick up a parcel",
+    "Pay the $86 bill",
+    "Renew your lease"
+   ],
+   "answer": 2,
+   "explain": "Facture is bill and à payer avant le 25 octobre means to pay before October 25."
+  },
+  {
+   "type": "choose",
+   "id": "read-3",
+   "prompt": "Why can't Lina come?",
+   "promptFr": "Salut Jade ! Je ne peux pas venir au cinéma ce soir : mon fils est malade. On peut y aller demain ? Bises, Lina",
+   "options": [
+    "She works late",
+    "She lost her ticket",
+    "She is travelling",
+    "Her son is sick"
+   ],
+   "answer": 3,
+   "explain": "Mon fils est malade: her son is sick."
+  },
+  {
+   "type": "choose",
+   "id": "read-4",
+   "prompt": "Can you borrow a book on Monday?",
+   "promptFr": "Bibliothèque municipale · Mardi et jeudi : 10 h à 20 h · Samedi : 10 h à 16 h · Dimanche et lundi : fermé · Prêt de trois semaines.",
+   "options": [
+    "No, the library is closed",
+    "Yes, until 8 p.m.",
+    "Yes, until 4 p.m.",
+    "Only in the evening"
+   ],
+   "answer": 0,
+   "explain": "Dimanche et lundi : fermé means closed on Sunday and Monday."
+  },
+  {
+   "type": "choose",
+   "id": "read-5",
+   "prompt": "What should you bring?",
+   "promptFr": "Nouveau dans le quartier ? Venez à la fête des voisins samedi à 15 h dans le parc. Apportez un plat à partager.",
+   "options": [
+    "Nothing",
+    "A dish to share",
+    "A chair",
+    "Money"
+   ],
+   "answer": 1,
+   "explain": "Apportez un plat à partager means bring a dish to share."
+  }
+ ]
+}

@@ -1,0 +1,66 @@
+{
+ "id": "exam-b2-writing",
+ "title": "Writing, B2",
+ "subtitle": "Structure an opinion",
+ "minutes": 8,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada writing test has three tasks: a message (60 to 120 words), a longer text (120 to 150 words) and an opinion (120 to 180 words). Here you practise the building blocks: greetings, sentences, connectors and structure.",
+   "examples": []
+  },
+  {
+   "type": "explain",
+   "id": "model",
+   "title": "A model opinion",
+   "body": "Task 3 at B2: give your position, two arguments with connectors, a counter-point, and a conclusion.",
+   "examples": [
+    {
+     "fr": "À mon avis, le télétravail devrait rester une option pour tous les employés. D'abord, il réduit le temps perdu dans les transports. De plus, il permet de mieux concilier vie professionnelle et vie privée. Cependant, il faut prévoir des réunions régulières afin de maintenir le contact. En conclusion, je pense que la flexibilité profite à tout le monde.",
+     "en": "In my opinion remote work should stay an option for all employees. First, it reduces time lost in transport. Moreover, it helps balance work and private life. However, regular meetings are needed to keep contact. In conclusion, I think flexibility benefits everyone."
+    }
+   ]
+  },
+  {
+   "type": "choose",
+   "id": "add",
+   "prompt": "Which connector adds an argument?",
+   "options": [
+    "Pourtant,",
+    "Sinon,",
+    "De plus,",
+    "Cependant,"
+   ],
+   "answer": 2,
+   "explain": "De plus means moreover."
+  },
+  {
+   "type": "choose",
+   "id": "subj",
+   "prompt": "Which sentence uses the subjunctive correctly?",
+   "options": [
+    "Il faut que nous finissons ce travail ce soir.",
+    "Il faut que nous finirons ce travail ce soir.",
+    "Il faut que nous avons fini ce travail ce soir.",
+    "Il faut que nous finissions ce travail ce soir."
+   ],
+   "answer": 3,
+   "explain": "Il faut que is followed by the subjunctive: nous finissions."
+  },
+  {
+   "type": "choose",
+   "id": "conclusion",
+   "prompt": "Which phrase best opens a conclusion?",
+   "options": [
+    "En conclusion,",
+    "Au début,",
+    "Par exemple,",
+    "Heureusement,"
+   ],
+   "answer": 0,
+   "explain": "En conclusion closes the text."
+  }
+ ]
+}

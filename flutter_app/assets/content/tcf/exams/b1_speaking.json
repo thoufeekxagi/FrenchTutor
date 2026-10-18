@@ -1,0 +1,62 @@
+{
+ "id": "exam-b1-speaking",
+ "title": "Speaking, B1",
+ "subtitle": "Give and explain an opinion",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada speaking test has three tasks: a short talk about yourself, a role-play and an opinion. Here you practise useful sentences out loud and choosing the right reply. At B1 you give an opinion and a reason, and you ask for explanations politely.",
+   "examples": []
+  },
+  {
+   "type": "phrase",
+   "id": "say-1",
+   "fr": "À mon avis, il est important d'apprendre le français pour travailler au Canada.",
+   "en": "In my opinion, it is important to learn French to work in Canada.",
+   "tip": "À mon avis introduces an opinion. Then give a reason."
+  },
+  {
+   "type": "phrase",
+   "id": "say-2",
+   "fr": "D'un côté, c'est pratique, mais de l'autre, c'est cher.",
+   "en": "On one hand it is practical, but on the other it is expensive.",
+   "tip": "Use d'un côté, de l'autre to show two sides."
+  },
+  {
+   "type": "phrase",
+   "id": "say-3",
+   "fr": "Pourriez-vous m'expliquer comment ça fonctionne ?",
+   "en": "Could you explain to me how it works?",
+   "tip": "A polite way to ask for information in the role-play."
+  },
+  {
+   "type": "choose",
+   "id": "opinion",
+   "prompt": "Which phrase introduces an opinion?",
+   "options": [
+    "Parce qu'il",
+    "Au revoir,",
+    "À mon avis,",
+    "Hier,"
+   ],
+   "answer": 2,
+   "explain": "À mon avis means in my opinion."
+  },
+  {
+   "type": "choose",
+   "id": "refuse",
+   "prompt": "You want to refuse politely. Which is best?",
+   "options": [
+    "Non, jamais.",
+    "Ça ne m'intéresse pas du tout.",
+    "Taisez-vous.",
+    "Je suis désolé, mais je ne suis pas disponible."
+   ],
+   "answer": 3,
+   "explain": "Désolé, mais plus a reason keeps it polite."
+  }
+ ]
+}

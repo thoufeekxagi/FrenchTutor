@@ -22,6 +22,7 @@ import '../lesson/v3_course.dart';
 import '../lesson/v3_lesson.dart';
 import '../lesson/v3_lesson_player.dart';
 import '../progress/v3_streak_calendar_screen.dart';
+import '../v3_prefs.dart';
 import '../review/v3_review_queue.dart';
 import '../story/v3_stories_panel.dart';
 import '../ui/v3_ui.dart';
@@ -81,13 +82,14 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     false,
   ];
   bool _showPath = false;
-  bool _practiceTab = false;
+  bool _practiceTab = true;
   Set<String> _freeDays = const {};
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    unawaited(_restoreTab());
     unawaited(_load());
   }
 
@@ -470,9 +472,9 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _topTab('Course', selected: !_practiceTab),
-              const SizedBox(width: 18),
               _topTab('Practice', selected: _practiceTab),
+              const SizedBox(width: 18),
+              _topTab('Course', selected: !_practiceTab),
             ],
           ),
         ),
@@ -485,10 +487,13 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     key: ValueKey('learn.topTab.${label.toLowerCase()}'),
     label: label,
     selected: selected,
-    onTap: () => setState(() {
-      _practiceTab = label == 'Practice';
-      _showPath = false;
-    }),
+    onTap: () {
+      setState(() {
+        _practiceTab = label == 'Practice';
+        _showPath = false;
+      });
+      unawaited(_saveTab());
+    },
     child: ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
       child: Center(
@@ -549,8 +554,24 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     );
   }
 
+  /// The tab the learner used last. A new install opens on Practice.
+  Future<void> _saveTab() async => (await SharedPreferences.getInstance())
+      .setString(v3Key('v3_learn_tab'), _practiceTab ? 'practice' : 'course');
+
+  Future<void> _restoreTab() async {
+    final saved = (await SharedPreferences.getInstance()).getString(
+      v3Key('v3_learn_tab'),
+    );
+    if (saved != null && mounted) {
+      setState(() => _practiceTab = saved != 'course');
+    }
+  }
+
   void _showCoursePath() {
-    setState(() => _showPath = true);
+    setState(() {
+      _showPath = true;
+      _practiceTab = false;
+    });
     unawaited(_loadAllCoursePath());
   }
 
@@ -812,6 +833,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     const SizedBox(height: 14),
     _quickPracticeGrid(),
     const SizedBox(height: 14),
+    _coursePathCard(),
+    const SizedBox(height: 14),
     Align(alignment: Alignment.centerLeft, child: _examCountdown(days)),
   ];
 
@@ -989,72 +1012,73 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
         : _reviewCount == 0
         ? 'None due'
         : '$_reviewCount due';
+    final challengeCta = challenge == null
+        ? 'Coming soon'
+        : challenge.completed
+        ? 'Done for today'
+        : _dailyLocked
+        ? 'Subscribe'
+        : challenge.currentStep > 0
+        ? 'Resume'
+        : 'Start';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Your practice', style: V3Type.title(22)),
-        const SizedBox(height: 10),
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _quickPracticeCard(
-                  key: const ValueKey('learn.quick.marie'),
-                  icon: CupertinoIcons.chat_bubble_2,
-                  title: 'Talk with Marie',
-                  subtitle: null,
-                  label: 'Talk with Marie. Conversation practice.',
-                  onTap: _openMarie,
-                  accent: DesignTokens.primary,
-                  tint: DesignTokens.primarySoft,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _quickPracticeCard(
-                  key: const ValueKey('learn.quick.challenge'),
-                  icon: CupertinoIcons.sparkles,
-                  title: 'Daily challenge',
-                  subtitle: challengeSubtitle,
-                  label: challenge == null
-                      ? 'Daily challenge. $challengeSubtitle.'
-                      : challenge.completed
-                      ? 'Daily challenge completed today.'
-                      : '${challenge.currentStep > 0 ? 'Resume' : 'Start'} challenge. ${challenge.title}.',
-                  onTap: () => unawaited(_tapDailyChallenge(challenge)),
-                  accent: DesignTokens.homeChallenge,
-                  tint: DesignTokens.homeChallengeSoft,
-                ),
-              ),
-            ],
-          ),
+        const SizedBox(height: 12),
+        _wideCard(
+          key: const ValueKey('learn.quick.challenge'),
+          icon: CupertinoIcons.sparkles,
+          title: 'Daily challenge',
+          body: challengeSubtitle,
+          cta: challengeCta,
+          label: challenge == null
+              ? 'Daily challenge. $challengeSubtitle.'
+              : challenge.completed
+              ? 'Daily challenge completed today.'
+              : '${challenge.currentStep > 0 ? 'Resume' : 'Start'} challenge. ${challenge.title}.',
+          onTap: () => unawaited(_tapDailyChallenge(challenge)),
+          accent: DesignTokens.homeChallenge,
+          tint: DesignTokens.homeChallengeSoft,
+          tall: true,
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
+        _wideCard(
+          key: const ValueKey('learn.quick.marie'),
+          icon: CupertinoIcons.chat_bubble_2_fill,
+          title: 'Talk with Marie',
+          body: 'Speak naturally and get gentle corrections.',
+          cta: 'Start talking',
+          label: 'Talk with Marie. Conversation practice.',
+          onTap: _openMarie,
+          accent: DesignTokens.primary,
+          tint: DesignTokens.primarySoft,
+        ),
+        const SizedBox(height: 12),
         IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: _quickPracticeCard(
+                child: _tallCard(
                   key: const ValueKey('learn.quick.review'),
                   icon: CupertinoIcons.arrow_2_circlepath,
                   title: 'Review words',
-                  subtitle: reviewStatus,
+                  body: reviewStatus,
                   label: 'Review flashcards. $reviewStatus.',
                   onTap: _openReview,
                   accent: DesignTokens.homeReview,
                   tint: DesignTokens.homeReviewSoft,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
-                child: _quickPracticeCard(
+                child: _tallCard(
                   key: const ValueKey('learn.quick.stories'),
-                  icon: CupertinoIcons.book,
+                  icon: CupertinoIcons.book_fill,
                   title: 'Stories',
-                  subtitle: 'Read or listen',
+                  body: 'Read or listen',
                   label: 'Open Stories. Read or listen.',
                   onTap: _openStories,
                   accent: DesignTokens.homeStories,
@@ -1067,6 +1091,124 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
       ],
     );
   }
+
+  /// A full-width practice card with a short line and one action.
+  Widget _wideCard({
+    required Key key,
+    required IconData icon,
+    required String title,
+    required String body,
+    required String cta,
+    required String label,
+    required VoidCallback onTap,
+    required Color accent,
+    required Color tint,
+    bool tall = false,
+  }) => V3Pressable(
+    key: key,
+    label: label,
+    onTap: onTap,
+    child: Container(
+      constraints: BoxConstraints(minHeight: tall ? 150 : 118),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: DesignTokens.hairline),
+        boxShadow: DesignTokens.surfaceShadow,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: tint,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Icon(icon, size: 30, color: accent),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: V3Type.title(20)),
+                const SizedBox(height: 4),
+                Text(
+                  body,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: V3Type.body(14),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(cta, style: V3Type.strong(14.5, accent)),
+                    const SizedBox(width: 6),
+                    Icon(CupertinoIcons.arrow_right, size: 15, color: accent),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  /// A tall half-width practice card: icon on top, title and one line below.
+  Widget _tallCard({
+    required Key key,
+    required IconData icon,
+    required String title,
+    required String body,
+    required String label,
+    required VoidCallback onTap,
+    required Color accent,
+    required Color tint,
+  }) => V3Pressable(
+    key: key,
+    label: label,
+    onTap: onTap,
+    child: Container(
+      constraints: const BoxConstraints(minHeight: 168),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: DesignTokens.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: DesignTokens.hairline),
+        boxShadow: DesignTokens.surfaceShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: tint,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Icon(icon, size: 28, color: accent),
+          ),
+          const Spacer(),
+          Text(title, style: V3Type.title(19)),
+          const SizedBox(height: 4),
+          Text(
+            body,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: V3Type.body(14),
+          ),
+        ],
+      ),
+    ),
+  );
 
   Future<void> _openStories() async {
     await showModalBottomSheet<void>(
@@ -1132,75 +1274,6 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     );
     if (mounted) unawaited(_load());
   }
-
-  Widget _quickPracticeCard({
-    required Key key,
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    required String label,
-    required VoidCallback onTap,
-    required Color accent,
-    required Color tint,
-  }) => V3Pressable(
-    key: key,
-    label: label,
-    onTap: onTap,
-    child: Container(
-      constraints: const BoxConstraints(minHeight: 80),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: DesignTokens.surface,
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: DesignTokens.hairline),
-        boxShadow: DesignTokens.surfaceShadow,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: tint,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, size: 22, color: accent),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: V3Type.strong(13.5),
-                ),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: V3Type.body(11.5),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 3),
-          Icon(
-            CupertinoIcons.chevron_right,
-            size: 15,
-            color: DesignTokens.inkSoft,
-          ),
-        ],
-      ),
-    ),
-  );
 
   Future<void> _openMarie() async {
     await AppRouter.push<void>(

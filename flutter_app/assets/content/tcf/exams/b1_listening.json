@@ -1,0 +1,85 @@
+{
+ "id": "exam-b1-listening",
+ "title": "Listening, B1",
+ "subtitle": "Reasons, plans and notices",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada listening test you hear each recording once, then answer a multiple-choice question. Listen for numbers, times, places and reasons. Do not try to understand every word. At B1 the recordings give reasons, plans and notices in a few sentences.",
+   "examples": []
+  },
+  {
+   "type": "listen",
+   "id": "listen-1",
+   "fr": "Je travaille à Calgary depuis deux ans, mais je pense déménager à Vancouver, parce que le climat est plus doux et que ma sœur y habite.",
+   "question": "Why does he want to move?",
+   "options": [
+    "The climate is milder and his sister lives there",
+    "He wants a higher salary",
+    "He dislikes Calgary",
+    "His school is in Vancouver"
+   ],
+   "answer": 0,
+   "explain": "Parce que le climat est plus doux et que ma sœur y habite."
+  },
+  {
+   "type": "listen",
+   "id": "listen-2",
+   "fr": "Attention, mesdames et messieurs, en raison de travaux, la ligne verte du métro est fermée jusqu'à la fin du mois. Des autobus gratuits sont disponibles.",
+   "question": "What is available during the closure?",
+   "options": [
+    "Nothing",
+    "Free buses",
+    "A ticket discount",
+    "A taxi service"
+   ],
+   "answer": 1,
+   "explain": "Des autobus gratuits sont disponibles."
+  },
+  {
+   "type": "listen",
+   "id": "listen-3",
+   "fr": "Moi, je préfère étudier à la maison. À la bibliothèque, il y a trop de bruit, et je perds du temps à voyager.",
+   "question": "Why does he prefer studying at home?",
+   "options": [
+    "He has no books",
+    "His friends help him",
+    "It is quieter and saves travel time",
+    "The library is closed"
+   ],
+   "answer": 2,
+   "explain": "Trop de bruit and perds du temps à voyager."
+  },
+  {
+   "type": "listen",
+   "id": "listen-4",
+   "fr": "Le directeur nous a annoncé que la réunion de mercredi est reportée à vendredi, parce qu'il doit rencontrer un client important.",
+   "question": "What happened to the meeting?",
+   "options": [
+    "It was cancelled",
+    "It moved to Wednesday evening",
+    "It was moved earlier",
+    "It was postponed to Friday"
+   ],
+   "answer": 3,
+   "explain": "Reportée à vendredi means postponed to Friday."
+  },
+  {
+   "type": "listen",
+   "id": "listen-5",
+   "fr": "J'ai acheté ce manteau la semaine dernière, mais la fermeture éclair est cassée. Je voudrais l'échanger ou me faire rembourser.",
+   "question": "What does the customer want?",
+   "options": [
+    "An exchange or a refund",
+    "A discount on a new coat",
+    "A repair appointment",
+    "To buy a second coat"
+   ],
+   "answer": 0,
+   "explain": "L'échanger ou me faire rembourser: exchange or refund."
+  }
+ ]
+}

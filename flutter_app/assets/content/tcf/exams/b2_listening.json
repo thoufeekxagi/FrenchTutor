@@ -1,0 +1,85 @@
+{
+ "id": "exam-b2-listening",
+ "title": "Listening, B2",
+ "subtitle": "Arguments and nuance",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada listening test you hear each recording once, then answer a multiple-choice question. Listen for numbers, times, places and reasons. Do not try to understand every word. At B2 the speakers argue, contrast ideas and draw conclusions.",
+   "examples": []
+  },
+  {
+   "type": "listen",
+   "id": "listen-1",
+   "fr": "Les jeunes lisent moins de livres qu'avant, mais ils consacrent plus de temps à lire des articles en ligne. Selon l'auteur, cela ne signifie pas forcément un déclin de la lecture, mais plutôt un changement de support.",
+   "question": "What is the author's view?",
+   "options": [
+    "Reading is changing format, not necessarily declining",
+    "Young people no longer read",
+    "Books are better than online articles",
+    "Online reading is harmful"
+   ],
+   "answer": 0,
+   "explain": "Un changement de support, pas forcément un déclin."
+  },
+  {
+   "type": "listen",
+   "id": "listen-2",
+   "fr": "Malgré les efforts de la municipalité, le nombre de cyclistes reste faible en hiver. Beaucoup de personnes jugent les pistes cyclables mal déneigées et préfèrent donc prendre l'autobus.",
+   "question": "Why do few people cycle in winter?",
+   "options": [
+    "Cycling is banned",
+    "Bike paths are poorly cleared of snow",
+    "Buses are free",
+    "Bikes are too expensive"
+   ],
+   "answer": 1,
+   "explain": "Les pistes cyclables mal déneigées."
+  },
+  {
+   "type": "listen",
+   "id": "listen-3",
+   "fr": "Si j'avais su que le vol serait retardé de six heures, j'aurais pris le train. J'ai finalement raté ma correspondance et j'ai dû réserver une nuit d'hôtel.",
+   "question": "What does the speaker regret?",
+   "options": [
+    "Missing the train",
+    "Leaving too early",
+    "Taking the plane instead of the train",
+    "Booking the hotel"
+   ],
+   "answer": 2,
+   "explain": "Si j'avais su... j'aurais pris le train expresses a regret."
+  },
+  {
+   "type": "listen",
+   "id": "listen-4",
+   "fr": "Notre entreprise vise la neutralité carbone d'ici 2035. Pour y parvenir, nous réduirons nos déplacements professionnels et nous investirons dans l'énergie solaire.",
+   "question": "How will the company reach its goal?",
+   "options": [
+    "Selling its offices",
+    "Moving to another city",
+    "Buying carbon credits only",
+    "Fewer business trips and solar investment"
+   ],
+   "answer": 3,
+   "explain": "Réduire les déplacements et investir dans l'énergie solaire."
+  },
+  {
+   "type": "listen",
+   "id": "listen-5",
+   "fr": "Certes, le télétravail offre plus de flexibilité, toutefois il peut fragiliser le sentiment d'appartenance à l'équipe, ce qui exige des rencontres régulières.",
+   "question": "What does the speaker conclude?",
+   "options": [
+    "Remote work needs regular meetings to keep team spirit",
+    "Remote work should end",
+    "Teams never meet",
+    "Flexibility is worthless"
+   ],
+   "answer": 0,
+   "explain": "Toutefois introduces the drawback and the conclusion."
+  }
+ ]
+}

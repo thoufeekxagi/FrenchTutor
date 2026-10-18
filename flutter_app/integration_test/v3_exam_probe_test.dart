@@ -15,7 +15,11 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('dev_force_pro_unlock', true);
     app.main();
-    await probe.waitForLabel(tester, 'Tests', timeout: const Duration(seconds: 60));
+    await probe.waitForLabel(
+      tester,
+      'Tests',
+      timeout: const Duration(seconds: 60),
+    );
     await probe.settle(tester, timeout: const Duration(seconds: 12));
     await probe.tapLabel(tester, 'Tests');
     await tester.pump(const Duration(milliseconds: 700));

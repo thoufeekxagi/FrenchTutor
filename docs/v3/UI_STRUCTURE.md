@@ -58,12 +58,13 @@ button (it asks the tutor to say it). Every step has the Marie phone button.
 
 ## Approved Learn home contract (updated 2026-10-18)
 
-The home has a header with the level chip, `Course` and `Practice` text tabs,
-and a streak chip, then a thin course progress bar. **Course** shows the unit
+The home has a header with the level chip, `Practice` and `Course` text tabs
+(Practice first; a new install opens on Practice and the app remembers the
+last tab), and a streak chip, then a thin course progress bar. **Course** shows the unit
 the learner is in (eyebrow, big title, a book button that opens the full
-path), the continue card, and that unit's lessons. **Practice** shows the
-weekly activity strip, the four practice tiles (Talk with Marie, Daily
-challenge, Review words, Stories) and the exam countdown. The bottom
+path), the continue card, and that unit's lessons. **Practice** fills the page: the weekly activity strip, a large Daily
+challenge card, a wide Talk with Marie card, tall Review words and Stories
+cards, the TCF path card and the exam countdown. The bottom
 navigation stays Learn, Marie, Tests, Me. The header is capped at 1.2x text
 scale so it never overflows; everything below scales to 2x.
 
@@ -88,8 +89,9 @@ A1, A2, B1 and B2; the first 7 daily challenges; 7 Talk with Marie sessions and
 7 stories (Review words stays free); Tests for the first 7 days. Past that the
 control shows a lock or "Subscribe to keep going" and opens `SpeakPaywallScreen`.
 Counters live in SharedPreferences and the account (`V3CloudState`), so a
-reinstall cannot reset them. Subscribers and debug builds with
-`dev_force_pro_unlock` are never limited.
+reinstall cannot reset them. Subscribers, learners in an Apple
+free trial (RevenueCat reports the entitlement active during the trial) and debug
+builds with `dev_force_pro_unlock` are never limited.
 
 ## Daily challenge screen contracts
 

@@ -1,0 +1,85 @@
+{
+ "id": "exam-a1-reading",
+ "title": "Reading, A1",
+ "subtitle": "Notices and short messages",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada reading test you read a short text, such as a notice, a message or an article, and choose the best answer. Look for the exact detail the question asks about. At A1 the texts are very short.",
+   "examples": []
+  },
+  {
+   "type": "choose",
+   "id": "read-1",
+   "prompt": "When does Marc arrive?",
+   "promptFr": "Bonjour Léa, je suis en retard. J'arrive à huit heures. Marc",
+   "options": [
+    "At noon",
+    "At 8:00",
+    "At 6:00",
+    "At 9:00"
+   ],
+   "answer": 1,
+   "explain": "Huit heures is 8:00."
+  },
+  {
+   "type": "choose",
+   "id": "read-2",
+   "prompt": "When is the pharmacy closed?",
+   "promptFr": "PHARMACIE · Ouvert du lundi au samedi · 9 h à 18 h · Fermé le dimanche",
+   "options": [
+    "On Monday",
+    "Every evening",
+    "On Sunday",
+    "On Saturday"
+   ],
+   "answer": 2,
+   "explain": "Fermé le dimanche means closed on Sunday."
+  },
+  {
+   "type": "choose",
+   "id": "read-3",
+   "prompt": "How much is the rent?",
+   "promptFr": "À louer : appartement, deux chambres, 900 $ par mois, près du métro.",
+   "options": [
+    "$90 a month",
+    "$2,000 a month",
+    "$900 a year",
+    "$900 a month"
+   ],
+   "answer": 3,
+   "explain": "900 $ par mois means $900 a month."
+  },
+  {
+   "type": "choose",
+   "id": "read-4",
+   "prompt": "What does the sign say?",
+   "promptFr": "Attention ! Sortie de secours. Ne pas fumer.",
+   "options": [
+    "Emergency exit, no smoking",
+    "Entrance, smoking allowed",
+    "Parking is free",
+    "The shop is closed"
+   ],
+   "answer": 0,
+   "explain": "Sortie de secours is emergency exit and ne pas fumer is no smoking."
+  },
+  {
+   "type": "choose",
+   "id": "read-5",
+   "prompt": "What does Nina ask Sam?",
+   "promptFr": "Salut Sam ! Samedi, j'ai une fête chez moi à 19 h. Tu viens ? Nina",
+   "options": [
+    "To lend her money",
+    "To come to her party on Saturday",
+    "To cook dinner",
+    "To call her at seven"
+   ],
+   "answer": 1,
+   "explain": "She invites him to a party at her home on Saturday at 7 p.m."
+  }
+ ]
+}

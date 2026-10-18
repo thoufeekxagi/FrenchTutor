@@ -1,0 +1,85 @@
+{
+ "id": "exam-a1-listening",
+ "title": "Listening, A1",
+ "subtitle": "Short recordings, one play",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "In the TCF Canada listening test you hear each recording once, then answer a multiple-choice question. Listen for numbers, times, places and reasons. Do not try to understand every word. At A1 the recordings are one or two short sentences.",
+   "examples": []
+  },
+  {
+   "type": "listen",
+   "id": "listen-1",
+   "fr": "Bonjour, je m'appelle Karim. J'habite à Montréal.",
+   "question": "Where does Karim live?",
+   "options": [
+    "Montréal",
+    "Québec",
+    "Ottawa",
+    "Toronto"
+   ],
+   "answer": 0,
+   "explain": "The recording says J'habite à Montréal."
+  },
+  {
+   "type": "listen",
+   "id": "listen-2",
+   "fr": "Le magasin ouvre à neuf heures.",
+   "question": "What time does the shop open?",
+   "options": [
+    "19:00",
+    "9:00",
+    "7:00",
+    "10:00"
+   ],
+   "answer": 1,
+   "explain": "Neuf heures is nine o'clock."
+  },
+  {
+   "type": "listen",
+   "id": "listen-3",
+   "fr": "Aujourd'hui, il fait froid et il neige.",
+   "question": "What is the weather like?",
+   "options": [
+    "Rainy and warm",
+    "Windy and dry",
+    "Cold and snowing",
+    "Hot and sunny"
+   ],
+   "answer": 2,
+   "explain": "Il fait froid means it is cold, il neige means it is snowing."
+  },
+  {
+   "type": "listen",
+   "id": "listen-4",
+   "fr": "Votre rendez-vous est lundi à quatorze heures.",
+   "question": "When is the appointment?",
+   "options": [
+    "Monday at 4 p.m.",
+    "Friday at 2 p.m.",
+    "Sunday at 4 a.m.",
+    "Monday at 2 p.m."
+   ],
+   "answer": 3,
+   "explain": "Lundi is Monday and quatorze heures is 14:00, so 2 p.m."
+  },
+  {
+   "type": "listen",
+   "id": "listen-5",
+   "fr": "Le café coûte trois dollars cinquante.",
+   "question": "How much is the coffee?",
+   "options": [
+    "$3.50",
+    "$2.50",
+    "$13.50",
+    "$3.15"
+   ],
+   "answer": 0,
+   "explain": "Trois dollars cinquante is $3.50."
+  }
+ ]
+}

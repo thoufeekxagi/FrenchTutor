@@ -21,7 +21,10 @@ void main() {
 
   Future<void> closePaywall(WidgetTester t) async {
     await probe.capture(t, 'paywall_${DateTime.now().millisecondsSinceEpoch}');
-    expect(find.byKey(const ValueKey('paywall.purchase.primary')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('paywall.purchase.primary')),
+      findsOneWidget,
+    );
     await t.pageBack();
     await probe.settle(t, timeout: const Duration(seconds: 8));
   }
@@ -32,6 +35,7 @@ void main() {
     final semantics = tester.ensureSemantics();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('dev_force_pro_unlock', false);
+    await prefs.setString(v3Key('v3_learn_tab'), 'course');
     final course = await V3Course.load(idPrefixes: const ['s0', 'a1']);
     final s0 = course.where((l) => l.id.startsWith('s0')).map((l) => l.id);
     final a1 = course.where((l) => l.id.startsWith('a1')).toList();

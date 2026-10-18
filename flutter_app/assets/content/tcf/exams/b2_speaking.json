@@ -1,0 +1,62 @@
+{
+ "id": "exam-b2-speaking",
+ "title": "Speaking, B2",
+ "subtitle": "Argue and nuance",
+ "minutes": 6,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada speaking test has three tasks: a short talk about yourself, a role-play and an opinion. Here you practise useful sentences out loud and choosing the right reply. At B2 you defend a position, agree with nuance and disagree politely.",
+   "examples": []
+  },
+  {
+   "type": "phrase",
+   "id": "say-1",
+   "fr": "Je suis tout à fait d'accord, cependant il faut tenir compte des inconvénients.",
+   "en": "I completely agree; however, we must consider the drawbacks.",
+   "tip": "Agree first, then add the nuance."
+  },
+  {
+   "type": "phrase",
+   "id": "say-2",
+   "fr": "Il me semble que cette solution présente plus d'avantages que d'inconvénients.",
+   "en": "It seems to me that this solution has more advantages than drawbacks.",
+   "tip": "Il me semble que softens a strong opinion."
+  },
+  {
+   "type": "phrase",
+   "id": "say-3",
+   "fr": "Je comprends votre point de vue, mais je ne partage pas votre avis.",
+   "en": "I understand your point of view, but I do not share your opinion.",
+   "tip": "A polite way to disagree."
+  },
+  {
+   "type": "choose",
+   "id": "disagree",
+   "prompt": "Which phrase politely disagrees?",
+   "options": [
+    "C'est ridicule.",
+    "Je m'en fiche.",
+    "Je comprends votre point de vue, mais je ne suis pas d'accord.",
+    "Vous avez complètement tort."
+   ],
+   "answer": 2,
+   "explain": "Acknowledge first, then disagree."
+  },
+  {
+   "type": "choose",
+   "id": "structure",
+   "prompt": "Which order builds the strongest spoken argument?",
+   "options": [
+    "Conclusion only",
+    "Examples with no opinion",
+    "Three questions for the examiner",
+    "Opinion, two reasons, an example, conclusion"
+   ],
+   "answer": 3,
+   "explain": "A clear structure is what the examiner listens for."
+  }
+ ]
+}

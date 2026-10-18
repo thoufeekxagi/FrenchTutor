@@ -1,0 +1,66 @@
+{
+ "id": "exam-a2-writing",
+ "title": "Writing, A2",
+ "subtitle": "A polite message",
+ "minutes": 8,
+ "steps": [
+  {
+   "type": "explain",
+   "id": "intro",
+   "title": "How this test works",
+   "body": "The TCF Canada writing test has three tasks: a message (60 to 120 words), a longer text (120 to 150 words) and an opinion (120 to 180 words). Here you practise the building blocks: greetings, sentences, connectors and structure.",
+   "examples": []
+  },
+  {
+   "type": "explain",
+   "id": "model",
+   "title": "A model message",
+   "body": "Task 1 at A2: say who you are, ask politely, give a reason or a choice, thank, and sign.",
+   "examples": [
+    {
+     "fr": "Bonjour Julie, je voudrais changer mon rendez-vous de mardi. Je suis libre jeudi matin. Est-ce possible ? Merci beaucoup. Amina",
+     "en": "Hello Julie, I would like to change my Tuesday appointment. I am free Thursday morning. Is that possible? Thank you very much. Amina"
+    }
+   ]
+  },
+  {
+   "type": "choose",
+   "id": "polite",
+   "prompt": "Which sentence politely asks for something?",
+   "options": [
+    "Je veux le formulaire maintenant.",
+    "Le formulaire, vite !",
+    "Pourriez-vous m'envoyer le formulaire, s'il vous plaît ?",
+    "Envoyez le formulaire."
+   ],
+   "answer": 2,
+   "explain": "Pourriez-vous plus s'il vous plaît is polite."
+  },
+  {
+   "type": "choose",
+   "id": "past",
+   "prompt": "Choose the sentence in the past (passé composé).",
+   "options": [
+    "Demain, je visite un musée.",
+    "Je visite un musée souvent.",
+    "Je vais visiter un musée.",
+    "Hier, j'ai visité un musée."
+   ],
+   "answer": 3,
+   "explain": "J'ai visité is the passé composé."
+  },
+  {
+   "type": "choose",
+   "id": "because",
+   "prompt": "Which connector gives a reason?",
+   "options": [
+    "parce que",
+    "mais",
+    "alors",
+    "pendant"
+   ],
+   "answer": 0,
+   "explain": "Parce que means because."
+  }
+ ]
+}
