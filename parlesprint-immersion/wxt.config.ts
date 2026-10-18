@@ -16,6 +16,7 @@ export default defineConfig({
       "https://oxfnrsjskdjbroekxdco.supabase.co/*",
       "https://generativelanguage.googleapis.com/*",
       "https://translate.googleapis.com/*",
+      "https://www.youtube.com/*",
       ...(qa ? ["https://www.youtube.com/*"] : []),
     ],
     web_accessible_resources: [

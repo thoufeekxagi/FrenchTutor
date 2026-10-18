@@ -30,8 +30,13 @@ export function Popup() {
     status: "connecting" | "listening";
   }>();
   const [liveBusy, setLiveBusy] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
+  const [youtubeTab, setYoutubeTab] = useState<number | null>(null);
 
   useEffect(() => {
+    void browser.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+      if (tab?.id !== undefined && /^https:\/\/www\.youtube\.com\//.test(tab.url ?? "")) setYoutubeTab(tab.id);
+    }).catch(() => undefined);
     void load();
     void browser.storage.local.get(["transcriptionLiveConsent", "liveSession"]).then((raw) => {
       const data = raw as Record<string, unknown>;
@@ -95,7 +100,12 @@ export function Popup() {
     tabButtons.current[next]?.focus();
   }
   function updatePrefs(patch: Parameters<typeof update>[0]) {
-    void update(patch).catch((e) => setError(errorText(e)));
+    void update(patch)
+      .then(() => {
+        setSavedFlash(true);
+        window.setTimeout(() => setSavedFlash(false), 2500);
+      })
+      .catch((e) => setError(errorText(e)));
   }
   async function updateLiveConsent(accepted: boolean) {
     setLiveBusy(true);
@@ -189,6 +199,12 @@ export function Popup() {
                   </a>
                 </div>
               </div>
+              <div className="settings-head">
+                <h3>Settings</h3>
+                <span className={`saved-note${savedFlash ? " on" : ""}`} role="status">
+                  {savedFlash ? "Saved ✓" : "Saved automatically"}
+                </span>
+              </div>
               <div className="group">
                 <div className="row-item">
                   <label htmlFor="level">Your French</label>
@@ -223,6 +239,12 @@ export function Popup() {
                   <input id="hl-spoken" type="checkbox" checked={prefs.highlightSpokenWords} onChange={(event) => updatePrefs({ highlightSpokenWords: event.target.checked })} />
                 </div>
               </div>
+              {youtubeTab !== null && (
+                <button className="action" onClick={() => void browser.tabs.reload(youtubeTab)}>
+                  Reload this YouTube tab
+                </button>
+              )}
+              <p className="field-note">Changes apply instantly. If the video page looks out of date, reload it.</p>
               <div className="group">
                 <a className="row-item link-row" href={feedbackUrl(browser.runtime.getManifest().version)} target="_blank" rel="noreferrer">
                   <span>Send feedback</span>

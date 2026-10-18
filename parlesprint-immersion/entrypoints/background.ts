@@ -523,8 +523,22 @@ async function connectOAuth(provider: Provider) {
     if (pendingOAuth === flow) pendingOAuth = undefined;
   }
 }
+/** Chrome never updates content scripts in tabs that were already open; inject the new one. */
+async function refreshOpenYoutubeTabs() {
+  try {
+    const tabs = await browser.tabs.query({
+      url: ["https://www.youtube.com/watch*", "https://www.youtube.com/shorts/*"],
+    });
+    for (const tab of tabs)
+      if (typeof tab.id === "number")
+        await chromeApis.scripting
+          .executeScript({ target: { tabId: tab.id }, files: ["content-scripts/content.js"] })
+          .catch(() => undefined);
+  } catch { /* best effort */ }
+}
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener((details) => {
+    if (details.reason === "update" || details.reason === "install") void refreshOpenYoutubeTabs();
     if (details.reason !== "install") return;
     // A local marker and serialized check protect against duplicate install events.
     return serialize(async () => {

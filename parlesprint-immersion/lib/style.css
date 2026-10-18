@@ -1496,3 +1496,8 @@ html.popup-document #root { min-height: 580px; }
 .ps.youtube-companion .watch-caption-title { order: 3; flex: 1 1 100%; }
 .ps.youtube-companion.layout-floating .watch-caption-title { order: 1; flex: 1 1 auto; }
 .ps.youtube-companion.layout-floating .head-right { order: 2; }
+
+.ps.popup .settings-head { display: flex; align-items: baseline; justify-content: space-between; margin-top: 4px; }
+.ps.popup .settings-head h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.ps.popup .saved-note { font-size: 12px; color: var(--muted); transition: color .2s; }
+.ps.popup .saved-note.on { color: var(--success); font-weight: 650; }

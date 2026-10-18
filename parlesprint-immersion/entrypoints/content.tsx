@@ -164,6 +164,12 @@ export default defineContentScript({
       },
     });
     ui.mount();
+    let disposed = false;
+    ctx.onInvalidated(() => {
+      disposed = true;
+      ui.remove();
+      ui.shadowHost.remove();
+    });
 
     const host = ui.shadowHost;
     type Placement = "side" | "overlay" | "below" | "floating";
@@ -171,6 +177,7 @@ export default defineContentScript({
       value === "floating" || value === "overlay" || value === "below" ? value : "side";
     let placement: Placement = "side";
     const placeHost = () => {
+      if (disposed) return;
       if (placement === "overlay") {
         const player = document.querySelector<HTMLElement>("#movie_player");
         if (player) {
