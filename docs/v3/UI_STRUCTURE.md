@@ -56,27 +56,40 @@ word, phrase repeat, grammar card, multiple choice, listen once (TCF style),
 arrange the sentence, speak and compare. Every French string has a speaker
 button (it asks the tutor to say it). Every step has the Marie phone button.
 
-## Approved Learn home contract
+## Approved Learn home contract (updated 2026-10-18)
 
-The approved home reference is the screen with `Bonjour!`, the A1 and exam
-date chips, a Monday-to-Sunday activity strip, the illustrated course card,
-the two-by-two practice grid, and the illustrated TCF path card. The bottom
-navigation remains Learn, Marie, Tests, and Me. There is no Course/Practice
-segment on this screen; the practice tiles open their destinations directly.
+The home has a header with the level chip, `Course` and `Practice` text tabs,
+and a streak chip, then a thin course progress bar. **Course** shows the unit
+the learner is in (eyebrow, big title, a book button that opens the full
+path), the continue card, and that unit's lessons. **Practice** shows the
+weekly activity strip, the four practice tiles (Talk with Marie, Daily
+challenge, Review words, Stories) and the exam countdown. The bottom
+navigation stays Learn, Marie, Tests, Me. The header is capped at 1.2x text
+scale so it never overflows; everything below scales to 2x.
 
 ```text
 Screen: Learn home   Key prefix: learn.
 User arrived to: open the app and choose one useful French action.
 They must understand: what lesson to continue, what practice is available,
-their real weekly activity, and where the full TCF path lives.
+their real streak, and where the full TCF path lives.
 Primary action: continue the authored course lesson. Exactly one.
-Secondary action: daily challenge, Marie, review words, Stories, and TCF path.
+Secondary action: daily challenge, Marie, review words, Stories, TCF path.
 Success state: each action opens its existing route and real progress remains
 available when the learner returns home.
 Must not contain: invented streaks, fake challenge availability, XP, coins,
 lives, or a second competing primary action.
 States: default, loading, empty, error, interrupted, completed.
 ```
+
+## Free allowance and the subscription (`lib/v3/access/v3_access.dart`)
+
+Free before the App Store subscription: Stage 0; the first 7 lessons of each of
+A1, A2, B1 and B2; the first 7 daily challenges; 7 Talk with Marie sessions and
+7 stories (Review words stays free); Tests for the first 7 days. Past that the
+control shows a lock or "Subscribe to keep going" and opens `SpeakPaywallScreen`.
+Counters live in SharedPreferences and the account (`V3CloudState`), so a
+reinstall cannot reset them. Subscribers and debug builds with
+`dev_force_pro_unlock` are never limited.
 
 ## Daily challenge screen contracts
 

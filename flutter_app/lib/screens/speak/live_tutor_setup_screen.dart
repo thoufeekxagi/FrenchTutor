@@ -7,6 +7,7 @@ import '../../design/tokens.dart';
 import '../../providers/database_provider.dart';
 import '../../prompts/live_prompts.dart';
 import '../../services/ai_session_gate.dart';
+import '../../v3/access/v3_access.dart';
 import '../../widgets/live_tutor_mascot.dart';
 import '../session/session_screen.dart';
 
@@ -51,6 +52,27 @@ class _LiveTutorSetupScreenState extends ConsumerState<LiveTutorSetupScreen> {
     if (!allowed || !mounted) {
       if (mounted) setState(() => _starting = false);
       return;
+    }
+
+    // Seven free sessions, then the App Store subscription.
+    var premium = V3Access.premium(ref);
+    if (!premium) {
+      final uses = await V3FreeUsage.uses(V3PracticeKind.marie);
+      if (!mounted) return;
+      if (V3Access.practiceLocked(uses: uses, premium: false)) {
+        premium = await V3Access.openPaywall(
+          context,
+          ref,
+          source: 'marie_locked',
+        );
+        if (!premium || !mounted) {
+          if (mounted) setState(() => _starting = false);
+          return;
+        }
+      } else {
+        await V3FreeUsage.recordUse(V3PracticeKind.marie);
+        if (!mounted) return;
+      }
     }
 
     final profile = ref.read(learningStoreProvider).profile();

@@ -492,10 +492,10 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/v3/learn/v3_learn_screen.dart`
 - widgets: V3LearnScreen
-- opens: LabsScreen, LiveTutorSetupScreen, V3LessonPlayer, V3StreakCalendarScreen, VocabularyFlashcardsScreen
-- tap handlers: 20
-- keys: `learn.backToCourse`, `learn.continuePath`, `learn.examDate`, `learn.lesson.${l.id}`, `learn.level`, `learn.level.${level.toUpperCase()}`, `learn.practiceBack`, `learn.practiceLibrary`, `learn.quick.challenge`, `learn.quick.marie`, `learn.quick.review`, `learn.quick.stories`, `learn.review`, `learn.sheet`, `learn.sheet.resume`, `learn.sheet.review`, `learn.stories`, `learn.streak`, `learn.unit.$unit`, `learn.viewPath`
-- labels: 'Back home', 'Explore practice library', 'Open Stories. Read or listen.', 'Review flashcards', 'Review from the start', 'Talk with Marie. Conversation practice.', 'View course path'
+- opens: LiveTutorSetupScreen, V3LessonPlayer, V3StreakCalendarScreen, VocabularyFlashcardsScreen
+- tap handlers: 21
+- keys: `learn.continuePath`, `learn.examDate`, `learn.lesson.${l.id}`, `learn.level`, `learn.level.${level.toUpperCase()}`, `learn.path.retry`, `learn.pathLevel.$level`, `learn.progress`, `learn.quick.challenge`, `learn.quick.marie`, `learn.quick.review`, `learn.quick.stories`, `learn.sheet`, `learn.sheet.resume`, `learn.sheet.review`, `learn.stories`, `learn.stories.close`, `learn.streak`, `learn.streakChip`, `learn.topTab.${label.toLowerCase()}`, `learn.unit.$unit`, `learn.unitMap`, `learn.viewPath`
+- labels: 'Close Stories', 'Open Stories. Read or listen.', 'Open the full course path', 'Review from the start', 'Talk with Marie. Conversation practice.', 'View course path'
 
 ## `lib/v3/lesson/v3_lesson_player.dart`
 - widgets: V3LessonPlayer, V3Speaker
@@ -511,7 +511,7 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/v3/marie/v3_marie_screen.dart`
 - widgets: V3MarieScreen
-- opens: LiveTutorSetupScreen, MocksScreen
+- opens: LiveTutorSetupScreen
 - tap handlers: 3
 - keys: `marie.mode.$id`
 
@@ -544,7 +544,7 @@ Rule: read this, then read the file. Never assume a key, label or route.
 
 ## `lib/v3/story/v3_stories_panel.dart`
 - widgets: V3StoriesPanel
-- opens: V3StoryReader
+- opens: SpeakPaywallScreen, V3StoryReader
 - tap handlers: 4
 - keys: `stories.card.${s.id}`, `stories.featured`, `stories.level.$level`, `stories.mode.$id`
 
@@ -561,10 +561,9 @@ Rule: read this, then read the file. Never assume a key, label or route.
 - labels: 'Hear word'
 
 ## `lib/v3/tests/v3_tests_screen.dart`
-- widgets: V3TestsScreen
-- opens: ExamReadinessScreen
+- widgets: V3TestsScreen, V3ExamFreeNote
 - tap handlers: 1
-- keys: `tests.section.${s.$1.toLowerCase()}`
+- keys: `tests.freeNote`, `tests.section.${s.$1.toLowerCase()}`
 
 ## `lib/v3/tutors/v3_tutor_picker_sheet.dart`
 - widgets: V3TutorPickerSheet

@@ -2,10 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../design/app_router.dart';
 import '../../design/appearance_colors.dart';
 import '../../design/tokens.dart';
+import '../../providers/database_provider.dart';
+import '../../screens/subscription/speak_paywall_screen.dart';
+import '../../services/revenue_cat_service.dart';
+import '../access/v3_access.dart';
 import '../ui/v3_ui.dart';
 import 'v3_story.dart';
 import 'v3_story_reader.dart';
@@ -67,6 +72,24 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
   }
 
   Future<void> _open(V3Story story) async {
+    // Seven free stories, then the App Store subscription. Reopening a story
+    // that was already started never uses another one.
+    final container = ProviderScope.containerOf(context);
+    final premium = container
+        .read(subscriptionGateServiceProvider)
+        .hasPremiumAccess;
+    final isNew = (_pos[story.id] ?? 0) == 0 && !_done.contains(story.id);
+    if (!premium && isNew) {
+      final uses = await V3FreeUsage.uses(V3PracticeKind.stories);
+      if (!mounted) return;
+      if (V3Access.practiceLocked(uses: uses, premium: false)) {
+        final unlocked = await _paywall(container);
+        if (!unlocked || !mounted) return;
+      } else {
+        await V3FreeUsage.recordUse(V3PracticeKind.stories);
+      }
+    }
+    if (!mounted) return;
     await AppRouter.push<bool>(
       context,
       (_) => V3StoryReader(
@@ -76,6 +99,16 @@ class _V3StoriesPanelState extends State<V3StoriesPanel> {
       ),
     );
     if (mounted) unawaited(_load());
+  }
+
+  Future<bool> _paywall(ProviderContainer container) async {
+    await AppRouter.push<void>(
+      context,
+      (_) => const SpeakPaywallScreen(source: 'stories_locked'),
+      fullscreenDialog: true,
+    );
+    await RevenueCatService.shared.refreshCustomerInfo();
+    return container.read(subscriptionGateServiceProvider).hasPremiumAccess;
   }
 
   V3Story? _featured(List<V3Story> atLevel) {

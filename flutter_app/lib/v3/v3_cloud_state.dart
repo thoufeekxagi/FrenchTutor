@@ -8,7 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'v3_prefs.dart';
 
 /// How a value is merged when the phone and the account disagree.
-enum V3StateKind { set, positions, scalar }
+enum V3StateKind { set, positions, scalar, max, earliest }
 
 class V3StateSpec {
   const V3StateSpec(this.key, this.kind);
@@ -27,6 +27,10 @@ abstract final class V3CloudState {
     V3StateSpec('v3_story_position', V3StateKind.positions),
     V3StateSpec('v3_story_hear_words', V3StateKind.scalar),
     V3StateSpec('learner_name', V3StateKind.scalar),
+    V3StateSpec('v3_free_started_on', V3StateKind.earliest),
+    V3StateSpec('v3_free_daily_days', V3StateKind.set),
+    V3StateSpec('v3_free_uses_marie', V3StateKind.max),
+    V3StateSpec('v3_free_uses_stories', V3StateKind.max),
   ];
 
   static const _table = 'v3_user_state';
@@ -45,6 +49,8 @@ abstract final class V3CloudState {
       case V3StateKind.positions:
         return prefs.getStringList(k);
       case V3StateKind.scalar:
+      case V3StateKind.max:
+      case V3StateKind.earliest:
         return prefs.get(k);
     }
   }
@@ -98,6 +104,16 @@ abstract final class V3CloudState {
           }
         }
         return [for (final e in best.entries) '${e.key}:${e.value}'];
+      case V3StateKind.max:
+        final a = local is int ? local : int.tryParse('$local');
+        final b = remote is int ? remote : int.tryParse('$remote');
+        if (a == null) return b;
+        if (b == null) return a;
+        return a >= b ? a : b;
+      case V3StateKind.earliest:
+        if (local == null) return remote;
+        if (remote == null) return local;
+        return '$local'.compareTo('$remote') <= 0 ? local : remote;
       case V3StateKind.scalar:
         if (remote == null) return local;
         if (local == null) return remote;

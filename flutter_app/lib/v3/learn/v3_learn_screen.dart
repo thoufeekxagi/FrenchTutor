@@ -15,6 +15,7 @@ import '../../screens/speak/live_tutor_setup_screen.dart';
 import '../../screens/labs/vocabulary_flashcards_screen.dart';
 import '../../services/learning_streak_service.dart';
 import '../../services/srs_service.dart';
+import '../access/v3_access.dart';
 import '../daily_challenge/v3_daily_challenge.dart';
 import '../daily_challenge/v3_daily_challenge_repository.dart';
 import '../lesson/v3_course.dart';
@@ -81,6 +82,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
   ];
   bool _showPath = false;
   bool _practiceTab = false;
+  Set<String> _freeDays = const {};
 
   @override
   void initState() {
@@ -135,6 +137,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
       profile.tcfExamDate = examDate;
       learningStore.saveProfile(profile);
     }
+    await V3FreeUsage.startedOn();
+    final freeDays = await V3FreeUsage.dailyDays();
     final sessions = ref.read(storageServiceProvider).getAllSessions();
     final streak = LearningStreakService.summarize(sessions);
     final now = DateTime.now();
@@ -155,6 +159,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
       _lastDone = lastDone;
       _examDate = examDate;
       _selectedLevel = level;
+      _freeDays = freeDays;
       _dailyChallenge = challengeForLevel;
       _streakDays = streak.currentDays;
       _activeWeekDays = activeWeekDays;
@@ -230,7 +235,33 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
 
   /// [review] opens from the first step to look again. It never lowers real
   /// progress: the furthest step reached is kept and Resume still returns to it.
+  bool get _premium => V3Access.premium(ref);
+
+  bool _lessonLocked(V3Lesson lesson) {
+    if (_premium) return false;
+    final all = _allCourse.isNotEmpty ? _allCourse : _course;
+    return V3Access.lessonLocked(
+      lessonId: lesson.id,
+      indexInLevel: V3Access.indexInLevel(lesson, all),
+      premium: false,
+    );
+  }
+
+  bool get _dailyLocked => V3Access.dailyChallengeLocked(
+    usedDays: _freeDays,
+    today: V3FreeUsage.dateKey(),
+    premium: _premium,
+  );
+
   Future<void> _openLesson(V3Lesson lesson, {bool review = false}) async {
+    if (_lessonLocked(lesson)) {
+      final ok = await V3Access.openPaywall(
+        context,
+        ref,
+        source: 'lesson_locked',
+      );
+      if (!ok || !mounted) return;
+    }
     final reached = _pos[lesson.id] ?? 0;
     final finished = _done.contains(lesson.id);
     await AppRouter.push<bool>(
@@ -950,6 +981,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
         ? 'Being prepared for ${_selectedLevel?.toUpperCase() ?? 'A1'}'
         : challenge.completed
         ? 'Completed today'
+        : _dailyLocked
+        ? 'Subscribe to keep going'
         : challenge.title;
     final reviewStatus = _reviewCount == null
         ? 'Checking your words'
@@ -1287,6 +1320,14 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
       _say('You completed today’s challenge. Come back tomorrow.');
       return;
     }
+    if (_dailyLocked) {
+      final ok = await V3Access.openPaywall(
+        context,
+        ref,
+        source: 'daily_challenge_locked',
+      );
+      if (!ok || !mounted) return;
+    }
     try {
       await _openChallenge(challenge);
     } catch (_) {
@@ -1296,6 +1337,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
 
   Future<void> _openChallenge(V3DailyChallenge source) async {
     final challenge = await V3DailyChallengeRepository.start(source);
+    if (!mounted) return;
+    await V3FreeUsage.recordDaily();
     if (!mounted) return;
     await AppRouter.push<bool>(
       context,
@@ -1336,6 +1379,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
       key: const ValueKey('learn.continuePath'),
       label: !_loaded || next == null
           ? 'Open course path'
+          : _lessonLocked(next)
+          ? 'Subscribe to keep going, ${next.title}'
           : 'Continue lesson, ${next.title}',
       onTap: !_loaded || next == null
           ? _showCoursePath
@@ -1414,6 +1459,8 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
                           Text(
                             !_loaded || next == null
                                 ? 'View course path'
+                                : _lessonLocked(next)
+                                ? 'Subscribe to keep going'
                                 : 'Continue lesson',
                             style: V3Type.strong(15, DesignTokens.onPrimary),
                           ),
@@ -1622,7 +1669,9 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
               ),
             ),
             Icon(
-              done
+              _lessonLocked(l)
+                  ? CupertinoIcons.lock_fill
+                  : done
                   ? CupertinoIcons.checkmark_circle_fill
                   : at > 0
                   ? CupertinoIcons.play_circle_fill

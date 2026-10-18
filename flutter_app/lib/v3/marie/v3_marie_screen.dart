@@ -1,3 +1,4 @@
+import '../tests/v3_tests_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -54,8 +55,9 @@ class V3MarieScreen extends ConsumerWidget {
               title: 'TCF speaking practice',
               subtitle: 'The three speaking tasks, timed like the exam.',
               icon: Icons.record_voice_over_outlined,
-              onTap: () => AppRouter.push(
+              onTap: () => openV3Exam(
                 context,
+                ref,
                 (_) => MocksScreen(
                   examName: 'TCF Canada',
                   levelBand: band,
