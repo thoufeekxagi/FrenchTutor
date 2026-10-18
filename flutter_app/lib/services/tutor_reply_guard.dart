@@ -65,6 +65,22 @@ class TutorReplyGuard {
     'later',
   };
 
+  /// True when [text] contains letters outside the Latin script (Malayalam,
+  /// Arabic, Cyrillic, CJK, ...). The tutor only teaches English and French,
+  /// so a transcript in another script is noise misheard as speech.
+  static bool hasUnsupportedScript(String text) {
+    for (final rune in text.runes) {
+      if (rune > 0x024F &&
+          !(rune >= 0x2000 && rune <= 0x2BFF) &&
+          !(rune >= 0x1E00 && rune <= 0x1EFF) &&
+          !(rune >= 0xFE00 && rune <= 0xFE0F) &&
+          rune < 0x1F000) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /// True when the learner's turn is only a filler, acknowledgement or thanks.
   static bool isFillerTurn(String learnerTranscript) {
     final words = learnerTranscript

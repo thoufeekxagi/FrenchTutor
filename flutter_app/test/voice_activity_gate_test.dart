@@ -84,4 +84,26 @@ void main() {
     expect(resumed.speechEnded, isFalse);
     expect(resumed.frames, hasLength(1));
   });
+
+  test('steady chatter behind the learner does not hold the turn open', () {
+    final gate = VoiceActivityGate();
+    for (var i = 0; i < 20; i++) {
+      gate.add(pcmFrame(12000));
+    }
+    var ended = false;
+    for (var i = 0; i < 60 && !ended; i++) {
+      ended = gate.add(pcmFrame(1500)).speechEnded;
+    }
+    expect(ended, isTrue);
+  });
+
+  test('a learner who keeps talking at their own level stays open', () {
+    final gate = VoiceActivityGate();
+    for (var i = 0; i < 20; i++) {
+      gate.add(pcmFrame(12000));
+    }
+    for (var i = 0; i < 100; i++) {
+      expect(gate.add(pcmFrame(9000)).speechEnded, isFalse);
+    }
+  });
 }

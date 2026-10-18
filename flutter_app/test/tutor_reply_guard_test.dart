@@ -53,6 +53,26 @@ void main() {
     });
   });
 
+  test('only Latin-script English or French passes the language guard', () {
+    expect(
+      TutorReplyGuard.hasUnsupportedScript('എനിക്ക് കോഡ് ഒന്നുമില്ല.'),
+      isTrue,
+    );
+    expect(TutorReplyGuard.hasUnsupportedScript('Привет, как дела?'), isTrue);
+    expect(TutorReplyGuard.hasUnsupportedScript('你好'), isTrue);
+    expect(TutorReplyGuard.hasUnsupportedScript('أهلا'), isTrue);
+    expect(
+      TutorReplyGuard.hasUnsupportedScript(
+        'Où sont les toilettes ? « Çà » — ok…',
+      ),
+      isFalse,
+    );
+    expect(
+      TutorReplyGuard.hasUnsupportedScript('bon\u2019jour \u00e9\u00e8'),
+      isFalse,
+    );
+  });
+
   group('TutorReplyGuard.chatterStart', () {
     test('finds generic offers and ignores teaching', () {
       expect(
@@ -95,6 +115,19 @@ void main() {
       expect(audio, isEmpty);
       expect(tutor, isEmpty);
       expect(guarded, ['filler']);
+    });
+
+    test('a Malayalam reply is never played', () {
+      final s = make();
+      final audio = <List<int>>[];
+      s.onAudioChunk = audio.add;
+      s.receiveServerMessageForTest({
+        'serverContent': {
+          'inputTranscription': {'text': 'എനിക്ക് കോഡ് ഒന്നുമില്ല'},
+        },
+      });
+      s.receiveServerMessageForTest(_reply('എന്ത് കാര്യമാണ് നിങ്ങളെ'));
+      expect(audio, isEmpty);
     });
 
     test('a real question is answered normally', () {

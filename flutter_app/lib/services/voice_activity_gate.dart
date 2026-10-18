@@ -28,6 +28,7 @@ class VoiceActivityGate {
   double _candidateMs = 0;
   double _silenceMs = 0;
   bool _active = false;
+  double _peak = 0;
 
   bool get isSpeechActive => _active;
   double get noiseFloor => _noiseFloor;
@@ -64,6 +65,7 @@ class VoiceActivityGate {
       }
 
       _active = true;
+      _peak = level;
       _candidateMs = 0;
       _silenceMs = 0;
       final frames = List<Uint8List>.unmodifiable(_preRoll);
@@ -72,7 +74,12 @@ class VoiceActivityGate {
       return VoiceActivityUpdate(speechStarted: true, frames: frames);
     }
 
-    _silenceMs = speechLike ? 0 : _silenceMs + durationMs;
+    // Steady chatter or music behind the learner stays above the absolute
+    // threshold forever and would keep the turn open. The turn ends when the
+    // level falls well below this utterance's own peak (the learner's voice).
+    _peak = math.max(_peak * 0.9995, level);
+    final stillSpeaking = level >= math.max(threshold, _peak * 0.4);
+    _silenceMs = stillSpeaking ? 0 : _silenceMs + durationMs;
     if (_silenceMs < endSilence.inMicroseconds / 1000) {
       return VoiceActivityUpdate(frames: [Uint8List.fromList(frame)]);
     }
@@ -95,6 +102,7 @@ class VoiceActivityGate {
     _candidateMs = 0;
     _silenceMs = 0;
     _active = false;
+    _peak = 0;
   }
 
   double _speechLevel(Uint8List bytes) {

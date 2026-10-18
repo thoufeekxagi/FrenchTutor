@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart'
+    show debugPrint, kDebugMode, visibleForTesting;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../data/database/learning_store.dart';
@@ -1212,6 +1213,7 @@ class GeminiLiveService {
       if (_currentTutorTranscript.isNotEmpty) {
         final t = normalizeGeneratedText(_currentTutorTranscript);
         _currentTutorTranscript = '';
+        _dbg('TUTOR(interrupted)', t);
         onTutorTranscript?.call(t);
       }
       onInterrupted?.call();
@@ -1292,12 +1294,17 @@ class GeminiLiveService {
       if (_currentTutorTranscript.isNotEmpty) {
         final tutorTranscript = normalizeGeneratedText(_currentTutorTranscript);
         _currentTutorTranscript = '';
+        _dbg('TUTOR', tutorTranscript);
         onTutorTranscript?.call(tutorTranscript);
       }
       onTurnComplete?.call();
       _deliverPendingSpokenContext();
       if (_goAwayPending) _finishGoAway();
     }
+  }
+
+  void _dbg(String who, String text) {
+    if (kDebugMode) debugPrint('LIVE_TXT $who: $text');
   }
 
   bool _guardChecked = false;
@@ -1316,18 +1323,20 @@ class GeminiLiveService {
     if (!hasReply) return;
     if (!_guardChecked) {
       _guardChecked = true;
-      if (TutorReplyGuard.isFillerTurn(
-        _turnUserTranscript + _currentUserTranscript,
-      )) {
+      final heard = _turnUserTranscript + _currentUserTranscript;
+      if (TutorReplyGuard.isFillerTurn(heard) ||
+          TutorReplyGuard.hasUnsupportedScript(heard)) {
         _isModelGenerating = true;
         suppressCurrentReply();
+        _dbg('GUARD', 'dropped reply to: $heard');
         onReplyGuarded?.call('filler');
         return;
       }
     }
     if (out is Map && !_suppressPreInjection) {
       final text = _currentTutorTranscript + ((out['text'] as String?) ?? '');
-      final cut = TutorReplyGuard.chatterStart(text);
+      var cut = TutorReplyGuard.chatterStart(text);
+      if (TutorReplyGuard.hasUnsupportedScript(text)) cut = 0;
       if (cut >= 0) {
         _currentTutorTranscript = text.substring(0, cut).trimRight();
         _isModelGenerating = true;
@@ -1352,6 +1361,7 @@ class GeminiLiveService {
     final t = _currentUserTranscript;
     _currentUserTranscript = '';
     _turnUserTranscript += t;
+    _dbg('LEARNER', t);
     onUserTranscript?.call(t);
   }
 
