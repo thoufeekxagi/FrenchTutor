@@ -270,18 +270,26 @@ body {
 }
 .ps .brand-lockup {
   display: flex;
-  flex-direction: column;
-  gap: 1px;
+  align-items: center;
+  gap: 10px;
 }
+.ps .brand-mark { width: 30px; height: 30px; border-radius: 8px; display: block; }
+.ps .brand-text { display: flex; flex-direction: column; gap: 1px; }
 .ps .brand-word {
-  font-size: 23px;
-  line-height: 1.15;
+  display: inline-flex;
+  align-items: center;
+  font-size: 21px;
+  line-height: 1.1;
   font-weight: 800;
-  letter-spacing: -1.1px;
-  color: var(--ink);
+  letter-spacing: -0.8px;
+  color: var(--accent);
 }
 .ps .brand-word > span {
-  color: var(--accent);
+  margin-left: 3px;
+  padding: 1px 7px 2px;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff;
 }
 .ps .brand-extension {
   color: var(--muted);
@@ -1414,3 +1422,17 @@ body {
 /* Chrome sizes the toolbar popup from its first paint; reserve the full height up front. */
 html.popup-document, html.popup-document body { min-height: 580px; }
 html.popup-document #root { min-height: 580px; }
+
+/* Popup: calm, grouped, Apple-style */
+.ps.popup .pop-hero { padding: 6px 2px 2px; }
+.ps.popup .pop-hero h1 { margin: 10px 0 6px; font-size: 26px; line-height: 1.15; letter-spacing: -0.8px; font-weight: 750; }
+.ps.popup .pop-hero p { margin: 0 0 14px; color: var(--muted); font-size: 14px; }
+.ps.popup .pop-actions { display: grid; gap: 8px; }
+.ps.popup .group { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.ps.popup .group .row-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 6px 14px; }
+.ps.popup .group .row-item + .row-item { border-top: 1px solid var(--line); }
+.ps.popup .group .row-item select { min-height: 34px; border-radius: 9px; padding: 0 8px; }
+.ps.popup details.group > summary { list-style: none; cursor: pointer; padding: 13px 14px; font-weight: 600; display: flex; justify-content: space-between; }
+.ps.popup details.group > summary::after { content: "›"; color: var(--muted); transform: rotate(90deg); }
+.ps.popup details.group[open] > summary::after { transform: rotate(-90deg); }
+.ps.popup details.group .stack { padding: 0 14px 14px; }

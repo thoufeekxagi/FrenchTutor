@@ -11,28 +11,25 @@
   </head>
   <body>
     <h1>ParleSprint Immersion privacy policy</h1>
-    <p>Version 0.2 · Updated October 17, 2026</p>
-    <p>ParleSprint Immersion helps you practise French from videos in regular browser tabs with live captions, replay, and a local vocabulary notebook.</p>
-
-    <h2>Live French transcription</h2>
-    <p>Live captions are optional and start only when you open the extension popup, accept the audio notice, and choose Start. Chrome grants access to the current tab for that user action. The extension captures only the active tab's audio, routes the sound back to your speakers, and does not use your microphone or capture video frames. The extension can inject its companion into that page after you start.</p>
-    <p>Captured audio is streamed directly from the extension to Google's Gemini Live transcription service. Raw tab audio is not sent to or stored by ParleSprint. The ParleSprint Supabase Edge Function receives consent and a random installation identifier, hashes that identifier for a daily duration quota, and uses the server-only <code>GEMINI_API_KEY</code> secret to create a constrained, one-use, short-lived Google session token. The extension receives that token; the provider API key never enters the extension bundle. Supabase stores only daily hashed installation quota counters and does not receive or store audio.</p>
-    <p>Google's Gemini API terms depend on whether the account uses unpaid/free or paid services. Google states that content submitted through unpaid services may be used to provide, improve, and develop Google products and machine-learning technologies, and human reviewers may process it. Do not use live transcription on sensitive or confidential audio. Google's paid-service terms state that prompts and responses are not used to improve products. See <a href="https://ai.google.dev/gemini-api/terms">Google's current Gemini API terms</a> and <a href="https://ai.google.dev/gemini-api/docs/pricing">pricing</a>.</p>
-    <p>Transcript and estimated utterance timing are stored in Chrome's local extension storage under a hash of the video page URL. Live transcription does not provide word-level timestamps. You can stop capture at any time from the popup; the live connection closes and the tab stream is released. A session lasts up to eight minutes and may renew while listening. The current service quota reserves up to 30 minutes per installation per UTC day and 60 minutes across all users per UTC day. Sites that block extension access, DRM-protected media, muted tabs, poor audio, or non-French speech may not work as expected.</p>
-
-    <h2>Local practice and preferences</h2>
-    <p>The extension includes an original short French listening sample and authored translations. Its bundled audio can be played without an account or AI request. Learning preferences, audio/explanation consent, saved vocabulary, transcripts, optional imports, account session, and explanation cache are stored in Chrome's local extension storage. Vocabulary can include selected words, phrases, sentences, learning level, saved time, and explanation. Imported subtitle files are processed locally. Signing out removes the session and local explanation cache. Uninstalling the extension removes local data; export vocabulary you wish to keep first.</p>
-
-    <h2>Optional account connection and explanations</h2>
-    <p>Local learning works without an account. Existing ParleSprint email/password accounts use the same Supabase service as the app. Your password is sent to Supabase for authentication and is not stored by the extension. Account identifier, email, display name, provider, and session tokens may be stored locally to show and maintain your connection. Google and Apple browser sign-in are disabled in this version.</p>
-    <p>AI explanations use separate consent. When you request one, the selected French text, subtitle sentence, and learning level are sent to the ParleSprint Supabase service, which calls Google's Gemini service. Your account/session identifier and network metadata may be processed for authentication and usage limits. The backend stores cached explanations and account-based daily quota counters. These server records do not currently have automatic expiry. Do not include sensitive personal information in selected text.</p>
-
-    <h2>Analytics, sale, and sharing</h2>
-    <p>This release contains no analytics events, advertisements, or sale of personal information. The extension does not send a browsing-history feed or video URL. Chrome, websites, Supabase, and Google process service and network data under their own policies.</p>
-
+    <p>Version 0.3 · Updated October 18, 2026</p>
+    <p>ParleSprint Immersion helps you learn French from videos on YouTube. It shows French captions under the video, English meanings for words you tap, and a private vocabulary notebook on your device.</p>
+    <h2>Captions from YouTube</h2>
+    <p>When you open a YouTube video page, the extension asks youtube.com for that video&#x27;s French caption track, the same captions the YouTube player uses, using your normal browser connection. The captions are shown under the video and are stored in Chrome&#x27;s local extension storage under the video ID so they load faster next time. They are not sent to ParleSprint.</p>
+    <p>The extension reads the video&#x27;s playback position and state (playing, paused, seeking, ad) on the page so captions stay in sync. It does not read your YouTube account, watch history or comments.</p>
+    <h2>Translation and word meanings</h2>
+    <p>When you tap a word or phrase, or turn on English translation, the selected French text or the current caption line is sent to Google Translate (translate.googleapis.com) to get the English meaning. Only that text is sent. The video URL, video ID, your identity and your vocabulary are not sent. Google processes this request under its own terms and privacy policy. Do not select sensitive personal text.</p>
+    <p>ParleSprint does not run a server for translation and does not receive these requests.</p>
+    <h2>Live captions for videos without captions (optional)</h2>
+    <p>This feature is off unless you open the extension popup, accept a separate audio notice, and choose Start live captions on this tab. Chrome then lets the extension capture the audio of that one tab. The sound keeps playing for you. Your microphone is not used and no video frames are captured.</p>
+    <p>While live captions run, the tab audio is streamed directly from your browser to Google&#x27;s Gemini Live transcription service. Raw audio is not sent to or stored by ParleSprint. To start a session, the extension asks a ParleSprint Supabase function for a short-lived, single-use Google session token. That request contains a random installation identifier, which the function hashes to enforce a daily time limit. The Google API key stays on the server and never enters the extension. Supabase stores only hashed daily time counters.</p>
+    <p>Google&#x27;s Gemini API terms depend on whether a service is unpaid or paid. Content submitted through unpaid services may be used to improve Google products, and people may review it. Do not use live captions with sensitive or confidential audio. Capture stops when you press Stop or close the tab.</p>
+    <p>Live transcripts are kept in Chrome&#x27;s local extension storage under a hash of the page address. Daily limits apply per installation and across all users.</p>
+    <h2>What is stored on your device</h2>
+    <p>Preferences, saved vocabulary (words or phrases, the sentence they came from, your level and the save time), cached captions and live transcripts stay in Chrome&#x27;s local extension storage. You can delete saved words in the extension. Uninstalling the extension removes all of it. Export your vocabulary first if you want to keep it.</p>
+    <h2>No accounts, analytics or ads</h2>
+    <p>This version has no sign-in and no accounts. It contains no analytics, advertising or sale of personal information, and does not send a browsing history feed. Chrome, YouTube, Google and Supabase process network data under their own policies.</p>
     <h2>Your choices and contact</h2>
-    <p>You can stop live captions and withdraw audio consent from the popup. You can remove saved vocabulary with the extension controls. Disabling consent or clearing local data does not remove requests already processed by Google or existing backend explanation records. For privacy questions or account data requests, contact <a href="mailto:thoufeek@agiventures.ca">thoufeek@agiventures.ca</a>. Never send an API key or session token.</p>
-    <p>Provider policies: <a href="https://supabase.com/privacy">Supabase</a> and <a href="https://ai.google.dev/gemini-api/terms">Google Gemini API</a>.</p>
-    <p>Publisher contact: <a href="mailto:thoufeek@agiventures.ca">thoufeek@agiventures.ca</a>.</p>
+    <p>You can turn captions off on videos, stop live captions, withdraw audio consent and delete saved words at any time from the extension. Requests already processed by Google cannot be recalled by ParleSprint. For privacy questions contact thoufeek@agiventures.ca.</p>
+    <p>Provider policies: <a href="https://policies.google.com/terms">Google Translate terms</a>, <a href="https://policies.google.com/privacy">Google privacy policy</a>, <a href="https://ai.google.dev/gemini-api/terms">Gemini API terms</a>, <a href="https://supabase.com/privacy">Supabase privacy</a>.</p>
   </body>
 </html>

@@ -246,21 +246,13 @@ test("first practice works entirely offline with real media, free meaning, repla
     el.scrollTop = 0;
   });
   await page.screenshot({ path: "artifacts/qa-first-practice.png" });
-  const opened = context.waitForEvent("page");
-  await panel
-    .getByRole("button", { name: "Account connection for AI", exact: true })
-    .click();
-  const popup = await opened;
-  await popup.waitForLoadState();
-  await expect(popup).toHaveURL(`chrome-extension://${id}/popup.html#account`);
-  await expect(
-    popup.getByRole("tab", { name: "Account", exact: true }),
-  ).toHaveAttribute("aria-selected", "true");
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${id}/popup.html`);
   await popup.getByRole("tab", { name: "Notebook", exact: true }).click();
   await expect(popup.getByText("Bonjour", { exact: true })).toBeVisible();
   await popup.getByRole("tab", { name: "Practice", exact: true }).click();
   await expect(
-    popup.getByRole("link", { name: "Try your first practice" }),
+    popup.getByRole("link", { name: "Try the 41-second sample" }),
   ).toBeVisible();
   await context.setOffline(false);
 });
@@ -284,7 +276,7 @@ test("manual seeking and disabling the companion cancel the replay stop", async 
   await panel.getByRole("button", { name: "↻ Repeat", exact: true }).click();
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${id}/popup.html`);
-  await popup.getByLabel("Show companion on video pages").uncheck();
+  await popup.getByLabel("Show captions on videos").uncheck();
   await expect(panel).toHaveCount(0);
   await seek(page, 3.8);
   await page.locator("video").evaluate((v: HTMLVideoElement) => v.play());
@@ -612,10 +604,7 @@ test("practice uses bundled Inter, blue primary actions and fits a narrow screen
   await panel
     .getByRole("button", { name: "Study Bonjour", exact: true })
     .click();
-  const primary = panel.getByRole("button", {
-    name: "Explain in context",
-    exact: true,
-  });
+  const primary = panel.getByRole("button", { name: /Repeat/ });
   await expect(primary).toHaveCSS("background-color", "rgb(37, 99, 235)");
   const overflow = await page.evaluate(() => ({
     document:
@@ -765,13 +754,12 @@ test("reading preferences synchronize with popup and retain floating placement a
     .evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${id}/popup.html`);
-  await popup.getByText("Reading preferences", { exact: true }).click();
   await popup.getByLabel("Caption size", { exact: true }).selectOption("large");
   await popup
     .getByLabel("Caption placement", { exact: true })
     .selectOption("floating");
   await popup
-    .getByLabel("Highlight saved vocabulary", { exact: true })
+    .getByLabel("Highlight spoken words", { exact: true })
     .uncheck();
   await expect(panel).toHaveClass(/caption-large/);
   await expect(panel).toHaveClass(/layout-floating/);
@@ -784,13 +772,13 @@ test("reading preferences synchronize with popup and retain floating placement a
   expect(box!.x + box!.width).toBeLessThanOrEqual(1280);
   await panel.getByText("Reading & playback", { exact: true }).click();
   await expect(
-    panel.getByLabel("Highlight saved words and phrases", { exact: true }),
+    panel.getByLabel("Highlight words as the video plays", { exact: true }),
   ).not.toBeChecked();
   await panel
-    .getByLabel("Highlight saved words and phrases", { exact: true })
+    .getByLabel("Highlight words as the video plays", { exact: true })
     .check();
   await expect(
-    popup.getByLabel("Highlight saved vocabulary", { exact: true }),
+    popup.getByLabel("Highlight spoken words", { exact: true }),
   ).toBeChecked();
   await page.reload();
   await expect(panel).toHaveClass(/caption-large/);

@@ -39,15 +39,6 @@ test("real MV3 popup, subtitle timing, replay, notebook, navigation, errors", as
       .locator(".ps.popup")
       .evaluate((el) => el.getBoundingClientRect().width),
   ).toBe(400);
-  expect(
-    await popup
-      .locator(".live-card")
-      .evaluate((el) => el.getBoundingClientRect().top),
-  ).toBeLessThan(
-    await popup
-      .locator(".popup-hero")
-      .evaluate((el) => el.getBoundingClientRect().top),
-  );
   await popup.getByRole("tab", { name: "Notebook", exact: true }).click();
   await expect(
     popup.getByText("Save a word or sentence while you watch."),
@@ -156,9 +147,9 @@ test("real MV3 popup, subtitle timing, replay, notebook, navigation, errors", as
   });
   await expect(panel.getByText("Source: demo-fr.srt")).toBeVisible();
   await popup.getByRole("tab", { name: "Practice", exact: true }).click();
-  await popup.getByLabel("Show companion on video pages").uncheck();
+  await popup.getByLabel("Show captions on videos").uncheck();
   await expect(panel).toHaveCount(0);
-  await popup.getByLabel("Show companion on video pages").check();
+  await popup.getByLabel("Show captions on videos").check();
   await expect(page.getByRole("complementary")).toBeVisible();
   await page.locator("video").evaluate((v: HTMLVideoElement) => {
     v.pause();

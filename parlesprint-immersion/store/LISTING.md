@@ -2,7 +2,7 @@
 
 **Name:** ParleSprint Immersion
 
-**Summary:** Watch videos with live French captions, study phrases, replay sentences, and save words in a private notebook.
+**Summary:** French captions under YouTube videos, with instant word meanings, English translation and a private vocabulary notebook.
 
 **Category:** Education
 
@@ -12,37 +12,44 @@
 
 ## Description
 
-Keep the video in view while a quiet French caption layer follows along. When matching subtitles are available, tap a word to study it or repeat the sentence.
+Learn French from the videos you already watch. Open a French YouTube video and ParleSprint Immersion shows the French captions right under the player, no setup and no sign-in.
 
-Try the bundled 41-second French listening sample with synchronized captions, authored English translations, grammar notes, sentence replay, and vocabulary saving. The sample works offline without signup. Its voice is synthetic and clearly disclosed.
+- Captions follow the video, including seeking, pausing, speed changes and ads.
+- Tap any word to see its English meaning and alternatives. The word being spoken is highlighted in blue as it is said.
+- Turn English translation on or off under each line. Hide the French when you want to test your listening.
+- Repeat any line. Save words and phrases to a private notebook, then export them as JSON or Anki-compatible CSV.
+- Choose your level (A1 to B2). Dark, quiet design that stays out of the way.
+- No captions on a video? Optionally start live captions from the extension popup. ParleSprint listens to that tab's audio and transcribes the French.
 
-Play a French video on a regular webpage and start live captions from the extension popup. ParleSprint transcribes the current tab's audio directly with Google Gemini Live; no subtitle upload, player caption track, or microphone is needed. Choose A1, A2, B1, or B2, select words or phrases, repeat a sentence, and save vocabulary in your browser. Blue marks your current selection; green underlines saved vocabulary. Search your notebook and export JSON or Anki-compatible CSV.
+Privacy: captions are fetched from YouTube the same way the player does. When you tap a word or turn on translation, only that French text is sent to Google Translate. Live captions are off until you start them and accept a separate notice; then the tab's audio is sent to Google's Gemini service. Vocabulary and preferences stay in your browser. No accounts, no analytics, no ads.
 
-Core practice works without signup. Vocabulary and preferences stay in local Chrome extension storage. Connect your existing ParleSprint email/password account for optional AI explanations. These offer meaning, grammar, and an example when you explicitly enable the connected service.
-
-The extension captures audio only from the active browser tab after you start it and accept a separate consent notice. The sound continues playing. Audio is sent directly to Google's Gemini Live API; it is not sent to or stored by ParleSprint. Google's free API tier may use submitted audio to improve its products and may include human review. Transcript timing is approximate at utterance level, not word-level. Sites that block extension access or protect media may not work. Do not use with sensitive content.
-
-This version does not use your microphone, download video files, synchronize vocabulary across devices, or guarantee protected media support. AI explanations and speech recognition may contain errors. ParleSprint Immersion is independently developed and is not affiliated with YouTube or Google.
+ParleSprint Immersion is independently developed and is not affiliated with or endorsed by YouTube or Google. Captions and translations can contain errors. Do not use live captions with sensitive content.
 
 ## Single purpose
 
-Help users study French from live captions while watching a video in a regular browser tab.
+Help users learn French while watching YouTube videos by showing French captions, word meanings and translation beside the video.
 
 ## Permission justification
 
-- `storage`: save learning preferences, consent, and vocabulary locally.
-- `activeTab`, `scripting`, and `tabCapture`: inject the companion and capture the active tab's audio only after the user starts it.
-- Offscreen document: maintain the audio stream while the popup closes and connect to Google's live transcription service.
-- `https://oxfnrsjskdjbroekxdco.supabase.co/*`: authenticate the optional account connection and send explicitly requested explanations after consent.
+- `storage`: save preferences, consent, cached captions and the vocabulary notebook in the browser.
+- `activeTab` and `scripting`: when the user starts live captions from the popup, run the caption companion in that tab.
+- `tabCapture`: capture the audio of the current tab, only after the user starts live captions and accepts the audio notice. Sound keeps playing. The microphone and video frames are never captured.
+- `offscreen`: keep the captured audio stream and the connection to Google's transcription service alive while the popup is closed.
+- `https://www.youtube.com/*` (content script on watch and Shorts pages): show captions under the video, read the playback position, and request the video's French caption track from YouTube.
+- `https://translate.googleapis.com/*`: send the word, phrase or caption line the user selects to Google Translate and receive the English meaning. Nothing else is sent.
+- `https://generativelanguage.googleapis.com/*`: stream tab audio to Google's Gemini live transcription, only while live captions run.
+- `https://oxfnrsjskdjbroekxdco.supabase.co/*`: request a short-lived, single-use Google session token for live captions. The request holds a random installation ID and consent flag, never audio.
+- Remote code: none. All JavaScript ships in the package.
 
 ## Reviewer instructions
 
-Open the extension popup and choose **Try your first practice**. Play the bundled video, reveal a sentence translation, select a word, repeat, and save it. This fully working local path needs no account or imported file.
+1. Open https://www.youtube.com/watch?v=EaNqp4FXh-s (Extra French, episode 1). Press play and skip to 1:02. French captions appear under the player on their own.
+2. Tap a word: its English meaning appears. Press EN to show the translation under the line, FR to hide the French.
+3. Optional live captions: on a video without captions, open the extension popup, expand "Video has no captions?", accept the audio notice and press Start live captions on this tab. Audio keeps playing, French text appears, Stop releases capture.
+4. The popup also has a 41-second bundled sample that works offline.
 
-Load a French video with clear speech. In the extension popup, accept the live-audio disclosure and press **Start live captions on this tab**. Confirm audio remains audible, interim/final captions appear, sentence replay and study work, and Stop releases capture. Repeat on YouTube and a second public video site. Local notebook features require no account. Explain the quota and Google's free-tier data use in reviewer instructions and consent copy.
+**Privacy URL:** https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-privacy (same text as `public/privacy.html`; deploy the function before submitting)
 
-**Privacy URL:** https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-privacy
+**Support:** thoufeek@agiventures.ca
 
-**Support:** thoufeek@agiventures.ca (existing ParleSprint support contact).
-
-Enter these in the dashboard. Do not claim backend verification, store approval, automatic captions, or live screenshots until evidenced.
+Do not claim store approval, official YouTube or Google partnership, or support for every video. Live screenshots must come from the current build.

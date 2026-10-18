@@ -10,7 +10,7 @@ export default defineConfig({
     key: identity.key,
     name: "ParleSprint Immersion",
     description:
-      "Live French captions from video audio, sentence replay, and a personal vocabulary notebook.",
+      "French captions under YouTube videos with instant word meanings, English translation and a private vocabulary notebook.",
     permissions: ["storage", "activeTab", "scripting", "tabCapture", "offscreen"],
     host_permissions: [
       "https://oxfnrsjskdjbroekxdco.supabase.co/*",

@@ -34,7 +34,7 @@ function FirstPractice() {
     <main className="ps practice-page">
       <header className="app-topbar">
         <Brand />
-        <span className="badge">Free practice · No account needed</span>
+        <span className="badge">Free practice</span>
       </header>
       <div className="practice-shell">
         <section className="practice-main stack">

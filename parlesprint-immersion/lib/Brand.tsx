@@ -1,10 +1,13 @@
 export function Brand() {
   return (
     <div className="brand-lockup">
-      <span className="brand-word">
-        Parle<span>Sprint</span>
+      <img className="brand-mark" src="/icon-48.png" alt="" width="30" height="30" />
+      <span className="brand-text">
+        <span className="brand-word">
+          Parle<span>Sprint</span>
+        </span>
+        <span className="brand-extension">Immersion</span>
       </span>
-      <span className="brand-extension">Immersion</span>
     </div>
   );
 }

@@ -1514,26 +1514,10 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
               </div>
               <p className="muted">From: {sentence}</p>
               {!practice && <MeaningCard meaning={meaning} state={meaningState} />}
-              {practice && !prefs.aiConsent && (
-                <div className="card stack">
-                  <p>
-                    For translation or word study, the selected text, its
-                    sentence, and your level are sent to ParleSprint and Google
-                    Gemini. AI can make mistakes.
-                  </p>
-                  <button disabled={consentBusy} onClick={() => void allowExplanations()}>
-                    {consentBusy ? "Enabling explanations…" : "Allow explanations"}
-                  </button>
-                </div>
-              )}
-              {practice && (
-                <button onClick={() => void openConnection()}>
-                  Account connection for AI
-                </button>
-              )}
+
               <div className="caption-actions">
-                {(practice || prefs.aiConsent) && (
-                  <button className="primary" disabled={busy || consentBusy || !prefs.aiConsent} onClick={() => void explain()}>
+                {!practice && prefs.aiConsent && (
+                  <button className="primary" disabled={busy} onClick={() => void explain()}>
                     {busy ? "Explaining…" : "Explain in context"}
                   </button>
                 )}
