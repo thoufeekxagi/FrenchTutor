@@ -5,6 +5,7 @@ Deno.env.set('SUPABASE_URL', 'https://backend.invalid');
 Deno.env.set('SUPABASE_SERVICE_ROLE_KEY', 'test-server-key');
 Deno.env.set('SUPABASE_ANON_KEY', 'test-public-key');
 Deno.env.set('GEMINI_API_KEY', 'test-model-key');
+Deno.env.set('IMMERSION_IP_SALT', 'test-salt');
 let handle: (request: Request) => Promise<Response>;
 const originalServe = Deno.serve;
 Deno.serve = ((handler: typeof handle) => { handle = handler; }) as typeof Deno.serve;
@@ -116,12 +117,12 @@ Deno.test('anonymous mode needs an installation id, is quota limited, and never 
   await withFetch((async (input) => {
     const url = String(input); urls.push(url);
     if (url.includes('/immersion_ai_cache?')) return json([]);
-    if (url.includes('/rpc/immersion_take_quota')) return json(false);
+    if (url.includes('/rpc/immersion_take_usage')) return json('ip');
     throw new Error('Unexpected network call');
   }) as typeof fetch, async () => {
     const result = await handle(anon);
     assertEquals(result.status, 429);
-    assertEquals(await result.json(), { error: 'daily_explanation_limit_reached' });
+    assertEquals(await result.json(), { error: 'daily_explanation_limit_reached', limit: 'ip' });
     assertEquals(urls.some((u) => u.endsWith('/auth/v1/user')), false);
   });
   const missingId = new Request('https://backend.invalid/functions/v1/immersion-explain', {

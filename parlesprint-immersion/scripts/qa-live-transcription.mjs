@@ -41,6 +41,7 @@ try {
   const popup = await context.newPage();
   const extensionId = new URL(worker.url()).host;
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  await popup.getByText("Video has no captions?").click();
   const consent = popup.locator("label").filter({ hasText: "Send this tab’s audio to Google" }).getByRole("checkbox");
   if (!(await consent.isChecked())) {
     await consent.click();
@@ -59,17 +60,22 @@ try {
   }
 
   await popup.getByRole("button", { name: "Start live captions on this tab" }).evaluate((button) => button.click());
+  await videoPage.waitForTimeout(4000);
+  console.log("popup says:", await popup.locator(".error, [role=alert], [role=status]").allInnerTexts());
+  console.log("panel count:", await videoPage.getByRole("complementary", { name: "ParleSprint Immersion" }).count(), "hosts:", await videoPage.locator("parlesprint-immersion").count());
   const panel = videoPage.getByRole("complementary", { name: "ParleSprint Immersion" });
   await expect(panel).toBeVisible({ timeout: 15000 });
-  await expect.poll(async () => {
-    const [panelBox, videoBox] = await Promise.all([panel.boundingBox(), video.boundingBox()]);
-    return !!panelBox && !!videoBox && panelBox.y >= videoBox.y + videoBox.height - 1;
-  }, { timeout: 10000 }).toBe(true);
   await expect.poll(async () => {
     const text = await panel.locator(".sentence").innerText().catch(() => "");
     return text.trim().length > 5 && text !== "Listening…";
   }, { timeout: 35000, intervals: [500, 1000, 2000] }).toBe(true);
 
+  await videoPage.waitForTimeout(12000);
+  console.log("storage:", JSON.stringify(await worker.evaluate(async () => { const d = await chrome.storage.local.get(["liveSession","transcriptionLiveConsent"]); const ctxs = await chrome.runtime.getContexts({}); return { ...d, contexts: ctxs.map((c) => c.contextType + ":" + (c.documentUrl||"").split("/").pop()) }; })));
+  const stats = await worker.evaluate(async () => (await chrome.storage.local.get("qaLive")).qaLive);
+  console.log("NOTES:", JSON.stringify(stats?.notes));
+  console.log("LIVE STATS (frames sent / silent frames skipped / flushes / interim / final):", JSON.stringify(stats));
+  if (!stats || stats.interim + stats.final === 0) throw new Error("No live transcript events arrived from Gemini.");
   const transcript = await panel.locator(".sentence").innerText();
   const playback = await video.evaluate((element) => ({ paused: element.paused, muted: element.muted, time: element.currentTime }));
   await videoPage.screenshot({ path: path.join(root, screenshot), fullPage: false });

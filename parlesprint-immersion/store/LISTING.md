@@ -38,7 +38,7 @@ Help users learn French while watching YouTube videos by showing French captions
 - `https://www.youtube.com/*` (content script on watch and Shorts pages): show captions under the video, read the playback position, and request the video's French caption track from YouTube.
 - `https://translate.googleapis.com/*`: send the word, phrase or caption line the user selects to Google Translate and receive the English meaning. Nothing else is sent.
 - `https://generativelanguage.googleapis.com/*`: stream tab audio to Google's Gemini live transcription, only while live captions run.
-- `https://oxfnrsjskdjbroekxdco.supabase.co/*`: (a) request a short-lived, single-use Google session token for live captions; (b) send the selected word, its caption line and level for Explain in context. Requests carry a random installation ID for a daily limit, never audio, accounts or video URLs.
+- `https://oxfnrsjskdjbroekxdco.supabase.co/*`: (a) request a short-lived, single-use Google session token for live captions; (b) send the selected word, its caption line and level for Explain in context. Requests carry a random installation ID and the server uses the IP address, both kept only as salted hashes for about a week, to enforce free daily limits. They never carry audio, accounts or video URLs.
 - Remote code: none. All JavaScript ships in the package.
 
 ## Reviewer instructions

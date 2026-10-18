@@ -1,6 +1,6 @@
 import { browser } from "wxt/browser";
 import { liveTranscriptionUrl, websocketMessageText } from "../../lib/geminiLive";
-import { resamplePcm16, TRANSCRIPTION_SAMPLE_RATE } from "../../lib/pcm";
+import { resamplePcm16, rms, SilenceGate, TRANSCRIPTION_SAMPLE_RATE } from "../../lib/pcm";
 import {
   isCurrentPlaybackTranscript,
   shouldCapturePlaybackAudio,
@@ -17,7 +17,15 @@ interface CaptureConfig {
   anonKey: string;
 }
 
-const SESSION_SECONDS = 480;
+// Matches the token lifetime issued by immersion-live-token.
+const SESSION_SECONDS = 180;
+declare const __QA__: boolean;
+const qaStats: Record<string, any> = { sent: 0, skipped: 0, flushes: 0, interim: 0, final: 0, notes: [] as string[] };
+const qaNote = (note: string) => { if (typeof __QA__ !== "undefined" && __QA__ && qaStats.notes.length < 12) qaStats.notes.push(note); };
+if (typeof __QA__ !== "undefined" && __QA__)
+  setInterval(() => void browser.runtime.sendMessage({ type: "qa-live-stats", stats: { ...qaStats } }).catch(() => undefined), 1000);
+let silenceGate = new SilenceGate();
+let leadIn: Int16Array | undefined;
 let config: CaptureConfig | undefined;
 let stream: MediaStream | undefined;
 let context: AudioContext | undefined;
@@ -85,13 +93,28 @@ function sendAudio(event: AudioProcessingEvent) {
   if (!config || status !== "listening" || !shouldCapturePlaybackAudio(clock)) return;
   const current = socket;
   if (!current || current.readyState !== WebSocket.OPEN) return;
-  const pcm = resamplePcm16(mono(event.inputBuffer), context?.sampleRate ?? 48000);
+  const samples = mono(event.inputBuffer);
+  const pcm = resamplePcm16(samples, context?.sampleRate ?? 48000);
   if (!pcm.length) return;
-  current.send(JSON.stringify({
-    realtimeInput: {
-      audio: { data: base64Pcm(pcm), mimeType: `audio/pcm;rate=${TRANSCRIPTION_SAMPLE_RATE}` },
-    },
-  }));
+  // Silence is billed by the minute, so it is not uploaded. A short lead-in keeps word starts.
+  const step = silenceGate.push(rms(samples), performance.now());
+  if (step.flush) {
+    qaStats.flushes++;
+    current.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+    return;
+  }
+  if (!step.send) {
+    qaStats.skipped++;
+    leadIn = pcm;
+    return;
+  }
+  const frame = (data: Int16Array) => JSON.stringify({
+    realtimeInput: { audio: { data: base64Pcm(data), mimeType: `audio/pcm;rate=${TRANSCRIPTION_SAMPLE_RATE}` } },
+  });
+  if (step.resumed && leadIn) current.send(frame(leadIn));
+  leadIn = undefined;
+  qaStats.sent++;
+  current.send(frame(pcm));
 }
 
 async function requestToken(): Promise<{ token: string; expiresAt: string }> {
@@ -106,6 +129,7 @@ async function requestToken(): Promise<{ token: string; expiresAt: string }> {
     body: JSON.stringify({ consent: true, installationId: config.installationId }),
     signal: AbortSignal.timeout(15000),
   });
+  qaNote(`token ${response.status}`);
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     const code = typeof result?.error === "string" ? result.error : "";
@@ -136,6 +160,7 @@ function connect(token: string, generation: number, segment: number, epoch: numb
       reject(Error("Google transcription took too long to connect."));
     }, 20000);
     ws.onopen = () => {
+      qaNote("ws open");
       if (!config || generation !== connectGeneration || segment !== segmentGeneration) {
         intentionallyClosed.add(ws);
         ws.close();
@@ -171,6 +196,7 @@ function connect(token: string, generation: number, segment: number, epoch: numb
         }
         return;
       }
+      if (message?.setupComplete) qaNote("setupComplete");
       if (message?.setupComplete && !settled) {
         settled = true;
         window.clearTimeout(timeout);
@@ -184,6 +210,7 @@ function connect(token: string, generation: number, segment: number, epoch: numb
       const interim = content?.interimInputTranscription?.text;
       const final = content?.inputTranscription?.text;
       if (typeof interim === "string" && interim.trim()) {
+        qaStats.interim++;
         void runtimeMessage({
           type: "live-transcription-interim",
           tabId: currentConfig.tabId,
@@ -193,6 +220,7 @@ function connect(token: string, generation: number, segment: number, epoch: numb
         });
       }
       if (typeof final === "string" && final.trim()) {
+        qaStats.final++;
         void runtimeMessage({
           type: "live-transcription-final",
           tabId: currentConfig.tabId,
@@ -242,6 +270,7 @@ function scheduleSegmentReconnect(delay = 450) {
 }
 
 async function connectSegment() {
+  qaNote(`connectSegment status=${status} allowed=${shouldCapturePlaybackAudio(clock)} paused=${clock.paused}`);
   if (!config || status !== "listening" || !shouldCapturePlaybackAudio(clock)) return;
   if (socket?.readyState === WebSocket.OPEN) return;
   const generation = connectGeneration;
@@ -264,6 +293,7 @@ async function connectSegment() {
     closeSocket(old);
     scheduleRenewal();
   } catch (error) {
+    qaNote(`connect error: ${error instanceof Error ? error.message : String(error)}`);
     if (!config || generation !== connectGeneration || segment !== segmentGeneration || epoch !== clock.epoch) return;
     if (segmentRetries < 2) {
       segmentRetries++;
@@ -308,6 +338,8 @@ async function renewSession() {
 
 function invalidateSegment() {
   segmentGeneration++;
+  silenceGate = new SilenceGate();
+  leadIn = undefined;
   segmentRetries = 0;
   if (segmentTimer) window.clearTimeout(segmentTimer);
   segmentTimer = undefined;

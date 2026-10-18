@@ -1,11 +1,14 @@
 import { parseInput, parseExplanation, parseTranslation } from './core.ts';
+import { INSTALLATION_ID, limitsFromEnv, takeUsage } from '../_shared/usage.ts';
 
 const env = (key: string) => Deno.env.get(key) ?? '';
 const url = env('SUPABASE_URL');
 const serviceKey = env('SUPABASE_SERVICE_ROLE_KEY');
-const apiKey = env('GEMINI_API_KEY');
+// A dedicated key keeps the extension's spend and rate limits separate from the app.
+const apiKey = env('IMMERSION_GEMINI_API_KEY') || env('GEMINI_API_KEY');
+const ipSalt = env('IMMERSION_IP_SALT');
+const explainLimits = limitsFromEnv('IMMERSION_EXPLAIN_LIMIT', { install: 20, ip: 60, global: 1500, burst: 8 });
 const anonKey = env('SUPABASE_ANON_KEY');
-const installationPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const liteModel = env('IMMERSION_GEMINI_MODEL') || 'gemini-3.1-flash-lite';
 const carefulModel = env('IMMERSION_GEMINI_CAREFUL_MODEL') || 'gemini-3-flash-preview';
 const allowedOrigins = new Set([
@@ -64,11 +67,10 @@ Deno.serve(async (req: Request) => {
     let input;
     let installationId: unknown;
     try { const raw = JSON.parse(body); installationId = raw?.installationId; input = parseInput(raw); } catch { return respond(400, { error: 'invalid_input' }); }
-    let quotaSubject: string | undefined;
+    let quotaInstall: string | undefined;
     if (anonymous) {
-      if (typeof installationId !== 'string' || !installationPattern.test(installationId)) return respond(400, { error: 'invalid_input' });
-      const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`explain:${installationId}`))), x => x.toString(16).padStart(2, '0')).join('');
-      quotaSubject = `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-8${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
+      if (typeof installationId !== 'string' || !INSTALLATION_ID.test(installationId)) return respond(400, { error: 'invalid_input' });
+      quotaInstall = installationId;
     }
     const careful = input.level === 'B1' || input.level === 'B2';
     const model = input.mode === 'explanation' && careful ? carefulModel : liteModel;
@@ -81,12 +83,10 @@ Deno.serve(async (req: Request) => {
     if (rows[0]) return respond(200, input.mode === 'translation'
       ? parseTranslation(rows[0].explanation)
       : parseExplanation(rows[0].explanation));
-    if (quotaSubject) {
-      const quota = await fetch(`${url}/rest/v1/rpc/immersion_take_quota`, {
-        method: 'POST', headers: dbHeaders, body: JSON.stringify({ p_user: quotaSubject }), signal: stageSignal(8000),
-      });
-      if (!quota.ok) return respond(503, { error: 'quota_unavailable' });
-      if (await quota.json() !== true) return respond(429, { error: 'daily_explanation_limit_reached' });
+    if (quotaInstall) {
+      const usage = await takeUsage({ url, serviceKey, salt: ipSalt, kind: 'explain', installationId: quotaInstall, request: req, units: 1, limits: explainLimits, signal: stageSignal(8000) });
+      if (usage === 'unavailable' || usage === 'invalid') return respond(503, { error: 'quota_unavailable' });
+      if (usage !== 'ok') return respond(429, { error: 'daily_explanation_limit_reached', limit: usage });
     }
     const translationMode = input.mode === 'translation';
     const fields = translationMode
@@ -109,6 +109,7 @@ Deno.serve(async (req: Request) => {
     });
     if (!response.ok) return respond(502, { error: 'ai_unavailable' });
     const generated = await response.json();
+    console.log(JSON.stringify({ event: 'explain_usage', model, mode: input.mode, level: input.level, inputTokens: generated.usageMetadata?.promptTokenCount, outputTokens: generated.usageMetadata?.candidatesTokenCount, thinkingTokens: generated.usageMetadata?.thoughtsTokenCount }));
     const raw = generated.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? '').join('');
     let result;
     try { result = translationMode ? parseTranslation(JSON.parse(raw)) : parseExplanation(JSON.parse(raw)); }

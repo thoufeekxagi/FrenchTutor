@@ -5,7 +5,7 @@ const qa = process.env.PARLESPRINT_QA === "1";
 export default defineConfig({
   ...(qa ? { outDir: ".output-qa" } : {}),
   modules: ["@wxt-dev/module-react"],
-  vite: () => ({ plugins: [tailwindcss()] }),
+  vite: () => ({ plugins: [tailwindcss()], define: { __QA__: JSON.stringify(qa) } }),
   manifest: {
     key: identity.key,
     name: "ParleSprint Immersion",

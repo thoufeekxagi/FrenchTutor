@@ -160,7 +160,10 @@ async function stopLiveTranscription() {
   }
 }
 /** Live captions cost money: only French speech without captions may use them. */
+declare const __QA__: boolean;
 async function liveGate(tabId: number): Promise<GateDecision> {
+  // The QA build (never shipped) skips the gate so live captions can be tested on captioned videos.
+  if (typeof __QA__ !== "undefined" && __QA__) return { allowed: true, reason: "unknown", message: "" };
   let info: Record<string, any> = {};
   try {
     info = (await browser.tabs.sendMessage(tabId, { type: "live-get-page-info" })) ?? {};
@@ -583,6 +586,10 @@ export default defineBackground(() => {
       return Promise.resolve({ error: "Invalid request." });
     const offscreenUrl = chromeApis.runtime.getURL("/offscreen.html");
     const fromOffscreen = sender.url === offscreenUrl;
+    if (message.type === "qa-live-stats" && fromOffscreen && typeof __QA__ !== "undefined" && __QA__) {
+      void browser.storage.local.set({ qaLive: message.stats });
+      return Promise.resolve({ ok: true });
+    }
     if (message.type === "live-video-clock") {
       const tabId = sender.tab?.id;
       if (typeof tabId === "number" && liveSession?.tabId === tabId &&

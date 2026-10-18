@@ -17,17 +17,17 @@ ParleSprint does not run a server for translation and does not receive these req
 
 Explain in context (optional)
 
-When you press Explain in context, the selected French word or phrase, the caption line it came from and your chosen level (A1 to B2) are sent to a ParleSprint Supabase function, which asks Google's Gemini service for a short explanation. The request also carries the random installation identifier, which the function hashes to apply a daily limit per installation. No account, name, email, video URL or video ID is sent. The explanation is returned to you, cached on your device, and also cached on the server keyed only by a hash of the text, so the same explanation is not generated twice. Do not select sensitive personal text.
+When you press Explain in context, the selected French word or phrase, the caption line it came from and your chosen level (A1 to B2) are sent to a ParleSprint Supabase function, which asks Google's Gemini service for a short explanation. The request also carries the random installation identifier, and the function uses your IP address, both stored only as salted hashes in daily counters deleted after about a week, to apply free daily limits. No account, name, email, video URL or video ID is sent. The explanation is returned to you, cached on your device, and also cached on the server keyed only by a hash of the text, so the same explanation is not generated twice. Do not select sensitive personal text.
 
 Live captions for videos without captions (optional)
 
 This feature is off unless you open the extension popup, accept a separate audio notice, and choose Start live captions on this tab. Chrome then lets the extension capture the audio of that one tab. The sound keeps playing for you. Your microphone is not used and no video frames are captured.
 
-While live captions run, the tab audio is streamed directly from your browser to Google's Gemini Live transcription service. Raw audio is not sent to or stored by ParleSprint. To start a session, the extension asks a ParleSprint Supabase function for a short-lived, single-use Google session token. That request contains your consent flag. The Google API key stays on the server and never enters the extension. ParleSprint does not receive or store the audio.
+While live captions run, the tab audio is streamed directly from your browser to Google's Gemini Live transcription service. Raw audio is not sent to or stored by ParleSprint. To start a session, the extension asks a ParleSprint Supabase function for a short-lived, single-use Google session token. That request contains your consent flag and a random installation identifier. To enforce free daily limits, the function also uses your IP address; the IP address and the installation identifier are stored only as salted hashes in daily counters that are deleted after about a week. The Google API key stays on the server and never enters the extension. ParleSprint does not receive or store the audio.
 
 Google's Gemini API terms depend on whether a service is unpaid or paid. Content submitted through unpaid services may be used to improve Google products, and people may review it. Do not use live captions with sensitive or confidential audio. Capture stops when you press Stop or close the tab.
 
-Live transcripts are kept in Chrome's local extension storage under a hash of the page address. Daily limits apply per installation and across all users.
+Live transcripts are kept in Chrome's local extension storage under a hash of the page address. Free daily limits apply per installation, per network and across all users.
 
 What is stored on your device
 
