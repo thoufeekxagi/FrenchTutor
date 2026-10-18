@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../v3_cloud_state.dart';
+
 import '../v3_prefs.dart';
 import 'v3_story.dart';
 
@@ -60,6 +62,7 @@ abstract final class V3StoryProgress {
     hearWords.value = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_hearKey, value);
+    V3CloudState.push('v3_story_hear_words');
   }
 
   static Future<Set<String>> done() async {
@@ -72,6 +75,7 @@ abstract final class V3StoryProgress {
     final set = (prefs.getStringList(_doneKey) ?? const []).toSet()
       ..add(storyId);
     await prefs.setStringList(_doneKey, set.toList());
+    V3CloudState.push('v3_story_done');
     await savePosition(storyId, 0);
   }
 
@@ -95,6 +99,7 @@ abstract final class V3StoryProgress {
     await prefs.setStringList(_posKey, [
       for (final e in map.entries) '${e.key}:${e.value}',
     ]);
+    V3CloudState.push('v3_story_position');
   }
 
   static Future<Set<String>> savedWords() async {
@@ -109,6 +114,7 @@ abstract final class V3StoryProgress {
     final nowSaved = !set.remove(key);
     if (nowSaved) set.add(key);
     await prefs.setStringList(_savedKey, set.toList());
+    V3CloudState.push('v3_story_saved_words');
     return nowSaved;
   }
 }

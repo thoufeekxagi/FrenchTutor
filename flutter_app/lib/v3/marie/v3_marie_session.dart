@@ -96,6 +96,11 @@ abstract class V3MarieSession extends ChangeNotifier {
   /// away. She is still heard.
   Future<bool> speak(BuildContext context, String text, {bool reveal = true});
 
+  /// Quietly makes the clips for [lines] ahead of the learner's tap so the
+  /// speaker buttons answer at once. Short lines only; already saved clips are
+  /// skipped. Never plays anything and never opens a call.
+  void prefetch(List<String> lines) {}
+
   /// Cuts off what she is saying right now. The call stays open.
   Future<void> skip();
 
@@ -328,6 +333,46 @@ class V3LiveMarieSession extends V3MarieSession {
   Future<void> toggleMute() async => _callInstance?.toggleMute();
 
   Timer? _clipTimer;
+  final _prefetchQueue = <String>[];
+  final _prefetchSeen = <String>{};
+  var _prefetching = false;
+
+  @override
+  void prefetch(List<String> lines) {
+    for (final raw in lines) {
+      final line = raw.trim();
+      if (line.isEmpty || line.length > 90 || !_prefetchSeen.add(line))
+        continue;
+      _prefetchQueue.add(line);
+    }
+    if (!_prefetching && _prefetchQueue.isNotEmpty) unawaited(_runPrefetch());
+  }
+
+  Future<void> _runPrefetch() async {
+    _prefetching = true;
+    final voice = ActiveTutor.current.voiceName;
+    try {
+      while (_prefetchQueue.isNotEmpty) {
+        final line = _prefetchQueue.removeAt(0);
+        try {
+          final saved = await LessonSpeechService.shared.loadCachedAudio(
+            line,
+            voiceName: voice,
+          );
+          if (saved != null && saved.isNotEmpty) continue;
+          await GeminiLiveAudioService.shared.generateAndCache(
+            text: line,
+            contentItemId: 'v3_speaker',
+            voiceName: voice,
+          );
+        } catch (_) {
+          _prefetchSeen.remove(line);
+        }
+      }
+    } finally {
+      _prefetching = false;
+    }
+  }
 
   /// A speaker tap plays a saved audio clip in the selected tutor's voice. It
   /// never opens a call and never touches the microphone: the first tap of a

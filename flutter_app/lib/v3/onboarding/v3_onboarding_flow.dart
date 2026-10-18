@@ -1,3 +1,4 @@
+import '../v3_cloud_state.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -323,6 +324,7 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow>
       await prefs.remove('learner_name');
     } else {
       await prefs.setString('learner_name', name);
+      V3CloudState.push('learner_name');
     }
     if (_examDate == null) {
       await prefs.remove('tcf_exam_date');

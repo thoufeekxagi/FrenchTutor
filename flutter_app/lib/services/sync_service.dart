@@ -1,3 +1,4 @@
+import '../v3/v3_cloud_state.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -1907,6 +1908,7 @@ class SyncService {
       ),
     );
     unawaited(_syncV3CourseProgressSnapshot());
+    unawaited(V3CloudState.sync());
     // This is intentionally outside the critical hydration path. The bundled
     // catalog is already available locally, so publishing it cannot delay the
     // first screen after sign-in.
@@ -1936,6 +1938,7 @@ class SyncService {
       return;
     }
     if (_userId == uid) await _syncV3CourseProgressSnapshot();
+    unawaited(V3CloudState.sync());
   }
 
   /// Pulls the public, validated Speaking catalog into SQLite. It is safe to
