@@ -80,6 +80,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     false,
   ];
   bool _showPath = false;
+  bool _practiceTab = false;
 
   @override
   void initState() {
@@ -409,17 +410,15 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 children: [
-                  Row(
-                    children: [
-                      _levelSelector(level),
-                      const Spacer(),
-                      _examCountdown(days),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _homePathToggle(),
-                  const SizedBox(height: 13),
-                  ...(_showPath ? _pathPage() : _courseHome()),
+                  _speakHeader(level),
+                  const SizedBox(height: 10),
+                  _courseProgressBar(),
+                  const SizedBox(height: 16),
+                  ...(_showPath
+                      ? _pathPage()
+                      : _practiceTab
+                      ? _practicePage(days)
+                      : _courseTab()),
                 ],
               ),
             ),
@@ -429,49 +428,95 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     );
   }
 
-  Widget _homePathToggle() => Container(
-    padding: const EdgeInsets.all(4),
-    decoration: BoxDecoration(
-      color: DesignTokens.canvasDim,
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: DesignTokens.hairline),
-    ),
+  /// Level on the left, Course and Practice in the middle, streak on the
+  /// right. Course holds the lessons; Practice holds everything else.
+  Widget _speakHeader(String level) => MediaQuery.withClampedTextScaling(
+    maxScaleFactor: 1.2,
     child: Row(
       children: [
-        _topTab('Home', selected: !_showPath),
-        const SizedBox(width: 4),
-        _topTab('Path', selected: _showPath),
+        _levelSelector(level),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _topTab('Course', selected: !_practiceTab),
+              const SizedBox(width: 18),
+              _topTab('Practice', selected: _practiceTab),
+            ],
+          ),
+        ),
+        _streakChip(),
       ],
     ),
   );
 
-  Widget _topTab(String label, {required bool selected}) => Expanded(
-    child: V3Pressable(
-      key: ValueKey('learn.topTab.${label.toLowerCase()}'),
-      label: label,
-      selected: selected,
-      onTap: label == 'Path'
-          ? _showCoursePath
-          : () => setState(() => _showPath = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        constraints: const BoxConstraints(minHeight: 46),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? DesignTokens.surface : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: selected ? DesignTokens.surfaceShadow : null,
-        ),
+  Widget _topTab(String label, {required bool selected}) => V3Pressable(
+    key: ValueKey('learn.topTab.${label.toLowerCase()}'),
+    label: label,
+    selected: selected,
+    onTap: () => setState(() {
+      _practiceTab = label == 'Practice';
+      _showPath = false;
+    }),
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+      child: Center(
         child: Text(
           label,
           style: V3Type.strong(
-            15,
-            selected ? DesignTokens.primary : DesignTokens.inkSoft,
+            19,
+            selected ? DesignTokens.ink : DesignTokens.inkSoft.withAlpha(150),
           ),
         ),
       ),
     ),
   );
+
+  Widget _streakChip() => V3Pressable(
+    key: const ValueKey('learn.streakChip'),
+    label: 'Open streak calendar, $_streakDays day streak',
+    onTap: _openStreakCalendar,
+    child: Container(
+      constraints: const BoxConstraints(minHeight: 48),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: DesignTokens.canvasDim,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            CupertinoIcons.flame_fill,
+            size: 22,
+            color: DesignTokens.homeFlame,
+          ),
+          const SizedBox(width: 6),
+          Text('$_streakDays', style: V3Type.strong(16)),
+        ],
+      ),
+    ),
+  );
+
+  /// Lessons finished across the levels shown on this screen.
+  Widget _courseProgressBar() {
+    final total = _course.length;
+    final done = _course.where((l) => _done.contains(l.id)).length;
+    final fraction = total == 0 ? 0.0 : done / total;
+    return Semantics(
+      label: 'Course progress, $done of $total lessons',
+      child: ClipRRect(
+        key: const ValueKey('learn.progress'),
+        borderRadius: BorderRadius.circular(3),
+        child: LinearProgressIndicator(
+          value: fraction,
+          minHeight: 6,
+          backgroundColor: DesignTokens.primarySoft,
+          color: DesignTokens.primary,
+        ),
+      ),
+    );
+  }
 
   void _showCoursePath() {
     setState(() => _showPath = true);
@@ -652,14 +697,91 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
         : '';
   }
 
-  List<Widget> _courseHome() => [
+  /// Course tab: the unit the learner is in, the lesson to continue, and
+  /// that unit's lessons.
+  List<Widget> _courseTab() {
+    final groups = _lessonGroups(_course);
+    final unit = (_loaded ? _next?.unit : null) ?? _openUnit;
+    final group = groups.isEmpty
+        ? null
+        : groups.firstWhere((g) => g.key == unit, orElse: () => groups.first);
+    final first = group?.value.first;
+    return [
+      Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  (first == null ? 'YOUR COURSE' : first.unitLabel)
+                      .toUpperCase(),
+                  style: V3Type.eyebrow(DesignTokens.inkSoft),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  first == null ? 'Loading your lessons' : first.unitTitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: V3Type.title(30),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          V3Pressable(
+            key: const ValueKey('learn.unitMap'),
+            label: 'Open the full course path',
+            onTap: _showCoursePath,
+            child: Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: DesignTokens.canvasDim,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                CupertinoIcons.book_fill,
+                color: DesignTokens.primary,
+                size: 26,
+              ),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 16),
+      _continuePathCard(),
+      if (group != null) ...[
+        const SizedBox(height: 14),
+        Container(
+          decoration: BoxDecoration(
+            color: DesignTokens.surface,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: DesignTokens.hairline),
+            boxShadow: DesignTokens.surfaceShadow,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              for (var i = 0; i < group.value.length; i++)
+                _lessonRow(group.value[i], first: i == 0, indent: false),
+            ],
+          ),
+        ),
+      ],
+      const SizedBox(height: 10),
+      _coursePathCard(),
+    ];
+  }
+
+  /// Practice tab: weekly activity, the four practice actions and the exam
+  /// date.
+  List<Widget> _practicePage(int? days) => [
     _streakStrip(),
-    const SizedBox(height: 12),
-    _continuePathCard(),
     const SizedBox(height: 14),
     _quickPracticeGrid(),
-    const SizedBox(height: 10),
-    _coursePathCard(),
+    const SizedBox(height: 14),
+    Align(alignment: Alignment.centerLeft, child: _examCountdown(days)),
   ];
 
   List<Widget> _pathPage() {
@@ -1083,8 +1205,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     }
     return V3Pressable(
       key: const ValueKey('learn.streak'),
-      label:
-          'Open streak calendar, $_streakDays day streak, $_activeWeekDays days this week',
+      label: 'Weekly activity, $_activeWeekDays days this week',
       onTap: _openStreakCalendar,
       child: Container(
         constraints: const BoxConstraints(minHeight: 56),
@@ -1467,7 +1588,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
     );
   }
 
-  Widget _lessonRow(V3Lesson l) {
+  Widget _lessonRow(V3Lesson l, {bool first = false, bool indent = true}) {
     final done = _done.contains(l.id);
     final at = _pos[l.id] ?? 0;
     return V3Pressable(
@@ -1475,9 +1596,11 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
       label: 'Lesson, ${l.title}',
       onTap: () => _tapLesson(l),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(38, 12, 18, 12),
+        padding: EdgeInsets.fromLTRB(indent ? 38 : 18, 12, 18, 12),
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: DesignTokens.hairline)),
+          border: first
+              ? null
+              : Border(top: BorderSide(color: DesignTokens.hairline)),
         ),
         child: Row(
           children: [

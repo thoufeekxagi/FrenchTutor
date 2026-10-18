@@ -82,12 +82,12 @@ void main() {
     app.main();
     await probe.waitForLabel(
       tester,
-      'Start challenge.',
+      'Continue lesson',
       startsWith: true,
       timeout: const Duration(seconds: 60),
     );
     await probe.settle(tester, timeout: const Duration(seconds: 15));
-    await probe.capture(tester, '01_approved_home');
+    await probe.capture(tester, '01_course_tab');
 
     final dispatcher = tester.binding.platformDispatcher;
     dispatcher.textScaleFactorTestValue = 2;
@@ -97,44 +97,32 @@ void main() {
     dispatcher.clearTextScaleFactorTestValue();
     await probe.settle(tester, timeout: const Duration(seconds: 10));
 
-    final homeTexts = await texts(tester);
-    expect(homeTexts, contains('Home'));
-    expect(homeTexts, contains('Path'));
-    expect(homeTexts, contains('CONTINUE YOUR COURSE'));
-    expect(homeTexts, contains('Your practice'));
-    expect(homeTexts, contains('Your TCF path'));
-    expect(homeTexts, contains('Talk with Marie'));
-    expect(homeTexts, contains('Daily challenge'));
-    expect(homeTexts, contains('Stories'));
-    expect(homeTexts, contains('A clinic message'));
-    expect(homeTexts, isNot(contains('ParleSprint')));
-    expect(homeTexts, isNot(contains('Today')));
-    expect(homeTexts, contains('Exam in 69 days'));
-    final homeLabels = await labels(tester);
-    for (final label in ['Change level, A1', 'Exam in 69 days']) {
+    // Course tab: the unit, the lesson to continue, that unit's lessons.
+    final courseTexts = await texts(tester);
+    expect(courseTexts, contains('Course'));
+    expect(courseTexts, contains('Practice'));
+    expect(courseTexts, isNot(contains('Your practice')));
+    expect(courseTexts, isNot(contains('ParleSprint')));
+    final courseLabels0 = await labels(tester);
+    for (final label in ['Change level, A1', 'Open the full course path']) {
       expect(
-        homeLabels,
+        courseLabels0,
         contains(label),
-        reason: 'missing $label in $homeLabels',
+        reason: 'missing $label in $courseLabels0',
       );
     }
     expect(
-      homeLabels.any((label) => label.startsWith('Start challenge.')),
+      courseLabels0.any((l) => l.startsWith('Open streak calendar,')),
       isTrue,
     );
+    expect(courseLabels0.any((l) => l.startsWith('Continue lesson')), isTrue);
     expect(
-      homeLabels.any((label) => label.startsWith('Review flashcards.')),
-      isTrue,
+      courseLabels0.where((l) => l.startsWith('Lesson, ')).length,
+      greaterThanOrEqualTo(2),
+      reason: 'the unit lessons must be listed: $courseLabels0',
     );
-    expect(
-      homeLabels.any((label) => label.startsWith('Continue lesson,')),
-      isTrue,
-    );
-    expect(homeLabels, contains('View course path'));
-    expect(homeLabels, contains('Talk with Marie. Conversation practice.'));
-    expect(homeLabels, contains('Open Stories. Read or listen.'));
     for (final tab in ['Learn', 'Marie', 'Tests', 'Me']) {
-      expect(homeLabels, contains(tab));
+      expect(courseLabels0, contains(tab));
     }
 
     // Open and retain the selected level, then verify the course hero enters
@@ -142,10 +130,43 @@ void main() {
     await probe.tapLabel(tester, 'Change level, A1');
     await probe.waitForLabel(tester, 'A1 level');
     await probe.tapLabel(tester, 'A1 level');
-    await probe.tapLabel(tester, 'Continue lesson,', startsWith: true);
+    await probe.settle(tester, timeout: const Duration(seconds: 8));
+    await probe.waitForLabel(tester, 'Continue lesson', startsWith: true);
+    await probe.tapLabel(tester, 'Continue lesson', startsWith: true);
     await probe.waitForLabel(tester, 'Close lesson');
     await probe.tapLabel(tester, 'Close lesson');
+    await probe.waitForLabel(tester, 'Continue lesson', startsWith: true);
+
+    // Practice tab: weekly activity, the four practice actions, exam date.
+    await probe.tapLabel(tester, 'Practice');
     await probe.waitForLabel(tester, 'Start challenge.', startsWith: true);
+    await probe.capture(tester, '01_practice_tab');
+    final practiceTexts = await texts(tester);
+    for (final t in [
+      'Your practice',
+      'Talk with Marie',
+      'Daily challenge',
+      'Stories',
+      'A clinic message',
+      'Exam in 69 days',
+    ]) {
+      expect(practiceTexts, contains(t), reason: 'practice tab lacks $t');
+    }
+    final practiceLabels0 = await labels(tester);
+    expect(practiceLabels0, contains('Exam in 69 days'));
+    expect(
+      practiceLabels0.any((l) => l.startsWith('Review flashcards.')),
+      isTrue,
+    );
+    expect(
+      practiceLabels0.any((l) => l.startsWith('Weekly activity,')),
+      isTrue,
+    );
+    expect(
+      practiceLabels0,
+      contains('Talk with Marie. Conversation practice.'),
+    );
+    expect(practiceLabels0, contains('Open Stories. Read or listen.'));
 
     // Walk through each authored step without relying on network audio.
     await probe.tapLabel(tester, 'Start challenge.', startsWith: true);
@@ -173,15 +194,17 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     await probe.tapLabel(tester, 'Continue');
     await probe.waitFor(tester, find.text('Je voudrais un rendez-vous.'));
+    await tester.pump(const Duration(milliseconds: 700));
     await probe.tapLabel(tester, 'Continue');
     await probe.waitFor(tester, find.text('Challenge complete'));
     await probe.capture(tester, '03_daily_complete');
     await probe.tapLabel(tester, 'Done');
     await probe.waitFor(tester, find.text('Completed today'));
+    await probe.settle(tester, timeout: const Duration(seconds: 8));
 
     // The home practice tiles open Marie, review, and Stories from the home.
     await probe.tapLabel(tester, 'Talk with Marie. Conversation practice.');
-    await probe.waitForLabel(tester, 'Back');
+    await probe.waitForLabel(tester, 'Start');
     await tester.pageBack();
     await probe.waitForLabel(tester, 'Review flashcards.', startsWith: true);
     final reviewLabel = (await labels(
@@ -198,10 +221,15 @@ void main() {
     // The streak calendar opens from the home and refreshes the challenge
     // state after the local walkthrough finishes.
     await probe.tapLabel(tester, 'Close Stories');
-    await probe.tapLabel(tester, 'View course path');
+    await probe.settle(tester, timeout: const Duration(seconds: 8));
+    await probe.tapLabel(tester, 'Course');
+    await tester.pump(const Duration(milliseconds: 600));
+    await probe.waitForLabel(tester, 'Open the full course path');
+    await probe.tapLabel(tester, 'Open the full course path');
     await probe.waitFor(tester, find.text('Your course path'));
     await probe.capture(tester, '05_course_path');
-    await probe.tapLabel(tester, 'Home');
+    await probe.tapLabel(tester, 'Course');
+    await probe.waitForLabel(tester, 'Continue lesson', startsWith: true);
     await prefs.remove('$challengeKey.step');
     await prefs.remove('$challengeKey.completed');
     final courseLabels = await labels(tester);
@@ -212,8 +240,8 @@ void main() {
     await probe.waitFor(tester, find.text('Your streak'));
     await probe.capture(tester, '05_streak_calendar');
     expect(await texts(tester), contains('Recent activity'));
-    await probe.tapLabel(tester, 'Back');
-    await probe.waitForLabel(tester, 'Start challenge.', startsWith: true);
+    await tester.pageBack();
+    await probe.waitForLabel(tester, 'Continue lesson', startsWith: true);
     semantics.dispose();
   });
 }

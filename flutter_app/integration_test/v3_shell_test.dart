@@ -55,7 +55,12 @@ void main() {
       expect(l, contains(tab), reason: 'missing tab $tab in $l');
     }
     expect(l, isNot(contains('Photo tutor')));
+    // The exam countdown lives on the Practice tab.
+    await probe.tapLabel(tester, 'Practice');
+    await tester.pump(const Duration(milliseconds: 500));
     final texts = probe.describe(tester)['texts']! as List;
+    await probe.tapLabel(tester, 'Course');
+    await tester.pump(const Duration(milliseconds: 500));
     expect(
       texts.any((t) => t.toString().contains('days')),
       isTrue,
@@ -64,7 +69,7 @@ void main() {
     expect(texts, contains('Learn'));
 
     // Path tab shows units.
-    await probe.tapLabel(tester, 'Path');
+    await probe.tapLabel(tester, 'Open the full course path');
     await tester.pump(const Duration(milliseconds: 600));
     await probe.capture(tester, '02_learn_path');
     // Stage 0 is open first (it holds the next lesson) and lists its lessons.

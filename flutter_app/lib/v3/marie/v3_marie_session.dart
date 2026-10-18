@@ -341,8 +341,9 @@ class V3LiveMarieSession extends V3MarieSession {
   void prefetch(List<String> lines) {
     for (final raw in lines) {
       final line = raw.trim();
-      if (line.isEmpty || line.length > 90 || !_prefetchSeen.add(line))
+      if (line.isEmpty || line.length > 90 || !_prefetchSeen.add(line)) {
         continue;
+      }
       _prefetchQueue.add(line);
     }
     if (!_prefetching && _prefetchQueue.isNotEmpty) unawaited(_runPrefetch());
