@@ -62,6 +62,11 @@ void main() {
     int interruptAfterMs = 1500,
   }) async {
     var last = '';
+    var calm = 0;
+    for (var i = 0; i < 100 && calm < 6; i++) {
+      await t.pump(const Duration(milliseconds: 200));
+      calm = phase(await texts(t)) == 'LISTENING' ? calm + 1 : 0;
+    }
     mark('STEP $label');
     mark('CMD:$clip');
     var speaking = false;

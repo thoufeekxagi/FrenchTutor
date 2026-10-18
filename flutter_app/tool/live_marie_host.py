@@ -17,7 +17,7 @@ def bgstart(name):
     global bg
     def loop():
         while bg is not None and bg.get("run"):
-            p = subprocess.Popen(["afplay", "-v", "0.6", f"{CL}/{name}.wav"]); bg["p"] = p; p.wait()
+            p = subprocess.Popen(["afplay", "-v", "0.15", f"{CL}/{name}.wav"]); bg["p"] = p; p.wait()
     bg = {"run": True}; threading.Thread(target=loop, daemon=True).start(); ev(f"BG_START {name}")
 def bgstop():
     global bg

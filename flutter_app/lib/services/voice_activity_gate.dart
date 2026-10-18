@@ -12,9 +12,9 @@ import 'dart:typed_data';
 class VoiceActivityGate {
   VoiceActivityGate({
     this.sampleRate = 16000,
-    this.startConfirmation = const Duration(milliseconds: 180),
+    this.startConfirmation = const Duration(milliseconds: 360),
     this.endSilence = const Duration(milliseconds: 700),
-    this.preRoll = const Duration(milliseconds: 240),
+    this.preRoll = const Duration(milliseconds: 600),
   });
 
   final int sampleRate;
@@ -29,6 +29,7 @@ class VoiceActivityGate {
   double _silenceMs = 0;
   bool _active = false;
   double _peak = 0;
+  final List<double> _candidateRms = [];
 
   bool get isSpeechActive => _active;
   double get noiseFloor => _noiseFloor;
@@ -59,10 +60,28 @@ class VoiceActivityGate {
         _preRollBytes -= _preRoll.removeFirst().length;
       }
 
-      _candidateMs = speechLike ? _candidateMs + durationMs : 0;
+      if (speechLike) {
+        _candidateMs += durationMs;
+        _candidateRms.add(_rms(frame));
+      } else {
+        _candidateMs = 0;
+        _candidateRms.clear();
+      }
       if (_candidateMs < startConfirmation.inMicroseconds / 1000) {
         return const VoiceActivityUpdate();
       }
+      // Fans, air conditioning and tones hold a near-constant level while
+      // speech swings several times within a third of a second. A steady
+      // signal is noise however loud, so it raises the noise floor instead.
+      if (_isSteady(_candidateRms)) {
+        _noiseFloor = (_noiseFloor * 0.5 + level * 0.5)
+            .clamp(0.008, 0.18)
+            .toDouble();
+        _candidateMs = 0;
+        _candidateRms.clear();
+        return const VoiceActivityUpdate();
+      }
+      _candidateRms.clear();
 
       _active = true;
       _peak = level;
@@ -103,6 +122,33 @@ class VoiceActivityGate {
     _silenceMs = 0;
     _active = false;
     _peak = 0;
+    _candidateRms.clear();
+  }
+
+  static bool _isSteady(List<double> rms) {
+    if (rms.length < 8) return false;
+    var lo = double.infinity;
+    var hi = 0.0;
+    var total = 0.0;
+    for (final r in rms) {
+      lo = math.min(lo, r);
+      hi = math.max(hi, r);
+      total += r;
+    }
+    final mean = total / rms.length;
+    return mean > 0.01 && (hi - lo) < mean * 0.3;
+  }
+
+  static double _rms(Uint8List bytes) {
+    var sum = 0.0;
+    var n = 0;
+    for (var i = 0; i + 1 < bytes.length; i += 2) {
+      var v = bytes[i] | (bytes[i + 1] << 8);
+      if (v >= 0x8000) v -= 0x10000;
+      sum += v * v.toDouble();
+      n++;
+    }
+    return n == 0 ? 0 : math.sqrt(sum / n) / 32768.0;
   }
 
   double _speechLevel(Uint8List bytes) {

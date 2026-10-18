@@ -62,16 +62,17 @@ void main() {
     final sent = <List<int>>[];
     var speechStarts = 0;
     audio.onSpeechStarted = () => speechStarts++;
-    for (var i = 0; i < 12; i++) {
+    const swing = [9000, 2500, 11000, 1200, 8000, 3000, 10000, 600, 9500, 2000];
+    for (var i = 0; i < 30; i++) {
       audio.handleMicChunkForTest(
-        pcmFrame(6000),
+        pcmFrame(swing[i % swing.length]),
         sent.add,
         fullDuplexActive: true,
       );
     }
     expect(speechStarts, 1);
     expect(sent, isNotEmpty);
-    expect(sent.first, pcmFrame(6000));
+    expect(sent.first, pcmFrame(swing[0]));
   });
 
   test('replayed French voice is held during playback and heard afterward', () {

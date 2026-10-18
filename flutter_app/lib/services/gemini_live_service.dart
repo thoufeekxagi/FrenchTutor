@@ -421,6 +421,7 @@ class GeminiLiveService {
 
   void disconnect() {
     _isIntentionalDisconnect = true;
+    _turnNudgeTimer?.cancel();
     unawaited(
       AiCostTracker.event(
         feature: sessionType.name,
@@ -588,11 +589,15 @@ class GeminiLiveService {
           50;
       sendAudioChunk(Uint8List(ms * 32));
     }
+    _dbg('SENT', 'audioStreamEnd');
     _send({
       'realtimeInput': manualActivityBoundaries
           ? {'activityEnd': {}}
           : {'audioStreamEnd': true},
     });
+    if (!manualActivityBoundaries && (_isLessonCoach || liveTutorMode)) {
+      _armTurnNudge(0);
+    }
   }
 
   /// Waits for the server's turnComplete event for the learner turn that was
@@ -1081,6 +1086,18 @@ class GeminiLiveService {
       return;
     }
 
+    if (kDebugMode) {
+      final sc = json['serverContent'];
+      final keys = [
+        ...json.keys,
+        if (sc is Map)
+          ...sc.keys.where((k) => k != 'modelTurn').map((k) => 'sc.$k'),
+      ];
+      if (keys.length > 1 || !keys.contains('serverContent')) {
+        debugPrint('LIVE_MSG ${keys.join(',')}');
+      }
+    }
+
     final usageMetadata = json['usageMetadata'];
     if (usageMetadata is Map) {
       _usagePromptTokens = _intValue(usageMetadata['promptTokenCount']);
@@ -1195,6 +1212,7 @@ class GeminiLiveService {
 
     final serverContent = json['serverContent'];
     if (serverContent is! Map) return;
+    _turnNudgeTimer?.cancel();
 
     final interrupted = serverContent['interrupted'];
     if (interrupted == true) {
@@ -1305,6 +1323,25 @@ class GeminiLiveService {
 
   void _dbg(String who, String text) {
     if (kDebugMode) debugPrint('LIVE_TXT $who: $text');
+  }
+
+  Timer? _turnNudgeTimer;
+
+  /// Gemini occasionally detects speech but never closes the turn (measured on
+  /// the phone: no transcript, no reply). If nothing comes back, top up with
+  /// more digital silence and the end marker. Any server content cancels it.
+  void _armTurnNudge(int attempt) {
+    _turnNudgeTimer?.cancel();
+    if (attempt >= 2) return;
+    _turnNudgeTimer = Timer(const Duration(milliseconds: 3500), () {
+      if (!_isSetupComplete || _isIntentionalDisconnect) return;
+      _dbg('NUDGE', 'no reply after end of turn, attempt ${attempt + 1}');
+      sendAudioChunk(Uint8List(1500 * 32));
+      _send({
+        'realtimeInput': {'audioStreamEnd': true},
+      });
+      _armTurnNudge(attempt + 1);
+    });
   }
 
   bool _guardChecked = false;
