@@ -932,3 +932,34 @@ test("waiting messages follow the timeline: gap, countdown and end", async () =>
   await seek(page, 30);
   await expect(bar.locator(".ov-wait")).toHaveText("End of captions for this video.");
 });
+
+test("previous and next chevrons move between lines in the slim bar and the full panel", async () => {
+  const { page, panel } = await fixture();
+  const srt = "1\n00:00:00,000 --> 00:00:02,000\nBonjour.\n\n2\n00:00:10,000 --> 00:00:12,000\nMerci.\n\n3\n00:00:20,000 --> 00:00:22,000\nAu revoir.\n";
+  await panel.getByLabel("Import French subtitles").setInputFiles({ name: "lines.srt", mimeType: "text/plain", buffer: Buffer.from(srt) });
+  await expect(panel.getByText("Source: lines.srt")).toBeVisible();
+  const time = () => page.locator("video").evaluate((v: HTMLVideoElement) => v.currentTime);
+  const at = async (t: number) => { await page.locator("video").evaluate((v: HTMLVideoElement) => v.pause()); await seek(page, t); };
+  // Full panel (the seeded default in these tests)
+  await at(1);
+  await expect(panel.getByRole("button", { name: "Previous line" })).toBeDisabled();
+  await panel.getByRole("button", { name: "Next line" }).click();
+  await expect.poll(time).toBeGreaterThan(9.8);
+  await expect.poll(time).toBeLessThan(10.5);
+  await at(11);
+  await panel.getByRole("button", { name: "Previous line" }).click();
+  await expect.poll(time).toBeLessThan(0.5);
+  await at(21);
+  await expect(panel.getByRole("button", { name: "Next line" })).toBeDisabled();
+  // Slim bar, inside a silent gap: previous is the line that just ended
+  const worker = context.serviceWorkers()[0]!;
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: true } }));
+  await at(15);
+  await expect(panel.locator(".ov-wait")).toBeVisible();
+  await panel.getByRole("button", { name: "Previous line" }).click();
+  await expect.poll(time).toBeGreaterThan(9.8);
+  await expect.poll(time).toBeLessThan(10.5);
+  await at(15);
+  await panel.getByRole("button", { name: "Next line" }).click();
+  await expect.poll(time).toBeGreaterThan(19.8);
+});

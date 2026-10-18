@@ -1537,3 +1537,43 @@ body {
     box-shadow: 0 24px 60px rgba(20, 40, 90, 0.14), 0 2px 6px rgba(20, 40, 90, 0.06);
   }
 }
+
+/* Previous line / Repeat / Next line */
+.ps .seg-nav { display: flex; align-items: stretch; gap: 6px; grid-column: 1 / -1; width: 100%; }
+.ps .seg-nav .seg-chevron {
+  flex: 0 0 52px; min-height: 44px; padding: 0; border-radius: 14px; font-size: 26px; line-height: 1; font-weight: 500;
+  display: grid; place-items: center; background: #fff; color: var(--accent-deep); border: 1px solid var(--line); cursor: pointer;
+}
+.ps .seg-nav .seg-chevron:hover:not(:disabled) { background: var(--accent-soft); }
+.ps .seg-nav .seg-chevron:disabled { opacity: .35; cursor: default; }
+.ps .seg-nav .seg-repeat { flex: 1 1 auto; }
+.ps .seg-nav.compact { gap: 4px; width: auto; grid-column: auto; }
+.ps .seg-nav.compact .seg-chevron { flex: 0 0 36px; min-height: 34px; height: 34px; border-radius: 999px; font-size: 22px; background: transparent; border: 0; color: inherit; }
+.ps.ov:not(.docked) .seg-nav.compact .seg-chevron { color: #cfd6e4; }
+.ps.ov .seg-nav.compact .seg-chevron:hover:not(:disabled) { background: rgba(255,255,255,.18); }
+.ps.ov.docked .seg-nav.compact .seg-chevron { color: var(--muted); }
+.ps.ov.docked .seg-nav.compact .seg-chevron:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent-deep); }
+.ps.ov .seg-nav.compact .seg-repeat { flex: 0 0 auto; min-height: 34px; height: 34px; padding: 0 12px; border-radius: 999px; background: transparent; border: 0; color: inherit; font-size: 13px; font-weight: 700; }
+.ps.ov.docked .seg-nav.compact .seg-repeat { color: var(--muted); }
+.ps.ov .seg-nav.compact .seg-repeat.tour-hl { background: #2563eb; color: #fff; }
+
+/* Fit the line navigation in narrow columns */
+.ps.youtube-companion .caption-actions { flex-wrap: wrap; }
+.ps.youtube-companion .caption-actions button { white-space: nowrap; }
+.ps.youtube-companion .caption-actions .seg-nav { flex: 1 1 100%; }
+.ps.youtube-companion .caption-actions .seg-nav .seg-chevron {
+  flex: 0 0 56px; min-height: 44px; padding: 0; font-size: 28px; border-radius: 14px;
+  background: #fff; border: 1px solid var(--line); color: var(--accent-deep);
+}
+.ps.youtube-companion .caption-actions .seg-nav .seg-chevron:disabled { opacity: .35; }
+.ps.youtube-companion .caption-actions .seg-nav .seg-repeat {
+  flex: 1 1 auto; min-height: 44px; font-size: 14px; font-weight: 700; border-radius: 14px;
+  background: var(--accent-soft); color: var(--accent-deep);
+}
+.ps.ov .ov-controls { flex-wrap: wrap; justify-content: flex-end; }
+.ps.ov .ov-controls button { white-space: nowrap; }
+.ps.ov.docked .ov-controls { gap: 4px; }
+.ps.ov.docked .ov-controls > button { min-width: 34px; padding: 0 10px; }
+.ps.ov.docked .seg-nav.compact .seg-chevron { flex: 0 0 32px; min-width: 32px; padding: 0; }
+.ps.ov.docked .seg-nav.compact .seg-repeat { padding: 0 10px; }
+.ps.ov.docked .seg-nav.compact { gap: 2px; }

@@ -868,6 +868,27 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const currentIndex = cue
     ? cues.findIndex((c) => c.id === cue.id)
     : cues.reduce((found, c, i) => (c.start <= now - offset ? i : found), -1);
+  // In a silent gap, "previous" is the line that just ended; "next" is the upcoming one.
+  const prevCue = cue ? cues[currentIndex - 1] : cues[currentIndex];
+  const nextCue = cues[currentIndex + 1];
+  const lineNav = (compact: boolean) => (
+    <div className={`seg-nav${compact ? " compact" : ""}`} role="group" aria-label="Move between lines">
+      <button className="seg-chevron" aria-label="Previous line" title="Previous line" disabled={!prevCue} onClick={() => prevCue && replay(prevCue)}>
+        <span aria-hidden="true">‹</span>
+      </button>
+      <button
+        className={`seg-repeat primary${compact ? hl("repeat", compactTour) : ""}`}
+        title="Repeat this line"
+        disabled={!cue}
+        onClick={() => cue && replay(cue)}
+      >
+        {compact ? <><span aria-hidden="true">↻</span> Repeat</> : "↻ Repeat"}
+      </button>
+      <button className="seg-chevron" aria-label="Next line" title="Next line" disabled={!nextCue} onClick={() => nextCue && replay(nextCue)}>
+        <span aria-hidden="true">›</span>
+      </button>
+    </div>
+  );
   const practiceCue = practice?.cues.find(
     (c) => c.id === cue?.id && c.text === cue?.text,
   );
@@ -1019,7 +1040,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
           >
             EN
           </button>
-          <button className={hl("repeat", compactTour)} title="Repeat this line" disabled={!cue} onClick={() => cue && replay(cue)}><span aria-hidden="true">↻</span> Repeat</button>
+          {lineNav(true)}
           <button className={hl("more", compactTour)} title="Transcript, caption size, saved words and more" aria-label="More settings" onClick={() => void update({ compactView: false })}>More</button>
           <button title="Show the quick tour" aria-label="How this works" onClick={() => setTourStep(0)}>?</button>
         </div>
@@ -1368,13 +1389,17 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                   </span>
                 </div>}
                 <div className="caption-actions">
-                  <button
-                    className="primary"
-                    disabled={!cue}
-                    onClick={() => cue && replay(cue)}
-                  >
-                    ↻ Repeat
-                  </button>
+                  {practice ? (
+                    <button
+                      className="primary"
+                      disabled={!cue}
+                      onClick={() => cue && replay(cue)}
+                    >
+                      ↻ Repeat
+                    </button>
+                  ) : (
+                    lineNav(false)
+                  )}
                   {practice ? (
                     <button disabled={!cue} onClick={chooseSentence}>
                       Study sentence
