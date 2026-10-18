@@ -21,7 +21,8 @@ export default defineConfig({
       ...(qa ? ["https://upload.wikimedia.org/*"] : []),
     ],
     web_accessible_resources: [
-      { resources: ["fonts/*"], matches: ["https://www.youtube.com/*"] },
+      // The caption panel can be started on any video page, so its stylesheet and fonts must load there too.
+      { resources: ["fonts/*", "content-scripts/content.css"], matches: ["<all_urls>"], use_dynamic_url: true },
     ],
     icons: {
       16: "icon-16.png",

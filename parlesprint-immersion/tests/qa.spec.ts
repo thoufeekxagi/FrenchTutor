@@ -963,3 +963,44 @@ test("previous and next chevrons move between lines in the slim bar and the full
   await panel.getByRole("button", { name: "Next line" }).click();
   await expect.poll(time).toBeGreaterThan(19.8);
 });
+
+test("live captions: a rolling two-line window and a live English line, in both views", async () => {
+  const { page, panel } = await fixture();
+  await context.route("https://translate.googleapis.com/**", (route) =>
+    route.fulfill({ contentType: "application/json", body: JSON.stringify([[["Live English line", "x"]], null, "fr"]) }),
+  );
+  const worker = context.serviceWorkers()[0]!;
+  const long = Array.from({ length: 70 }, (_, i) => `mot${i}`).join(" ");
+  const send = (message: Record<string, unknown>) =>
+    worker.evaluate(async (m) => {
+      const c = (globalThis as any).chrome;
+      const [tab] = await c.tabs.query({ url: "https://www.youtube.com/watch*" });
+      await c.tabs.sendMessage(tab.id, { ...m, tabId: tab.id });
+    }, message);
+  const check = async () => {
+    await send({ type: "live-transcription-status", status: "listening" });
+    await send({ type: "live-transcription-interim", text: long, at: 0, epoch: 0 });
+    const line = panel.locator(".sentence.live");
+    await expect(line).toBeVisible();
+    await expect(line).toContainText("mot69");
+    await expect(line).not.toContainText("mot0 ");
+    const lines = await line.evaluate((el) => {
+      const visible = el.querySelector("span > span") as HTMLElement;
+      const lh = parseFloat(getComputedStyle(el).lineHeight);
+      return visible.getBoundingClientRect().height / lh;
+    });
+    expect(lines).toBeLessThanOrEqual(2.05);
+    await expect(panel.locator(".ov-tx, .sentence-translation")).toContainText("Live English line");
+    // the French text is shown once, not duplicated in a status card
+    await expect(panel.locator("text=mot69 >> visible=true")).toHaveCount(1);
+  };
+  // slim bar
+  await panel.getByLabel("Import French subtitles").setInputFiles("public/demo-fr.srt").catch(() => undefined);
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: true, showTranslation: true } }));
+  await seek(page, 30);
+  await check();
+  // full panel
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false, placement: "below", tourDone: true, showTranslation: true } }));
+  await check();
+  await context.unroute("https://translate.googleapis.com/**");
+});

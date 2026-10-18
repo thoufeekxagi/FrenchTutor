@@ -1604,3 +1604,8 @@ body {
 .ps.youtube-companion .watch-caption-title > span:nth-child(2) { font-size: 14px; font-weight: 650; }
 
 .meaning-card .meaning-source { margin: 2px 0 0; font-size: 11px; font-weight: 650; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); }
+
+/* Rolling two-line live caption window */
+.ps .tail-clamp { display: block; position: relative; }
+.ps .tail-measure { position: absolute; left: 0; right: 0; top: 0; display: block; visibility: hidden; pointer-events: none; }
+.ps.youtube-companion .sentence.live { display: block; -webkit-line-clamp: unset; max-height: none; overflow: visible; }

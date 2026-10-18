@@ -33,6 +33,20 @@ try {
   console.log("NOTES:", JSON.stringify(stats?.notes?.slice(0, 5)));
   console.log("STATS sent/skipped/interim/final:", stats?.sent, stats?.skipped, stats?.interim, stats?.final);
   const text = await page.evaluate(() => document.querySelector("parlesprint-immersion")?.shadowRoot?.querySelector(".sentence")?.textContent ?? "");
+  const view = await page.evaluate(() => {
+    const root = document.querySelector("parlesprint-immersion")?.shadowRoot;
+    const fr = root?.querySelector(".sentence.live > .tail-clamp > span");
+    const en = root?.querySelector(".sentence-translation, .ov-tx");
+    const lh = fr ? parseFloat(getComputedStyle(fr.parentElement.parentElement).lineHeight) : 0;
+    return { french: fr?.textContent ?? "", lines: fr ? +(fr.getBoundingClientRect().height / lh).toFixed(1) : null, english: en?.textContent ?? "", frenchCopies: root ? [...root.querySelectorAll("*")].filter((e) => e.children.length === 0 && (e.textContent || "").length > 20 && !e.classList.contains("tail-measure")).length : 0 };
+  });
+  console.log("LIVE VIEW:", JSON.stringify(view));
+  console.log("DEBUG:", JSON.stringify(await page.evaluate(() => {
+    const root = document.querySelector("parlesprint-immersion")?.shadowRoot;
+    const clamp = root?.querySelector(".tail-clamp"); const m = root?.querySelector(".tail-measure"); const sent = root?.querySelector(".sentence.live");
+    const r = (e) => e ? { w: Math.round(e.getBoundingClientRect().width), h: Math.round(e.getBoundingClientRect().height) } : null;
+    return { hasClamp: !!clamp, clamp: r(clamp), measure: r(m), measureLen: m?.textContent.length, sentLH: sent && getComputedStyle(sent).lineHeight, sentFS: sent && getComputedStyle(sent).fontSize, aside: root?.querySelector("aside")?.className, shown: clamp?.firstChild?.textContent.length };
+  })));
   console.log("on-page text:", JSON.stringify(text.slice(0, 120)));
   console.log("RESULT:", stats && stats.interim + stats.final > 0 && text.length > 5 ? "PASS" : "FAIL");
 } finally {
