@@ -840,70 +840,74 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
       children: [
         Text('Your practice', style: V3Type.title(22)),
         const SizedBox(height: 10),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: _quickPracticeCard(
-                key: const ValueKey('learn.quick.marie'),
-                icon: CupertinoIcons.chat_bubble_2,
-                title: 'Talk with Marie',
-                subtitle: null,
-                label: 'Talk with Marie. Conversation practice.',
-                onTap: _openMarie,
-                accent: DesignTokens.primary,
-                tint: DesignTokens.primarySoft,
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _quickPracticeCard(
+                  key: const ValueKey('learn.quick.marie'),
+                  icon: CupertinoIcons.chat_bubble_2,
+                  title: 'Talk with Marie',
+                  subtitle: null,
+                  label: 'Talk with Marie. Conversation practice.',
+                  onTap: _openMarie,
+                  accent: DesignTokens.primary,
+                  tint: DesignTokens.primarySoft,
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _quickPracticeCard(
-                key: const ValueKey('learn.quick.challenge'),
-                icon: CupertinoIcons.sparkles,
-                title: 'Daily challenge',
-                subtitle: challengeSubtitle,
-                label: challenge == null
-                    ? 'Daily challenge. $challengeSubtitle.'
-                    : challenge.completed
-                    ? 'Daily challenge completed today.'
-                    : '${challenge.currentStep > 0 ? 'Resume' : 'Start'} challenge. ${challenge.title}.',
-                onTap: () => unawaited(_tapDailyChallenge(challenge)),
-                accent: DesignTokens.homeChallenge,
-                tint: DesignTokens.homeChallengeSoft,
+              const SizedBox(width: 10),
+              Expanded(
+                child: _quickPracticeCard(
+                  key: const ValueKey('learn.quick.challenge'),
+                  icon: CupertinoIcons.sparkles,
+                  title: 'Daily challenge',
+                  subtitle: challengeSubtitle,
+                  label: challenge == null
+                      ? 'Daily challenge. $challengeSubtitle.'
+                      : challenge.completed
+                      ? 'Daily challenge completed today.'
+                      : '${challenge.currentStep > 0 ? 'Resume' : 'Start'} challenge. ${challenge.title}.',
+                  onTap: () => unawaited(_tapDailyChallenge(challenge)),
+                  accent: DesignTokens.homeChallenge,
+                  tint: DesignTokens.homeChallengeSoft,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 10),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: _quickPracticeCard(
-                key: const ValueKey('learn.quick.review'),
-                icon: CupertinoIcons.arrow_2_circlepath,
-                title: 'Review words',
-                subtitle: reviewStatus,
-                label: 'Review flashcards. $reviewStatus.',
-                onTap: _openReview,
-                accent: DesignTokens.homeReview,
-                tint: DesignTokens.homeReviewSoft,
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _quickPracticeCard(
+                  key: const ValueKey('learn.quick.review'),
+                  icon: CupertinoIcons.arrow_2_circlepath,
+                  title: 'Review words',
+                  subtitle: reviewStatus,
+                  label: 'Review flashcards. $reviewStatus.',
+                  onTap: _openReview,
+                  accent: DesignTokens.homeReview,
+                  tint: DesignTokens.homeReviewSoft,
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _quickPracticeCard(
-                key: const ValueKey('learn.quick.stories'),
-                icon: CupertinoIcons.book,
-                title: 'Stories',
-                subtitle: 'Read or listen',
-                label: 'Open Stories. Read or listen.',
-                onTap: _openStories,
-                accent: DesignTokens.homeStories,
-                tint: DesignTokens.homeStoriesSoft,
+              const SizedBox(width: 10),
+              Expanded(
+                child: _quickPracticeCard(
+                  key: const ValueKey('learn.quick.stories'),
+                  icon: CupertinoIcons.book,
+                  title: 'Stories',
+                  subtitle: 'Read or listen',
+                  label: 'Open Stories. Read or listen.',
+                  onTap: _openStories,
+                  accent: DesignTokens.homeStories,
+                  tint: DesignTokens.homeStoriesSoft,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
