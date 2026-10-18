@@ -872,7 +872,7 @@ test("compact bar: first-run tour, word meaning, Explain in context without logi
       body: JSON.stringify({ meaning: "Fixture meaning", grammar: "Fixture grammar", example: "Bonjour !", exampleTranslation: "Hello!" }),
     });
   });
-  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: false } }));
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: false, showTranslation: false } }));
   await seek(page, 1);
   const bar = page.getByRole("complementary", { name: "ParleSprint Immersion" });
   const tour = bar.getByRole("dialog", { name: "Quick tour" });
@@ -892,7 +892,7 @@ test("compact bar: first-run tour, word meaning, Explain in context without logi
 test("floating panel has the English toggle and the move/resize tour", async () => {
   const { page, panel } = await imported();
   const worker = context.serviceWorkers()[0]!;
-  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { placement: "floating", tourDone: false } }));
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { placement: "floating", tourDone: false, showTranslation: false } }));
   await seek(page, 1);
   await expect(panel).toHaveClass(/layout-floating/);
   const english = panel.getByRole("button", { name: /English: off/ });

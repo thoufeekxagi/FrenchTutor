@@ -21,7 +21,7 @@ Learn French from the videos you already watch. Open a French YouTube video and 
 - Choose your level (A1 to B2). Dark, quiet design that stays out of the way.
 - No captions on a video? Optionally start live captions from the extension popup. ParleSprint listens to that tab's audio and transcribes the French. Live captions are offered only for videos that have no French captions and are not clearly in another language, to avoid wasting resources.
 
-Privacy: captions are fetched from YouTube the same way the player does. When you tap a word or turn on translation, only that French text is sent to Google Translate. If you press Explain in context, that word, its caption line and your level go to ParleSprint's server and Google Gemini. Live captions are off until you start them and accept a separate notice; then the tab's audio is sent to Google's Gemini service. Vocabulary and preferences stay in your browser. No accounts, no analytics, no ads.
+Privacy: captions are fetched from YouTube the same way the player does. English translation is on by default: the caption lines you are reading and any word you tap are sent to Google Translate (nothing else is sent), and you can switch it off at any time. If you press Explain in context, that word, its caption line and your level go to ParleSprint's server and Google Gemini. Live captions are off until you start them and accept a separate notice; then the tab's audio is sent to Google's Gemini service. Vocabulary and preferences stay in your browser. No accounts, no analytics, no ads.
 
 ParleSprint Immersion is independently developed and is not affiliated with or endorsed by YouTube or Google. Captions and translations can contain errors. Do not use live captions with sensitive content.
 
@@ -36,7 +36,7 @@ Help users learn French while watching YouTube videos by showing French captions
 - `tabCapture`: capture the audio of the current tab, only after the user starts live captions and accepts the audio notice. Sound keeps playing. The microphone and video frames are never captured.
 - `offscreen`: keep the captured audio stream and the connection to Google's transcription service alive while the popup is closed.
 - `https://www.youtube.com/*` (content script on watch and Shorts pages): show captions under the video, read the playback position, and request the video's French caption track from YouTube.
-- `https://translate.googleapis.com/*`: send the word, phrase or caption line the user selects to Google Translate and receive the English meaning. Nothing else is sent.
+- `https://translate.googleapis.com/*`: send the word, phrase or caption lines shown to the user (English translation is on by default and can be switched off) to Google Translate and receive the English meaning. Nothing else is sent.
 - `https://generativelanguage.googleapis.com/*`: stream tab audio to Google's Gemini live transcription, only while live captions run.
 - `https://oxfnrsjskdjbroekxdco.supabase.co/*`: (a) request a short-lived, single-use Google session token for live captions; (b) send the selected word, its caption line and level for Explain in context. Requests carry a random installation ID and the server uses the IP address, both kept only as salted hashes for about a week, to enforce free daily limits. They never carry audio, accounts or video URLs.
 - Remote code: none. All JavaScript ships in the package.

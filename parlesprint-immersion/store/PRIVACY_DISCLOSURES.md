@@ -9,7 +9,7 @@ Single purpose: help adults learn French while watching YouTube videos by showin
 | Data | When | Where it goes |
 | --- | --- | --- |
 | YouTube French caption track | Opening a YouTube watch page | Requested from youtube.com by the page's own origin; cached locally by video ID |
-| Selected French word, phrase or caption line | User taps a word or turns on English translation | Google Translate (translate.googleapis.com). Nothing else is attached: no URL, video ID or identity |
+| Selected French word, phrase or the caption lines being shown | User taps a word, or English translation is on (default) | Google Translate (translate.googleapis.com). Nothing else is attached: no URL, video ID or identity |
 | Tab audio | Only after the user accepts the audio notice and starts live captions | Streamed straight to Google Gemini live transcription. Not sent to ParleSprint |
 | Selected word/phrase, its caption line and level | User presses Explain in context | ParleSprint Supabase function, then Google Gemini; cached server-side by hash. Random installation ID and IP address (salted hashes only) for daily limits. No account |
 | Consent flag, random installation ID, IP address | Starting live captions | ParleSprint Supabase function: issues a one-use 3-minute Google token and applies daily limits. ID and IP are kept only as salted hashes for about a week. No audio |

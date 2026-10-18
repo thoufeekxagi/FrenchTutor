@@ -11,7 +11,7 @@ The extension reads the video's playback position and state (playing, paused, se
 
 Translation and word meanings
 
-When you tap a word or phrase, or turn on English translation, the selected French text or the current caption line is sent to Google Translate (translate.googleapis.com) to get the English meaning. Only that text is sent. The video URL, video ID, your identity and your vocabulary are not sent. Google processes this request under its own terms and privacy policy. Do not select sensitive personal text.
+When you tap a word or phrase, or when English translation is on (it is on by default; turn it off with the EN or English switch), the selected French text or the caption lines being shown are sent to Google Translate (translate.googleapis.com) to get the English meaning. Only that text is sent. The video URL, video ID, your identity and your vocabulary are not sent. Google processes this request under its own terms and privacy policy. Do not select sensitive personal text.
 
 ParleSprint does not run a server for translation and does not receive these requests.
 

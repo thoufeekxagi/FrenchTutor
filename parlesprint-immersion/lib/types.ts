@@ -43,8 +43,8 @@ export const defaults: Preferences = {
   dock: "right",
   placement: "side",
   showCaptions: true,
-  showTranslation: false,
-  compactView: true,
+  showTranslation: true,
+  compactView: false,
   tourDone: false,
   floatRect: { left: 0.54, top: 0.16, width: 0.4, height: 0.34 },
 };
