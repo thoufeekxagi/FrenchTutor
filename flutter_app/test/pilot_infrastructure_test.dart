@@ -21,7 +21,7 @@ void main() {
         db
             .select('SELECT version FROM schema_migrations ORDER BY version')
             .map((row) => row['version']),
-        List.generate(45, (index) => index + 1),
+        List.generate(47, (index) => index + 1),
       );
     });
 
