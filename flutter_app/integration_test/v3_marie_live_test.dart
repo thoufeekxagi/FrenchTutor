@@ -5,6 +5,7 @@ import 'package:french_tutor/v3/lesson/v3_course.dart';
 import 'package:french_tutor/v3/marie/v3_marie_session.dart';
 import 'package:french_tutor/v3/v3_prefs.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/probe.dart';
@@ -77,6 +78,12 @@ void main() {
     await press(tester, 'Continue lesson', startsWith: true);
     await probe.waitForLabel(tester, 'Talk to $name');
 
+    mark('MIC_STATUS_BEFORE ${await Permission.microphone.status}');
+    if (!await Permission.microphone.isGranted) {
+      mark('MIC_REQUEST_NOW_TAP_ALLOW');
+      final r = await Permission.microphone.request();
+      mark('MIC_STATUS_AFTER $r');
+    }
     mark('CALL_START');
     await probe.tapLabel(tester, 'Talk to $name');
     for (var i = 0; i < 200; i++) {
