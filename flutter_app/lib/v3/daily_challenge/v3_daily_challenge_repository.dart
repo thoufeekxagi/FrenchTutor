@@ -7,7 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../v3_prefs.dart';
 import 'v3_daily_challenge.dart';
-import '../lesson/v3_lesson.dart';
 
 /// Loads the signed-in learner's published challenge, with a bundled fallback
 /// so the Course screen still opens offline and before the feed is configured.
