@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const extension = path.join(root, ".output/chrome-mv3");
+const extension = path.join(root, ".output-qa/chrome-mv3");
 const videoId = process.env.PARLESPRINT_LIVE_VIDEO_ID || "qkBf1pshW8E";
 const screenshot = `artifacts/live-transcription-youtube-${videoId}.png`;
 const profile = await fs.mkdtemp(path.join(os.tmpdir(), "parlesprint-live-"));
@@ -15,6 +15,8 @@ const context = await chromium.launchPersistentContext(profile, {
     `--disable-extensions-except=${extension}`,
     `--load-extension=${extension}`,
     "--autoplay-policy=no-user-gesture-required",
+    "--allowlisted-extension-id=ijclgmkoljddlalgcnpodeemcmcipolb",
+    "--whitelisted-extension-id=ijclgmkoljddlalgcnpodeemcmcipolb",
   ],
   viewport: { width: 1440, height: 900 },
 });
@@ -39,12 +41,11 @@ try {
   const popup = await context.newPage();
   const extensionId = new URL(worker.url()).host;
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
-  const consent = popup.locator("label").filter({ hasText: "I agree to send this tab’s audio directly to Google" }).getByRole("checkbox");
+  const consent = popup.locator("label").filter({ hasText: "Send this tab’s audio to Google" }).getByRole("checkbox");
   if (!(await consent.isChecked())) {
     await consent.click();
     await expect(consent).toBeChecked({ timeout: 5000 });
   }
-  await worker.evaluate(() => chrome.action.openPopup());
   await videoPage.bringToFront();
   const activeTabs = await worker.evaluate(async () => {
     const [current] = await chrome.tabs.query({ active: true, currentWindow: true });

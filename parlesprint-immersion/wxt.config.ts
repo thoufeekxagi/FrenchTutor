@@ -1,7 +1,9 @@
 import identity from "./extension-identity.json";
 import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
+const qa = process.env.PARLESPRINT_QA === "1";
 export default defineConfig({
+  ...(qa ? { outDir: ".output-qa" } : {}),
   modules: ["@wxt-dev/module-react"],
   vite: () => ({ plugins: [tailwindcss()] }),
   manifest: {
@@ -13,6 +15,7 @@ export default defineConfig({
     host_permissions: [
       "https://oxfnrsjskdjbroekxdco.supabase.co/*",
       "https://generativelanguage.googleapis.com/*",
+      ...(qa ? ["https://www.youtube.com/*"] : []),
     ],
     web_accessible_resources: [
       { resources: ["fonts/*"], matches: ["<all_urls>"] },

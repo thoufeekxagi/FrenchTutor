@@ -8,3 +8,4 @@ artifacts/
 .local-browser-live/
 release/
 backend/supabase/.temp/
+.output-qa/
