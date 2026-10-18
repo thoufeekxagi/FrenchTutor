@@ -1501,3 +1501,10 @@ html.popup-document #root { min-height: 580px; }
 .ps.popup .settings-head h3 { margin: 0; font-size: 15px; font-weight: 700; }
 .ps.popup .saved-note { font-size: 12px; color: var(--muted); transition: color .2s; }
 .ps.popup .saved-note.on { color: var(--success); font-weight: 650; }
+
+/* Waiting / empty-state message so the bar never looks dead */
+.ps.ov .ov-wait { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 14px; line-height: 1.4; color: #cfd6e4; text-align: left; }
+.ps.ov.docked .ov-wait { color: var(--muted); font-size: 15px; font-weight: 550; padding: 6px 2px; }
+.ps.ov .wait-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); animation: wait-pulse 1.4s ease-in-out infinite; }
+@keyframes wait-pulse { 0%, 100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .ps.ov .wait-dot { animation: none; } }

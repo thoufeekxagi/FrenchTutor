@@ -904,3 +904,31 @@ test("floating panel has the English toggle and the move/resize tour", async () 
   await tour.getByRole("button", { name: "Next" }).click();
   await expect(tour).toContainText("Resize");
 });
+
+test("compact bar never looks empty: it says what it is waiting for", async () => {
+  const { page } = await fixture();
+  const worker = context.serviceWorkers()[0]!;
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: true } }));
+  const bar = page.getByRole("complementary", { name: "ParleSprint Immersion" });
+  await expect(bar.locator(".ov-wait")).toBeVisible();
+  await expect(bar.locator(".ov-wait")).not.toHaveText("");
+  await bar.getByRole("button", { name: "FR", exact: true }).click();
+  await expect(bar.locator(".ov-wait")).toContainText("French is hidden");
+});
+
+test("waiting messages follow the timeline: gap, countdown and end", async () => {
+  const { page, panel } = await fixture();
+  const srt = "1\n00:00:00,000 --> 00:00:02,000\nBonjour.\n\n2\n00:00:20,000 --> 00:00:22,000\nAu revoir.\n";
+  await panel.getByLabel("Import French subtitles").setInputFiles({ name: "gap.srt", mimeType: "text/plain", buffer: Buffer.from(srt) });
+  await expect(panel.getByText("Source: gap.srt")).toBeVisible();
+  const worker = context.serviceWorkers()[0]!;
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: true } }));
+  const bar = page.getByRole("complementary", { name: "ParleSprint Immersion" });
+  await page.locator("video").evaluate((v: HTMLVideoElement) => v.pause());
+  await seek(page, 5);
+  await expect(bar.locator(".ov-wait")).toHaveText("No speech right now. Next line at 0:20");
+  await seek(page, 17.5);
+  await expect(bar.locator(".ov-wait")).toHaveText("Next line in 3s");
+  await seek(page, 30);
+  await expect(bar.locator(".ov-wait")).toHaveText("End of captions for this video.");
+});

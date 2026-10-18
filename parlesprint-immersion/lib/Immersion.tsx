@@ -918,6 +918,27 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
       <p className="muted">{explanation.exampleTranslation}</p>
     </div>
   );
+  const fmtTime = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+  const waitingMessage = (): string => {
+    if (!prefs.showCaptions) return "French is hidden. Press FR to show it.";
+    if (liveCaptureActive)
+      return liveHoldReason === "ad" ? "Ad playing. Live captions resume with the video."
+        : liveHoldReason === "paused" ? "Paused. Live captions continue when you press play."
+        : liveHoldReason === "muted" ? "Unmute the video to continue live captions."
+        : "Listening for French…";
+    if (playerAdShowing) return "Ad playing. Captions resume with the video.";
+    if (captionStatus === "loading") return "Loading French captions…";
+    if (!cues.length)
+      return captionStatus === "none"
+        ? "No French captions on this video. Click the ParleSprint icon in the toolbar to start live captions."
+        : "Press play. French captions appear here.";
+    const t = now - offset;
+    const next = cues.find((c) => c.start > t);
+    if (!next) return "End of captions for this video.";
+    const wait = next.start - t;
+    if (t < cues[0]!.start) return wait > 5 ? `Captions start at ${fmtTime(next.start)}` : "Captions starting…";
+    return wait <= 8 ? `Next line in ${Math.ceil(wait)}s` : `No speech right now. Next line at ${fmtTime(next.start)}`;
+  };
   if (!practice && prefs.compactView && prefs.placement !== "floating") {
     const docked = prefs.placement !== "overlay";
     const stop = (event: React.SyntheticEvent) => event.stopPropagation();
@@ -960,6 +981,11 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
           </section>
         )}
         {renderTour(compactTour)}
+        {!(prefs.showCaptions && (cue || liveInterim)) && (
+          <div className="ov-line ov-placeholder">
+            <p className="ov-wait" role="status"><span className="wait-dot" aria-hidden="true" />{waitingMessage()}</p>
+          </div>
+        )}
         {prefs.showCaptions && (cue || liveInterim) && (
           <div className={`ov-line${tourStep !== null && compactTour[tourStep]?.target === "word" ? " tour-hl" : ""}`}>
             {liveInterim ? (
