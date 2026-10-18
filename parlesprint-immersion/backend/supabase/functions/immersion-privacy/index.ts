@@ -35,7 +35,7 @@ Preferences, saved vocabulary (words or phrases, the sentence they came from, yo
 
 No accounts, analytics or ads
 
-This version has no sign-in and no accounts. It contains no analytics, advertising or sale of personal information, and does not send a browsing history feed. Chrome, YouTube, Google and Supabase process network data under their own policies.
+This version has no sign-in and no accounts. It contains no analytics, advertising or sale of personal information, and does not send a browsing history feed. Chrome, YouTube, Google and Supabase process network data under their own policies. All network requests use HTTPS. Information is used only to provide the features described here (learning French from videos). It is never sold or transferred to third parties for other purposes, never used for advertising, and never used to judge creditworthiness or for lending.
 
 Your choices and contact
 

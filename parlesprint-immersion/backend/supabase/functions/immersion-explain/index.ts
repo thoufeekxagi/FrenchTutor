@@ -1,5 +1,5 @@
 import { parseInput, parseExplanation, parseTranslation } from './core.ts';
-import { INSTALLATION_ID, limitsFromEnv, takeUsage } from '../_shared/usage.ts';
+import { INSTALLATION_ID, isExtensionOrigin, limitsFromEnv, takeUsage } from '../_shared/usage.ts';
 
 const env = (key: string) => Deno.env.get(key) ?? '';
 const url = env('SUPABASE_URL');
@@ -18,7 +18,7 @@ const allowedOrigins = new Set([
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin') ?? '';
-  const allowed = allowedOrigins.has(origin);
+  const allowed = isExtensionOrigin(origin) || allowedOrigins.has(origin);
   const headers: Record<string, string> = {
     'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'Vary': 'Origin',
     'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',

@@ -4,6 +4,9 @@ const hex = (buffer: ArrayBuffer) =>
 
 export const INSTALLATION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+/** Any installed extension origin: the Web Store assigns the ID after the first upload. Abuse is bounded by the usage limits. */
+export const isExtensionOrigin = (origin: string) => /^chrome-extension:\/\/[a-p]{32}$/.test(origin);
+
 /** Salted hash so raw IP addresses and installation ids are never stored. */
 export async function hmacHex(salt: string, value: string): Promise<string> {
   const key = await crypto.subtle.importKey("raw", encoder.encode(salt), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);

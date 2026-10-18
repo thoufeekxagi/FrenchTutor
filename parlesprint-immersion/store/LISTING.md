@@ -43,10 +43,12 @@ Help users learn French while watching YouTube videos by showing French captions
 
 ## Reviewer instructions
 
-1. Open https://www.youtube.com/watch?v=EaNqp4FXh-s (Extra French, episode 1). Press play and skip to 1:02. French captions appear under the player on their own.
-2. Tap a word: its English meaning appears. Press Explain in context for grammar and an example (no sign-in). Press EN to show the translation under the line, FR to hide the French.
-3. Optional live captions: on a video without captions, open the extension popup, expand "Video has no captions?", accept the audio notice and press Start live captions on this tab. Audio keeps playing, French text appears, Stop releases capture.
-4. The popup also has a 41-second bundled sample that works offline.
+No account, login or payment is needed. Everything below works without signing in.
+
+1. **Offline sample (guaranteed to work):** click the extension icon, press "Try the 41-second sample". Play it, tap a word for its meaning, press Explain in context, and use the ‹ Repeat › buttons.
+2. **YouTube captions:** open https://www.youtube.com/watch?v=EaNqp4FXh-s (Extra French, episode 1) and skip to 1:00. French captions appear in the panel at the top of the suggested-videos column, with English under them. Tap a word, press Explain in context, press the English switch, use the Tour button for a walkthrough.
+3. **Live captions (optional feature, for videos without captions):** open https://upload.wikimedia.org/wikipedia/commons/2/2f/10-07-2013_-_Mary_Robinson_juge_%C2%AB_inacceptables_%C2%BB_les_violences_faites_aux_femmes_en_RDC_-_VOA.ogg (a French news recording, no captions). Press play, click the extension icon, expand "Video has no captions?", accept the audio notice, press "Start live captions on this tab". Audio keeps playing and French text appears. Press Stop to release capture. On YouTube videos that already have French captions, or are clearly another language, live captions are intentionally disabled and the popup explains why.
+4. If YouTube changes or blocks caption access for the reviewer's network, the panel says so and steps 1 and 3 still demonstrate every feature.
 
 **Privacy URL:** https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-privacy (same text as `public/privacy.html`; deploy the function before submitting)
 

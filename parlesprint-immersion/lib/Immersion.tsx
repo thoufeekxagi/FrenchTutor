@@ -1774,6 +1774,7 @@ function MeaningCard({ meaning, state, compact }: { meaning?: Meaning; state: "i
   if (!meaning) return null;
   return (
     <div className={`meaning-card${compact ? " compact" : ""}`} aria-live="polite">
+      <p className="meaning-source">Dictionary meaning</p>
       <p className="meaning-main">{meaning.translation}</p>
       {meaning.alternatives.map((entry) => (
         <p key={entry.pos} className="meaning-alt"><em>{entry.pos}</em> {entry.terms.join(", ")}</p>

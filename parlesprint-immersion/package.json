@@ -15,7 +15,8 @@
     "check": "npm run typecheck && npm test && npm run build",
     "launch": "node scripts/launch.mjs",
     "test:youtube": "node tests/live-youtube.mjs",
-    "test:ai": "node tests/live-ai.mjs"
+    "test:ai": "node tests/live-ai.mjs",
+    "zip:store": "PARLESPRINT_STORE=1 wxt zip"
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",

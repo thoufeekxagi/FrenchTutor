@@ -4,7 +4,7 @@ import {
   tokenValue,
 } from "./core.ts";
 
-import { INSTALLATION_ID, limitsFromEnv, takeUsage } from "../_shared/usage.ts";
+import { INSTALLATION_ID, isExtensionOrigin, limitsFromEnv, takeUsage } from "../_shared/usage.ts";
 
 const env = (key: string) => Deno.env.get(key) ?? "";
 const url = env("SUPABASE_URL");
@@ -15,7 +15,6 @@ const googleKey = env("IMMERSION_GEMINI_API_KEY") || env("GEMINI_API_KEY");
 const ipSalt = env("IMMERSION_IP_SALT");
 // Units are minutes of live captions. One token reserves LIVE_SESSION_SECONDS / 60.
 const liveLimits = limitsFromEnv("IMMERSION_LIVE_LIMIT", { install: 30, ip: 40, global: 360, burst: 4 });
-const extensionOrigin = "chrome-extension://ijclgmkoljddlalgcnpodeemcmcipolb";
 
 function safeProviderError(value: unknown): string {
   if (!value || typeof value !== "object") return "unknown_provider_error";
@@ -43,11 +42,11 @@ Deno.serve(async (request: Request) => {
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
-  if (origin === extensionOrigin) headers["Access-Control-Allow-Origin"] = origin;
+  if (isExtensionOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
   const respond = (status: number, body: unknown) =>
     new Response(JSON.stringify(body), { status, headers });
 
-  if (origin !== extensionOrigin)
+  if (!isExtensionOrigin(origin))
     return respond(403, { error: "origin_not_allowed" });
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
   if (request.method !== "POST") return respond(405, { error: "method_not_allowed" });

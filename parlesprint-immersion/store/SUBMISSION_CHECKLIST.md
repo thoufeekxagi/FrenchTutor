@@ -1,39 +1,22 @@
-# Submission checklist
+# Submission checklist (v0.2.0)
 
-Target: October 18, 2026. A build or ZIP is not a submission, and submission is not approval. The publisher must complete account verification and submit through the Chrome Web Store Developer Dashboard.
+Upload: `release/parlesprint-immersion-0.2.0-chrome-STORE.zip` (built with `npm run zip:store`; the manifest has no `key`, as the Web Store requires).
 
-## Build and product evidence
+## Done and verified
+- [x] 117 unit tests, 16 backend tests, 28 browser tests pass; production build contains no test-only code or secrets.
+- [x] Minimal permissions: storage, activeTab, scripting, tabCapture, offscreen. Hosts: youtube.com, translate.googleapis.com, the Supabase project. No broad host access, no microphone, no remote code, no identity.
+- [x] Backend accepts any Chrome extension origin (the store assigns the ID after upload), rejects websites, and enforces free daily limits per install, IP and globally.
+- [x] Privacy policy deployed at the Supabase URL and matches this build (v0.4). Previous deployed text archived in `store/archive/`.
+- [x] Four real 1280x800 screenshots in `store/screenshots/` taken from this build on a real YouTube video. Old-UI screenshots moved to `store/archive-old-ui/`.
+- [x] Reviewer instructions with a guaranteed offline sample, a captioned YouTube video and a non-YouTube French audio page for live captions.
 
-- [x] Run `npm ci`, `npm run typecheck`, `npm test`, `npm run build`, and `npm run zip` from this portable folder.
-- [x] Automated Chromium QA recorded in `VERIFICATION.md`: all 15 extension browser flows pass; real YouTube placement/import/replay/fullscreen pass.
-- [ ] Complete the manual live-audio smoke test in `QA.md`: start from Chrome's real toolbar popup, confirm automatic French text and audible video, stop, and repeat on one non-YouTube video page. This is a core release gate.
-- [x] Inspect the final ZIP and `manifest.json`. Include only runtime assets; exclude source secrets, environment files, node_modules, backend credentials, and test artifacts.
-- [x] Verify the live build declares `storage`, `activeTab`, `scripting`, `tabCapture`, `offscreen`, Supabase and Google Gemini API hosts; no broad persistent all-sites host permission, microphone permission, or remote executable code.
-- [x] Inspect the final manifest to confirm the unused `identity` permission is absent and unavailable provider controls are hidden. Do not claim Google/Apple sign-in works.
-- [x] Verify public AI endpoint quotas and errors before enabling AI in the submitted build. Confirm privacy wording against actual backend behavior.
+## You still do in the dashboard
+- [ ] Upload the zip, choose Education, paste the listing text and single purpose from `LISTING.md`.
+- [ ] Privacy tab: paste the permission justifications; fill the data form from `PRIVACY_DISCLOSURES.md` (website content, no user accounts, not sold); privacy URL and support email.
+- [ ] Add the four screenshots and the 440x280 promo tile.
+- [ ] Optional: use a custom domain page for the policy instead of the Supabase URL.
+- [ ] Submit. Review can take days. If asked for test accounts: none exist.
 
-## Store assets and policy
-
-- [x] 128×128 extension/store icon: `public/icon-128.png`.
-- [x] Actual 1280×800 screenshots: `screenshot-first-practice-1280x800.png` and `screenshot-live-youtube-1280x800.png`. The YouTube screenshot shows a real watch page with the compact empty state; the tested video exposed no French track. Choose final listing images before uploading.
-- [x] 440×280 small promotional image: `store/promo-440x280.png`. Optional marquee omitted.
-- [x] Listing copy, privacy URL and verified support contact prepared in `LISTING.md`; enter them in the dashboard.
-- [x] Privacy policy deployed and verified: https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-privacy
-- [ ] Enter privacy URL and support contact in dashboard.
-- [ ] Complete the privacy questionnaire accurately. Optional explanation text/context leaves the browser after consent; do not select “no data collected” without reviewing the questionnaire definitions.
-- [ ] Explain every permission and the single learning purpose. Match dashboard disclosures to the build and policy.
-- [x] Reviewer instructions include the no-account bundled practice, subtitle-import path, and working existing-account email/password connection. Google/Apple are configuration-gated and are not represented as verified sign-in options. Optional AI reviewer credentials are in ignored `.env.review.local` (never upload this file; copy credentials only into the private reviewer form).
-
-## Publisher account and submission
-
-- [ ] Register a developer account and pay the one-time fee shown by Google if not already registered. Confirm actual checkout amount; do not assume a price from a planning document.
-- [ ] Enable Google account two-step verification and complete any dashboard-required identity/contact verification.
-- [ ] If enabling provider OAuth later, verify exact Chromium callback allowlisting and provider secrets; retain existing app redirect URLs, add the required `identity` manifest permission in a new build, and enable readiness flags only after verification. These provider paths remain gated in the current build.
-- [ ] After first draft upload, compare the assigned store extension ID with development ID `ijclgmkoljddlalgcnpodeemcmcipolb`. If different, allowlist the store ID in the backend and use the dashboard public key for development. Rebuild and reverify AI before submission.
-- [ ] After the manual live-audio gate passes, upload `release/parlesprint-immersion-0.1.0-live-2026-10-17.zip` through the developer dashboard.
-- [ ] Review dashboard warnings, screenshots, privacy declarations, distribution, and visibility.
-- [ ] Submit for review. Record the dashboard item URL and actual submission time. Do not report “submitted” until the dashboard confirms it.
-
-## Official references (checked October 17, 2026)
-
-Google's [image requirements](https://developer.chrome.com/docs/webstore/images/) specify the icon, screenshot, and promotional images. The [developer registration guide](https://developer.chrome.com/docs/webstore/register/) describes the one-time registration fee. Google's [two-step verification announcement](https://developer.chrome.com/blog/policy-update-2sv/) describes the publishing requirement. Review the current [publishing guide](https://developer.chrome.com/docs/webstore/publish/) and dashboard before submitting; requirements can change. Review timing is controlled by Google.
+## Known risks (accepted)
+- Unofficial YouTube caption and Google Translate endpoints can change; the extension then shows a clear message and the offline sample still works.
+- Live captions cannot be demonstrated on captioned YouTube videos by design; reviewers use the non-YouTube link.

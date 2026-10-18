@@ -1,6 +1,6 @@
 import { assertEquals } from "jsr:@std/assert@1";
 import { buildTokenRequest, LIVE_MODEL, LIVE_SESSION_SECONDS, tokenValue } from "./core.ts";
-import { clientIp, hmacHex, INSTALLATION_ID } from "../_shared/usage.ts";
+import { clientIp, hmacHex, INSTALLATION_ID, isExtensionOrigin } from "../_shared/usage.ts";
 
 Deno.test("live token is locked to one short French transcription session", () => {
   const now = Date.UTC(2026, 9, 17, 12);
@@ -32,4 +32,12 @@ Deno.test("client IP prefers the validated Cloudflare header and ignores caller-
   assertEquals(clientIp(request({ "cf-connecting-ip": "203.0.113.9", "x-forwarded-for": "1.1.1.1, 2.2.2.2" })), "203.0.113.9");
   assertEquals(clientIp(request({ "x-forwarded-for": "6.6.6.6, 203.0.113.9" })), "203.0.113.9");
   assertEquals(clientIp(request({})), "unknown");
+});
+
+Deno.test("any installed extension origin is accepted, websites are not", () => {
+  assertEquals(isExtensionOrigin("chrome-extension://ijclgmkoljddlalgcnpodeemcmcipolb"), true);
+  assertEquals(isExtensionOrigin("chrome-extension://abcdefghijklmnopabcdefghijklmnop"), true);
+  assertEquals(isExtensionOrigin("https://evil.example"), false);
+  assertEquals(isExtensionOrigin("chrome-extension://short"), false);
+  assertEquals(isExtensionOrigin(""), false);
 });

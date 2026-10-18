@@ -1595,3 +1595,12 @@ body {
 .ps.youtube-companion .sentence-translation.pending { color: #9aa3b2; }
 .ps.youtube-companion .sentence { -webkit-line-clamp: 4; max-height: calc(4 * 1.45em); }
 .ps.youtube-companion.caption-large .sentence { -webkit-line-clamp: 4; max-height: calc(4 * 1.5em); }
+
+/* Narrow side column: wrap whole items, never break words inside them */
+.ps.youtube-companion .watch-caption-title { flex-wrap: wrap; row-gap: 6px; }
+.ps.youtube-companion .watch-caption-title > span,
+.ps .watch-more-button,
+.ps .head-btn { white-space: nowrap; }
+.ps.youtube-companion .watch-caption-title > span:nth-child(2) { font-size: 14px; font-weight: 650; }
+
+.meaning-card .meaning-source { margin: 2px 0 0; font-size: 11px; font-weight: 650; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); }

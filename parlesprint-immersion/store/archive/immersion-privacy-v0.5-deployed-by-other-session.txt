@@ -1,0 +1,52 @@
+const policy = `ParleSprint Immersion privacy policy
+Version 0.5 · Updated October 18, 2026
+
+ParleSprint Immersion helps you practise French from videos in regular browser tabs with live captions, replay, and a local vocabulary notebook.
+
+Existing YouTube captions
+
+When you click Load YouTube captions, the extension requests the French caption track available for the video you are watching, then stores its timestamped text in Chrome's local extension storage. This action does not capture audio, send content to ParleSprint, or call Gemini. It uses a YouTube player endpoint that is not part of YouTube's documented public caption API, so the feature may change or stop working if YouTube changes its service. Some videos have no French track; use live transcription instead.
+
+Live French transcription
+
+Live captions are optional. Accept the audio notice in the extension popup before starting. On YouTube, use the Start button in the on-page companion; it captures only the decoded audio track from the current video player. This direct player capture does not depend on speakers, headphones, or the player’s output volume, and it does not change the player’s audio. On other supported video sites, start from the popup; Chrome captures the active tab's audio and routes it back to the speakers. Neither path uses your microphone or captures video frames. The companion is shown in a waiting state on YouTube and is injected into other pages only after you start.
+
+Captured audio is streamed directly from the extension to Google's Gemini Live transcription service. Raw audio is not sent to or stored by ParleSprint. The ParleSprint Supabase Edge Function receives your consent flag and uses the server-only GEMINI_API_KEY secret to create a constrained, one-use, short-lived Google session token. The extension receives that token; the provider API key never enters the extension bundle. Supabase does not receive or store audio, and ParleSprint does not maintain daily transcription counters.
+
+Google's Gemini API terms depend on whether the account uses an unpaid/free service or paid service. Google states that content submitted through unpaid services may be used to provide, improve, and develop Google products and machine-learning technologies, and human reviewers may process that content. Do not use live transcription on sensitive or confidential audio. Google's paid-service terms state that prompts and responses are not used to improve products. See Google's current Gemini API terms and pricing for details.
+
+YouTube caption text and live transcript cues with their timing are stored in Chrome's local extension storage under a hash of the video page URL. Live transcription does not provide word-level timestamps. Stop capture from the companion or popup; the live connection closes and the captured audio stream is released. Each Google session lasts up to eight minutes and may renew while you continue listening. ParleSprint does not enforce a daily AI usage quota; Google's own project rate limits and any applicable Google API charges still apply, based on audio actually streamed and model output. DRM-protected media, unavailable player audio, restricted pages, poor audio, or non-French speech may not work as expected.
+
+Local practice and preferences
+
+The extension includes an original short French listening sample and authored translations. Its bundled audio can be played without an account or AI request. Learning preferences, audio/explanation consent, saved vocabulary, transcripts, optional imports, account session and explanation cache are stored in Chrome's local extension storage. Vocabulary can include selected words, phrases, sentences, learning level, saved time, and explanation. Imported subtitle files are processed locally. Signing out removes the session and local explanation cache. Uninstalling the extension removes its local data; export vocabulary you wish to keep first.
+
+Optional account connection and explanations
+
+Local learning works without an account. Existing ParleSprint email/password accounts use the same Supabase service as the app. Your password is sent to Supabase for authentication and is not stored by the extension. Account identifier, email, display name, provider, and session tokens may be stored locally to show and maintain your connection. Google and Apple browser sign-in are currently disabled in this version.
+
+AI explanations use separate consent. When you request an explanation, the selected French text, subtitle sentence, and learning level are sent to the ParleSprint Supabase service, which calls Google's Gemini service. Your account/session identifier and network metadata are processed for authentication. The backend caches explanations by a hash of the request to avoid repeat model calls; it does not maintain daily explanation counters. Cache records do not currently have automatic expiry. Do not include sensitive personal information in selected text.
+
+Analytics, sale, and sharing
+
+This release contains no analytics events, advertisements, or sale of personal information. The extension does not send a browsing-history feed or video URL. Chrome, websites, Supabase, and Google process service and network data under their own policies.
+
+Your choices and contact
+
+You can stop live captions and withdraw audio consent from the popup. You can remove saved vocabulary with the extension controls. Disabling consent or clearing local data does not remove requests already processed by Google or existing backend explanation records. For privacy questions or account data requests, contact thoufeek@agiventures.ca. Never send an API key or session token.
+
+Provider policies: https://supabase.com/privacy and https://ai.google.dev/gemini-api/terms
+Publisher contact: thoufeek@agiventures.ca.
+`;
+
+Deno.serve((request: Request) => {
+  const headers = {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Cache-Control": "public, max-age=3600",
+    "X-Content-Type-Options": "nosniff",
+    Allow: "GET, HEAD",
+  };
+  if (request.method !== "GET" && request.method !== "HEAD")
+    return new Response("Method not allowed", { status: 405, headers });
+  return new Response(request.method === "HEAD" ? null : policy, { status: 200, headers });
+});
