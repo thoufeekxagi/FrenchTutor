@@ -29,7 +29,6 @@ void main() {
       );
       final setup = service.buildSetupBody('short tutor contract');
       final generation = setup['generationConfig'] as Map<String, dynamic>;
-      final proactive = setup['proactivity'] as Map<String, dynamic>;
       final vad =
           (setup['realtimeInputConfig']
                   as Map<String, dynamic>)['automaticActivityDetection']
@@ -37,7 +36,7 @@ void main() {
       expect(setup['model'], 'models/gemini-3.8-live');
       expect(generation['thinkingConfig'], isNull);
       expect(generation['maxOutputTokens'], 1000);
-      expect(proactive['proactiveAudio'], isTrue);
+      expect(setup.containsKey('proactivity'), isFalse);
       expect(vad['disabled'], isFalse);
       expect(vad['silenceDurationMs'], 850);
       final compression =
@@ -72,10 +71,7 @@ void main() {
       );
       final setup = service.buildSetupBody('tutor contract');
       expect(setup['model'], 'models/gemini-3.8-live');
-      expect(
-        (setup['proactivity'] as Map<String, dynamic>)['proactiveAudio'],
-        isTrue,
-      );
+      expect(setup.containsKey('proactivity'), isFalse);
       final compression =
           setup['contextWindowCompression'] as Map<String, dynamic>;
       expect(compression['triggerTokens'], 4000);

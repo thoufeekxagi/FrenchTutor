@@ -991,7 +991,6 @@ class GeminiLiveService {
               : 2500,
         },
       },
-      if (_usesGemini38Live) 'proactivity': {'proactiveAudio': true},
       // Always request resumption handles; on reconnect, present the last handle so
       // the SAME conversation continues (Marie keeps her context) on the new socket.
       'sessionResumption': _resumptionHandle == null

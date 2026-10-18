@@ -247,7 +247,15 @@ class AudioStreamingService {
     // shared session on the wrong route by the time we come back, and re-activating is what
     // makes the OS re-resolve routing against our configured options rather than leaving it
     // wherever it fell back to.
-    await session.setActive(true);
+    for (var attempt = 0; ; attempt++) {
+      try {
+        await session.setActive(true);
+        return;
+      } catch (_) {
+        if (attempt >= 3) rethrow;
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      }
+    }
   }
 
   /// Re-activating the session (rather than just observing) is what actually makes iOS/

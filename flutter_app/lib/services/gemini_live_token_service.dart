@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Mints a short-lived Gemini Live credential through the authenticated
@@ -14,7 +18,41 @@ class GeminiLiveTokenService {
     'BidiGenerateContentConstrained?access_token=${Uri.encodeQueryComponent(token)}',
   );
 
+  static const _debugKey = String.fromEnvironment('E2E_GEMINI_API_KEY');
+
+  static Future<String> _debugMint(bool modern) async {
+    final now = DateTime.now().toUtc();
+    final response = await http
+        .post(
+          Uri.parse(
+            'https://generativelanguage.googleapis.com/${modern ? 'v1beta' : 'v1alpha'}/auth_tokens',
+          ),
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': _debugKey,
+          },
+          body: jsonEncode({
+            'uses': 1,
+            'expireTime': now
+                .add(const Duration(minutes: 30))
+                .toIso8601String(),
+            'newSessionExpireTime': now
+                .add(const Duration(minutes: 1))
+                .toIso8601String(),
+            if (modern)
+              'bidiGenerateContentSetup': {'model': 'models/gemini-3.8-live'},
+          }),
+        )
+        .timeout(const Duration(seconds: 10));
+    final name = (jsonDecode(response.body) as Map)['name']?.toString();
+    if (name == null || name.isEmpty) {
+      throw StateError('Debug token mint failed: ${response.statusCode}');
+    }
+    return name;
+  }
+
   static Future<String> fetch({bool trial = false, bool modern = false}) async {
+    if (kDebugMode && _debugKey.isNotEmpty) return _debugMint(modern);
     if (!trial && Supabase.instance.client.auth.currentSession == null) {
       throw StateError('A signed-in session is required for Gemini Live');
     }

@@ -10,7 +10,7 @@ Deno.test("v3 token is restricted to Gemini 3.8 Live on v1beta", () => {
   if (!GEMINI_AUTH_TOKEN_URL.endsWith("/v1beta/auth_tokens")) {
     throw new Error("wrong token API version");
   }
-  if (body.liveConnectConstraints.model !== "models/gemini-3.8-live") {
+  if (body.bidiGenerateContentSetup.model !== "models/gemini-3.8-live") {
     throw new Error("wrong model constraint");
   }
   if (body.uses !== 1) throw new Error("token must be single-use");
