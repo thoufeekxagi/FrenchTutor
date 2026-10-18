@@ -142,6 +142,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const pausedByLookup = useRef(false);
   const [tourStep, setTourStep] = useState<number | null>(null);
   const [liveInterim, setLiveInterim] = useState("");
+  const [isPaused, setIsPaused] = useState(true);
   const [liveShown, setLiveShown] = useState("");
   const [liveTx, setLiveTx] = useState("");
   const [liveCaptureActive, setLiveCaptureActive] = useState(false);
@@ -446,12 +447,13 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
         cancelReplay();
     };
     const stop = () => cancelReplay();
-    const play = () => { setHeldCue(undefined); tick(); };
+    const syncPaused = () => setIsPaused(video.paused);
+    const play = () => { setHeldCue(undefined); pausedByLookup.current = false; syncPaused(); tick(); };
     const rate = () => { setPlaybackRate(video.playbackRate); };
     const clock = () => { tick(); };
     const seeking = () => { setPlayerSeeking(true); seek(); tick(); };
     const seeked = () => { setPlayerSeeking(false); tick(); };
-    const pause = () => { stop(); tick(); };
+    const pause = () => { stop(); syncPaused(); tick(); };
     video.addEventListener("play", play);
     video.addEventListener("ratechange", rate);
     rate();
@@ -460,6 +462,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     video.addEventListener("seeked", seeked);
     video.addEventListener("pause", pause);
     video.addEventListener("ended", stop);
+    syncPaused();
     tick();
     setPlayerSeeking(video.seeking);
     return () => {
@@ -892,6 +895,19 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     <div className={`seg-nav${compact ? " compact" : ""}`} role="group" aria-label="Move between lines">
       <button className="seg-chevron" aria-label="Previous line" title="Previous line" disabled={!prevCue} onClick={() => prevCue && replay(prevCue)}>
         <span aria-hidden="true">‹</span>
+      </button>
+      <button
+        className="seg-chevron seg-play"
+        aria-label={isPaused ? "Play" : "Pause"}
+        title={isPaused ? "Play" : "Pause"}
+        disabled={!video}
+        onClick={() => {
+          if (!video) return;
+          if (video.paused) void video.play().catch(() => undefined);
+          else video.pause();
+        }}
+      >
+        <span aria-hidden="true">{isPaused ? "▶" : "⏸"}</span>
       </button>
       <button
         className={`seg-repeat primary${compact ? hl("repeat", compactTour) : ""}`}

@@ -3,7 +3,7 @@
 Upload: `release/parlesprint-immersion-0.2.0-chrome-STORE.zip` (built with `npm run zip:store`; the manifest has no `key`, as the Web Store requires).
 
 ## Done and verified
-- [x] 117 unit tests, 16 backend tests, 28 browser tests pass; production build contains no test-only code or secrets.
+- [x] 117 unit tests, 16 backend tests, 31 browser tests pass; production build contains no test-only code or secrets.
 - [x] Minimal permissions: storage, activeTab, scripting, tabCapture, offscreen. Hosts: youtube.com, translate.googleapis.com, the Supabase project. No broad host access, no microphone, no remote code, no identity.
 - [x] Backend accepts any Chrome extension origin (the store assigns the ID after upload), rejects websites, and enforces free daily limits per install, IP and globally.
 - [x] Privacy policy deployed at the Supabase URL and matches this build (v0.4). Previous deployed text archived in `store/archive/`.

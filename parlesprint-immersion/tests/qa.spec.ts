@@ -1004,3 +1004,46 @@ test("live captions: a rolling two-line window and a live English line, in both 
   await check();
   await context.unroute("https://translate.googleapis.com/**");
 });
+
+test("play and pause button works like YouTube's, in the full panel and the slim bar", async () => {
+  const { page, panel } = await imported();
+  const paused = () => page.locator("video").evaluate((v: HTMLVideoElement) => v.paused);
+  await page.locator("video").evaluate((v: HTMLVideoElement) => { v.pause(); });
+  await expect(panel.getByRole("button", { name: "Play" })).toBeVisible();
+  await panel.getByRole("button", { name: "Play" }).click();
+  await expect.poll(paused).toBe(false);
+  await expect(panel.getByRole("button", { name: "Pause" })).toBeVisible();
+  await panel.getByRole("button", { name: "Pause" }).click();
+  await expect.poll(paused).toBe(true);
+  const worker = context.serviceWorkers()[0]!;
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: true } }));
+  await panel.getByRole("button", { name: "Play" }).click();
+  await expect.poll(paused).toBe(false);
+  await page.locator("video").evaluate((v: HTMLVideoElement) => v.pause());
+  await expect(panel.getByRole("button", { name: "Play" })).toBeVisible();
+});
+
+test("live lines are saved per video and shown again on a revisit with no new transcription", async () => {
+  const { page } = await fixture();
+  const worker = context.serviceWorkers()[0]!;
+  await page.route("https://www.youtube.com/youtubei/v1/player*", (r) => r.fulfill({ contentType: "application/json", body: JSON.stringify({ playabilityStatus: { status: "ERROR" } }) }));
+  await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: true, showTranslation: false } }));
+  const send = (message: Record<string, unknown>) =>
+    worker.evaluate(async (m) => {
+      const c = (globalThis as any).chrome;
+      const [tab] = await c.tabs.query({ url: "https://www.youtube.com/watch*" });
+      await c.tabs.sendMessage(tab.id, { ...m, tabId: tab.id });
+    }, message);
+  await page.locator("video").evaluate((v: HTMLVideoElement) => { v.pause(); v.currentTime = 2; });
+  await send({ type: "live-transcription-status", status: "listening" });
+  await send({ type: "live-transcription-final", text: "Bonjour le monde", at: 2, epoch: 0 });
+  await expect.poll(async () => {
+    const data = await worker.evaluate(async () => await (globalThis as any).chrome.storage.local.get(null));
+    return Object.keys(data).filter((k) => k.startsWith("captions:")).length;
+  }).toBeGreaterThan(0);
+  await page.reload();
+  await expect(page.locator("parlesprint-immersion")).toHaveCount(1);
+  await page.locator("video").evaluate((v: HTMLVideoElement) => { v.pause(); v.currentTime = 1.8; v.dispatchEvent(new Event("timeupdate")); });
+  const bar = page.getByRole("complementary", { name: "ParleSprint Immersion" });
+  await expect(bar.locator(".sentence")).toContainText("Bonjour le monde");
+});

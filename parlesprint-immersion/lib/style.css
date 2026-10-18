@@ -1609,3 +1609,11 @@ body {
 .ps .tail-clamp { display: block; position: relative; }
 .ps .tail-measure { position: absolute; left: 0; right: 0; top: 0; display: block; visibility: hidden; pointer-events: none; }
 .ps.youtube-companion .sentence.live { display: block; -webkit-line-clamp: unset; max-height: none; overflow: visible; }
+
+/* Play / pause between the chevrons */
+.ps .seg-nav .seg-play { font-size: 18px; }
+.ps.youtube-companion .caption-actions .seg-nav .seg-play { font-size: 20px; flex: 0 0 56px; }
+.ps.ov .seg-nav.compact .seg-play { font-size: 14px; }
+.ps.ov.docked .seg-nav.compact .seg-play { flex: 0 0 32px; min-width: 32px; }
+.ps.ov.docked .ov-controls > button[aria-label="How this works"] { display: none; }
+.ps.ov.docked .ov-controls { flex-wrap: nowrap; }
