@@ -18,6 +18,7 @@ import {
   parseSubtitles,
   type Cue,
 } from "./captions";
+import { fetchYoutubeCues } from "./youtubeCaptions";
 import { useStore } from "./store";
 import { Brand, Headphones } from "./Brand";
 import {
@@ -115,12 +116,14 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const [setupOpen, setSetupOpen] = useState(false);
   const [cues, setCues] = useState<Cue[]>([]);
   const [source, setSource] = useState("");
+  const [captionStatus, setCaptionStatus] = useState<"idle" | "loading" | "ready" | "none">("idle");
   const [liveInterim, setLiveInterim] = useState("");
   const [liveCaptureActive, setLiveCaptureActive] = useState(false);
   const [liveHoldReason, setLiveHoldReason] = useState<"ad" | "seek" | "paused" | "muted" | null>(null);
   const [playerAdShowing, setPlayerAdShowing] = useState(false);
   const [playerSeeking, setPlayerSeeking] = useState(false);
   const cuesRef = useRef<Cue[]>([]);
+  const offsetRef = useRef(0);
   const [heldCue, setHeldCue] = useState<Cue>();
   const [selection, setSelection] = useState<{
     cue: string;
@@ -224,6 +227,9 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     cuesRef.current = cues;
   }, [cues]);
   useEffect(() => {
+    offsetRef.current = offset;
+  }, [offset]);
+  useEffect(() => {
     const handleLive = (event: Event) => {
       const message = (event as CustomEvent<Record<string, unknown>>).detail;
       if (!message) return;
@@ -305,6 +311,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     cuesRef.current = [];
     setCues([]);
     setSource("");
+    setCaptionStatus("idle");
     setLiveInterim("");
     setOffset(0);
     setSelected("");
@@ -324,6 +331,26 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
       setSource(practice.source);
       return;
     }
+    const loadYoutube = () => {
+      const id = videoId.replace(/^shorts-/, "");
+      if (/^site-/.test(id)) return setCaptionStatus("none");
+      setCaptionStatus("loading");
+      fetchYoutubeCues(id)
+        .then((found) => {
+          if (ticket !== revision.current || videoId !== videoIdRef.current) return;
+          if (!found.length) return setCaptionStatus("none");
+          cuesRef.current = found;
+          setCues(found);
+          setSource("YouTube French captions");
+          setCaptionStatus("ready");
+          void browser.storage.local
+            .set({ [`captions:${videoId}`]: { cues: found, source: "YouTube French captions", offset: 0 } })
+            .catch(() => undefined);
+        })
+        .catch(() => {
+          if (ticket === revision.current && videoId === videoIdRef.current) setCaptionStatus("none");
+        });
+    };
     void browser.storage.local
       .get(`captions:${videoId}`)
       .then((data) => {
@@ -331,6 +358,8 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
           return;
         const stored = data[`captions:${videoId}`] as
           { cues?: Cue[]; source?: string; offset?: number } | undefined;
+        const fromLive = typeof stored?.source === "string" && /live/i.test(stored.source);
+        if (!stored?.cues?.length || fromLive) loadYoutube();
         if (
           stored &&
           Array.isArray(stored.cues) &&
@@ -366,6 +395,12 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     cancelReplay();
     if (!video) return;
     const tick = () => setNow(video.currentTime);
+    let shown: string | undefined;
+    const poll = window.setInterval(() => {
+      const t = video.currentTime;
+      const id = activeCue(cuesRef.current, t - offsetRef.current)?.id;
+      if (id !== shown) { shown = id; setNow(t); }
+    }, 80);
     const seek = () => {
       setHeldCue(undefined);
       if (
@@ -392,6 +427,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     tick();
     setPlayerSeeking(video.seeking);
     return () => {
+      window.clearInterval(poll);
       cancelReplay();
       video.removeEventListener("play", play);
       video.removeEventListener("ratechange", rate);
@@ -408,7 +444,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   useEffect(() => {
     setHeldCue(undefined);
   }, [videoId, cues, offset]);
-  const cue = playerAdShowing || playerSeeking
+  const cue = playerAdShowing || (playerSeeking && /live/i.test(source))
     ? undefined
     : video?.paused && heldCue && Math.abs(now - heldCue.end - offset) < 0.3
       ? heldCue
@@ -880,7 +916,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
             <div className="setup-card stack">
               <div className="row">
                 <span className="step-number">01</span>
-                <h3>{liveCaptureActive ? "Listening for French." : "Live French captions."}</h3>
+                <h3>{liveCaptureActive ? "Listening for French." : captionStatus === "loading" ? "Loading French captions…" : "French captions"}</h3>
               </div>
               <p className="muted">
                 {liveInterim || (liveCaptureActive
@@ -893,7 +929,11 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                         : liveHoldReason === "muted"
                           ? "Unmute the video to continue live captions."
                           : "Your video audio is being transcribed as it plays."
-                  : "Play a video, then click the ParleSprint toolbar button and choose Start live captions. No subtitle file needed.")}
+                  : captionStatus === "loading"
+                    ? "Fetching this video’s French captions."
+                    : captionStatus === "none"
+                      ? "This video has no French captions. Click the ParleSprint toolbar button and choose Start live captions to transcribe its audio."
+                      : "Play a video and French captions appear here automatically.")}
               </p>
             </div>
           )}
