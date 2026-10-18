@@ -73,6 +73,40 @@ void main() {
     );
   });
 
+  test('Spanish, Italian, German, Portuguese and Dutch are refused', () {
+    for (final t in [
+      'Hola, ¿cómo estás? Muy bien, gracias.',
+      'Gracias',
+      'Ciao, come stai? Sto molto bene, grazie.',
+      'Buongiorno, posso aiutare?',
+      'Danke, ich verstehe das nicht.',
+      'wieder wieder',
+      'Obrigado, não entendo muito bem.',
+      'Ik begrijp het niet, dank je.',
+      'Puedo ayudar con el español si quieres.',
+    ]) {
+      expect(TutorReplyGuard.isUnsupportedLanguage(t), isTrue, reason: t);
+    }
+  });
+
+  test('English and French (including mixed teaching lines) pass', () {
+    for (final t in [
+      'Bonjour means hello or good morning in French.',
+      'On dit simplement "bonsoir" pour dire "good evening" en anglais.',
+      'Où sont les toilettes ?',
+      'What does bonjour mean?',
+      'Say it slower, please.',
+      'To say "good night," you say "bonne nuit."',
+      'Merci beaucoup, au revoir !',
+      'Bonjour.',
+      'Raihan',
+      'The capital of Canada is Ottawa.',
+      'Comment dit-on où sont les toilettes en français ?',
+    ]) {
+      expect(TutorReplyGuard.isUnsupportedLanguage(t), isFalse, reason: t);
+    }
+  });
+
   group('TutorReplyGuard.chatterStart', () {
     test('finds generic offers and ignores teaching', () {
       expect(

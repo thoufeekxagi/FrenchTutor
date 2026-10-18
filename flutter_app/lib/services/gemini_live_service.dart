@@ -1362,7 +1362,7 @@ class GeminiLiveService {
       _guardChecked = true;
       final heard = _turnUserTranscript + _currentUserTranscript;
       if (TutorReplyGuard.isFillerTurn(heard) ||
-          TutorReplyGuard.hasUnsupportedScript(heard)) {
+          TutorReplyGuard.isUnsupportedLanguage(heard)) {
         _isModelGenerating = true;
         suppressCurrentReply();
         _dbg('GUARD', 'dropped reply to: $heard');
@@ -1373,7 +1373,7 @@ class GeminiLiveService {
     if (out is Map && !_suppressPreInjection) {
       final text = _currentTutorTranscript + ((out['text'] as String?) ?? '');
       var cut = TutorReplyGuard.chatterStart(text);
-      if (TutorReplyGuard.hasUnsupportedScript(text)) cut = 0;
+      if (TutorReplyGuard.isUnsupportedLanguage(text)) cut = 0;
       if (cut >= 0) {
         _currentTutorTranscript = text.substring(0, cut).trimRight();
         _isModelGenerating = true;

@@ -1018,7 +1018,7 @@ class _V3SpeakerState extends State<V3Speaker> {
         ..showSnackBar(
           const SnackBar(
             content: Text(
-              'Could not reach your tutor. Tap the speaker to try again.',
+              'Could not play the audio. Check your connection and tap the speaker to try again.',
             ),
           ),
         );

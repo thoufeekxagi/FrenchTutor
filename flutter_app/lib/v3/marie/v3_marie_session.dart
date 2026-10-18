@@ -6,7 +6,9 @@ import 'package:flutter/widgets.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
+import '../../services/gemini_live_audio_service.dart';
 import '../../services/inline_call_controller.dart';
+import '../../services/lesson_speech_service.dart';
 
 enum V3MariePhase { idle, connecting, live, error }
 
@@ -277,12 +279,6 @@ class V3LiveMarieSession extends V3MarieSession {
     return b.toString();
   }
 
-  static String _speakCommand(String text) =>
-      'APP COMMAND: the learner tapped the speaker. Say only the exact French '
-      'text below once, clearly and at a learner-friendly pace. Do not '
-      'translate it, explain it, or add any other words. Then wait.\n'
-      'EXACT TEXT: "$text"';
-
   static String _greeting() {
     final name = ActiveTutor.current.displayName;
     return '(App instruction, not learner speech.) The call has just connected. '
@@ -331,6 +327,13 @@ class V3LiveMarieSession extends V3MarieSession {
   @override
   Future<void> toggleMute() async => _callInstance?.toggleMute();
 
+  Timer? _clipTimer;
+
+  /// A speaker tap plays a saved audio clip in the selected tutor's voice. It
+  /// never opens a call and never touches the microphone: the first tap of a
+  /// line makes the clip once (a few seconds), every later tap is instant and
+  /// works offline. If a call is open, Marie stops talking and the microphone
+  /// stays closed while the clip plays.
   @override
   Future<bool> speak(
     BuildContext context,
@@ -339,24 +342,38 @@ class V3LiveMarieSession extends V3MarieSession {
   }) async {
     final line = text.trim();
     if (line.isEmpty) return false;
-    final call = _call;
-    if (call.connecting || call.reconnecting) return false;
-    if (!call.active) {
-      startedCall();
-      // A speaker tap is a request for audio, not a conversation: no hello,
-      // microphone closed until the learner chooses to talk.
-      await call.start(context, sendOpeningPrompt: false);
-      if (!call.active) return false;
-      if (!call.muted) await call.toggleMute();
+    final voice = ActiveTutor.current.voiceName;
+    try {
+      final bytes =
+          await LessonSpeechService.shared.loadCachedAudio(
+            line,
+            voiceName: voice,
+          ) ??
+          await GeminiLiveAudioService.shared.generateAndCache(
+            text: line,
+            contentItemId: 'v3_speaker',
+            voiceName: voice,
+          );
+      if (bytes == null || bytes.isEmpty || bytes.length.isOdd) return false;
+      final call = _callInstance;
+      if (call != null && call.active && call.tutorTurnActive) {
+        await call.interruptTutorReply();
+      }
+      clearCaption();
+      setSpeakingText(line, reveal: false);
+      await LessonSpeechService.shared.playBytes(bytes);
+      _clipTimer?.cancel();
+      _clipTimer = Timer(
+        Duration(microseconds: (bytes.length / 2 / 24000 * 1000000).round()),
+        () {
+          if (_speakingText == line) setSpeakingText(null);
+        },
+      );
+      if (call != null && call.active) touch();
+      return true;
+    } catch (_) {
+      return false;
     }
-    // A new tap wins over whatever she was still saying.
-    if (call.tutorTurnActive) await call.interruptTutorReply();
-    if (!call.active) return false;
-    clearCaption();
-    setSpeakingText(line, reveal: reveal);
-    call.promptTutor(_speakCommand(line));
-    touch();
-    return true;
   }
 
   @override
@@ -392,6 +409,7 @@ class V3LiveMarieSession extends V3MarieSession {
 
   @override
   void dispose() {
+    _clipTimer?.cancel();
     _callInstance?.dispose();
     super.dispose();
   }
