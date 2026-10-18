@@ -19,7 +19,7 @@ Learn French from the videos you already watch. Open a French YouTube video and 
 - Turn English translation on or off under each line. Hide the French when you want to test your listening.
 - Repeat any line. Save words and phrases to a private notebook, then export them as JSON or Anki-compatible CSV.
 - Choose your level (A1 to B2). Dark, quiet design that stays out of the way.
-- No captions on a video? Optionally start live captions from the extension popup. ParleSprint listens to that tab's audio and transcribes the French.
+- No captions on a video? Optionally start live captions from the extension popup. ParleSprint listens to that tab's audio and transcribes the French. Live captions are offered only for videos that have no French captions and are not clearly in another language, to avoid wasting resources.
 
 Privacy: captions are fetched from YouTube the same way the player does. When you tap a word or turn on translation, only that French text is sent to Google Translate. If you press Explain in context, that word, its caption line and your level go to ParleSprint's server and Google Gemini. Live captions are off until you start them and accept a separate notice; then the tab's audio is sent to Google's Gemini service. Vocabulary and preferences stay in your browser. No accounts, no analytics, no ads.
 

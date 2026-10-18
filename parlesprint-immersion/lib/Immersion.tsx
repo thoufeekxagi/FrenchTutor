@@ -19,7 +19,8 @@ import {
   parseSubtitles,
   type Cue,
 } from "./captions";
-import { fetchYoutubeCues } from "./youtubeCaptions";
+import { fetchYoutubeCaptions } from "./youtubeCaptions";
+import { decideLiveEligibility, type GateDecision } from "./liveGate";
 import type { Meaning } from "./freeTranslate";
 import { useStore } from "./store";
 import { Brand, Headphones } from "./Brand";
@@ -133,6 +134,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const [setupOpen, setSetupOpen] = useState(false);
   const [cues, setCues] = useState<Cue[]>([]);
   const [source, setSource] = useState("");
+  const [videoGate, setVideoGate] = useState<GateDecision>();
   const [captionStatus, setCaptionStatus] = useState<"idle" | "loading" | "ready" | "none">("idle");
   const [meaning, setMeaning] = useState<Meaning>();
   const [meaningState, setMeaningState] = useState<"idle" | "loading" | "error">("idle");
@@ -340,6 +342,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     setCues([]);
     setSource("");
     setCaptionStatus("idle");
+    setVideoGate(undefined);
     setLineTx({});
     setLiveInterim("");
     setOffset(0);
@@ -364,9 +367,10 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
       const id = videoId.replace(/^shorts-/, "");
       if (/^site-/.test(id)) return setCaptionStatus("none");
       setCaptionStatus("loading");
-      fetchYoutubeCues(id)
-        .then((found) => {
+      fetchYoutubeCaptions(id)
+        .then(({ cues: found, info }) => {
           if (ticket !== revision.current || videoId !== videoIdRef.current) return;
+          setVideoGate(decideLiveEligibility({ tracks: info.tracks, title: info.title, description: info.description }));
           if (!found.length) return setCaptionStatus("none");
           cuesRef.current = found;
           setCues(found);
@@ -930,7 +934,9 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     if (captionStatus === "loading") return "Loading French captions…";
     if (!cues.length)
       return captionStatus === "none"
-        ? "No French captions on this video. Click the ParleSprint icon in the toolbar to start live captions."
+        ? videoGate?.reason === "not_french"
+          ? "This video doesn't look like French, so there are no French captions to show."
+          : "No French captions on this video. Click the ParleSprint icon in the toolbar to start live captions."
         : "Press play. French captions appear here.";
     const t = now - offset;
     const next = cues.find((c) => c.start > t);

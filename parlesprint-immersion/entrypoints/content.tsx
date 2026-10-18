@@ -4,6 +4,7 @@ import { createShadowRootUi } from "wxt/utils/content-script-ui/shadow-root";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { browser } from "wxt/browser";
 import { Immersion } from "../lib/Immersion";
+import { fetchPlayerInfo } from "../lib/youtubeCaptions";
 import {
   isCurrentPlaybackTranscript,
   isPlaybackDiscontinuity,
@@ -125,6 +126,27 @@ export default defineContentScript({
           hasVideo: !!clockVideo,
           ...value,
         };
+      }
+      if (data.type === "live-get-page-info") {
+        const url = new URL(location.href);
+        const id = url.searchParams.get("v") || url.pathname.match(/^\/shorts\/([\w-]+)/)?.[1] || "";
+        const base = {
+          title: document.title.slice(0, 300),
+          description: (document.querySelector<HTMLMetaElement>('meta[name="description"]')?.content ?? "").slice(0, 1500),
+          htmlLang: document.documentElement.lang || "",
+        };
+        if (url.hostname.endsWith("youtube.com") && id)
+          return fetchPlayerInfo(id)
+            .then((info) => ({
+              ...base,
+              videoId: id,
+              title: info.title || base.title,
+              description: info.description || base.description,
+              isLive: info.isLive,
+              tracks: info.tracks.map(({ languageCode, kind }) => ({ languageCode, kind, baseUrl: "" })),
+            }))
+            .catch(() => base);
+        return base;
       }
       if (data.type === "live-transcription-status") {
         liveCaptureActive = data.status === "connecting" || data.status === "listening";

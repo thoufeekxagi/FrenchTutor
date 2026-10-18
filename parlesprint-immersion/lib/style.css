@@ -1508,3 +1508,4 @@ html.popup-document #root { min-height: 580px; }
 .ps.ov .wait-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); animation: wait-pulse 1.4s ease-in-out infinite; }
 @keyframes wait-pulse { 0%, 100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .ps.ov .wait-dot { animation: none; } }
+.ps.popup .gate-hint { color: #8a5a00; background: #fff6e0; border-radius: 8px; padding: 8px 10px; }

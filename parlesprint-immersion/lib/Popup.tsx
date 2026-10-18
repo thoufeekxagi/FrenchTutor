@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { browser } from "wxt/browser";
 import { Arrow, Book, Brand, Headphones } from "./Brand";
 import { APP, feedbackUrl } from "./config";
+import type { GateDecision } from "./liveGate";
 import { useStore } from "./store";
 import type { Level } from "./types";
 import { matchesVocabulary, vocabularyCsv } from "./vocabularyExport";
@@ -32,10 +33,17 @@ export function Popup() {
   const [liveBusy, setLiveBusy] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [youtubeTab, setYoutubeTab] = useState<number | null>(null);
+  const [gate, setGate] = useState<GateDecision>();
 
   useEffect(() => {
     void browser.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
-      if (tab?.id !== undefined && /^https:\/\/www\.youtube\.com\//.test(tab.url ?? "")) setYoutubeTab(tab.id);
+      if (tab?.id === undefined) return;
+      if (/^https:\/\/www\.youtube\.com\//.test(tab.url ?? "")) setYoutubeTab(tab.id);
+      if (/^https?:\/\//.test(tab.url ?? ""))
+        void browser.runtime
+          .sendMessage({ type: "live-gate", tabId: tab.id })
+          .then((result) => result?.gate && setGate(result.gate as GateDecision))
+          .catch(() => undefined);
     }).catch(() => undefined);
     void load();
     void browser.storage.local.get(["transcriptionLiveConsent", "liveSession"]).then((raw) => {
@@ -261,33 +269,44 @@ export function Popup() {
                   <span className="pill">Coming soon</span>
                 </div>
               </div>
-              <details className="group live-card" aria-label="Live French captions">
-                <summary>Video has no captions?</summary>
+              <details className="group live-card" aria-label="Live French captions" open={!!gate && !gate.allowed && !liveSession ? true : undefined}>
+                <summary>
+                  {gate && !gate.allowed && !liveSession
+                    ? gate.reason === "has_french_captions" ? "This video already has captions" : "Live captions are off for this video"
+                    : "Video has no captions?"}
+                </summary>
                 <div className="stack">
-                  <p className="muted">
-                    ParleSprint can listen to this tab and transcribe the French instead.
-                    {liveSession ? ` Current tab: ${liveSession.hostname}.` : ""}
-                  </p>
-                  <label style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                    <input
-                      type="checkbox"
-                      checked={liveConsent}
-                      disabled={liveBusy || !!liveSession}
-                      onChange={(event) => void updateLiveConsent(event.target.checked)}
-                    />
-                    <span>
-                      Send this tab’s audio to Google for live French transcription. Google may use submitted audio to improve its products, and people may review it. Do not use with sensitive content.
-                    </span>
-                  </label>
-                  <button
-                    className={liveSession ? "action" : "action primary"}
-                    disabled={liveBusy || (!liveSession && !liveConsent)}
-                    onClick={() => void toggleLiveTranscription()}
-                  >
-                    {liveBusy ? "Working…" : liveSession ? "Stop live captions" : "Start live captions on this tab"}
-                  </button>
-                  {liveSession && <span className="pill">{liveSession.status === "listening" ? "Listening" : "Connecting"}</span>}
-                  <p className="field-note" role="status">Audio is sent only while live captions are running. Stop at any time.</p>
+                  {gate && !gate.allowed && !liveSession ? (
+                    <p className="muted" role="status">{gate.message}</p>
+                  ) : (
+                    <>
+                      <p className="muted">
+                        ParleSprint can listen to this tab and transcribe the French instead.
+                        {liveSession ? ` Current tab: ${liveSession.hostname}.` : ""}
+                      </p>
+                      {gate?.reason === "unknown" && !liveSession && <p className="field-note gate-hint">{gate.message}</p>}
+                      <label style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                        <input
+                          type="checkbox"
+                          checked={liveConsent}
+                          disabled={liveBusy || !!liveSession}
+                          onChange={(event) => void updateLiveConsent(event.target.checked)}
+                        />
+                        <span>
+                          Send this tab’s audio to Google for live French transcription. Google may use submitted audio to improve its products, and people may review it. Do not use with sensitive content.
+                        </span>
+                      </label>
+                      <button
+                        className={liveSession ? "action" : "action primary"}
+                        disabled={liveBusy || (!liveSession && !liveConsent)}
+                        onClick={() => void toggleLiveTranscription()}
+                      >
+                        {liveBusy ? "Working…" : liveSession ? "Stop live captions" : "Start live captions on this tab"}
+                      </button>
+                      {liveSession && <span className="pill">{liveSession.status === "listening" ? "Listening" : "Connecting"}</span>}
+                      <p className="field-note" role="status">Audio is sent only while live captions are running. Stop at any time.</p>
+                    </>
+                  )}
                 </div>
               </details>
             </div>

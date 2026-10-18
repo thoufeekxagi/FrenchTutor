@@ -1,5 +1,6 @@
 import { translateFrench } from "../lib/freeTranslate";
 import { limitMessage } from "../lib/plan";
+import { decideLiveEligibility, type GateDecision } from "../lib/liveGate";
 import { browser } from "wxt/browser";
 import { defineBackground } from "wxt/utils/define-background";
 import {
@@ -158,6 +159,27 @@ async function stopLiveTranscription() {
     }).catch(() => undefined);
   }
 }
+/** Live captions cost money: only French speech without captions may use them. */
+async function liveGate(tabId: number): Promise<GateDecision> {
+  let info: Record<string, any> = {};
+  try {
+    info = (await browser.tabs.sendMessage(tabId, { type: "live-get-page-info" })) ?? {};
+  } catch { /* page not reachable: language unknown */ }
+  const text = `${info.title ?? ""} ${info.description ?? ""}`.trim();
+  let textLanguage: { language: string; reliable: boolean } | undefined;
+  try {
+    const detected = await (browser as any).i18n?.detectLanguage?.(text);
+    const top = detected?.languages?.[0];
+    if (detected?.isReliable && typeof top?.language === "string") textLanguage = { language: top.language, reliable: true };
+  } catch { /* fall back to the word-list guess */ }
+  return decideLiveEligibility({
+    tracks: Array.isArray(info.tracks) ? info.tracks : undefined,
+    title: info.title,
+    description: info.description,
+    htmlLang: info.htmlLang,
+    textLanguage,
+  });
+}
 async function startLiveTranscription() {
   if (liveStartTask) return liveStartTask;
   liveStartTask = (async () => {
@@ -213,6 +235,8 @@ async function startLiveTranscription() {
       }
     } catch { /* the video may not be on the page yet; start at zero */ }
 
+    const gate = await liveGate(tab.id);
+    if (!gate.allowed) throw Error(gate.message);
     await ensureOffscreen();
     const streamId = await chromeApis.tabCapture.getMediaStreamId({ targetTabId: tab.id });
     liveSession = {
@@ -691,6 +715,12 @@ export default defineBackground(() => {
         if (message.type === "start-live-transcription") {
           if (!fromPopup) throw Error("Open the extension popup and press Start from there.");
           return await startLiveTranscription();
+        }
+        if (message.type === "live-gate") {
+          if (!fromPopup) throw Error("Open the extension popup.");
+          const tabId = Number.isInteger(message.tabId) ? Number(message.tabId) : undefined;
+          if (tabId === undefined) throw Error("No video tab.");
+          return { gate: await liveGate(tabId) };
         }
         if (message.type === "stop-live-transcription") {
           if (!fromPopup) throw Error("Open the extension popup to stop transcription.");

@@ -106,7 +106,20 @@ export function pickFrenchTrack(tracks: readonly CaptionTrack[]): CaptionTrack |
   return french.find((track) => track.kind !== "asr") ?? french[0];
 }
 
-async function playerCaptionTracks(videoId: string): Promise<CaptionTrack[]> {
+export interface PlayerInfo {
+  tracks: CaptionTrack[];
+  title: string;
+  description: string;
+  isLive: boolean;
+  playable: boolean;
+}
+
+const infoCache = new Map<string, { at: number; info: PlayerInfo }>();
+
+/** One shared lookup for captions and language signals; cached for five minutes. */
+export async function fetchPlayerInfo(videoId: string): Promise<PlayerInfo> {
+  const hit = infoCache.get(videoId);
+  if (hit && Date.now() - hit.at < 300_000) return hit.info;
   // The ANDROID client returns caption URLs that serve text without a page-bound token.
   const response = await fetch("https://www.youtube.com/youtubei/v1/player?prettyPrint=false", {
     method: "POST",
@@ -119,25 +132,42 @@ async function playerCaptionTracks(videoId: string): Promise<CaptionTrack[]> {
   });
   if (!response.ok) throw Error(`player ${response.status}`);
   const data = await response.json();
-  const tracks = data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
-  return Array.isArray(tracks)
-    ? tracks.filter(
-        (track: CaptionTrack) =>
-          typeof track?.baseUrl === "string" && typeof track?.languageCode === "string",
-      )
-    : [];
+  const rawTracks = data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+  const details = data?.videoDetails ?? {};
+  const info: PlayerInfo = {
+    tracks: Array.isArray(rawTracks)
+      ? rawTracks.filter(
+          (track: CaptionTrack) =>
+            typeof track?.baseUrl === "string" && typeof track?.languageCode === "string",
+        )
+      : [],
+    title: typeof details.title === "string" ? details.title.slice(0, 300) : "",
+    description: typeof details.shortDescription === "string" ? details.shortDescription.slice(0, 1500) : "",
+    isLive: details.isLiveContent === true,
+    playable: data?.playabilityStatus?.status === "OK",
+  };
+  if (infoCache.size > 50) infoCache.delete(infoCache.keys().next().value!);
+  infoCache.set(videoId, { at: Date.now(), info });
+  return info;
+}
+
+/** French caption cues plus the language signals for the same video. */
+export async function fetchYoutubeCaptions(videoId: string): Promise<{ cues: Cue[]; info: PlayerInfo }> {
+  if (!/^[\w-]{6,20}$/.test(videoId))
+    return { cues: [], info: { tracks: [], title: "", description: "", isLive: false, playable: false } };
+  const info = await fetchPlayerInfo(videoId);
+  const track = pickFrenchTrack(info.tracks);
+  if (!track) return { cues: [], info };
+  const url = new URL(track.baseUrl);
+  if (!/(^|\.)youtube\.com$/.test(url.hostname)) return { cues: [], info };
+  const response = await fetch(url.href, { signal: AbortSignal.timeout(12000) });
+  if (!response.ok) throw Error(`captions ${response.status}`);
+  const text = await response.text();
+  if (new TextEncoder().encode(text).length > SUBTITLE_LIMITS.bytes * 4) return { cues: [], info };
+  return { cues: parseTimedText(text), info };
 }
 
 /** Returns French caption cues for a YouTube video, or [] when it has no French track. */
 export async function fetchYoutubeCues(videoId: string): Promise<Cue[]> {
-  if (!/^[\w-]{6,20}$/.test(videoId)) return [];
-  const track = pickFrenchTrack(await playerCaptionTracks(videoId));
-  if (!track) return [];
-  const url = new URL(track.baseUrl);
-  if (!/(^|\.)youtube\.com$/.test(url.hostname)) return [];
-  const response = await fetch(url.href, { signal: AbortSignal.timeout(12000) });
-  if (!response.ok) throw Error(`captions ${response.status}`);
-  const text = await response.text();
-  if (new TextEncoder().encode(text).length > SUBTITLE_LIMITS.bytes * 4) return [];
-  return parseTimedText(text);
+  return (await fetchYoutubeCaptions(videoId)).cues;
 }
