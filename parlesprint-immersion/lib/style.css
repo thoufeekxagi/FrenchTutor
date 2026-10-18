@@ -1466,3 +1466,33 @@ html.popup-document #root { min-height: 580px; }
 @keyframes tour-pulse { 0% { box-shadow: 0 0 0 0 rgba(37,99,235,.75); } 100% { box-shadow: 0 0 0 10px rgba(37,99,235,0); } }
 .ps .tour-hl { outline: 2px solid #2563eb; outline-offset: 3px; border-radius: 10px; animation: tour-pulse 1.2s ease-out infinite; }
 .ps.ov .ov-controls button.tour-hl { border-radius: 999px; background: #2563eb; color: #fff; }
+
+/* Full panel header: big, labeled, self-explanatory */
+.ps.youtube-companion .companion-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 48px; margin: 0 0 8px; }
+.ps.youtube-companion .head-right { margin-left: auto; display: flex; gap: 8px; }
+.ps .head-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 38px; min-height: 38px; padding: 0 16px;
+  border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink);
+  font-size: 14px; font-weight: 650; cursor: pointer; white-space: nowrap;
+}
+.ps .head-btn:hover { background: var(--accent-soft); color: var(--accent-deep); border-color: #c9d8fb; }
+.ps .head-btn.head-back { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ps .head-btn.head-back:hover { background: var(--accent-deep); color: #fff; }
+.ps.youtube-companion .watch-caption-title { flex: 1 1 auto; gap: 10px; font-size: 14px; color: var(--ink); }
+.ps.youtube-companion .watch-caption-title > span:first-child { width: 30px; height: 30px; font-size: 11px; }
+.ps.youtube-companion .watch-caption-title select { min-height: 38px; font-size: 14px; font-weight: 650; padding: 0 10px; }
+.ps .watch-more-button {
+  width: auto; height: 38px; min-height: 38px; padding: 0 14px; border-radius: 999px; gap: 6px;
+  display: inline-flex; align-items: center; border: 1px solid var(--line); background: #fff;
+  font-size: 14px; font-weight: 650; letter-spacing: 0; color: var(--ink);
+}
+.ps .head-btn.tour-hl, .ps .watch-more-button.tour-hl { background: var(--accent); color: #fff; }
+
+.ps.ov.docked .ov-controls { gap: 6px; padding: 4px; }
+.ps.ov.docked .ov-controls button { height: 34px; min-width: 42px; padding: 0 12px; font-size: 13px; }
+.ps.ov .ov-meaning-head button { height: 32px; width: 32px; font-size: 18px; }
+.ps.youtube-companion .head-back { order: 1; }
+.ps.youtube-companion .head-right { order: 2; margin-left: auto; }
+.ps.youtube-companion .watch-caption-title { order: 3; flex: 1 1 100%; }
+.ps.youtube-companion.layout-floating .watch-caption-title { order: 1; flex: 1 1 auto; }
+.ps.youtube-companion.layout-floating .head-right { order: 2; }

@@ -987,9 +987,9 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
           >
             EN
           </button>
-          <button className={hl("repeat", compactTour)} title="Repeat this line" disabled={!cue} onClick={() => cue && replay(cue)}>↻</button>
-          <button className={hl("more", compactTour)} title="More settings, transcript and notebook" onClick={() => void update({ compactView: false })}>⋯</button>
-          <button title="How this works" aria-label="How this works" onClick={() => setTourStep(0)}>?</button>
+          <button className={hl("repeat", compactTour)} title="Repeat this line" disabled={!cue} onClick={() => cue && replay(cue)}><span aria-hidden="true">↻</span> Repeat</button>
+          <button className={hl("more", compactTour)} title="Transcript, caption size, saved words and more" aria-label="More settings" onClick={() => void update({ compactView: false })}>More</button>
+          <button title="Show the quick tour" aria-label="How this works" onClick={() => setTourStep(0)}>?</button>
         </div>
       </aside>
     );
@@ -1023,6 +1023,16 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
             : undefined
         }
       >
+        {!practice && prefs.placement !== "floating" && (
+          <button
+            className={`head-btn head-back${hl("compact", fullTour)}`}
+            aria-label="Back to compact captions"
+            title="Back to the slim caption bar"
+            onClick={() => void update({ compactView: true })}
+          >
+            <span aria-hidden="true">←</span> Captions
+          </button>
+        )}
         {practice ? (
           <Brand />
         ) : (
@@ -1070,27 +1080,33 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
               aria-expanded={moreOpen}
               onClick={() => setMoreOpen(!moreOpen)}
             >
-              ···
+              <span>Tools</span>
+              <span aria-hidden="true">{moreOpen ? "▴" : "▾"}</span>
             </button>
           </div>
         )}
-        {!practice && (
-          <button className="icon-button" aria-label="How this works" title="How this works" onClick={() => setTourStep(0)}>
-            ?
+        {practice ? (
+          <button
+            className="icon-button"
+            aria-label={collapsed ? "Expand immersion" : "Minimize immersion"}
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            {collapsed ? "+" : "−"}
           </button>
+        ) : (
+          <div className="head-right">
+            <button className="head-btn" aria-label="How this works" title="Show the quick tour" onClick={() => setTourStep(0)}>
+              Tour
+            </button>
+            <button
+              className="head-btn"
+              aria-label={collapsed ? "Expand immersion" : "Minimize immersion"}
+              onClick={() => setCollapsed(!collapsed)}
+            >
+              {collapsed ? "Show" : "Hide"}
+            </button>
+          </div>
         )}
-        {!practice && prefs.placement !== "floating" && (
-          <button className={`icon-button${hl("compact", fullTour)}`} aria-label="Back to compact captions" title="Back to compact captions" onClick={() => void update({ compactView: true })}>
-            ⌄
-          </button>
-        )}
-        <button
-          className="icon-button"
-          aria-label={collapsed ? "Expand immersion" : "Minimize immersion"}
-          onClick={() => setCollapsed(!collapsed)}
-        >
-          {collapsed ? "+" : "−"}
-        </button>
       </div>
       {!collapsed && (
         <div className="stack">
