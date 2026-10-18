@@ -351,7 +351,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
       ref.read(learningStoreProvider).profile().level,
     );
     final b = StringBuffer(
-      'LEARNER LEVEL: $level. LESSON: ${_lesson.title} '
+      'LEARNER LEVEL: $level${level == 'A1' || level == 'A2' ? ' (reply ONLY in English, even if asked in French; put French words inside the English)' : ''}. LESSON: ${_lesson.title} '
       '(step ${_index + 1} of ${_lesson.steps.length}). ',
     );
     switch (_step) {
@@ -368,10 +368,15 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
         if (s.exampleFr.isNotEmpty) {
           b.write(' Example shown: ${s.exampleFr} (${s.exampleEn}).');
         }
+        b.write(
+          ' If asked to repeat or say it slower, say ONLY "${s.fr}" slowly in '
+          'French and stop.',
+        );
       case V3PhraseStep s:
         b.write(
           'ON SCREEN (phrase to say aloud): "${s.fr}" means "${s.en}". '
-          'If the learner says it, give pronunciation feedback.',
+          'If the learner says it, give pronunciation feedback. If asked to '
+          'repeat or say it slower, say ONLY that French slowly and stop.',
         );
       case V3TableStep s:
         b.write(

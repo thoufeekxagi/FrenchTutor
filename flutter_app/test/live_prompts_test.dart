@@ -61,12 +61,14 @@ void main() {
       final prompt = LivePrompts.compactLessonCoach(
         persona: TutorPersona.marie,
       );
-      expect(prompt, contains('ANSWER THE LATEST REQUEST FIRST'));
-      expect(prompt, contains('usually 8 to 25 words'));
-      expect(prompt, contains('that pace until the learner changes it'));
-      expect(prompt, contains('If they say stop,'));
-      expect(prompt, contains('TEACH, DON\'T CHATTER'));
-      expect(prompt, contains('stop your answer immediately'));
+      expect(prompt, contains('ANSWER FIRST, THEN STOP'));
+      expect(prompt, contains('about 8 to 25 words'));
+      expect(prompt, contains('until they change it'));
+      expect(prompt, contains('If they say stop, stop'));
+      expect(prompt, contains('TEACH WITH ONE MOVE'));
+      expect(prompt, contains('REPEAT OR SLOWER'));
+      expect(prompt, contains('LANGUAGE (hard rule)'));
+      expect(prompt, contains('stop at'));
       expect(prompt, contains('INTERRUPTIONS AND NOISE'));
     });
 
