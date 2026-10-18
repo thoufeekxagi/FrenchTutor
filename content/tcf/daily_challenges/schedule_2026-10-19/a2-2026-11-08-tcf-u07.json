@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-08-tcf-u07",
+  "revision": 1,
+  "available_on": "2026-11-08",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "TCF practice: Health appointments and getting help",
+  "summary": "Read for two key details about health appointments and getting help.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u07-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-08-tcf-u07",
+    "title": "TCF practice: Health appointments and getting help",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What document should the patient bring?",
+        "options": [
+          "The lab result",
+          "A lease",
+          "A course form",
+          "A bus pass"
+        ],
+        "answer": 0,
+        "explain": "The notice asks for the lab result.",
+        "promptFr": "CONSULTATION — Lundi, 15 h. Document à apporter : le résultat de laboratoire. Adresse dans le message de confirmation."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "By when should the caller expect the call?",
+        "options": [
+          "Before 4 p.m.",
+          "After 6 p.m.",
+          "Tomorrow",
+          "Next month"
+        ],
+        "answer": 0,
+        "explain": "The notice says the call is before sixteen hundred hours.",
+        "promptFr": "RAPPEL — Une personne du service va appeler la personne qui a téléphoné. L'appel est avant 16 h."
+      }
+    ]
+  }
+}

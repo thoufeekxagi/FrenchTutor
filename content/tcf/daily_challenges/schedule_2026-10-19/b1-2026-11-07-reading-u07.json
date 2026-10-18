@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-07-reading-u07",
+  "revision": 1,
+  "available_on": "2026-11-07",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · Report what someone said and asked",
+  "summary": "Read for two key details about b1 · Report what someone said and asked.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u07-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-07-reading-u07",
+    "title": "Read: B1 · Report what someone said and asked",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What will be communicated after registration?",
+        "options": [
+          "The coordinator's question",
+          "The room address",
+          "The workshop topic",
+          "The final number of participants"
+        ],
+        "answer": 3,
+        "explain": "The final participant number will come after registration.",
+        "promptFr": "Extrait du compte rendu — La coordonnatrice a confirmé que l'atelier aurait lieu le 12 juin. Elle a demandé si la salle pouvait accueillir vingt personnes. Le nombre final de participants sera communiqué après la période d'inscription."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What should readers do?",
+        "options": [
+          "Cancel their registration immediately",
+          "Check the official notice before changing registration",
+          "Assume the course is cancelled",
+          "Forward the message to everyone"
+        ],
+        "answer": 1,
+        "explain": "The organization says no change is confirmed and asks readers to check the official notice.",
+        "promptFr": "Message transféré — « Le cours du samedi est annulé. » Note de l'organisme : aucun changement n'a été confirmé. Veuillez consulter l'avis officiel avant de modifier votre inscription."
+      }
+    ]
+  }
+}

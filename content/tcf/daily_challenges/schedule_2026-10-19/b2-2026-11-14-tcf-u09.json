@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-11-14-tcf-u09",
+  "revision": 1,
+  "available_on": "2026-11-14",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Reading",
+  "title": "TCF practice: B2 · Everyday economics: qualify numbers and recommendations",
+  "summary": "Read for two key details about b2 · Everyday economics: qualify numbers and recommendations.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b2-u09-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-11-14-tcf-u09",
+    "title": "TCF practice: B2 · Everyday economics: qualify numbers and recommendations",
+    "subtitle": "B2 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Why do the authors recommend a longer observation period?",
+        "options": [
+          "The average never changed",
+          "The table has no households",
+          "Seasonal changes may affect the comparison",
+          "The authors reject every figure"
+        ],
+        "answer": 2,
+        "explain": "A longer period may reveal whether seasonal factors affected the result.",
+        "promptFr": "Un tableau fictif présente les dépenses de transport de vingt ménages sur deux mois. La moyenne augmente légèrement, mais les réponses varient beaucoup. Le document n'indique pas si les déplacements saisonniers ont changé. Les auteurs recommandent de recueillir les mêmes renseignements pendant une période plus longue avant de parler d'une tendance générale. Cette précaution ne nie pas la hausse observée; elle limite la portée de l'interprétation."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What does the text say about the two recommendations?",
+        "options": [
+          "They have been proven for everyone",
+          "Their usefulness depends on individual circumstances",
+          "They cannot be compared",
+          "They require the same contract"
+        ],
+        "answer": 1,
+        "explain": "The text says that each recommendation depends on a person's situation.",
+        "promptFr": "Deux conseils budgétaires sont proposés. Le premier recommande de comparer les contrats; le second insiste sur la réduction des achats non essentiels. Le texte précise qu'aucun conseil n'a été évalué auprès de tous les ménages. Leur utilité dépendra donc des besoins, des obligations et des choix de chaque personne."
+      }
+    ]
+  }
+}

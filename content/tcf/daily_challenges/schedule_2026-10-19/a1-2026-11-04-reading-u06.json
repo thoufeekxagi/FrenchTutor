@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-04-reading-u06",
+  "revision": 1,
+  "available_on": "2026-11-04",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Reading",
+  "title": "Read: Days, time and appointments",
+  "summary": "Read for two key details about days, time and appointments.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a1-u06-reading"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-04-reading-u06",
+    "title": "Read: Days, time and appointments",
+    "subtitle": "A1 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "When does the clinic open on Saturday?",
+        "options": [
+          "8:00",
+          "9:00",
+          "12:00",
+          "16:00"
+        ],
+        "answer": 1,
+        "explain": "Samedi : de 9 h à 12 h.",
+        "promptFr": "CLINIQUE SAINTE-ANNE · Lundi au vendredi : 8 h à 16 h · Samedi : 9 h à 12 h · Dimanche : fermé"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "When is the clinic closed?",
+        "options": [
+          "Monday",
+          "Wednesday",
+          "Saturday afternoon",
+          "Sunday"
+        ],
+        "answer": 3,
+        "explain": "Dimanche : fermé.",
+        "promptFr": "CLINIQUE SAINTE-ANNE · Lundi au vendredi : 8 h à 16 h · Samedi : 9 h à 12 h · Dimanche : fermé"
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-13-reading-u09",
+  "revision": 1,
+  "available_on": "2026-11-13",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Reading",
+  "title": "Read: Getting around",
+  "summary": "Read for two key details about getting around.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a1-u09-reading"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-13-reading-u09",
+    "title": "Read: Getting around",
+    "subtitle": "A1 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Where does the line go?",
+        "options": [
+          "From downtown to the museum",
+          "From the museum to the airport",
+          "From the bank to the park",
+          "From the station to city hall"
+        ],
+        "answer": 0,
+        "explain": "The arrow shows the direction from downtown to the museum.",
+        "promptFr": "LIGNE 4 · Centre-ville → Musée · Arrêt : Banque"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Which route has a detour?",
+        "options": [
+          "Route 2",
+          "Route 4",
+          "The train",
+          "The taxi"
+        ],
+        "answer": 0,
+        "explain": "The detour notice names ligne 2.",
+        "promptFr": "DÉTOUR · Ligne 2 · Rue du Parc"
+      }
+    ]
+  }
+}

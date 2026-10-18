@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-10-25-listening-u03",
+  "revision": 1,
+  "available_on": "2026-10-25",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "Listen: B2 · Work and study decisions: describe relationships precisely",
+  "summary": "Listen for two key details about b2 · Work and study decisions: describe relationships precisely.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u03-listening"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-10-25-listening-u03",
+    "title": "Listen: B2 · Work and study decisions: describe relationships precisely",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le programme auquel elle s'est inscrite comprend un stage. C'est ce volet qui lui permettra d'appliquer les compétences qu'elle a développées.",
+        "question": "What will the placement allow her to do?",
+        "options": [
+          "Apply the skills she developed",
+          "Choose a different mentor",
+          "Change the application deadline",
+          "Skip every prerequisite"
+        ],
+        "answer": 0,
+        "explain": "The placement lets her apply the skills she has developed."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Le dossier dont nous parlons doit être remis avant la fin du mois. La personne à qui vous pouvez écrire se trouve sur la page de contact.",
+        "question": "Who can the learner contact?",
+        "options": [
+          "The person who wrote the file",
+          "The internship supervisor",
+          "A course participant",
+          "The person listed on the contact page"
+        ],
+        "answer": 3,
+        "explain": "The speaker directs the learner to the contact person on the page."
+      }
+    ]
+  }
+}

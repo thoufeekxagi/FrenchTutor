@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-10-31-listening-u05",
+  "revision": 1,
+  "available_on": "2026-10-31",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "Listen: B2 · Health and public services: express needs and limits carefully",
+  "summary": "Listen for two key details about b2 · Health and public services: express needs and limits carefully.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u05-listening"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-10-31-listening-u05",
+    "title": "Listen: B2 · Health and public services: express needs and limits carefully",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Il faut que vous confirmiez l'heure directement auprès du service. Le message d'exercice ne précise pas si les horaires ont changé.",
+        "question": "What should the learner confirm?",
+        "options": [
+          "A fictional fee",
+          "A diagnosis from the tutor",
+          "The identity of another learner",
+          "The time directly with the service"
+        ],
+        "answer": 3,
+        "explain": "The speaker says to confirm the time with the service."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Je sais que le formulaire demande une date de contact. En revanche, je ne suis pas certain que le délai indiqué s'applique à chaque cas.",
+        "question": "What is the speaker uncertain about?",
+        "options": [
+          "Who filled out the form",
+          "Whether the meeting happened",
+          "Whether the stated time limit applies to every case",
+          "Whether the form asks for a date"
+        ],
+        "answer": 2,
+        "explain": "The speaker knows the form asks for a date but is unsure about the deadline's scope."
+      }
+    ]
+  }
+}

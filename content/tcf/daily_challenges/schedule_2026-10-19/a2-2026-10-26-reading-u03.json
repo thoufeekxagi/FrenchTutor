@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-26-reading-u03",
+  "revision": 1,
+  "available_on": "2026-10-26",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "Read: Everyday events: what I did",
+  "summary": "Read for two key details about everyday events: what I did.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u03-reading"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-26-reading-u03",
+    "title": "Read: Everyday events: what I did",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Where is the welcome desk?",
+        "options": [
+          "Near the entrance",
+          "On platform two",
+          "At the service window",
+          "Beside the bus stop"
+        ],
+        "answer": 0,
+        "explain": "The notice says accueil près de l'entrée.",
+        "promptFr": "SÉANCE DE FRANÇAIS · Bibliothèque municipale · Jeudi, 18 h · Accueil près de l'entrée"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Where is the centre's address?",
+        "options": [
+          "At the end of the message",
+          "On a ticket",
+          "At the train station",
+          "In a voice message"
+        ],
+        "answer": 0,
+        "explain": "Sam says the address is at the end of the message.",
+        "promptFr": "Salut Awa, · J'ai lu ton article sur le centre. Son adresse est à la fin du message. · Sam"
+      }
+    ]
+  }
+}

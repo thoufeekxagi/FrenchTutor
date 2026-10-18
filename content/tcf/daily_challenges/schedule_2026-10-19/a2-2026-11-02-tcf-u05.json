@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-02-tcf-u05",
+  "revision": 1,
+  "available_on": "2026-11-02",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "TCF practice: Organise work, study and future plans",
+  "summary": "Read for two key details about organise work, study and future plans.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u05-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-02-tcf-u05",
+    "title": "TCF practice: Organise work, study and future plans",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "When will places be confirmed?",
+        "options": [
+          "May 8",
+          "May 3",
+          "May 18",
+          "June 8"
+        ],
+        "answer": 0,
+        "explain": "The notice says the centre will confirm places on May 8.",
+        "promptFr": "INSCRIPTION — Date limite pour envoyer le formulaire : 3 mai. Le centre va confirmer les places par courriel le 8 mai."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What should the reader do?",
+        "options": [
+          "Reply before Wednesday",
+          "Arrive Tuesday at 11",
+          "Send the application again",
+          "Choose a course level"
+        ],
+        "answer": 0,
+        "explain": "The message asks the reader to reply before Wednesday.",
+        "promptFr": "Bonjour Nadia, nouveau rendez-vous : jeudi à 11 h. Merci de répondre avant mercredi. — Le centre"
+      }
+    ]
+  }
+}

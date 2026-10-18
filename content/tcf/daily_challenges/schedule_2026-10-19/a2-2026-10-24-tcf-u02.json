@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-24-tcf-u02",
+  "revision": 1,
+  "available_on": "2026-10-24",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "TCF practice: What happened this week?",
+  "summary": "Listen for two key details about what happened this week?.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u02-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-24-tcf-u02",
+    "title": "TCF practice: What happened this week?",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Hier, j'ai réservé une salle pour la réunion de vendredi.",
+        "question": "What did the speaker reserve?",
+        "options": [
+          "A room",
+          "A parcel",
+          "A book",
+          "A guided tour"
+        ],
+        "answer": 0,
+        "explain": "The speaker says j'ai réservé une salle."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Nous avons marché vingt minutes, puis nous avons commencé le cours.",
+        "question": "What happened after they walked?",
+        "options": [
+          "They started class.",
+          "They cancelled a delivery.",
+          "They returned a book.",
+          "They booked a tour."
+        ],
+        "answer": 0,
+        "explain": "The script says they started class after walking."
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-10-27-tcf-u03",
+  "revision": 1,
+  "available_on": "2026-10-27",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Reading",
+  "title": "TCF practice: Forms and papers",
+  "summary": "Read for two key details about forms and papers.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a1-u03-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-10-27-tcf-u03",
+    "title": "TCF practice: Forms and papers",
+    "subtitle": "A1 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What do you need for the SIN?",
+        "options": [
+          "Passport and a permit",
+          "Only a phone",
+          "A library card",
+          "A photo"
+        ],
+        "answer": 0,
+        "explain": "Passeport et permis.",
+        "promptFr": "Pour le NAS : passeport et permis de travail ou d'études."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Which province?",
+        "options": [
+          "Québec",
+          "Manitoba",
+          "New Brunswick",
+          "Nova Scotia"
+        ],
+        "answer": 2,
+        "explain": "Nouveau-Brunswick.",
+        "promptFr": "Adresse : 15, rue Principale, Moncton, Nouveau-Brunswick"
+      }
+    ]
+  }
+}

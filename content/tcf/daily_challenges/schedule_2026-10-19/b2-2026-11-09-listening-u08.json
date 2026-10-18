@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-11-09-listening-u08",
+  "revision": 1,
+  "available_on": "2026-11-09",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "Listen: B2 · Education, culture and identity: synthesize what people say",
+  "summary": "Listen for two key details about b2 · Education, culture and identity: synthesize what people say.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u08-listening"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-11-09-listening-u08",
+    "title": "Listen: B2 · Education, culture and identity: synthesize what people say",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "L'invitée a expliqué qu'elle avait repris ses études après plusieurs années. Elle a ajouté que les échanges du groupe l'avaient aidée à persévérer.",
+        "question": "What helped the guest persist?",
+        "options": [
+          "The group's discussions",
+          "A shorter commute",
+          "A new test format",
+          "A change of employer"
+        ],
+        "answer": 0,
+        "explain": "She says the group's exchanges helped her continue."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Il dit que la lecture lui permet de découvrir d'autres perspectives. Il ne prétend pas que cette pratique suffit à elle seule.",
+        "question": "What limitation does the speaker make?",
+        "options": [
+          "The speaker has never joined a group",
+          "Reading offers no new perspective",
+          "No one should read",
+          "Reading alone may not be sufficient"
+        ],
+        "answer": 3,
+        "explain": "He explicitly says reading is not necessarily enough by itself."
+      }
+    ]
+  }
+}

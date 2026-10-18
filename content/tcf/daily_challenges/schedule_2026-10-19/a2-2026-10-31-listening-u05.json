@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-31-listening-u05",
+  "revision": 1,
+  "available_on": "2026-10-31",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Organise work, study and future plans",
+  "summary": "Listen for two key details about organise work, study and future plans.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u05-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-31-listening-u05",
+    "title": "Listen: Organise work, study and future plans",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "La formation du soir commence le 4 novembre. La date limite pour envoyer le formulaire est le 28 octobre.",
+        "question": "What is the last day to send the form?",
+        "options": [
+          "October 28",
+          "November 4",
+          "October 4",
+          "November 28"
+        ],
+        "answer": 0,
+        "explain": "The speaker gives October 28 as the deadline."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Je vais participer à l'entretien vendredi matin. Si l'heure change, la conseillère va m'envoyer un courriel.",
+        "question": "What will the adviser do if the time changes?",
+        "options": [
+          "Send an email",
+          "Cancel the interview",
+          "Change the course level",
+          "Submit the application"
+        ],
+        "answer": 0,
+        "explain": "The speaker says the adviser will email if the time changes."
+      }
+    ]
+  }
+}

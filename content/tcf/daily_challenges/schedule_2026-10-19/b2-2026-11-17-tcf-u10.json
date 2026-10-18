@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-11-17-tcf-u10",
+  "revision": 1,
+  "available_on": "2026-11-17",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "TCF practice: B2 · Community debate: connect ideas without losing the thread",
+  "summary": "Listen for two key details about b2 · Community debate: connect ideas without losing the thread.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u10-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-11-17-tcf-u10",
+    "title": "TCF practice: B2 · Community debate: connect ideas without losing the thread",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Mina propose une ouverture en soirée, tandis que Louis s'inquiète des trajets tardifs. Ils s'entendent toutefois sur la nécessité de demander l'avis des usagers.",
+        "question": "What do Mina and Louis agree on?",
+        "options": [
+          "Choosing one final proposal today",
+          "Asking users for their views",
+          "Ending public transport",
+          "Opening the room every night"
+        ],
+        "answer": 1,
+        "explain": "They agree on consulting users."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Nous avons parlé des horaires. Nous en reparlerons après avoir reçu les commentaires.",
+        "question": "What does en refer to?",
+        "options": [
+          "The deadline",
+          "The comments",
+          "The room",
+          "The schedules"
+        ],
+        "answer": 3,
+        "explain": "En parler refers back to des horaires."
+      }
+    ]
+  }
+}

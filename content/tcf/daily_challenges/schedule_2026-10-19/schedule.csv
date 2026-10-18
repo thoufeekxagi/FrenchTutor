@@ -1,0 +1,121 @@
+available_on,level,primary_skill,title,source_lesson_id,review_status,package
+2026-10-19,a1,Listening,Listen: Introduce yourself,a1-u01-listening,needs_human_review,a1-2026-10-19-listening-u01.json
+2026-10-19,a2,Listening,Listen: A week in my life: connect the details,a2-u01-listening,needs_human_review,a2-2026-10-19-listening-u01.json
+2026-10-19,b1,Listening,"Listen: B1 · Tell the story clearly: before, during and after",b1-u01-listening,needs_human_review,b1-2026-10-19-listening-u01.json
+2026-10-19,b2,Listening,Listen: B2 · From opinion to argument: make the logic visible,b2-u01-listening,needs_human_review,b2-2026-10-19-listening-u01.json
+2026-10-20,a1,Reading,Read: Introduce yourself,a1-u01-reading,needs_human_review,a1-2026-10-20-reading-u01.json
+2026-10-20,a2,Reading,Read: A week in my life: connect the details,a2-u01-reading,needs_human_review,a2-2026-10-20-reading-u01.json
+2026-10-20,b1,Reading,"Read: B1 · Tell the story clearly: before, during and after",b1-u01-reading,needs_human_review,b1-2026-10-20-reading-u01.json
+2026-10-20,b2,Reading,Read: B2 · From opinion to argument: make the logic visible,b2-u01-reading,needs_human_review,b2-2026-10-20-reading-u01.json
+2026-10-21,a1,Reading,TCF practice: Introduce yourself,a1-u01-tcf,needs_human_review,a1-2026-10-21-tcf-u01.json
+2026-10-21,a2,Reading,TCF practice: A week in my life: connect the details,a2-u01-tcf,needs_human_review,a2-2026-10-21-tcf-u01.json
+2026-10-21,b1,Reading,"TCF practice: B1 · Tell the story clearly: before, during and after",b1-u01-tcf,needs_human_review,b1-2026-10-21-tcf-u01.json
+2026-10-21,b2,Reading,TCF practice: B2 · From opinion to argument: make the logic visible,b2-u01-tcf,needs_human_review,b2-2026-10-21-tcf-u01.json
+2026-10-22,a1,Listening,"Listen: Greet, be polite, spell your name",a1-u02-listening,needs_human_review,a1-2026-10-22-listening-u02.json
+2026-10-22,a2,Listening,Listen: What happened this week?,a2-u02-listening,needs_human_review,a2-2026-10-22-listening-u02.json
+2026-10-22,b1,Listening,Listen: B1 · Work and study paths: explain plans and outcomes,b1-u02-listening,needs_human_review,b1-2026-10-22-listening-u02.json
+2026-10-22,b2,Listening,Listen: B2 · News and public claims: report without overstating,b2-u02-listening,needs_human_review,b2-2026-10-22-listening-u02.json
+2026-10-23,a1,Reading,"Read: Greet, be polite, spell your name",a1-u02-reading,needs_human_review,a1-2026-10-23-reading-u02.json
+2026-10-23,a2,Reading,Read: What happened this week?,a2-u02-reading,needs_human_review,a2-2026-10-23-reading-u02.json
+2026-10-23,b1,Reading,Read: B1 · Work and study paths: explain plans and outcomes,b1-u02-reading,needs_human_review,b1-2026-10-23-reading-u02.json
+2026-10-23,b2,Reading,Read: B2 · News and public claims: report without overstating,b2-u02-reading,needs_human_review,b2-2026-10-23-reading-u02.json
+2026-10-24,a1,Listening,"TCF practice: Greet, be polite, spell your name",a1-u02-tcf,needs_human_review,a1-2026-10-24-tcf-u02.json
+2026-10-24,a2,Listening,TCF practice: What happened this week?,a2-u02-tcf,needs_human_review,a2-2026-10-24-tcf-u02.json
+2026-10-24,b1,Listening,TCF practice: B1 · Work and study paths: explain plans and outcomes,b1-u02-tcf,needs_human_review,b1-2026-10-24-tcf-u02.json
+2026-10-24,b2,Listening,TCF practice: B2 · News and public claims: report without overstating,b2-u02-tcf,needs_human_review,b2-2026-10-24-tcf-u02.json
+2026-10-25,a1,Listening,Listen: Forms and papers,a1-u03-listening,needs_human_review,a1-2026-10-25-listening-u03.json
+2026-10-25,a2,Listening,Listen: Everyday events: what I did,a2-u03-listening,needs_human_review,a2-2026-10-25-listening-u03.json
+2026-10-25,b1,Listening,Listen: B1 · Make a proposal and explore what could happen,b1-u03-listening,needs_human_review,b1-2026-10-25-listening-u03.json
+2026-10-25,b2,Listening,Listen: B2 · Work and study decisions: describe relationships precisely,b2-u03-listening,needs_human_review,b2-2026-10-25-listening-u03.json
+2026-10-26,a1,Reading,Read: Forms and papers,a1-u03-reading,needs_human_review,a1-2026-10-26-reading-u03.json
+2026-10-26,a2,Reading,Read: Everyday events: what I did,a2-u03-reading,needs_human_review,a2-2026-10-26-reading-u03.json
+2026-10-26,b1,Reading,Read: B1 · Make a proposal and explore what could happen,b1-u03-reading,needs_human_review,b1-2026-10-26-reading-u03.json
+2026-10-26,b2,Reading,Read: B2 · Work and study decisions: describe relationships precisely,b2-u03-reading,needs_human_review,b2-2026-10-26-reading-u03.json
+2026-10-27,a1,Reading,TCF practice: Forms and papers,a1-u03-tcf,needs_human_review,a1-2026-10-27-tcf-u03.json
+2026-10-27,a2,Reading,TCF practice: Everyday events: what I did,a2-u03-tcf,needs_human_review,a2-2026-10-27-tcf-u03.json
+2026-10-27,b1,Reading,TCF practice: B1 · Make a proposal and explore what could happen,b1-u03-tcf,needs_human_review,b1-2026-10-27-tcf-u03.json
+2026-10-27,b2,Reading,TCF practice: B2 · Work and study decisions: describe relationships precisely,b2-u03-tcf,needs_human_review,b2-2026-10-27-tcf-u03.json
+2026-10-28,a1,Listening,Listen: Family and people,a1-u04-listening,needs_human_review,a1-2026-10-28-listening-u04.json
+2026-10-28,a2,Listening,Listen: Tell a clear story,a2-u04-listening,needs_human_review,a2-2026-10-28-listening-u04.json
+2026-10-28,b1,Listening,"Listen: B1 · Describe the people, places and choices that matter",b1-u04-listening,needs_human_review,b1-2026-10-28-listening-u04.json
+2026-10-28,b2,Listening,Listen: B2 · Housing and city life: compare competing needs,b2-u04-listening,needs_human_review,b2-2026-10-28-listening-u04.json
+2026-10-29,a1,Reading,Read: Family and people,a1-u04-reading,needs_human_review,a1-2026-10-29-reading-u04.json
+2026-10-29,a2,Reading,Read: Tell a clear story,a2-u04-reading,needs_human_review,a2-2026-10-29-reading-u04.json
+2026-10-29,b1,Reading,"Read: B1 · Describe the people, places and choices that matter",b1-u04-reading,needs_human_review,b1-2026-10-29-reading-u04.json
+2026-10-29,b2,Reading,Read: B2 · Housing and city life: compare competing needs,b2-u04-reading,needs_human_review,b2-2026-10-29-reading-u04.json
+2026-10-30,a1,Listening,TCF practice: Family and people,a1-u04-tcf,needs_human_review,a1-2026-10-30-tcf-u04.json
+2026-10-30,a2,Listening,TCF practice: Tell a clear story,a2-u04-tcf,needs_human_review,a2-2026-10-30-tcf-u04.json
+2026-10-30,b1,Listening,"TCF practice: B1 · Describe the people, places and choices that matter",b1-u04-tcf,needs_human_review,b1-2026-10-30-tcf-u04.json
+2026-10-30,b2,Listening,TCF practice: B2 · Housing and city life: compare competing needs,b2-u04-tcf,needs_human_review,b2-2026-10-30-tcf-u04.json
+2026-10-31,a1,Listening,"Listen: Numbers, money and prices",a1-u05-listening,needs_human_review,a1-2026-10-31-listening-u05.json
+2026-10-31,a2,Listening,"Listen: Organise work, study and future plans",a2-u05-listening,needs_human_review,a2-2026-10-31-listening-u05.json
+2026-10-31,b1,Listening,"Listen: B1 · Explain needs, preferences and recommendations",b1-u05-listening,needs_human_review,b1-2026-10-31-listening-u05.json
+2026-10-31,b2,Listening,Listen: B2 · Health and public services: express needs and limits carefully,b2-u05-listening,needs_human_review,b2-2026-10-31-listening-u05.json
+2026-11-01,a1,Reading,"Read: Numbers, money and prices",a1-u05-reading,needs_human_review,a1-2026-11-01-reading-u05.json
+2026-11-01,a2,Reading,"Read: Organise work, study and future plans",a2-u05-reading,needs_human_review,a2-2026-11-01-reading-u05.json
+2026-11-01,b1,Reading,"Read: B1 · Explain needs, preferences and recommendations",b1-u05-reading,needs_human_review,b1-2026-11-01-reading-u05.json
+2026-11-01,b2,Reading,Read: B2 · Health and public services: express needs and limits carefully,b2-u05-reading,needs_human_review,b2-2026-11-01-reading-u05.json
+2026-11-02,a1,Reading,"TCF practice: Numbers, money and prices",a1-u05-tcf,needs_human_review,a1-2026-11-02-tcf-u05.json
+2026-11-02,a2,Reading,"TCF practice: Organise work, study and future plans",a2-u05-tcf,needs_human_review,a2-2026-11-02-tcf-u05.json
+2026-11-02,b1,Reading,"TCF practice: B1 · Explain needs, preferences and recommendations",b1-u05-tcf,needs_human_review,b1-2026-11-02-tcf-u05.json
+2026-11-02,b2,Reading,TCF practice: B2 · Health and public services: express needs and limits carefully,b2-u05-tcf,needs_human_review,b2-2026-11-02-tcf-u05.json
+2026-11-03,a1,Listening,"Listen: Days, time and appointments",a1-u06-listening,needs_human_review,a1-2026-11-03-listening-u06.json
+2026-11-03,a2,Listening,Listen: Choose a home and describe a neighbourhood,a2-u06-listening,needs_human_review,a2-2026-11-03-listening-u06.json
+2026-11-03,b1,Listening,"Listen: B1 · Connect reasons, results and points of contrast",b1-u06-listening,needs_human_review,b1-2026-11-03-listening-u06.json
+2026-11-03,b2,Listening,Listen: B2 · Technology and privacy: reason through possibilities,b2-u06-listening,needs_human_review,b2-2026-11-03-listening-u06.json
+2026-11-04,a1,Reading,"Read: Days, time and appointments",a1-u06-reading,needs_human_review,a1-2026-11-04-reading-u06.json
+2026-11-04,a2,Reading,Read: Choose a home and describe a neighbourhood,a2-u06-reading,needs_human_review,a2-2026-11-04-reading-u06.json
+2026-11-04,b1,Reading,"Read: B1 · Connect reasons, results and points of contrast",b1-u06-reading,needs_human_review,b1-2026-11-04-reading-u06.json
+2026-11-04,b2,Reading,Read: B2 · Technology and privacy: reason through possibilities,b2-u06-reading,needs_human_review,b2-2026-11-04-reading-u06.json
+2026-11-05,a1,Listening,"TCF practice: Days, time and appointments",a1-u06-tcf,needs_human_review,a1-2026-11-05-tcf-u06.json
+2026-11-05,a2,Listening,TCF practice: Choose a home and describe a neighbourhood,a2-u06-tcf,needs_human_review,a2-2026-11-05-tcf-u06.json
+2026-11-05,b1,Listening,"TCF practice: B1 · Connect reasons, results and points of contrast",b1-u06-tcf,needs_human_review,b1-2026-11-05-tcf-u06.json
+2026-11-05,b2,Listening,TCF practice: B2 · Technology and privacy: reason through possibilities,b2-u06-tcf,needs_human_review,b2-2026-11-05-tcf-u06.json
+2026-11-06,a1,Listening,"Listen: Eating: déjeuner, dîner, souper",a1-u07-listening,needs_human_review,a1-2026-11-06-listening-u07.json
+2026-11-06,a2,Listening,Listen: Health appointments and getting help,a2-u07-listening,needs_human_review,a2-2026-11-06-listening-u07.json
+2026-11-06,b1,Listening,Listen: B1 · Report what someone said and asked,b1-u07-listening,needs_human_review,b1-2026-11-06-listening-u07.json
+2026-11-06,b2,Listening,Listen: B2 · Environment and public policy: explain causes and effects,b2-u07-listening,needs_human_review,b2-2026-11-06-listening-u07.json
+2026-11-07,a1,Reading,"Read: Eating: déjeuner, dîner, souper",a1-u07-reading,needs_human_review,a1-2026-11-07-reading-u07.json
+2026-11-07,a2,Reading,Read: Health appointments and getting help,a2-u07-reading,needs_human_review,a2-2026-11-07-reading-u07.json
+2026-11-07,b1,Reading,Read: B1 · Report what someone said and asked,b1-u07-reading,needs_human_review,b1-2026-11-07-reading-u07.json
+2026-11-07,b2,Reading,Read: B2 · Environment and public policy: explain causes and effects,b2-u07-reading,needs_human_review,b2-2026-11-07-reading-u07.json
+2026-11-08,a1,Reading,"TCF practice: Eating: déjeuner, dîner, souper",a1-u07-tcf,needs_human_review,a1-2026-11-08-tcf-u07.json
+2026-11-08,a2,Reading,TCF practice: Health appointments and getting help,a2-u07-tcf,needs_human_review,a2-2026-11-08-tcf-u07.json
+2026-11-08,b1,Reading,TCF practice: B1 · Report what someone said and asked,b1-u07-tcf,needs_human_review,b1-2026-11-08-tcf-u07.json
+2026-11-08,b2,Reading,TCF practice: B2 · Environment and public policy: explain causes and effects,b2-u07-tcf,needs_human_review,b2-2026-11-08-tcf-u07.json
+2026-11-09,a1,Listening,Listen: Groceries and shopping,a1-u08-listening,needs_human_review,a1-2026-11-09-listening-u08.json
+2026-11-09,a2,Listening,"Listen: Ask, answer and follow up at work or school",a2-u08-listening,needs_human_review,a2-2026-11-09-listening-u08.json
+2026-11-09,b1,Listening,Listen: B1 · Ask precise questions and clarify the answer,b1-u08-listening,needs_human_review,b1-2026-11-09-listening-u08.json
+2026-11-09,b2,Listening,"Listen: B2 · Education, culture and identity: synthesize what people say",b2-u08-listening,needs_human_review,b2-2026-11-09-listening-u08.json
+2026-11-10,a1,Reading,Read: Groceries and shopping,a1-u08-reading,needs_human_review,a1-2026-11-10-reading-u08.json
+2026-11-10,a2,Reading,"Read: Ask, answer and follow up at work or school",a2-u08-reading,needs_human_review,a2-2026-11-10-reading-u08.json
+2026-11-10,b1,Reading,Read: B1 · Ask precise questions and clarify the answer,b1-u08-reading,needs_human_review,b1-2026-11-10-reading-u08.json
+2026-11-10,b2,Reading,"Read: B2 · Education, culture and identity: synthesize what people say",b2-u08-reading,needs_human_review,b2-2026-11-10-reading-u08.json
+2026-11-11,a1,Listening,TCF practice: Groceries and shopping,a1-u08-tcf,needs_human_review,a1-2026-11-11-tcf-u08.json
+2026-11-11,a2,Listening,"TCF practice: Ask, answer and follow up at work or school",a2-u08-tcf,needs_human_review,a2-2026-11-11-tcf-u08.json
+2026-11-11,b1,Listening,TCF practice: B1 · Ask precise questions and clarify the answer,b1-u08-tcf,needs_human_review,b1-2026-11-11-tcf-u08.json
+2026-11-11,b2,Listening,"TCF practice: B2 · Education, culture and identity: synthesize what people say",b2-u08-tcf,needs_human_review,b2-2026-11-11-tcf-u08.json
+2026-11-12,a1,Listening,Listen: Getting around,a1-u09-listening,needs_human_review,a1-2026-11-12-listening-u09.json
+2026-11-12,a2,Listening,Listen: Travel across the city and beyond,a2-u09-listening,needs_human_review,a2-2026-11-12-listening-u09.json
+2026-11-12,b1,Listening,Listen: B1 · Talk about how things are done and what you experienced,b1-u09-listening,needs_human_review,b1-2026-11-12-listening-u09.json
+2026-11-12,b2,Listening,Listen: B2 · Everyday economics: qualify numbers and recommendations,b2-u09-listening,needs_human_review,b2-2026-11-12-listening-u09.json
+2026-11-13,a1,Reading,Read: Getting around,a1-u09-reading,needs_human_review,a1-2026-11-13-reading-u09.json
+2026-11-13,a2,Reading,Read: Travel across the city and beyond,a2-u09-reading,needs_human_review,a2-2026-11-13-reading-u09.json
+2026-11-13,b1,Reading,Read: B1 · Talk about how things are done and what you experienced,b1-u09-reading,needs_human_review,b1-2026-11-13-reading-u09.json
+2026-11-13,b2,Reading,Read: B2 · Everyday economics: qualify numbers and recommendations,b2-u09-reading,needs_human_review,b2-2026-11-13-reading-u09.json
+2026-11-14,a1,Reading,TCF practice: Getting around,a1-u09-tcf,needs_human_review,a1-2026-11-14-tcf-u09.json
+2026-11-14,a2,Reading,TCF practice: Travel across the city and beyond,a2-u09-tcf,needs_human_review,a2-2026-11-14-tcf-u09.json
+2026-11-14,b1,Reading,TCF practice: B1 · Talk about how things are done and what you experienced,b1-u09-tcf,needs_human_review,b1-2026-11-14-tcf-u09.json
+2026-11-14,b2,Reading,TCF practice: B2 · Everyday economics: qualify numbers and recommendations,b2-u09-tcf,needs_human_review,b2-2026-11-14-tcf-u09.json
+2026-11-15,a1,Listening,Listen: Housing and the lease,a1-u10-listening,needs_human_review,a1-2026-11-15-listening-u10.json
+2026-11-15,a2,Listening,"Listen: Food, shopping and quantities",a2-u10-listening,needs_human_review,a2-2026-11-15-listening-u10.json
+2026-11-15,b1,Listening,Listen: B1 · TCF oral Task 2: get the information you need,b1-u10-listening,needs_human_review,b1-2026-11-15-listening-u10.json
+2026-11-15,b2,Listening,Listen: B2 · Community debate: connect ideas without losing the thread,b2-u10-listening,needs_human_review,b2-2026-11-15-listening-u10.json
+2026-11-16,a1,Reading,Read: Housing and the lease,a1-u10-reading,needs_human_review,a1-2026-11-16-reading-u10.json
+2026-11-16,a2,Reading,"Read: Food, shopping and quantities",a2-u10-reading,needs_human_review,a2-2026-11-16-reading-u10.json
+2026-11-16,b1,Reading,Read: B1 · TCF oral Task 2: get the information you need,b1-u10-reading,needs_human_review,b1-2026-11-16-reading-u10.json
+2026-11-16,b2,Reading,Read: B2 · Community debate: connect ideas without losing the thread,b2-u10-reading,needs_human_review,b2-2026-11-16-reading-u10.json
+2026-11-17,a1,Listening,TCF practice: Housing and the lease,a1-u10-tcf,needs_human_review,a1-2026-11-17-tcf-u10.json
+2026-11-17,a2,Listening,"TCF practice: Food, shopping and quantities",a2-u10-tcf,needs_human_review,a2-2026-11-17-tcf-u10.json
+2026-11-17,b1,Listening,TCF practice: B1 · TCF oral Task 2: get the information you need,b1-u10-tcf,needs_human_review,b1-2026-11-17-tcf-u10.json
+2026-11-17,b2,Listening,TCF practice: B2 · Community debate: connect ideas without losing the thread,b2-u10-tcf,needs_human_review,b2-2026-11-17-tcf-u10.json

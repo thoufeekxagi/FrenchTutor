@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-04-reading-u06",
+  "revision": 1,
+  "available_on": "2026-11-04",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · Connect reasons, results and points of contrast",
+  "summary": "Read for two key details about b1 · Connect reasons, results and points of contrast.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u06-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-04-reading-u06",
+    "title": "Read: B1 · Connect reasons, results and points of contrast",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Why was the temporary ramp installed?",
+        "options": [
+          "So the station can move",
+          "So people with reduced mobility can reach the platform",
+          "To close the north entrance",
+          "To shorten the construction period"
+        ],
+        "answer": 1,
+        "explain": "The notice states the ramp allows access to the platform.",
+        "promptFr": "AVIS DE TRAVAUX — La passerelle sera fermée du 4 au 18 juin. Afin de rejoindre la station, suivez les panneaux vers l'entrée nord. Ce trajet prend environ six minutes de plus. Une rampe temporaire est installée pour que les personnes à mobilité réduite puissent accéder au quai."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What has not yet been calculated?",
+        "options": [
+          "Staffing cost",
+          "Number of workers",
+          "The current closing time",
+          "The centre's address"
+        ],
+        "answer": 0,
+        "explain": "The report says staffing cost has not been calculated.",
+        "promptFr": "Le comité souhaite prolonger les heures d'ouverture parce que des travailleurs terminent tard. Toutefois, le rapport précise que le coût du personnel n'a pas encore été calculé. Une période d'essai permettrait de mesurer la fréquentation avant de prendre une décision permanente."
+      }
+    ]
+  }
+}

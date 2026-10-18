@@ -85,6 +85,26 @@ abstract final class DesignTokens {
   static Color get text => ink;
   static Color get onPrimary => AppearanceColors.onAccentFor(isDark);
 
+  // Home-specific illustration and practice-tile roles. These stay local to
+  // Learn so category colors cannot spread into unrelated screens.
+  static Color get homeFlame => AppearanceColors.homeFlameFor(isDark);
+  static Color get homeChallenge => AppearanceColors.homeVioletFor(isDark);
+  static Color get homeChallengeSoft =>
+      AppearanceColors.homeVioletSoftFor(isDark);
+  static Color get homeReview => AppearanceColors.homeTealFor(isDark);
+  static Color get homeReviewSoft => AppearanceColors.homeTealSoftFor(isDark);
+  static Color get homeStories => AppearanceColors.homeAmberFor(isDark);
+  static Color get homeStoriesSoft => AppearanceColors.homeAmberSoftFor(isDark);
+  static Color get homePathCanvas =>
+      isDark ? surface : AppearanceColors.homePathCanvas;
+  static LinearGradient get homeHeroGradient => isDark
+      ? heroGradient
+      : const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFF3F8FF), Color(0xFFD7E7FF)],
+        );
+
   // Legacy aliases (Passeport era) — migrate call sites, don't add new uses.
   static Color get parchment => canvas;
   static Color get parchmentDim => canvasDim;

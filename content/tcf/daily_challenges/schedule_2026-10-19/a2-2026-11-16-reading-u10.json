@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-16-reading-u10",
+  "revision": 1,
+  "available_on": "2026-11-16",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "Read: Food, shopping and quantities",
+  "summary": "Read for two key details about food, shopping and quantities.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u10-reading"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-16-reading-u10",
+    "title": "Read: Food, shopping and quantities",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "How many strawberry punnets are on the list?",
+        "options": [
+          "Two",
+          "One",
+          "Three",
+          "Four"
+        ],
+        "answer": 0,
+        "explain": "The list gives two punnets of strawberries.",
+        "promptFr": "LISTE — lentilles sèches : 1 sachet; fraises : 2 barquettes; lait végétal : 1 litre."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What date appears on the label?",
+        "options": [
+          "18 November",
+          "18 October",
+          "8 November",
+          "28 November"
+        ],
+        "answer": 0,
+        "explain": "The label gives 18 November.",
+        "promptFr": "ÉTIQUETTE — Sauce maison. Ingrédients : tomates et eau. Date de péremption : 18 novembre."
+      }
+    ]
+  }
+}

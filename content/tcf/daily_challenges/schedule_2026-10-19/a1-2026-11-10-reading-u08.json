@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-10-reading-u08",
+  "revision": 1,
+  "available_on": "2026-11-10",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Reading",
+  "title": "Read: Groceries and shopping",
+  "summary": "Read for two key details about groceries and shopping.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a1-u08-reading"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-10-reading-u08",
+    "title": "Read: Groceries and shopping",
+    "subtitle": "A1 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What quantity of apples is on the list?",
+        "options": [
+          "One kilogram",
+          "One litre",
+          "One box",
+          "One packet"
+        ],
+        "answer": 0,
+        "explain": "The list says un kilo de pommes.",
+        "promptFr": "LISTE · Un kilo de pommes · Une boîte de céréales · Un litre de lait"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Where are the apples?",
+        "options": [
+          "In the fruit aisle",
+          "At the checkout",
+          "In the pharmacy",
+          "In the clothing section"
+        ],
+        "answer": 0,
+        "explain": "The sign says rayon des fruits.",
+        "promptFr": "ÉPICERIE · RAYON DES FRUITS · Pommes : 3,00 $ / kilo"
+      }
+    ]
+  }
+}

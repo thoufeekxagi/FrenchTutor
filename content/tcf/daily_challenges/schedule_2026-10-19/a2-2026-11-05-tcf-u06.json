@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-05-tcf-u06",
+  "revision": 1,
+  "available_on": "2026-11-05",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "TCF practice: Choose a home and describe a neighbourhood",
+  "summary": "Listen for two key details about choose a home and describe a neighbourhood.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u06-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-05-tcf-u06",
+    "title": "TCF practice: Choose a home and describe a neighbourhood",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le studio est moins cher que l'appartement d'une chambre. Le stationnement intérieur coûte soixante-quinze dollars de plus chaque mois.",
+        "question": "What costs an extra $75 per month?",
+        "options": [
+          "Indoor parking",
+          "Electricity",
+          "The laundry room",
+          "The private balcony"
+        ],
+        "answer": 0,
+        "explain": "The speaker names indoor parking as the extra monthly cost."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La bibliothèque est plus près du logement A. L'épicerie est à trois minutes du logement B.",
+        "question": "Which home is closer to the grocery store?",
+        "options": [
+          "Home B",
+          "Home A",
+          "They are equally close",
+          "Neither home has a grocery store"
+        ],
+        "answer": 0,
+        "explain": "The speaker says the grocery store is three minutes from home B."
+      }
+    ]
+  }
+}

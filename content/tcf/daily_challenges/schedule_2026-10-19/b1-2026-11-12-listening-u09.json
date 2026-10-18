@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-12-listening-u09",
+  "revision": 1,
+  "available_on": "2026-11-12",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "Listen: B1 · Talk about how things are done and what you experienced",
+  "summary": "Listen for two key details about b1 · Talk about how things are done and what you experienced.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u09-listening"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-12-listening-u09",
+    "title": "Listen: B1 · Talk about how things are done and what you experienced",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Les participants ont été accueillis à l'entrée. On leur a remis un badge et le matériel a été distribué dans la salle. En suivant les panneaux, ils ont trouvé leur groupe.",
+        "question": "What did participants receive at the entrance?",
+        "options": [
+          "A certificate",
+          "A new schedule",
+          "A bus ticket",
+          "A badge"
+        ],
+        "answer": 3,
+        "explain": "They received a badge at the entrance."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "On peut s'inscrire au comptoir. Les places sont confirmées par courriel, et les personnes qui annulent doivent prévenir le centre avant mardi.",
+        "question": "How are places confirmed?",
+        "options": [
+          "By phone only",
+          "By email",
+          "By a paper notice",
+          "At the bus stop"
+        ],
+        "answer": 1,
+        "explain": "The notice says confirmation is sent by email."
+      }
+    ]
+  }
+}

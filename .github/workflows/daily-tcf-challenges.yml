@@ -1,0 +1,182 @@
+name: Daily TCF challenges
+
+on:
+  pull_request:
+    branches: [master, tcf-v3]
+    paths:
+      - "content/tcf/daily_challenges/**"
+      - "flutter_app/tool/daily_challenges.py"
+      - "flutter_app/tool/plan_daily_challenges.py"
+      - "flutter_app/lib/v3/daily_challenge/**"
+      - "flutter_app/lib/v3/learn/v3_learn_screen.dart"
+      - "flutter_app/lib/v3/lesson/v3_lesson.dart"
+      - "flutter_app/lib/v3/lesson/v3_lesson_player.dart"
+      - "flutter_app/integration_test/v3_home_test.dart"
+      - "flutter_app/test/v3_daily_challenge_test.dart"
+      - "flutter_app/pubspec.yaml"
+      - "flutter_app/supabase/config.toml"
+      - "flutter_app/supabase/functions/daily-challenge/**"
+      - "flutter_app/supabase/migrations/**"
+      - ".github/workflows/daily-tcf-challenges.yml"
+  push:
+    branches: [master, tcf-v3]
+    paths:
+      - "content/tcf/daily_challenges/**"
+      - "flutter_app/tool/daily_challenges.py"
+      - "flutter_app/tool/plan_daily_challenges.py"
+      - "flutter_app/lib/v3/daily_challenge/**"
+      - "flutter_app/lib/v3/learn/v3_learn_screen.dart"
+      - "flutter_app/lib/v3/lesson/v3_lesson.dart"
+      - "flutter_app/lib/v3/lesson/v3_lesson_player.dart"
+      - "flutter_app/integration_test/v3_home_test.dart"
+      - "flutter_app/test/v3_daily_challenge_test.dart"
+      - "flutter_app/pubspec.yaml"
+      - "flutter_app/supabase/config.toml"
+      - "flutter_app/supabase/functions/daily-challenge/**"
+      - "flutter_app/supabase/migrations/**"
+      - ".github/workflows/daily-tcf-challenges.yml"
+  schedule:
+    - cron: "17 8 * * *"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Supabase target; production only publishes reviewed packages
+        required: true
+        type: choice
+        options: [staging, production]
+        default: staging
+      from_date:
+        description: First learner-local package date (YYYY-MM-DD; blank means today UTC)
+        required: false
+        type: string
+      days:
+        description: Number of dates to publish (1–30)
+        required: true
+        type: number
+        default: 30
+      deploy_backend:
+        description: Apply database migrations and deploy the daily-challenge Edge Function
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate challenge packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate every dated package
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          root = Path("content/tcf/daily_challenges")
+          packages = sorted(root.rglob("*.json"))
+          if not packages:
+              raise SystemExit("No daily challenge packages found.")
+          for package in packages:
+              subprocess.run(
+                  [sys.executable, "flutter_app/tool/daily_challenges.py", "validate", str(package)],
+                  check=True,
+              )
+          print(f"Validated {len(packages)} daily challenge packages.")
+          PY
+
+  publish:
+    name: Publish approved schedule
+    needs: validate
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'schedule' && 'production' || inputs.environment }}
+    env:
+      DAILY_CHALLENGE_STAGING_URL: ${{ secrets.DAILY_CHALLENGE_STAGING_URL }}
+      DAILY_CHALLENGE_STAGING_SERVICE_ROLE_KEY: ${{ secrets.DAILY_CHALLENGE_STAGING_SERVICE_ROLE_KEY }}
+      DAILY_CHALLENGE_PRODUCTION_URL: ${{ secrets.DAILY_CHALLENGE_PRODUCTION_URL }}
+      DAILY_CHALLENGE_PRODUCTION_SERVICE_ROLE_KEY: ${{ secrets.DAILY_CHALLENGE_PRODUCTION_SERVICE_ROLE_KEY }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      INPUT_FROM_DATE: ${{ inputs.from_date }}
+      INPUT_DAYS: ${{ inputs.days }}
+      INPUT_ENVIRONMENT: ${{ inputs.environment }}
+      INPUT_DEPLOY_BACKEND: ${{ inputs.deploy_backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Resolve publish window
+        id: window
+        run: |
+          from_date="${INPUT_FROM_DATE:-$(date -u +%F)}"
+          days="${INPUT_DAYS:-30}"
+          python3 - "$from_date" "$days" <<'PY'
+          import os
+          import sys
+          from datetime import date, timedelta
+
+          start = date.fromisoformat(sys.argv[1])
+          days = int(sys.argv[2])
+          if not 1 <= days <= 30:
+              raise SystemExit("days must be between 1 and 30")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"from_date={start.isoformat()}\n")
+              output.write(f"days={days}\n")
+          print(f"Publishing window: {start} through {start + timedelta(days=days - 1)}")
+          PY
+      - name: Install Supabase CLI
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_backend }}
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Apply migrations and deploy answer endpoint
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_backend }}
+        working-directory: flutter_app
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo "Set SUPABASE_ACCESS_TOKEN in this GitHub environment."; exit 1; }
+          test -n "$SUPABASE_PROJECT_REF" || { echo "Set SUPABASE_PROJECT_REF in this GitHub environment."; exit 1; }
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push --linked
+          supabase functions deploy daily-challenge --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Publish the date window
+        env:
+          FROM_DATE: ${{ steps.window.outputs.from_date }}
+          PUBLISH_DAYS: ${{ steps.window.outputs.days }}
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "schedule" ]; then
+            target=production
+          else
+            target="$INPUT_ENVIRONMENT"
+          fi
+          case "$target" in
+            staging)
+              url="$DAILY_CHALLENGE_STAGING_URL"
+              key="$DAILY_CHALLENGE_STAGING_SERVICE_ROLE_KEY"
+              ;;
+            production)
+              url="$DAILY_CHALLENGE_PRODUCTION_URL"
+              key="$DAILY_CHALLENGE_PRODUCTION_SERVICE_ROLE_KEY"
+              ;;
+            *) echo "Unsupported environment."; exit 1 ;;
+          esac
+          if [ -z "$url" ] || [ -z "$key" ]; then
+            if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+              echo "Production publish skipped: add the production URL and service key to the GitHub production environment."
+              exit 0
+            fi
+            echo "Set the selected environment's daily challenge URL and service key."; exit 1
+          fi
+          python3 flutter_app/tool/daily_challenges.py publish-schedule \
+            content/tcf/daily_challenges \
+            --environment "$target" \
+            --from-date "$FROM_DATE" \
+            --days "$PUBLISH_DAYS"

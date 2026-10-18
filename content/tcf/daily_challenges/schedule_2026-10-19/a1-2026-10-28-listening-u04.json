@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-10-28-listening-u04",
+  "revision": 1,
+  "available_on": "2026-10-28",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "Listen: Family and people",
+  "summary": "Listen for two key details about family and people.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a1-u04-listening"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-10-28-listening-u04",
+    "title": "Listen: Family and people",
+    "subtitle": "A1 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Voici mon frère. Il s'appelle Ali. Il est grand et il a les cheveux noirs.",
+        "question": "What colour is Ali's hair?",
+        "options": [
+          "Black",
+          "Brown",
+          "Blond",
+          "Red"
+        ],
+        "answer": 0,
+        "explain": "Les cheveux noirs."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Ma mère travaille à l'hôpital. Mon père travaille à la maison.",
+        "question": "Who works at the hospital?",
+        "options": [
+          "His father",
+          "His mother",
+          "His sister",
+          "His uncle"
+        ],
+        "answer": 1,
+        "explain": "Ma mère."
+      }
+    ]
+  }
+}

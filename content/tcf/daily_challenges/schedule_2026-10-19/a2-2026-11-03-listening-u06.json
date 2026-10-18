@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-03-listening-u06",
+  "revision": 1,
+  "available_on": "2026-11-03",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Choose a home and describe a neighbourhood",
+  "summary": "Listen for two key details about choose a home and describe a neighbourhood.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u06-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-03-listening-u06",
+    "title": "Listen: Choose a home and describe a neighbourhood",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le studio coûte mille trois cent cinquante dollars. L'appartement d'une chambre est plus spacieux, mais il coûte cent dollars de plus.",
+        "question": "Which home costs less?",
+        "options": [
+          "The studio",
+          "The one-bedroom",
+          "Both cost the same",
+          "The recording gives no price"
+        ],
+        "answer": 0,
+        "explain": "The studio is $1,350; the one-bedroom costs $100 more."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La buanderie est au sous-sol. La laveuse et la sécheuse sont dans cette salle.",
+        "question": "Where are the washer and dryer?",
+        "options": [
+          "In the basement laundry room",
+          "Inside one apartment",
+          "In the parking garage",
+          "At the bus stop"
+        ],
+        "answer": 0,
+        "explain": "The speaker says they are in the basement laundry room."
+      }
+    ]
+  }
+}

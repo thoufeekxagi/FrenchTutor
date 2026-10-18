@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-10-26-reading-u03",
+  "revision": 1,
+  "available_on": "2026-10-26",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · Make a proposal and explore what could happen",
+  "summary": "Read for two key details about b1 · Make a proposal and explore what could happen.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u03-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-10-26-reading-u03",
+    "title": "Read: B1 · Make a proposal and explore what could happen",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What is the condition for the proposed trial?",
+        "options": [
+          "The committee must cancel the survey",
+          "The room must be available",
+          "Everyone must attend every week",
+          "The activity must move online"
+        ],
+        "answer": 1,
+        "explain": "The room's availability is a stated condition.",
+        "promptFr": "Compte rendu — Plusieurs membres souhaitent une activité plus tôt. D'autres ne peuvent arriver qu'après 19 h. Le comité propose un essai de trois semaines, si la salle est disponible. Après l'essai, les participants pourront donner leur avis."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Why would Saturday work for the writer?",
+        "options": [
+          "The workshop is cancelled",
+          "The writer prefers online classes",
+          "The writer is moving on Saturday",
+          "The writer's brother works on weekday evenings"
+        ],
+        "answer": 3,
+        "explain": "The brother works weekday evenings, so Saturday may work.",
+        "promptFr": "Message — Si l'atelier avait lieu le samedi, je pourrais venir avec mon frère. Il travaille le soir en semaine. À mon avis, une séance d'essai permettrait de vérifier si d'autres personnes sont disponibles."
+      }
+    ]
+  }
+}

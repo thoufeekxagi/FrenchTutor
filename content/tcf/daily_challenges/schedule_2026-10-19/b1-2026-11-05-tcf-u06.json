@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-05-tcf-u06",
+  "revision": 1,
+  "available_on": "2026-11-05",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "TCF practice: B1 · Connect reasons, results and points of contrast",
+  "summary": "Listen for two key details about b1 · Connect reasons, results and points of contrast.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u06-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-05-tcf-u06",
+    "title": "TCF practice: B1 · Connect reasons, results and points of contrast",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le chantier a fermé l'entrée principale. Par conséquent, les visiteurs doivent utiliser la porte latérale. Le détour est plus long, toutefois une rampe d'accès est disponible à cette entrée.",
+        "question": "What is one result of the entrance closure?",
+        "options": [
+          "The construction has ended",
+          "The ramp has been removed",
+          "Visitors must use the side door",
+          "The centre is permanently closed"
+        ],
+        "answer": 2,
+        "explain": "The notice says visitors must use the side door."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La nouvelle ligne a été ajoutée afin de desservir le quartier. Elle ne passe pas toutes les dix minutes, alors certains résidents devront attendre plus longtemps.",
+        "question": "What limitation does the speaker mention?",
+        "options": [
+          "The service is less frequent",
+          "The line does not serve the neighbourhood",
+          "The bus stops at every home",
+          "The route is free"
+        ],
+        "answer": 0,
+        "explain": "The new service is not as frequent, so the wait may be longer."
+      }
+    ]
+  }
+}

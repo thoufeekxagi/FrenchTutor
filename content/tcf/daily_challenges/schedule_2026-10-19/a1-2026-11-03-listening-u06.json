@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-03-listening-u06",
+  "revision": 1,
+  "available_on": "2026-11-03",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "Listen: Days, time and appointments",
+  "summary": "Listen for two key details about days, time and appointments.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a1-u06-listening"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-03-listening-u06",
+    "title": "Listen: Days, time and appointments",
+    "subtitle": "A1 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Votre rendez-vous est jeudi, le 12 mars, à quatorze heures trente.",
+        "question": "When is the appointment?",
+        "options": [
+          "Thursday, March 12 at 14:30",
+          "Thursday, March 12 at 14:13",
+          "Tuesday, March 12 at 14:30",
+          "Thursday, May 12 at 14:30"
+        ],
+        "answer": 0,
+        "explain": "Jeudi, le 12 mars, à quatorze heures trente."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La réception est ouverte du lundi au vendredi, de huit heures à seize heures.",
+        "question": "When is reception open?",
+        "options": [
+          "Monday to Friday, 8:00 to 16:00",
+          "Monday to Friday, 8:00 to 18:00",
+          "Tuesday to Saturday, 8:00 to 16:00",
+          "Monday to Friday, 9:00 to 16:00"
+        ],
+        "answer": 0,
+        "explain": "Du lundi au vendredi, de 8 h à 16 h."
+      }
+    ]
+  }
+}

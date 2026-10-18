@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-10-29-reading-u04",
+  "revision": 1,
+  "available_on": "2026-10-29",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Reading",
+  "title": "Read: Family and people",
+  "summary": "Read for two key details about family and people.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a1-u04-reading"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-10-29-reading-u04",
+    "title": "Read: Family and people",
+    "subtitle": "A1 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What is the marital status?",
+        "options": [
+          "Single",
+          "Married",
+          "Common-law",
+          "Divorced"
+        ],
+        "answer": 1,
+        "explain": "Marié(e) is ticked.",
+        "promptFr": "Situation familiale : ☐ célibataire ☒ marié(e) ☐ conjoint(e) de fait ☐ divorcé(e) · Nom du conjoint : Haddad · Prénom : Samira · Nombre d'enfants : 2"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "How many children?",
+        "options": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "answer": 2,
+        "explain": "Nombre d'enfants : 2.",
+        "promptFr": "Situation familiale : ☐ célibataire ☒ marié(e) ☐ conjoint(e) de fait ☐ divorcé(e) · Nom du conjoint : Haddad · Prénom : Samira · Nombre d'enfants : 2"
+      }
+    ]
+  }
+}

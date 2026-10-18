@@ -1,0 +1,4 @@
+project_id = "parlesprint-tcf-v3"
+
+[functions.daily-challenge]
+verify_jwt = true

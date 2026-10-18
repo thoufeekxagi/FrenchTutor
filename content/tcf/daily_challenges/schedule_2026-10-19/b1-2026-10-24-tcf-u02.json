@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-10-24-tcf-u02",
+  "revision": 1,
+  "available_on": "2026-10-24",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "TCF practice: B1 · Work and study paths: explain plans and outcomes",
+  "summary": "Listen for two key details about b1 · Work and study paths: explain plans and outcomes.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u02-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-10-24-tcf-u02",
+    "title": "TCF practice: B1 · Work and study paths: explain plans and outcomes",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le centre confirmera la date lundi. Si l'atelier commence en septembre, Karim s'inscrira cette semaine; sinon, il attendra le prochain groupe.",
+        "question": "What will Karim do if the workshop starts in September?",
+        "options": [
+          "He will move to another city",
+          "He will register this week",
+          "He will cancel his application",
+          "He will ask to teach the course"
+        ],
+        "answer": 1,
+        "explain": "He says he will register this week if the workshop starts in September."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Quand elle recevra son horaire de travail, elle appellera le centre. Si les cours ont lieu le soir, elle pourra participer.",
+        "question": "What information is she waiting for before calling?",
+        "options": [
+          "Her work schedule",
+          "The course certificate",
+          "A bus ticket",
+          "A new address"
+        ],
+        "answer": 0,
+        "explain": "She is waiting for her work schedule."
+      }
+    ]
+  }
+}

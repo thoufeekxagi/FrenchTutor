@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-21-tcf-u01",
+  "revision": 1,
+  "available_on": "2026-10-21",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "TCF practice: A week in my life: connect the details",
+  "summary": "Read for two key details about a week in my life: connect the details.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u01-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-21-tcf-u01",
+    "title": "TCF practice: A week in my life: connect the details",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "When can Awa attend?",
+        "options": [
+          "Tuesday before work",
+          "Wednesday at 18 h",
+          "Thursday at 18 h",
+          "Friday after work"
+        ],
+        "answer": 2,
+        "explain": "Awa says she can go to the session Thursday at 18 h.",
+        "promptFr": "Bonjour, · Je suis libre mardi après le travail, mais pas mercredi. En revanche, je peux aller à la séance jeudi à 18 h. Merci de confirmer avant demain. · Awa"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What should the learner do after each session?",
+        "options": [
+          "Call a classmate",
+          "Write an example from memory",
+          "Study for two hours",
+          "Prepare a presentation"
+        ],
+        "answer": 1,
+        "explain": "The notice says to write an example without looking at notes.",
+        "promptFr": "SEMAINE DE FRANÇAIS · Objectif de la semaine : réviser trois fois. · Lundi : 20 minutes · Mercredi : 20 minutes · Samedi : 30 minutes · Après chaque séance : écrire un exemple sans regarder les notes."
+      }
+    ]
+  }
+}

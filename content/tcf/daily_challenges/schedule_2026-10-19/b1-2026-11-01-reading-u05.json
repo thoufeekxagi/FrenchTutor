@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-01-reading-u05",
+  "revision": 1,
+  "available_on": "2026-11-01",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · Explain needs, preferences and recommendations",
+  "summary": "Read for two key details about b1 · Explain needs, preferences and recommendations.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u05-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-01-reading-u05",
+    "title": "Read: B1 · Explain needs, preferences and recommendations",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What kind of response does the form request?",
+        "options": [
+          "A list of instructors",
+          "A payment record",
+          "A general review of another centre",
+          "A concrete need to improve access"
+        ],
+        "answer": 3,
+        "explain": "It asks for a concrete need related to access.",
+        "promptFr": "Formulaire de commentaires — Nous souhaitons que les activités soient accessibles au plus grand nombre. Indiquez ce qu'il faut améliorer : inscription, transport, horaire ou format. Il est important que votre réponse décrive un besoin concret."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What information is still needed?",
+        "options": [
+          "When the message was written",
+          "Whether children can accompany their parents",
+          "Who paid for the room",
+          "Whether the centre has a name"
+        ],
+        "answer": 1,
+        "explain": "The writer needs confirmation about children attending.",
+        "promptFr": "Message — Je suis contente que le centre propose une séance d'essai. Il faut toutefois que le groupe confirme si les enfants peuvent accompagner leurs parents. Sans cette information, plusieurs personnes ne pourront pas décider."
+      }
+    ]
+  }
+}

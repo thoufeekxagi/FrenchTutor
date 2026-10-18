@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-09-listening-u08",
+  "revision": 1,
+  "available_on": "2026-11-09",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Ask, answer and follow up at work or school",
+  "summary": "Listen for two key details about ask, answer and follow up at work or school.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u08-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-09-listening-u08",
+    "title": "Listen: Ask, answer and follow up at work or school",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "La version finale ? Je la corrige avant midi. Le compte rendu, le tuteur va le relire cet après-midi.",
+        "question": "What will the speaker correct before noon?",
+        "options": [
+          "The final version",
+          "The meeting report",
+          "The attendance sheet",
+          "The class outline"
+        ],
+        "answer": 0,
+        "explain": "La refers to la version finale."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Les documents sont dans le dossier. Nous allons les classer par date, puis envoyer le dossier au comité.",
+        "question": "What will the team do with the documents?",
+        "options": [
+          "File them by date",
+          "Print them in colour",
+          "Delete them",
+          "Send them to the clinic"
+        ],
+        "answer": 0,
+        "explain": "The speaker says the team will file them by date."
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-07-reading-u07",
+  "revision": 1,
+  "available_on": "2026-11-07",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Reading",
+  "title": "Read: Eating: déjeuner, dîner, souper",
+  "summary": "Read for two key details about eating: déjeuner, dîner, souper.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a1-u07-reading"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-07-reading-u07",
+    "title": "Read: Eating: déjeuner, dîner, souper",
+    "subtitle": "A1 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Which drink comes with this breakfast?",
+        "options": [
+          "Tea",
+          "Milk",
+          "Juice",
+          "Water"
+        ],
+        "answer": 0,
+        "explain": "The menu lists du thé.",
+        "promptFr": "DÉJEUNER · Gruau, fruit et thé · 9,50 $"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What comes with the chicken?",
+        "options": [
+          "Rice and vegetables",
+          "Soup and fries",
+          "Bread and cheese",
+          "Pasta and salad"
+        ],
+        "answer": 0,
+        "explain": "The line says poulet, riz et légumes.",
+        "promptFr": "DÎNER · Soupe du jour · Poulet, riz et légumes · 12,50 $"
+      }
+    ]
+  }
+}

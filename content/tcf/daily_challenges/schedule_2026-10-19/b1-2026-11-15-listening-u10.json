@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-15-listening-u10",
+  "revision": 1,
+  "available_on": "2026-11-15",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "Listen: B1 · TCF oral Task 2: get the information you need",
+  "summary": "Listen for two key details about b1 · TCF oral Task 2: get the information you need.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u10-listening"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-15-listening-u10",
+    "title": "Listen: B1 · TCF oral Task 2: get the information you need",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "La rencontre commence à dix heures trente au lieu de dix heures. Les participants doivent entrer par la porte nord. Si vous arrivez après le début, demandez l'organisateur à l'accueil.",
+        "question": "Where should late arrivals ask for the organizer?",
+        "options": [
+          "At reception",
+          "At the bus terminal",
+          "In the parking lot",
+          "At the south entrance"
+        ],
+        "answer": 0,
+        "explain": "Late arrivals should ask at reception."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "L'inscription est facultative, mais les personnes qui souhaitent recevoir le document doivent donner leur adresse courriel. La salle se trouve au deuxième étage.",
+        "question": "What should someone provide to receive the document?",
+        "options": [
+          "A bus pass",
+          "An email address",
+          "A phone number",
+          "A paper form"
+        ],
+        "answer": 1,
+        "explain": "The speaker says an email address is needed to receive the document."
+      }
+    ]
+  }
+}

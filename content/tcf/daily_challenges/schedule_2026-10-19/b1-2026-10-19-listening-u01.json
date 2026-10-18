@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-10-19-listening-u01",
+  "revision": 1,
+  "available_on": "2026-10-19",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "Listen: B1 · Tell the story clearly: before, during and after",
+  "summary": "Listen for two key details about b1 · Tell the story clearly: before, during and after.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u01-listening"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-10-19-listening-u01",
+    "title": "Listen: B1 · Tell the story clearly: before, during and after",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Quand j'ai ouvert le courriel, l'organisatrice avait déjà déplacé l'atelier. Il pleuvait fort, alors j'ai pris le métro vers la nouvelle salle.",
+        "question": "What had happened before the speaker opened the email?",
+        "options": [
+          "The metro had stopped for the day",
+          "The speaker had taught the workshop",
+          "The new room had closed",
+          "The workshop had been moved"
+        ],
+        "answer": 3,
+        "explain": "The organizer had already moved the workshop."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "J'attendais devant la salle quand le gardien m'a expliqué que le groupe était parti. Il avait affiché un avis près de l'entrée, mais je ne l'avais pas remarqué.",
+        "question": "Why did the speaker not know the group had left?",
+        "options": [
+          "The entrance was closed the previous day",
+          "They had not noticed the posted notice",
+          "The group had never arrived",
+          "They had posted the notice"
+        ],
+        "answer": 1,
+        "explain": "The speaker says they had not noticed the notice."
+      }
+    ]
+  }
+}

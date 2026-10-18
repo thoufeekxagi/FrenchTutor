@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-09-listening-u08",
+  "revision": 1,
+  "available_on": "2026-11-09",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "Listen: B1 · Ask precise questions and clarify the answer",
+  "summary": "Listen for two key details about b1 · Ask precise questions and clarify the answer.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u08-listening"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-09-listening-u08",
+    "title": "Listen: B1 · Ask precise questions and clarify the answer",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Pourriez-vous me dire si le formulaire peut être envoyé en ligne ? Oui, mais la preuve d'adresse doit être lisible. Le délai de réponse est de cinq jours ouvrables.",
+        "question": "What must be readable?",
+        "options": [
+          "Proof of address",
+          "The course schedule",
+          "The email subject",
+          "The appointment calendar"
+        ],
+        "answer": 0,
+        "explain": "The proof of address must be readable."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Je voudrais savoir où déposer le document original. On m'a dit que je pouvais l'apporter à l'accueil, du lundi au jeudi.",
+        "question": "Where can the original document be left?",
+        "options": [
+          "By phone",
+          "At the library",
+          "At a bus terminal",
+          "At reception"
+        ],
+        "answer": 3,
+        "explain": "The speaker was told to bring it to reception."
+      }
+    ]
+  }
+}

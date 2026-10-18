@@ -39,7 +39,8 @@ Put the contract as a comment at the top of the screen file.
 | Screen | Intent | Pattern source |
 |---|---|---|
 | Onboarding | animated greeting, three concise TCF value screens, optional exam date, single-row level choices, optional reminders, consent/account gates, then optional Marie practice | Babbel greeting/value slides; single-column choice rows |
-| Today | one next action with reason and time, reviews due, exam countdown, level vs target | new |
+| Learn home | Bonjour greeting, level and exam date, weekly activity, a vivid course continuation, four compact practice actions, and the TCF path | approved home reference, 2026-10-18 |
+| Daily challenge | one short, authored TCF-style task sequence, one step at a time, clear feedback and a useful next step | Speak practice, Babbel review |
 | Path | stage and unit list with states, what each unit lets you do | Babbel course list |
 | Lesson player | one instruction per step, big answers, bottom feedback bar, Previous beside Continue, Marie phone button and inline panel | Speak lesson skeleton |
 | Marie | practise this lesson, exam examiner, ask anything, correction cards | Speak roleplay and corrections |
@@ -54,6 +55,49 @@ Reference screenshots live in `references/extracted/` (local only, not in git).
 word, phrase repeat, grammar card, multiple choice, listen once (TCF style),
 arrange the sentence, speak and compare. Every French string has a speaker
 button (it asks the tutor to say it). Every step has the Marie phone button.
+
+## Approved Learn home contract
+
+The approved home reference is the screen with `Bonjour!`, the A1 and exam
+date chips, a Monday-to-Sunday activity strip, the illustrated course card,
+the two-by-two practice grid, and the illustrated TCF path card. The bottom
+navigation remains Learn, Marie, Tests, and Me. There is no Course/Practice
+segment on this screen; the practice tiles open their destinations directly.
+
+```text
+Screen: Learn home   Key prefix: learn.
+User arrived to: open the app and choose one useful French action.
+They must understand: what lesson to continue, what practice is available,
+their real weekly activity, and where the full TCF path lives.
+Primary action: continue the authored course lesson. Exactly one.
+Secondary action: daily challenge, Marie, review words, Stories, and TCF path.
+Success state: each action opens its existing route and real progress remains
+available when the learner returns home.
+Must not contain: invented streaks, fake challenge availability, XP, coins,
+lives, or a second competing primary action.
+States: default, loading, empty, error, interrupted, completed.
+```
+
+## Daily challenge screen contracts
+
+These are the design contracts for the daily-challenge wireframes in
+`docs/v3/daily-challenges/`. Challenge content and learner completion are not
+yet connected to a published Supabase feed.
+
+```text
+Screen: Daily challenge   Key prefix: dailyChallenge.
+User arrived to: start or resume the challenge tile from the Learn home.
+They must understand: the current skill, step count, progress, and the response
+they are being asked to make.
+Primary action: answer or continue the current step. Exactly one.
+Secondary action: exit and resume later; open the selected tutor when a speaking
+step needs it.
+Success state: objective results are shown with explanations and the Learn
+home reflects the real completion state.
+Must not contain: invented scores, XP, coins, lives, leaderboards, guilt copy,
+or unreleased answer keys in a public content table.
+States: default, loading, empty, error, interrupted, completed.
+```
 
 ## Rules for building v3 UI
 

@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-11-04-reading-u06",
+  "revision": 1,
+  "available_on": "2026-11-04",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Reading",
+  "title": "Read: B2 · Technology and privacy: reason through possibilities",
+  "summary": "Read for two key details about b2 · Technology and privacy: reason through possibilities.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b2-u06-reading"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-11-04-reading-u06",
+    "title": "Read: B2 · Technology and privacy: reason through possibilities",
+    "subtitle": "B2 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What has not yet been measured?",
+        "options": [
+          "The wording of the notice",
+          "The time saved by the feature",
+          "The user's ability to view choices",
+          "Whether the prototype exists"
+        ],
+        "answer": 1,
+        "explain": "The text says the time saving has not been measured.",
+        "promptFr": "Le prototype fictif propose d'enregistrer certaines préférences. L'équipe affirme que cette fonction pourrait accélérer une recherche, mais elle n'a pas encore mesuré le gain. Si les données étaient conservées, les utilisateurs devraient pouvoir consulter et modifier leurs choix. Le document propose aussi un mode sans enregistrement. La décision de lancer la fonction dépendra donc d'un essai et d'explications compréhensibles."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What does the report recommend?",
+        "options": [
+          "Test with several user profiles",
+          "Keep the link difficult to find",
+          "Remove the consent choice",
+          "Assume one test represents everyone"
+        ],
+        "answer": 0,
+        "explain": "The report calls for tests with multiple profiles.",
+        "promptFr": "Deux personnes ont testé le même formulaire. La première a compris le choix de consentement; la seconde n'a pas vu le lien vers les paramètres. Le rapport recommande de tester l'interface avec plusieurs profils, sans supposer qu'une seule expérience représente tous les utilisateurs."
+      }
+    ]
+  }
+}

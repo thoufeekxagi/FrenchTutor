@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-12-listening-u09",
+  "revision": 1,
+  "available_on": "2026-11-12",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "Listen: Getting around",
+  "summary": "Listen for two key details about getting around.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a1-u09-listening"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-12-listening-u09",
+    "title": "Listen: Getting around",
+    "subtitle": "A1 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le musée est en face de la banque.",
+        "question": "Where is the museum?",
+        "options": [
+          "Across from the bank",
+          "Behind the bank",
+          "Inside the bank",
+          "Far from the bank"
+        ],
+        "answer": 0,
+        "explain": "En face de means across from."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Je vais prendre l'autobus au coin de la rue.",
+        "question": "Where will the speaker take the bus?",
+        "options": [
+          "At the corner of the street",
+          "At the museum",
+          "At the train station",
+          "In the park"
+        ],
+        "answer": 0,
+        "explain": "The speaker says au coin de la rue."
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-05-tcf-u06",
+  "revision": 1,
+  "available_on": "2026-11-05",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "TCF practice: Days, time and appointments",
+  "summary": "Listen for two key details about days, time and appointments.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a1-u06-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-05-tcf-u06",
+    "title": "TCF practice: Days, time and appointments",
+    "subtitle": "A1 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Votre rendez-vous est le mercredi 8 juillet à onze heures quinze.",
+        "question": "When is the appointment?",
+        "options": [
+          "Wednesday, July 8 at 11:15",
+          "Wednesday, July 8 at 11:50",
+          "Thursday, July 8 at 11:15",
+          "Wednesday, June 8 at 11:15"
+        ],
+        "answer": 0,
+        "explain": "Mercredi 8 juillet, onze heures quinze."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Le bureau est ouvert de neuf heures à dix-sept heures, du lundi au jeudi.",
+        "question": "On which days is the office open?",
+        "options": [
+          "Monday to Thursday",
+          "Monday to Friday",
+          "Tuesday to Thursday",
+          "Saturday and Sunday"
+        ],
+        "answer": 0,
+        "explain": "Du lundi au jeudi means Monday through Thursday."
+      }
+    ]
+  }
+}

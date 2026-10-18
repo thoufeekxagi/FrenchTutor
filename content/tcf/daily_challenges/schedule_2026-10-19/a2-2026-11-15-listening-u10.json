@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-15-listening-u10",
+  "revision": 1,
+  "available_on": "2026-11-15",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Food, shopping and quantities",
+  "summary": "Listen for two key details about food, shopping and quantities.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u10-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-15-listening-u10",
+    "title": "Listen: Food, shopping and quantities",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Je prends un sachet de lentilles et deux barquettes de fraises. Le prix des fraises est au kilo.",
+        "question": "How many strawberry punnets does the speaker take?",
+        "options": [
+          "Two",
+          "One",
+          "Three",
+          "Four"
+        ],
+        "answer": 0,
+        "explain": "The recording says deux barquettes."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Du lait végétal ? J'en prends un litre. La boisson sans sucre reste au magasin.",
+        "question": "How much plant-based milk does the speaker take?",
+        "options": [
+          "One litre",
+          "One gram",
+          "One glass",
+          "One bottle of water"
+        ],
+        "answer": 0,
+        "explain": "The quantity kept after en is un litre."
+      }
+    ]
+  }
+}

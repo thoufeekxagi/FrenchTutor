@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-10-reading-u08",
+  "revision": 1,
+  "available_on": "2026-11-10",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · Ask precise questions and clarify the answer",
+  "summary": "Read for two key details about b1 · Ask precise questions and clarify the answer.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u08-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-10-reading-u08",
+    "title": "Read: B1 · Ask precise questions and clarify the answer",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "When should applicants follow up?",
+        "options": [
+          "Before sending the form",
+          "After five business days",
+          "Before getting proof of address",
+          "On August 15 at 16 h"
+        ],
+        "answer": 1,
+        "explain": "The notice recommends following up after five business days.",
+        "promptFr": "INSCRIPTION — Envoyez le formulaire et une preuve d'adresse avant le 15 août. Pour confirmer que votre dossier est complet, communiquez avec le bureau après cinq jours ouvrables. Les documents originaux ne doivent pas être envoyés par la poste."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What information does the writer need?",
+        "options": [
+          "Whether the office is moving",
+          "Who will translate the form",
+          "How to replace the document",
+          "Whether an appointment is required and where to see availability"
+        ],
+        "answer": 3,
+        "explain": "The writer asks whether an appointment is required and where to check openings.",
+        "promptFr": "Message — Bonjour, je voudrais savoir si je dois prendre rendez-vous pour remettre le document. Si oui, pourriez-vous me dire où je peux consulter les disponibilités ? Merci."
+      }
+    ]
+  }
+}

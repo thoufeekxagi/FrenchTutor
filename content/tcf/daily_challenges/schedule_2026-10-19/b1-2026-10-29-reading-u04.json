@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-10-29-reading-u04",
+  "revision": 1,
+  "available_on": "2026-10-29",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · Describe the people, places and choices that matter",
+  "summary": "Read for two key details about b1 · Describe the people, places and choices that matter.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u04-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-10-29-reading-u04",
+    "title": "Read: B1 · Describe the people, places and choices that matter",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Which option is closer to work?",
+        "options": [
+          "Option A",
+          "Both are equally close",
+          "The notice does not say",
+          "Option B"
+        ],
+        "answer": 0,
+        "explain": "Option A is described as near the transit terminal, while B is forty minutes from work.",
+        "promptFr": "OPTION A — Studio près du terminus; chauffage compris; buanderie à laquelle les locataires ont accès au sous-sol. OPTION B — Appartement plus grand, dont le loyer est inférieur, mais situé à quarante minutes du travail. Les visites ont lieu sur rendez-vous."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Why did the writer choose the evening group?",
+        "options": [
+          "It is closer to the writer's home",
+          "It fits around work",
+          "It is the only course offered",
+          "It has no placement"
+        ],
+        "answer": 1,
+        "explain": "The evening group fits the writer's work schedule.",
+        "promptFr": "La formation dont le conseiller m'avait parlé comprend un stage. J'ai préféré le groupe du soir, auquel je peux participer après mon travail. Le cours du samedi, que j'avais aussi considéré, se remplit rapidement."
+      }
+    ]
+  }
+}

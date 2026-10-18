@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-11-12-listening-u09",
+  "revision": 1,
+  "available_on": "2026-11-12",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "Listen: B2 · Everyday economics: qualify numbers and recommendations",
+  "summary": "Listen for two key details about b2 · Everyday economics: qualify numbers and recommendations.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u09-listening"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-11-12-listening-u09",
+    "title": "Listen: B2 · Everyday economics: qualify numbers and recommendations",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "La moyenne des dépenses a baissé légèrement. Toutefois, les répondants ne forment pas un échantillon aléatoire; les résultats ne décrivent donc pas nécessairement chaque ménage.",
+        "question": "What limits the conclusion?",
+        "options": [
+          "The average increased sharply",
+          "The report includes every household",
+          "No expenses were recorded",
+          "The sample is not random"
+        ],
+        "answer": 3,
+        "explain": "The speaker says the sample was not random."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Cette hausse pourrait être liée au coût des déplacements, mais le tableau ne donne pas assez de détails pour le confirmer.",
+        "question": "What is the status of the explanation?",
+        "options": [
+          "It is the final confirmed cause",
+          "It is a possibility that the data cannot confirm",
+          "It applies to every household",
+          "It is unrelated to the figures"
+        ],
+        "answer": 1,
+        "explain": "The speaker presents a possible explanation, not a confirmed cause."
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-11-tcf-u08",
+  "revision": 1,
+  "available_on": "2026-11-11",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "TCF practice: Ask, answer and follow up at work or school",
+  "summary": "Listen for two key details about ask, answer and follow up at work or school.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u08-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-11-tcf-u08",
+    "title": "TCF practice: Ask, answer and follow up at work or school",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le compte rendu ? Je vais le remettre vendredi. La liste de corrections, je vais la joindre au fichier.",
+        "question": "What will the speaker attach to the file?",
+        "options": [
+          "The correction list",
+          "The meeting report",
+          "The agenda",
+          "The attendance sheet"
+        ],
+        "answer": 0,
+        "explain": "La refers to la liste de corrections."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Les documents sont prêts. Le tuteur va les relire demain matin.",
+        "question": "Who will reread the documents?",
+        "options": [
+          "The internship supervisor",
+          "The project committee",
+          "The instructor's class",
+          "The reception staff"
+        ],
+        "answer": 0,
+        "explain": "The recording says the supervisor will reread them."
+      }
+    ]
+  }
+}

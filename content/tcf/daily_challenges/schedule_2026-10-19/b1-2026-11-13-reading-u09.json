@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-13-reading-u09",
+  "revision": 1,
+  "available_on": "2026-11-13",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · Talk about how things are done and what you experienced",
+  "summary": "Read for two key details about b1 · Talk about how things are done and what you experienced.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u09-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-13-reading-u09",
+    "title": "Read: B1 · Talk about how things are done and what you experienced",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What is provided?",
+        "options": [
+          "A certificate",
+          "A meal",
+          "Transportation",
+          "The equipment"
+        ],
+        "answer": 3,
+        "explain": "The notice states that equipment is provided.",
+        "promptFr": "ATELIER DU QUARTIER — Les places sont limitées. L'inscription se fait en ligne; un courriel de confirmation est envoyé dans les deux jours. Le matériel est fourni. Les participants sont priés d'arriver dix minutes avant le début."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Where were comments collected?",
+        "options": [
+          "At the registration desk",
+          "In a box near the exit",
+          "By email only",
+          "In the main hall"
+        ],
+        "answer": 1,
+        "explain": "They were collected in a box near the exit.",
+        "promptFr": "Compte rendu — En préparant la salle avec les bénévoles, j'ai appris comment les activités étaient réparties. Les inscriptions ont été vérifiées à l'entrée. À la fin, les commentaires ont été recueillis dans une boîte près de la sortie."
+      }
+    ]
+  }
+}

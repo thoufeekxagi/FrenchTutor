@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-10-27-tcf-u03",
+  "revision": 1,
+  "available_on": "2026-10-27",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Reading",
+  "title": "TCF practice: B2 · Work and study decisions: describe relationships precisely",
+  "summary": "Read for two key details about b2 · Work and study decisions: describe relationships precisely.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b2-u03-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-10-27-tcf-u03",
+    "title": "TCF practice: B2 · Work and study decisions: describe relationships precisely",
+    "subtitle": "B2 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What is offered at the end of the pathway?",
+        "options": [
+          "A full-time job",
+          "A placement, subject to availability",
+          "A new language test",
+          "Automatic recognition for everyone"
+        ],
+        "answer": 1,
+        "explain": "The notice says an internship is offered at the end, subject to availability.",
+        "promptFr": "Le programme de perfectionnement s'adresse aux adultes qui souhaitent consolider leurs compétences en communication. Les cours ont lieu deux soirs par semaine. Les personnes dont l'expérience est pertinente peuvent demander une reconnaissance de leurs acquis, selon les critères publiés. Le stage auquel plusieurs participants s'intéressent est offert à la fin du parcours, sous réserve de disponibilité. La date à laquelle les demandes doivent être déposées figure dans le calendrier."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What does the text recommend checking?",
+        "options": [
+          "Only the program's name",
+          "The number of available jobs",
+          "Whether everyone prefers theory",
+          "Schedules and prerequisites"
+        ],
+        "answer": 3,
+        "explain": "The learner should check schedules and prerequisites.",
+        "promptFr": "Deux programmes semblent comparables. Le premier, auquel on peut s'inscrire à l'automne, comprend davantage de travaux pratiques. Le second donne plus de temps aux notions théoriques. Ce qui importe pour une personne qui travaille déjà, c'est de vérifier les horaires et les préalables. Le document ne permet pas de dire qu'un choix convient à tous."
+      }
+    ]
+  }
+}

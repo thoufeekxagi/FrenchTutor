@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-10-22-listening-u02",
+  "revision": 1,
+  "available_on": "2026-10-22",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "Listen: B2 · News and public claims: report without overstating",
+  "summary": "Listen for two key details about b2 · News and public claims: report without overstating.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u02-listening"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-10-22-listening-u02",
+    "title": "Listen: B2 · News and public claims: report without overstating",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le porte-parole dit que le projet sera évalué après six mois. Il précise que les premiers chiffres ne suffiront pas à mesurer tous les effets.",
+        "question": "What limitation does the spokesperson mention?",
+        "options": [
+          "The project has already been cancelled",
+          "The first figures will not measure every effect",
+          "No figures will be collected",
+          "The evaluation lasts six years"
+        ],
+        "answer": 1,
+        "explain": "The speaker says the first figures will not capture every effect."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Selon une source citée par le média, le coût pourrait augmenter. Le ministère n'a pas confirmé cette estimation.",
+        "question": "How certain is the cost increase?",
+        "options": [
+          "It is a personal preference",
+          "It has already been paid",
+          "It is a final official result",
+          "It is an unconfirmed estimate"
+        ],
+        "answer": 3,
+        "explain": "The estimate is attributed to a source and is not confirmed by the ministry."
+      }
+    ]
+  }
+}

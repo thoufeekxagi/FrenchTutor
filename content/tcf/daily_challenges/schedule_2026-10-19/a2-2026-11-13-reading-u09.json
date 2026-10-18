@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-13-reading-u09",
+  "revision": 1,
+  "available_on": "2026-11-13",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "Read: Travel across the city and beyond",
+  "summary": "Read for two key details about travel across the city and beyond.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u09-reading"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-13-reading-u09",
+    "title": "Read: Travel across the city and beyond",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What should travellers do?",
+        "options": [
+          "Take the detour by the intersection",
+          "Wait at the public library",
+          "Ask for a reserved seat",
+          "Go to the community centre on foot"
+        ],
+        "answer": 0,
+        "explain": "The notice says the express line does not go to the terminus; the detour is by the intersection.",
+        "promptFr": "AVIS DE SERVICE — La ligne express ne va pas au terminus. Prenez le détour par le carrefour."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "When is the arrival time?",
+        "options": [
+          "13:45",
+          "13:20",
+          "14:00",
+          "12:45"
+        ],
+        "answer": 0,
+        "explain": "The ticket information gives an arrival time of 13 h 45.",
+        "promptFr": "Billet : un aller-retour pour le centre communautaire. Départ : 13 h 20. Arrivée : 13 h 45."
+      }
+    ]
+  }
+}

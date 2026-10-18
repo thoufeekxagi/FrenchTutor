@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-12-listening-u09",
+  "revision": 1,
+  "available_on": "2026-11-12",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Travel across the city and beyond",
+  "summary": "Listen for two key details about travel across the city and beyond.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u09-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-12-listening-u09",
+    "title": "Listen: Travel across the city and beyond",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le terminus est fermé aujourd'hui. L'employée indique le nouvel arrêt.",
+        "question": "Who should a traveller ask?",
+        "options": [
+          "The staff member",
+          "The driver in the story",
+          "The library group",
+          "The ticket office manager"
+        ],
+        "answer": 0,
+        "explain": "The announcement says that the staff member points out the stop."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La ligne express va au centre communautaire. Le groupe est là à 14 h.",
+        "question": "Where does the express line go?",
+        "options": [
+          "The community centre",
+          "The public library",
+          "The final stop",
+          "The airport"
+        ],
+        "answer": 0,
+        "explain": "The community centre is the named destination."
+      }
+    ]
+  }
+}

@@ -50,6 +50,32 @@ abstract final class AppearanceColors {
   static const dangerSoftDark = Color(0xFF3D1D1D);
   static const dangerSoftLight = Color(0xFFFCE9E9);
 
+  // Home's small practice tiles keep their category tint while the main
+  // action remains the shared blue accent.
+  static const homeFlame = Color(0xFFF28B35);
+  static const homeViolet = Color(0xFF8053D7);
+  static const homeVioletSoft = Color(0xFFF1EBFF);
+  static const homeTeal = Color(0xFF0F766E);
+  static const homeTealSoft = Color(0xFFE3F5F1);
+  static const homeAmber = Color(0xFFE99424);
+  static const homeAmberSoft = Color(0xFFFFF3E3);
+  static const homePathCanvas = Color(0xFFF7FAFF);
+
+  static Color homeFlameFor(bool dark) =>
+      dark ? const Color(0xFFFFA45B) : homeFlame;
+  static Color homeVioletFor(bool dark) =>
+      dark ? const Color(0xFFBDA2FF) : homeViolet;
+  static Color homeVioletSoftFor(bool dark) =>
+      dark ? const Color(0xFF2B2140) : homeVioletSoft;
+  static Color homeTealFor(bool dark) =>
+      dark ? const Color(0xFF53C8B7) : homeTeal;
+  static Color homeTealSoftFor(bool dark) =>
+      dark ? const Color(0xFF15332F) : homeTealSoft;
+  static Color homeAmberFor(bool dark) =>
+      dark ? const Color(0xFFFFC36E) : homeAmber;
+  static Color homeAmberSoftFor(bool dark) =>
+      dark ? const Color(0xFF3A2C17) : homeAmberSoft;
+
   static Color accentFor(bool dark) => dark ? blueDark : blueLight;
   static Color accentSoftFor(bool dark) => dark ? blueSoftDark : blueSoftLight;
   static Color onAccentFor(bool dark) => dark ? onBlueDark : onBlueLight;

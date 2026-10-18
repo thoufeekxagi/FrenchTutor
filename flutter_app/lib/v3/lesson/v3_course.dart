@@ -17,11 +17,25 @@ abstract final class V3Course {
   static const indexPath = 'assets/content/tcf/course.json';
   static const lessonDir = 'assets/content/tcf/lessons/';
 
-  static Future<List<V3Lesson>> load({AssetBundle? bundle}) async {
+  static Future<List<V3Lesson>> load({
+    AssetBundle? bundle,
+    List<String> idPrefixes = const [],
+  }) async {
     final b = bundle ?? rootBundle;
     final index =
         jsonDecode(await b.loadString(indexPath)) as Map<String, dynamic>;
-    final files = (index['lessons'] as List? ?? const []).cast<String>();
+    final indexedFiles = (index['lessons'] as List? ?? const []).cast<String>();
+    final files = idPrefixes.isEmpty
+        ? indexedFiles
+        : indexedFiles
+              .where(
+                (file) => idPrefixes.any(
+                  (prefix) => file
+                      .replaceFirst(RegExp(r'\.json$'), '')
+                      .startsWith(prefix),
+                ),
+              )
+              .toList();
     final lessons = <V3Lesson>[];
     for (final file in files) {
       try {

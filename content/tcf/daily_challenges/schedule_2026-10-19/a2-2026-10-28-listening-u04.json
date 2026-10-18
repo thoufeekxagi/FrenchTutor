@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-28-listening-u04",
+  "revision": 1,
+  "available_on": "2026-10-28",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Tell a clear story",
+  "summary": "Listen for two key details about tell a clear story.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u04-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-28-listening-u04",
+    "title": "Listen: Tell a clear story",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "À cette époque, le centre était paisible le matin et la rue était calme.",
+        "question": "How was the centre in the morning?",
+        "options": [
+          "Quiet",
+          "Crowded",
+          "Noisy",
+          "Closed"
+        ],
+        "answer": 0,
+        "explain": "The speaker describes it as paisible, quiet."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Chaque mardi, nous prenions le bus après le travail et nous rentrions à dix-huit heures.",
+        "question": "When did the speakers use to take the bus?",
+        "options": [
+          "Every Tuesday after work",
+          "Every morning before work",
+          "Only on Sundays",
+          "At midnight"
+        ],
+        "answer": 0,
+        "explain": "The recording says chaque mardi and après le travail."
+      }
+    ]
+  }
+}

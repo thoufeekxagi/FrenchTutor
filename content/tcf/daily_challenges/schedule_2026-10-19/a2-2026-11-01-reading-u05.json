@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-01-reading-u05",
+  "revision": 1,
+  "available_on": "2026-11-01",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "Read: Organise work, study and future plans",
+  "summary": "Read for two key details about organise work, study and future plans.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u05-reading"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-01-reading-u05",
+    "title": "Read: Organise work, study and future plans",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "By when must the form be submitted?",
+        "options": [
+          "October 28",
+          "November 4",
+          "October 18",
+          "November 28"
+        ],
+        "answer": 0,
+        "explain": "The notice gives October 28 as the deadline.",
+        "promptFr": "FORMATION DU SOIR — Début : 4 novembre. Les cours sont le mardi et le jeudi, de 18 h à 20 h. Date limite pour envoyer le formulaire : 28 octobre."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Has the applicant been accepted?",
+        "options": [
+          "No decision is given yet.",
+          "Yes, the application is accepted.",
+          "No, the application is refused.",
+          "The interview is cancelled."
+        ],
+        "answer": 0,
+        "explain": "The file is received and the application is pending; no decision is stated.",
+        "promptFr": "Votre dossier a été reçu. Votre candidature est en attente. Nous allons confirmer la date de l'entretien du 12 novembre par courriel."
+      }
+    ]
+  }
+}

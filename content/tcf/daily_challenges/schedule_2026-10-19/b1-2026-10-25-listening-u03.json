@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-10-25-listening-u03",
+  "revision": 1,
+  "available_on": "2026-10-25",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "Listen: B1 · Make a proposal and explore what could happen",
+  "summary": "Listen for two key details about b1 · Make a proposal and explore what could happen.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u03-listening"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-10-25-listening-u03",
+    "title": "Listen: B1 · Make a proposal and explore what could happen",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Si le centre ouvrait plus tard, les personnes qui travaillent le jour pourraient venir après leur quart. Le groupe propose de faire un essai avant de changer l'horaire toute l'année.",
+        "question": "What does the group suggest?",
+        "options": [
+          "Try a later opening before making a permanent change",
+          "Ask workers to change their shifts",
+          "Move every activity online",
+          "Close the centre all year"
+        ],
+        "answer": 0,
+        "explain": "They suggest a trial before a permanent schedule change."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "À ta place, je garderais deux options. Certains préfèrent se rencontrer, tandis que d'autres pourraient participer en ligne si la connexion fonctionne.",
+        "question": "What is the speaker recommending?",
+        "options": [
+          "Cancel all online meetings",
+          "Change the topic",
+          "Require everyone to attend in person",
+          "Keep both participation options"
+        ],
+        "answer": 3,
+        "explain": "The speaker recommends keeping both options."
+      }
+    ]
+  }
+}

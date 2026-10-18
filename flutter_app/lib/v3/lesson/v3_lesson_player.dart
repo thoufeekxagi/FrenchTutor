@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../design/tokens.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
+import '../../services/session_recorder.dart';
 import '../../widgets/adaptive/adaptive.dart' show PSHaptics;
 import '../marie/v3_marie_dock.dart';
 import '../marie/v3_marie_session.dart';
@@ -21,12 +22,12 @@ import 'v3_lesson.dart';
 /// User arrived to: do one lesson from the Learn tab.
 /// They must understand: what to do on this step, and how far they are.
 /// Primary action: one per step (Continue, or Check then Continue).
-/// Secondary: hear any French line, Ask Marie, close.
+/// Secondary: hear any French line, call the selected tutor, close.
 /// Success state: the lesson is complete, recorded, and the result is shown.
 /// Must not contain: confetti, XP, hearts, timers, anything centered.
 ///
 /// Voice: every French line has a speaker that plays Gemini Live in the
-/// selected tutor's voice (saved after it is made once). Ask Marie opens the
+/// selected tutor's voice (saved after it is made once). The call button opens the
 /// live tutor with the current step as context.
 class V3LessonPlayer extends ConsumerStatefulWidget {
   const V3LessonPlayer({
@@ -35,6 +36,12 @@ class V3LessonPlayer extends ConsumerStatefulWidget {
     this.startAt = 0,
     this.frontier = 0,
     this.reviewAll = false,
+    this.savePathProgress = true,
+    this.answerChecker,
+    this.onStepChanged,
+    this.onCompleted,
+    this.completionEyebrow = 'LESSON COMPLETE',
+    this.completionTitle = 'Well done.',
     @visibleForTesting this.marie,
   });
 
@@ -50,6 +57,22 @@ class V3LessonPlayer extends ConsumerStatefulWidget {
   /// True when the lesson is already finished: every step can be revisited
   /// freely and nothing here changes the learner's progress.
   final bool reviewAll;
+
+  /// False for authored practice packages that are not part of course order.
+  final bool savePathProgress;
+
+  /// Optional trusted check for remotely published challenge answers.
+  final Future<V3AnswerFeedback> Function(String stepId, int selectedIndex)?
+  answerChecker;
+
+  /// Called when the learner advances, allowing a daily package to resume.
+  final Future<void> Function(int step)? onStepChanged;
+
+  /// Called after the final step, without modifying course progress.
+  final Future<void> Function(Map<String, bool> results)? onCompleted;
+
+  final String completionEyebrow;
+  final String completionTitle;
 
   /// A second tap on Continue inside this window is ignored, so a double tap
   /// can never skip a step. Tests shorten it because they cannot move the real
@@ -67,6 +90,7 @@ class V3LessonPlayer extends ConsumerStatefulWidget {
 class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     with WidgetsBindingObserver {
   late final V3MarieSession _marie;
+  SessionRecorder? _recorder;
 
   @override
   void initState() {
@@ -78,6 +102,17 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
           store: () => ref.read(learningStoreProvider),
           context: _marieContext,
         );
+    try {
+      _recorder = SessionRecorder(
+        storage: ref.read(storageServiceProvider),
+        stage: widget.savePathProgress ? 'v3_lesson' : 'daily_challenge',
+        topic: _lesson.title,
+      );
+    } on UnimplementedError {
+      // Isolated layout tests can mount the player without the app database.
+      // A fully wired app always provides StorageService, so learner sessions
+      // still persist for streak and fingerprint evidence.
+    }
     _marie.addListener(_onMarie);
   }
 
@@ -119,10 +154,14 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
   var _lastAdvance = DateTime.fromMillisecondsSinceEpoch(0);
   int? _selected;
   var _checked = false;
+  var _checking = false;
+  var _savingProgress = false;
   var _complete = false;
   final _results = <String, bool>{};
   final _missed = <String>[];
   final _listenedOnce = <String>{};
+  String? _remoteExplanation;
+  String? _remoteCorrectAnswer;
 
   V3Lesson get _lesson => widget.lesson;
   V3Step get _step => _lesson.steps[_index];
@@ -137,17 +176,42 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     V3ListenStep s => s.options,
     _ => const [],
   };
-  String get _explain => switch (_step) {
-    V3ChooseStep s => s.explain,
-    V3ListenStep s => s.explain,
-    _ => '',
-  };
+  String get _explain =>
+      _remoteExplanation ??
+      switch (_step) {
+        V3ChooseStep s => s.explain,
+        V3ListenStep s => s.explain,
+        _ => '',
+      };
 
   String _audioId(String slot) => 'v3-${_lesson.id}-${_step.id}-$slot';
 
-  void _check() {
+  Future<void> _check() async {
+    if (_checking || _savingProgress || _selected == null) return;
     _lastAdvance = DateTime.now();
-    final correct = _selected == _answer;
+    V3AnswerFeedback? remote;
+    if (widget.answerChecker != null) {
+      setState(() => _checking = true);
+      try {
+        remote = await widget.answerChecker!(_step.id, _selected!);
+      } catch (_) {
+        if (!mounted) return;
+        setState(() => _checking = false);
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Could not check this answer. Try again.'),
+            ),
+          );
+        return;
+      }
+      if (!mounted) return;
+      setState(() => _checking = false);
+    }
+    final correct = remote?.correct ?? _selected == _answer;
+    _remoteExplanation = remote?.explanation;
+    _remoteCorrectAnswer = remote?.correctAnswer;
     _results[_step.id] = correct;
     _answers[_step.id] = _selected!;
     if (!correct) {
@@ -157,35 +221,88 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
         _ => '',
       });
     }
-    correct ? PSHaptics.success() : HapticFeedback.heavyImpact();
+    if (correct) {
+      // This brief native click is intentionally paired with a soft success
+      // haptic. Close Marie's mic first so the sound can never be transcribed
+      // as learner speech; the short hold also covers the system sound tail.
+      _marie.blockMicUntil(
+        DateTime.now().add(const Duration(milliseconds: 700)),
+      );
+      unawaited(SystemSound.play(SystemSoundType.click));
+      PSHaptics.success();
+    } else {
+      HapticFeedback.heavyImpact();
+    }
     setState(() => _checked = true);
     _marie.screenUpdated();
   }
 
-  void _next() {
+  Future<void> _next() async {
+    if (_savingProgress) return;
     // A double tap must never skip a step: ignore a second tap right away.
     final now = DateTime.now();
     if (now.difference(_lastAdvance) < V3LessonPlayer.advanceGuard) return;
     _lastAdvance = now;
     if (_index == _lesson.steps.length - 1) {
-      unawaited(V3Progress.markDone(_lesson.id));
+      if (widget.savePathProgress) unawaited(V3Progress.markDone(_lesson.id));
+      _recorder?.finish(
+        summary: widget.savePathProgress
+            ? 'Completed the course lesson.'
+            : 'Completed the daily TCF challenge.',
+        autoNote: false,
+      );
       unawaited(_marie.end());
+      final completed = widget.onCompleted;
+      if (completed != null) await completed(Map.unmodifiable(_results));
+      if (!mounted) return;
       setState(() => _complete = true);
       return;
     }
+    final changed = widget.onStepChanged;
+    final previousIndex = _index;
+    final previousFrontier = _frontier;
     setState(() {
       _index += 1;
       if (_index > _frontier) _frontier = _index;
+      _savingProgress = changed != null;
       _restoreStepState();
     });
-    unawaited(V3Progress.advanceFrontier(_lesson.id, _index));
+    if (widget.savePathProgress) {
+      unawaited(V3Progress.advanceFrontier(_lesson.id, _index));
+    }
+    if (changed != null) {
+      try {
+        await changed(_index);
+      } catch (_) {
+        if (!mounted) return;
+        setState(() {
+          _index = previousIndex;
+          _frontier = previousFrontier;
+          _savingProgress = false;
+          _restoreStepState();
+        });
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Progress could not be saved. Try continuing again.',
+              ),
+            ),
+          );
+        _marie.screenChanged();
+        return;
+      }
+      if (!mounted) return;
+      setState(() => _savingProgress = false);
+    }
     _marie.screenChanged();
   }
 
   /// Back to the step before, to look again. Real progress is untouched: the
   /// frontier stays where it was, so Resume still returns there.
   void _back() {
-    if (_index == 0) return;
+    if (_savingProgress || _index == 0) return;
     setState(() {
       _index -= 1;
       _restoreStepState();
@@ -194,7 +311,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
   }
 
   void _jumpToFrontier() {
-    if (_index >= _frontier) return;
+    if (_savingProgress || _index >= _frontier) return;
     setState(() {
       _index = _frontier;
       _restoreStepState();
@@ -208,6 +325,9 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     final answered = _answers[_step.id];
     _selected = answered;
     _checked = answered != null;
+    _checking = false;
+    _remoteExplanation = null;
+    _remoteCorrectAnswer = null;
   }
 
   bool get _reviewing => !widget.reviewAll && _index < _frontier;
@@ -486,7 +606,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     ],
     const SizedBox(height: 22),
     Text(
-      'Listen first, then say it yourself. Tap Ask Marie if you want her to listen.',
+      'Listen first, then say it yourself. Call your tutor if you want feedback.',
       style: V3Type.body(15),
     ),
   ];
@@ -646,7 +766,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     return V3Pressable(
       key: const ValueKey('lesson.back'),
       label: 'Previous step',
-      onTap: _back,
+      onTap: _savingProgress ? null : _back,
       child: Container(
         width: 58,
         height: 58,
@@ -703,7 +823,7 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
             if (!correct) ...[
               const SizedBox(height: 6),
               Text(
-                'Answer: ${_options[_answer]}',
+                'Answer: ${_remoteCorrectAnswer ?? _options[_answer]}',
                 style: V3Type.strong(16, tone),
               ),
             ],
@@ -715,8 +835,8 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
             _withBack(
               V3Button(
                 key: const ValueKey('lesson.continue'),
-                label: 'Continue',
-                onTap: _next,
+                label: _savingProgress ? 'Saving…' : 'Continue',
+                onTap: _savingProgress ? null : () => unawaited(_next()),
               ),
             ),
           ],
@@ -735,20 +855,26 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
             _isQuestion
                 ? V3Button(
                     key: const ValueKey('lesson.check'),
-                    label: 'Check',
-                    onTap: _selected == null ? null : _check,
+                    label: _savingProgress
+                        ? 'Saving…'
+                        : _checking
+                        ? 'Checking…'
+                        : 'Check',
+                    onTap: _selected == null || _checking || _savingProgress
+                        ? null
+                        : () => unawaited(_check()),
                   )
                 : V3Button(
                     key: const ValueKey('lesson.continue'),
-                    label: 'Continue',
-                    onTap: _next,
+                    label: _savingProgress ? 'Saving…' : 'Continue',
+                    onTap: _savingProgress ? null : () => unawaited(_next()),
                   ),
           ),
           if (skippable)
             V3Pressable(
               key: const ValueKey('lesson.skipQuestion'),
               label: 'Skip this question',
-              onTap: _next,
+              onTap: _savingProgress ? null : () => unawaited(_next()),
               child: Container(
                 constraints: const BoxConstraints(minHeight: 44),
                 alignment: Alignment.center,
@@ -778,9 +904,9 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('LESSON COMPLETE', style: V3Type.eyebrow()),
+          Text(widget.completionEyebrow, style: V3Type.eyebrow()),
           const SizedBox(height: 12),
-          Text('Well done.', style: V3Type.hero(54)),
+          Text(widget.completionTitle, style: V3Type.hero(54)),
           const SizedBox(height: 10),
           Text(_lesson.title, style: V3Type.body(18)),
           const SizedBox(height: 26),

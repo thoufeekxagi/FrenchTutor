@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-11-15-listening-u10",
+  "revision": 1,
+  "available_on": "2026-11-15",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "Listen: Housing and the lease",
+  "summary": "Listen for two key details about housing and the lease.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a1-u10-listening"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-11-15-listening-u10",
+    "title": "Listen: Housing and the lease",
+    "subtitle": "A1 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Il y a deux chambres et un balcon.",
+        "question": "How many bedrooms are there?",
+        "options": [
+          "Two",
+          "One",
+          "Three",
+          "Four"
+        ],
+        "answer": 0,
+        "explain": "The speaker says deux chambres."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "L'appartement est meublé.",
+        "question": "What is the apartment like?",
+        "options": [
+          "Furnished",
+          "Unfurnished",
+          "Very noisy",
+          "Not available"
+        ],
+        "answer": 0,
+        "explain": "Meublé means furnished."
+      }
+    ]
+  }
+}

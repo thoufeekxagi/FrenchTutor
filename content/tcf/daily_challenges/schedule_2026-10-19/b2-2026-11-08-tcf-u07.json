@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-11-08-tcf-u07",
+  "revision": 1,
+  "available_on": "2026-11-08",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Reading",
+  "title": "TCF practice: B2 · Environment and public policy: explain causes and effects",
+  "summary": "Read for two key details about b2 · Environment and public policy: explain causes and effects.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b2-u07-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-11-08-tcf-u07",
+    "title": "TCF practice: B2 · Environment and public policy: explain causes and effects",
+    "subtitle": "B2 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Why is more consistent data needed?",
+        "options": [
+          "The events differed in size",
+          "No bins were installed",
+          "The project has already ended",
+          "The guide was never distributed"
+        ],
+        "answer": 0,
+        "explain": "The events had different attendance, which can affect comparison.",
+        "promptFr": "Un projet pilote fictif cherche à réduire les déchets lors de rencontres communautaires. Les organisateurs ont installé des bacs et distribué un guide. Le premier bilan ne compare qu'un événement de petite taille avec un événement plus fréquenté; cette différence peut influencer les résultats. Le rapport conclut que la méthode est prometteuse, mais qu'une collecte de données plus uniforme est nécessaire avant toute décision à long terme."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What has the document not established?",
+        "options": [
+          "That transport can be discussed",
+          "That local products exist",
+          "That the proposed procurement already lowers the overall footprint",
+          "That the group has an intention"
+        ],
+        "answer": 2,
+        "explain": "The document presents an intention, not measured proof of overall impact.",
+        "promptFr": "Les organisateurs souhaitent acheter davantage de matériel local dans le but de limiter certains transports. Toutefois, le document ne compare ni les coûts ni la disponibilité des produits. Il présente une intention et une question à examiner, pas une preuve que l'approvisionnement proposé réduit déjà l'empreinte globale."
+      }
+    ]
+  }
+}

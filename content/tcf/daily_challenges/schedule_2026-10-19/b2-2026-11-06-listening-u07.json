@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-11-06-listening-u07",
+  "revision": 1,
+  "available_on": "2026-11-06",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "Listen: B2 · Environment and public policy: explain causes and effects",
+  "summary": "Listen for two key details about b2 · Environment and public policy: explain causes and effects.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u07-listening"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-11-06-listening-u07",
+    "title": "Listen: B2 · Environment and public policy: explain causes and effects",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le dispositif a été créé afin que les bénévoles puissent trier les matières plus facilement. Le premier bilan aura lieu après trois événements.",
+        "question": "When will the first assessment happen?",
+        "options": [
+          "After three events",
+          "Only if the budget changes",
+          "Before the first event",
+          "After one year"
+        ],
+        "answer": 0,
+        "explain": "The first assessment is planned after three events."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "En raison d'un manque de bacs, une partie des matières a été triée plus tard. Cela ne signifie pas que le projet a échoué; l'équipe doit d'abord mesurer l'incidence.",
+        "question": "What does the speaker say about the project's result?",
+        "options": [
+          "It will not be assessed",
+          "It has already met every target",
+          "It is too early to conclude that it failed",
+          "It has no relation to the missing bins"
+        ],
+        "answer": 2,
+        "explain": "The speaker says the effect still needs to be measured."
+      }
+    ]
+  }
+}

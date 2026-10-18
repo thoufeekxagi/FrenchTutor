@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-10-28-listening-u04",
+  "revision": 1,
+  "available_on": "2026-10-28",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "Listen: B1 · Describe the people, places and choices that matter",
+  "summary": "Listen for two key details about b1 · Describe the people, places and choices that matter.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u04-listening"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-10-28-listening-u04",
+    "title": "Listen: B1 · Describe the people, places and choices that matter",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Le logement que j'ai visité hier est lumineux. Le quartier où il se trouve est calme, mais le trajet auquel je dois penser prend presque une heure.",
+        "question": "Which feature is the main concern?",
+        "options": [
+          "The commute is long",
+          "The neighbourhood is noisy",
+          "The landlord has not replied",
+          "The apartment is dark"
+        ],
+        "answer": 0,
+        "explain": "The speaker says the commute takes almost an hour."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La conseillère m'a présenté trois cours. Celui dont les horaires me conviennent est aussi le plus près de mon travail.",
+        "question": "Which course is the speaker considering?",
+        "options": [
+          "The course with no evening classes",
+          "The course with no placement",
+          "The one with a suitable schedule and a location near work",
+          "The one the speaker has already completed"
+        ],
+        "answer": 2,
+        "explain": "The schedule and location fit the speaker."
+      }
+    ]
+  }
+}

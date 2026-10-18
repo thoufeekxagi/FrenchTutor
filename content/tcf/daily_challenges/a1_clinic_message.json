@@ -1,0 +1,52 @@
+{
+  "id": "a1-clinic-message-sample",
+  "revision": 1,
+  "available_on": "2026-10-15",
+  "author": "ParleSprint Editorial",
+  "review_status": "needs_human_review",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "A clinic message",
+  "summary": "Catch an appointment time, read a clinic notice, and ask for an appointment.",
+  "minutes": 5,
+  "steps": ["Listen once", "Read a notice", "Answer aloud"],
+  "source_lesson_ids": ["a1-u13-listening", "a1-u13-reading", "a1-u13-phrases"],
+  "lesson": {
+    "id": "daily-a1-clinic-message",
+    "title": "Clinic appointment",
+    "subtitle": "Listening, reading, then a useful phrase",
+    "minutes": 5,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "listen-time",
+        "fr": "Votre rendez-vous est à dix heures.",
+        "question": "What time is the appointment?",
+        "options": ["9:00", "12:00", "16:00", "10:00"],
+        "answer": 3,
+        "explain": "The recording says dix heures, which means 10:00."
+      },
+      {
+        "type": "choose",
+        "id": "read-hours",
+        "prompt": "Read the clinic notice. When is this clinic open?",
+        "promptFr": "CLINIQUE SANS RENDEZ-VOUS · Lundi au vendredi · 8 h à 16 h",
+        "options": [
+          "Monday only, 4 p.m. to midnight",
+          "Every day, 9 a.m. to 5 p.m.",
+          "Monday to Friday, 8 a.m. to 4 p.m.",
+          "Saturday and Sunday, 8 a.m. to noon"
+        ],
+        "answer": 2,
+        "explain": "The notice gives weekdays from 8 h to 16 h."
+      },
+      {
+        "type": "phrase",
+        "id": "ask-for-appointment",
+        "fr": "Je voudrais un rendez-vous.",
+        "en": "I would like an appointment.",
+        "tip": "Say this to ask a clinic receptionist for an appointment."
+      }
+    ]
+  }
+}

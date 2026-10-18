@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-06-listening-u07",
+  "revision": 1,
+  "available_on": "2026-11-06",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Listening",
+  "title": "Listen: B1 · Report what someone said and asked",
+  "summary": "Listen for two key details about b1 · Report what someone said and asked.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b1-u07-listening"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-06-listening-u07",
+    "title": "Listen: B1 · Report what someone said and asked",
+    "subtitle": "B1 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "La responsable a expliqué que la salle serait disponible dès dix-sept heures. Elle a aussi demandé si les bénévoles pouvaient arriver plus tôt pour installer les chaises.",
+        "question": "What did the coordinator ask the volunteers?",
+        "options": [
+          "Whether they could arrive early",
+          "Whether they could move the date",
+          "Whether they could cancel the event",
+          "Whether they had reserved a different room"
+        ],
+        "answer": 0,
+        "explain": "She asked whether they could arrive earlier to set up chairs."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Selon le compte rendu, le comité a retenu l'idée d'un essai. La durée exacte n'a pas été confirmée; elle sera discutée après la vérification du budget.",
+        "question": "What is not confirmed yet?",
+        "options": [
+          "Whether a budget exists",
+          "Whether the idea was discussed",
+          "The length of the trial",
+          "The meeting location"
+        ],
+        "answer": 2,
+        "explain": "The trial duration is still to be discussed."
+      }
+    ]
+  }
+}

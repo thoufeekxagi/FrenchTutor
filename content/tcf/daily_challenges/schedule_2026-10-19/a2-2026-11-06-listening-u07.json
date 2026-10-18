@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-11-06-listening-u07",
+  "revision": 1,
+  "available_on": "2026-11-06",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Health appointments and getting help",
+  "summary": "Listen for two key details about health appointments and getting help.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u07-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-11-06-listening-u07",
+    "title": "Listen: Health appointments and getting help",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Depuis hier soir, j'ai une gêne légère. Je voudrais une consultation téléphonique pour poser une question.",
+        "question": "What kind of consultation does the speaker request?",
+        "options": [
+          "A phone consultation",
+          "A follow-up by email",
+          "An in-person workshop",
+          "A lab result"
+        ],
+        "answer": 0,
+        "explain": "The speaker asks for a consultation téléphonique."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Votre rendez-vous de suivi est mardi à 14 h. Vous pouvez apporter le résultat de laboratoire.",
+        "question": "What should the listener bring?",
+        "options": [
+          "The lab result",
+          "A rental form",
+          "A bus pass",
+          "A course certificate"
+        ],
+        "answer": 0,
+        "explain": "The message says the listener can bring the lab result."
+      }
+    ]
+  }
+}

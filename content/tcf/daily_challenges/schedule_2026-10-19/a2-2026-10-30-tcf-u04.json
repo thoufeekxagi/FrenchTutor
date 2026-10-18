@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-30-tcf-u04",
+  "revision": 1,
+  "available_on": "2026-10-30",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "TCF practice: Tell a clear story",
+  "summary": "Listen for two key details about tell a clear story.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u04-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-30-tcf-u04",
+    "title": "TCF practice: Tell a clear story",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Quand nous habitions près du parc, les enfants jouaient près de l'entrée après l'école.",
+        "question": "Where did the children use to play?",
+        "options": [
+          "Near the entrance",
+          "Inside the library",
+          "At the bus station",
+          "At the office"
+        ],
+        "answer": 0,
+        "explain": "The recording says they played near the entrance."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La salle avait une grande fenêtre et restait calme si le ciel était couvert.",
+        "question": "What made the room bright?",
+        "options": [
+          "A large window",
+          "A white door",
+          "A balcony",
+          "A street lamp"
+        ],
+        "answer": 0,
+        "explain": "The speaker mentions a large window."
+      }
+    ]
+  }
+}

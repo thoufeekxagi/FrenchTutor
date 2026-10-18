@@ -107,6 +107,19 @@ class V3FrLine {
   final String en;
 }
 
+/// Result of checking an answer on a trusted content service.
+class V3AnswerFeedback {
+  const V3AnswerFeedback({
+    required this.correct,
+    required this.explanation,
+    this.correctAnswer,
+  });
+
+  final bool correct;
+  final String explanation;
+  final String? correctAnswer;
+}
+
 sealed class V3Step {
   const V3Step(this.id);
 

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ParleSprint | Daily TCF challenge wireframes</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --canvas: #f5f7fb;
+      --paper: #fff;
+      --ink: #161a22;
+      --muted: #657084;
+      --line: #e2e7f0;
+      --blue: #2864df;
+      --blue-soft: #eff5ff;
+      --green: #247a55;
+      --green-soft: #eaf6ef;
+      --nav: #707887;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 38px 30px 54px;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .wrap { width: min(1450px, 100%); margin: 0 auto; }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+    .brand { color: var(--blue); font-size: 14px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 8px 0 8px; font-size: clamp(28px, 4vw, 46px); letter-spacing: -.045em; line-height: 1.05; }
+    .intro p { max-width: 700px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+    .sample-tag { flex: 0 0 auto; padding: 10px 14px; border: 1px solid #d9e3f8; border-radius: 99px; background: #fff; color: #3d5d9c; font-size: 12px; font-weight: 700; }
+    .screens { display: grid; grid-template-columns: repeat(3, minmax(280px, 393px)); justify-content: center; align-items: start; gap: 26px; }
+    .screen-column { min-width: 0; }
+    .screen-label { margin: 0 0 10px 3px; color: #66728a; font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    .phone {
+      position: relative;
+      height: 852px;
+      overflow: hidden;
+      border: 7px solid #18202e;
+      border-radius: 40px;
+      background: var(--paper);
+      box-shadow: 0 20px 52px #1c2a441c, 0 4px 10px #1c2a4414;
+    }
+    .status { height: 47px; display: flex; align-items: center; justify-content: space-between; padding: 0 23px; font-size: 12px; font-weight: 750; }
+    .status-right { color: #2b3039; letter-spacing: .03em; }
+    .app-scroll { height: calc(100% - 47px - 74px); overflow: hidden; padding: 8px 21px 18px; }
+    .top { display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+    .wordmark { font-size: 20px; font-weight: 850; letter-spacing: -.055em; }
+    .wordmark span { color: var(--blue); }
+    .exam { text-align: right; }
+    .level { display: inline-block; padding: 5px 11px; border: 1px solid #b9cef9; border-radius: 99px; color: var(--blue); font-size: 12px; font-weight: 800; }
+    .exam small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .eyebrow { margin: 19px 0 4px; color: var(--blue); font-size: 10px; font-weight: 850; letter-spacing: .17em; }
+    .page-title { margin: 0 0 15px; font-size: 34px; font-weight: 850; letter-spacing: -.055em; line-height: 1; }
+    .segments { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin: 9px 0 12px; padding: 4px; border: 1px solid var(--line); border-radius: 15px; background: #f7f8fb; }
+    .segments span { padding: 10px 0; border-radius: 11px; color: var(--muted); font-size: 12px; font-weight: 700; text-align: center; }
+    .segments .active { background: #fff; color: var(--blue); box-shadow: 0 1px 4px #16233a14; }
+    .challenge-card { padding: 18px; border: 1px solid #bdd0fa; border-radius: 23px; background: linear-gradient(142deg, #f4f8ff 0%, #fff 70%); }
+    .challenge-topline { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .challenge-label { color: var(--blue); font-size: 9px; font-weight: 850; letter-spacing: .16em; }
+    .pill { padding: 5px 8px; border-radius: 99px; background: #e7efff; color: #3158a8; font-size: 9px; font-weight: 750; white-space: nowrap; }
+    .challenge-card h2 { margin: 13px 0 6px; font-size: 24px; letter-spacing: -.045em; line-height: 1.06; }
+    .challenge-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .meta-row { display: flex; align-items: center; gap: 12px; margin: 14px 0; color: #48546a; font-size: 10px; font-weight: 700; }
+    .meta-row span { display: inline-flex; align-items: center; gap: 5px; }
+    .step-list { display: grid; gap: 8px; margin: 15px 0; }
+    .step { display: flex; align-items: center; gap: 9px; color: #394256; font-size: 11px; font-weight: 650; }
+    .step-icon { width: 23px; height: 23px; display: grid; place-items: center; border: 1px solid #d4def0; border-radius: 8px; background: #fff; color: var(--blue); font-size: 10px; font-weight: 800; }
+    .progressline { display: flex; justify-content: space-between; margin: 14px 0 6px; color: var(--muted); font-size: 9px; font-weight: 700; }
+    .track { height: 5px; overflow: hidden; border-radius: 99px; background: #dfe7f6; }
+    .track i { display: block; width: 0%; height: 100%; border-radius: inherit; background: var(--blue); }
+    .button { width: 100%; height: 49px; display: flex; align-items: center; justify-content: space-between; margin-top: 15px; padding: 0 15px; border: 0; border-radius: 15px; background: var(--blue); color: white; font-size: 13px; font-weight: 800; }
+    .button .arrow { font-size: 19px; line-height: 0; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 18px 1px 9px; }
+    .section-head strong { font-size: 13px; letter-spacing: -.02em; }
+    .section-head small { color: var(--muted); font-size: 10px; }
+    .path-card { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 17px; background: #fff; }
+    .path-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 13px; background: #eef3fe; color: var(--blue); font-size: 19px; }
+    .path-copy { min-width: 0; flex: 1; }
+    .path-copy b { display: block; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .path-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .path-go { color: var(--blue); font-size: 11px; font-weight: 800; }
+    .review-row { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .review-title { font-size: 11px; font-weight: 750; }
+    .review-caption { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .review-action { color: var(--blue); font-size: 10px; font-weight: 800; }
+    .streak { display:flex; align-items:center; justify-content:space-between; margin:10px 0; padding:10px 13px; border:1px solid var(--line); border-radius:15px; background:#fff; color:#34415a; font-size:11px; font-weight:750; }
+    .streak b { color:var(--blue); }
+    .step-inline { display:flex; justify-content:space-between; gap:5px; margin:12px 0; }
+    .step-inline span { color:#394256; font-size:9px; font-weight:650; }
+    .tabbar { position: absolute; right: 0; bottom: 0; left: 0; height: 74px; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; padding: 0 8px 6px; border-top: 1px solid var(--line); background: #fff; }
+    .tab { display: grid; justify-items: center; gap: 5px; color: var(--nav); font-size: 9px; font-weight: 700; }
+    .tab .glyph { font-size: 18px; line-height: 1; }
+    .tab.selected { color: var(--blue); }
+    /* Challenge detail */
+    .detail-head { display: flex; align-items: center; gap: 12px; margin-top: 7px; }
+    .back { width: 35px; height: 35px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); font-size: 18px; }
+    .detail-meta { flex: 1; }
+    .detail-meta b { display: block; font-size: 10px; letter-spacing: .11em; }
+    .detail-meta small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .detail-progress { margin-top: 21px; }
+    .detail-progress .track i { width: 34%; }
+    .skilltag { display: inline-flex; align-items: center; gap: 6px; margin-top: 23px; padding: 6px 9px; border-radius: 99px; background: var(--blue-soft); color: var(--blue); font-size: 9px; font-weight: 800; }
+    .prompt-title { margin: 11px 0 6px; font-size: 27px; letter-spacing: -.05em; line-height: 1.04; }
+    .prompt-sub { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .audio { display: flex; align-items: center; gap: 11px; margin: 18px 0 18px; padding: 14px; border: 1px solid #c6d5f5; border-radius: 17px; background: #f5f8ff; }
+    .play { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 50%; background: var(--blue); color: white; font-size: 14px; }
+    .audio-main { flex: 1; }
+    .audio-main b { display: block; font-size: 11px; }
+    .audio-main small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+    .wave { width: 65px; height: 24px; display: flex; align-items: center; justify-content: space-between; }
+    .wave i { width: 3px; border-radius: 3px; background: #91ace5; }
+    .question { margin: 19px 0 10px; font-size: 14px; font-weight: 800; letter-spacing: -.02em; }
+    .answers { display: grid; gap: 8px; }
+    .answer { display: flex; align-items: center; justify-content: space-between; min-height: 49px; padding: 0 13px; border: 1px solid var(--line); border-radius: 14px; background: #fff; font-size: 12px; font-weight: 650; }
+    .answer.selected { border-color: var(--blue); background: var(--blue-soft); color: #1d4fae; }
+    .answer-key { width: 23px; height: 23px; display: grid; place-items: center; border: 1px solid #d8deea; border-radius: 8px; color: #6f788b; font-size: 9px; font-weight: 800; }
+    .selected .answer-key { border-color: #92b1f0; background: #fff; color: var(--blue); }
+    .hint { margin-top: 13px; padding: 11px 12px; border-radius: 13px; background: #f7f8fa; color: #5d687b; font-size: 10px; line-height: 1.45; }
+    .detail-footer { position: absolute; right: 21px; bottom: 18px; left: 21px; }
+    .detail-footer .button { margin: 0; }
+    .quiet-link { margin-top: 10px; color: var(--muted); font-size: 10px; font-weight: 650; text-align: center; }
+    /* Completion */
+    .done-mark { width: 66px; height: 66px; display: grid; place-items: center; margin: 37px auto 15px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 30px; font-weight: 700; }
+    .done-title { margin: 0; font-size: 28px; letter-spacing: -.05em; text-align: center; }
+    .done-caption { max-width: 230px; margin: 8px auto 22px; color: var(--muted); font-size: 11px; line-height: 1.5; text-align: center; }
+    .done-summary { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 17px; background: #fff; }
+    .done-row { display: flex; justify-content: space-between; gap: 10px; color: #3a4659; font-size: 10px; }
+    .done-row span:last-child { color: var(--green); font-weight: 750; }
+    .feedback { margin-top: 11px; padding: 14px; border-radius: 17px; background: var(--blue-soft); }
+    .feedback b { font-size: 11px; }
+    .feedback p { margin: 6px 0 0; color: #4e5d75; font-size: 10px; line-height: 1.5; }
+    .next-card { margin-top: 17px; padding: 14px; border: 1px solid var(--line); border-radius: 17px; }
+    .next-card small { color: var(--blue); font-size: 9px; font-weight: 850; letter-spacing: .12em; }
+    .next-card b { display: block; margin-top: 7px; font-size: 13px; }
+    .next-card p { margin: 4px 0 0; color: var(--muted); font-size: 10px; }
+    .footnote { margin: 25px auto 0; max-width: 900px; color: var(--muted); font-size: 12px; line-height: 1.6; text-align: center; }
+    @media (max-width: 1050px) {
+      body { padding: 25px 17px 42px; }
+      .intro { align-items: start; flex-direction: column; }
+      .screens { grid-template-columns: repeat(2, minmax(280px, 393px)); }
+    }
+    @media (max-width: 690px) {
+      .screens { grid-template-columns: minmax(270px, 393px); }
+      .phone { height: 790px; }
+      .app-scroll { height: calc(100% - 47px - 74px); }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="intro">
+      <div>
+        <div class="brand">ParleSprint · TCF Canada</div>
+        <h1>Home and daily challenge</h1>
+        <p>The compact Course home keeps the level and exam date at the top, then puts the daily challenge, course continuation, review, and streak in one glance. Practice holds independent review, the existing practice library, and Stories.</p>
+      </div>
+      <div class="sample-tag">Design wireframe · sample challenge content</div>
+    </header>
+
+    <section class="screens" aria-label="Home, challenge, and completion wireframes">
+      <div class="screen-column">
+        <div class="screen-label">01 · Compact Course home</div>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="status-right">▮▮ 5G&nbsp;&nbsp; 84%</span></div>
+          <div class="app-scroll">
+            <div class="top">
+              <div class="exam"><span class="level">A1</span></div>
+              <div class="exam"><small>Exam in 69 days</small></div>
+            </div>
+            <div class="segments"><span class="active">Course</span><span>Practice</span></div>
+            <div class="streak"><span><b>7 day streak</b></span><span>4 days this week&nbsp; ›</span></div>
+
+            <article class="challenge-card">
+              <div class="challenge-topline"><span class="challenge-label">TODAY'S TCF CHALLENGE</span><span class="pill">LISTENING</span></div>
+              <h2>A clinic message</h2>
+              <p>Catch an appointment time, read a clinic notice, and ask for an appointment.</p>
+              <div class="meta-row"><span>◷ 5 min</span><span>•</span><span>3 short steps</span><span>•</span><span>A1</span></div>
+              <div class="step-inline"><span>① Listen once</span><span>② Read a notice</span><span>③ Say a phrase</span></div>
+              <button class="button" type="button"><span>Start challenge</span><span class="arrow">→</span></button>
+            </article>
+
+            <div class="path-card">
+              <div class="path-icon">↗</div>
+              <div class="path-copy"><small>CONTINUE YOUR COURSE</small><b>Words: who is speaking?</b><small>A1 · 9 min</small></div>
+              <div class="path-go">Open →</div>
+            </div>
+            <div class="review-row"><div><div class="review-title">Review due words</div><div class="review-caption">From lessons you have completed</div></div><div class="review-action">5 due →</div></div>
+          </div>
+          <nav class="tabbar" aria-label="Primary navigation">
+            <div class="tab selected"><span class="glyph">⌂</span><span>Learn</span></div>
+            <div class="tab"><span class="glyph">◉</span><span>Marie</span></div>
+            <div class="tab"><span class="glyph">▤</span><span>Tests</span></div>
+            <div class="tab"><span class="glyph">⚙</span><span>Me</span></div>
+          </nav>
+        </div>
+      </div>
+
+      <div class="screen-column">
+        <div class="screen-label">02 · Daily challenge</div>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="status-right">▮▮ 5G&nbsp;&nbsp; 84%</span></div>
+          <div class="app-scroll" style="height: calc(100% - 47px); padding-top: 8px;">
+            <div class="detail-head"><div class="back">‹</div><div class="detail-meta"><b>DAILY TCF CHALLENGE</b><small>Clinic appointment · A1</small></div><div style="color:var(--muted);font-size:10px;font-weight:700">Exam in 69 days</div></div>
+            <div class="detail-progress">
+              <div class="progressline"><span>STEP 1 OF 3 · LISTENING</span><span>1 / 3</span></div>
+              <div class="track"><i></i></div>
+            </div>
+            <h2 class="prompt-title">Catch the appointment time</h2>
+            <div class="audio"><div class="play">▶</div><div class="audio-main"><b>Play message once</b><small>Short audio · listen before answering</small></div><div class="wave"><i style="height:7px"></i><i style="height:14px"></i><i style="height:18px"></i><i style="height:10px"></i><i style="height:22px"></i><i style="height:13px"></i><i style="height:18px"></i><i style="height:8px"></i><i style="height:15px"></i><i style="height:6px"></i></div></div>
+            <div class="question">What time is the appointment?</div>
+            <div class="answers">
+              <div class="answer"><span>9:00</span><span class="answer-key">A</span></div>
+              <div class="answer"><span>12:00</span><span class="answer-key">B</span></div>
+              <div class="answer"><span>16:00</span><span class="answer-key">C</span></div>
+              <div class="answer selected"><span>10:00</span><span class="answer-key">D</span></div>
+            </div>
+          </div>
+          <div class="detail-footer"><button class="button" type="button"><span>Check answer</span><span class="arrow">→</span></button><div class="quiet-link">Save and continue later</div></div>
+        </div>
+      </div>
+
+      <div class="screen-column">
+        <div class="screen-label">03 · After completion</div>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="status-right">▮▮ 5G&nbsp;&nbsp; 84%</span></div>
+          <div class="app-scroll" style="height: calc(100% - 47px); padding-top: 8px;">
+            <div class="detail-head"><div class="back">‹</div><div class="detail-meta"><b>TODAY'S PRACTICE</b><small>Thursday · A1</small></div></div>
+            <div class="done-mark">✓</div>
+            <h2 class="done-title">Challenge complete</h2>
+            <p class="done-caption">Your practice is saved. See what you understood and what to revisit.</p>
+            <div class="done-summary">
+              <div class="done-row"><span>Listening · appointment time</span><span>Correct</span></div>
+              <div class="done-row"><span>Reading · clinic hours</span><span>Correct</span></div>
+              <div class="done-row"><span>Speaking · ask for directions</span><span>Practised</span></div>
+            </div>
+            <div class="feedback"><b>One useful phrase</b><p>« À quelle heure ? » asks what time something happens. Review this phrase from your course if you need another try.</p></div>
+            <div class="next-card"><small>NEXT IN YOUR PATH</small><b>Words: who is speaking?</b><p>A1 · 9 min · Your course progress stays separate.</p></div>
+            <button class="button" type="button"><span>Continue path</span><span class="arrow">→</span></button>
+          </div>
+          <nav class="tabbar" aria-label="Primary navigation">
+            <div class="tab selected"><span class="glyph">⌂</span><span>Learn</span></div>
+            <div class="tab"><span class="glyph">◉</span><span>Marie</span></div>
+            <div class="tab"><span class="glyph">▤</span><span>Tests</span></div>
+            <div class="tab"><span class="glyph">⚙</span><span>Me</span></div>
+          </nav>
+        </div>
+      </div>
+    </section>
+    <p class="footnote">These are visual wireframes, not a live app build. The clinic scenario, answers, dates, and completion state are examples for review. Published challenge content should come from a reviewed, level-checked content package and real learner progress.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-10-20-reading-u01",
+  "revision": 1,
+  "available_on": "2026-10-20",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Reading",
+  "title": "Read: Introduce yourself",
+  "summary": "Read for two key details about introduce yourself.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a1-u01-reading"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-10-20-reading-u01",
+    "title": "Read: Introduce yourself",
+    "subtitle": "A1 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What is Samira's last name?",
+        "options": [
+          "Samira",
+          "Haddad",
+          "Algérie",
+          "Arabe"
+        ],
+        "answer": 1,
+        "explain": "Nom is the last name.",
+        "promptFr": "Nom : Haddad · Prénom : Samira · Nationalité : algérienne · Langues : arabe, français"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Which languages does Samira speak?",
+        "options": [
+          "Arabic and French",
+          "Arabic and English",
+          "French and English",
+          "Only Arabic"
+        ],
+        "answer": 0,
+        "explain": "Langues: arabe, français.",
+        "promptFr": "Nom : Haddad · Prénom : Samira · Nationalité : algérienne · Langues : arabe, français"
+      }
+    ]
+  }
+}

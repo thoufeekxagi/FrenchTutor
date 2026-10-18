@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-19-listening-u01",
+  "revision": 1,
+  "available_on": "2026-10-19",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: A week in my life: connect the details",
+  "summary": "Listen for two key details about a week in my life: connect the details.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u01-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-19-listening-u01",
+    "title": "Listen: A week in my life: connect the details",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "D'habitude, je travaille le lundi et le mardi. Cette semaine, je suis libre mardi parce que je vais à un atelier.",
+        "question": "Why is the speaker free on Tuesday this week?",
+        "options": [
+          "The speaker is attending a workshop.",
+          "The speaker is sick.",
+          "The speaker has no work this month.",
+          "The speaker is visiting a friend."
+        ],
+        "answer": 0,
+        "explain": "The speaker says je suis libre mardi parce que je vais à un atelier."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Je prépare ma liste de tâches le dimanche. Ensuite, je vérifie les heures de mon cours et de mon travail.",
+        "question": "What does the speaker do after making a to-do list?",
+        "options": [
+          "Checks class and work times",
+          "Calls a colleague",
+          "Changes the class",
+          "Takes a nap"
+        ],
+        "answer": 0,
+        "explain": "The next action is checking the hours for class and work."
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-11-16-reading-u10",
+  "revision": 1,
+  "available_on": "2026-11-16",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "Read: B1 · TCF oral Task 2: get the information you need",
+  "summary": "Read for two key details about b1 · TCF oral Task 2: get the information you need.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u10-reading"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-11-16-reading-u10",
+    "title": "Read: B1 · TCF oral Task 2: get the information you need",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What is optional?",
+        "options": [
+          "Using the north entrance",
+          "The meeting time",
+          "The room number",
+          "Registration"
+        ],
+        "answer": 3,
+        "explain": "The notice says registration is optional.",
+        "promptFr": "RENCONTRE D'INFORMATION — Samedi, 10 h 30, salle 204. Entrée par la porte nord. L'inscription est facultative. Pour obtenir le document de présentation, laissez votre adresse courriel à l'accueil."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Which two details does the writer want?",
+        "options": [
+          "A copy of the presentation and a refund",
+          "Elevator access and whom to contact on arrival",
+          "The organizer's name and phone number",
+          "A new date and the cost"
+        ],
+        "answer": 1,
+        "explain": "The writer asks about elevator access and the contact person.",
+        "promptFr": "Message — J'ai compris que l'atelier avait été déplacé, mais je ne sais pas si le nouveau local est accessible par ascenseur. Pourriez-vous confirmer ce point et me dire à qui m'adresser à mon arrivée ?"
+      }
+    ]
+  }
+}
