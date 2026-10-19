@@ -1,3 +1,4 @@
+import '../../v3/marie/v3_talk_setup.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -23,7 +24,6 @@ import 'speak_review_screen.dart';
 import 'speaking_flow_screen.dart';
 import 'speak_profile_screen.dart';
 import 'speak_settings_screen.dart';
-import 'live_tutor_setup_screen.dart';
 
 /// Speaking Studio: a compact next-action surface over the existing course/session
 /// data flow. The redesign changes hierarchy and presentation only.
@@ -123,7 +123,7 @@ class _SpeakingStudioScreenState extends ConsumerState<SpeakingStudioScreen> {
   }
 
   Future<void> _callTutor() async {
-    await AppRouter.push(context, (_) => const LiveTutorSetupScreen());
+    await AppRouter.push(context, (_) => const V3TalkSetupScreen());
     if (mounted) {
       _loadSessions();
       setState(() {});

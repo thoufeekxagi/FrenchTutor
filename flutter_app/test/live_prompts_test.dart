@@ -135,6 +135,80 @@ void main() {
     );
 
     test(
+      'every Talk with Marie mode is a teaching routine with the shared rules',
+      () {
+        for (final (mode, marker) in const [
+          ('talk', 'TALK IT THROUGH'),
+          ('fix', 'FIX MY FRENCH'),
+          ('tcf', 'TCF-STYLE SPEAKING DRILL'),
+          ('words', 'WORDS AND PRONUNCIATION'),
+        ]) {
+          final prompt = LivePrompts.talkTutor(
+            persona: TutorPersona.marie,
+            level: 'A2',
+            mode: mode,
+            focus: 'canada',
+          );
+          expect(prompt, contains(marker), reason: mode);
+          expect(prompt, contains('life in Canada and immigration'));
+          expect(prompt, contains('CONDUCT (hard rules)'));
+          expect(prompt, contains('Speak only English and French'));
+          expect(prompt, contains('LEVEL LANGUAGE POLICY'));
+          expect(prompt, contains('one prompt per turn'));
+          expect(prompt, isNot(contains('never end two turns')));
+        }
+      },
+    );
+
+    test('the TCF drill never scores or claims to be the official exam', () {
+      final brief = LivePrompts.talkModeBrief('tcf');
+      expect(brief, contains('never claim this is the official exam'));
+      expect(brief.replaceAll('\n', ' '), contains('Never give a score'));
+    });
+
+    test('each opening starts the mode with a concrete first action', () {
+      for (final (mode, action) in const [
+        ('fix', 'one sentence in French'),
+        ('tcf', 'Task 1'),
+        ('words', 'say it slowly'),
+        ('talk', 'one easy question'),
+      ]) {
+        expect(
+          LivePrompts.talkOpening(mode: mode, focus: 'Work and study'),
+          contains(action),
+          reason: mode,
+        );
+      }
+      final opening = LivePrompts.talkOpening(
+        mode: 'fix',
+        focus: 'Work and study',
+      );
+      expect(opening, contains('At most two short sentences'));
+    });
+
+    test('every mode has a short reminder that names the mode', () {
+      for (final (mode, name) in const [
+        ('talk', 'TALK IT THROUGH'),
+        ('fix', 'FIX MY FRENCH'),
+        ('tcf', 'TCF-STYLE DRILL'),
+        ('words', 'WORDS AND PRONUNCIATION'),
+      ]) {
+        final note = LivePrompts.talkModeReminder(mode);
+        expect(note, contains(name), reason: mode);
+        expect(note.length, lessThan(300), reason: mode);
+      }
+    });
+
+    test('the onboarding calibration keeps its probing questions', () {
+      final prompt = LivePrompts.compactOnboardingCalibration(
+        persona: TutorPersona.marie,
+      );
+      expect(prompt, contains('one short probing question at a time'));
+      expect(prompt, contains('CONDUCT (hard rules)'));
+      expect(prompt, isNot(contains('never end two turns')));
+    });
+
+    test(
       'Live Tutor kickoff asks for a fresh topic-based intro, not a script',
       () {
         final kickoff = LivePrompts.liveTutorKickoff(

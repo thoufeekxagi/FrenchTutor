@@ -16,12 +16,13 @@ import '../../models/profile.dart';
 import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
-import '../../screens/speak/speaking_practice_screen.dart';
 import '../../services/alphabet_prewarm.dart';
 import '../../services/notification_permission_service.dart';
 import '../../services/notification_scheduler_service.dart';
 import '../../services/product_analytics.dart';
 import '../../services/trial_call_gate.dart';
+import '../marie/v3_call_screen.dart';
+import '../marie/v3_marie_session.dart';
 import '../tutors/v3_tutor_picker_sheet.dart';
 import '../ui/v3_ui.dart';
 
@@ -1773,33 +1774,30 @@ class _V3OnboardingTrialOfferState extends ConsumerState<V3OnboardingTrialOffer>
 
     SpeakingResult? result;
     try {
+      final store = ref.read(learningStoreProvider);
+      final trialContext = LivePrompts.trialLessonContextFor(
+        goal: goal,
+        level: level,
+        focus: const ['Speaking', 'Listening'],
+        tutorName: _tutor.displayName,
+      );
       result = await AppRouter.push<SpeakingResult>(
         context,
-        (_) => SpeakingPracticeScreen(
-          autoStart: true,
-          request: SpeakingPracticeRequest(
-            mode: SpeakingMode.freeTalk,
-            topic: 'Onboarding calibration',
-            level: LivePrompts.normalizeLevel(level),
-            goal: goal,
-            durationMinutes: 3,
-            lessonContext: LivePrompts.trialLessonContextFor(
-              goal: goal,
-              level: level,
-              focus: const ['Speaking', 'Listening'],
-              tutorName: _tutor.displayName,
-            ),
-            stage: 'trial',
-            sessionTopic: 'Onboarding calibration · $goal',
-            kickoffMessage: LivePrompts.trialKickoffFor(
-              goal: goal,
-              level: level,
-            ),
-            durationLimitSeconds: TrialCallGate.maxSeconds,
-            wrapUpNote: LivePrompts.trialWrapUpNote,
-            wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
-            popResultImmediately: true,
-            skipQuota: true,
+        (_) => V3CallScreen(
+          keyPrefix: 'onboarding.trial',
+          title: 'Practice with ${_tutor.displayName}',
+          subtitle: 'A three-minute check of where you are',
+          stage: 'trial',
+          topic: 'Onboarding calibration · $goal',
+          limitSeconds: TrialCallGate.maxSeconds,
+          wrapUpNote: LivePrompts.trialWrapUpNote,
+          wrapUpLeadSeconds: TrialCallGate.wrapUpLeadSeconds,
+          createSession: () => V3MarieSession.createCall(
+            store: () => store,
+            context: () => trialContext,
+            opening: LivePrompts.trialKickoffFor(goal: goal, level: level),
+            isTrial: true,
+            idleLimit: const Duration(seconds: 60),
           ),
         ),
         fullscreenDialog: true,

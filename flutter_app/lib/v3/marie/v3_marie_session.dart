@@ -49,6 +49,29 @@ abstract class V3MarieSession extends ChangeNotifier {
       ? V3FakeMarieSession()
       : V3LiveMarieSession(store: store, context: context);
 
+  /// A whole-screen call (Talk with Marie, onboarding) on the same engine.
+  factory V3MarieSession.createCall({
+    required LearningStore Function() store,
+    required String Function() context,
+    String? systemPrompt,
+    required String opening,
+    bool isTrial = false,
+    bool limitFollowUps = false,
+    String? reminder,
+    Duration? idleLimit,
+  }) => useFake
+      ? V3FakeMarieSession(idleLimit: idleLimit)
+      : V3LiveMarieSession(
+          store: store,
+          context: context,
+          idleLimit: idleLimit,
+          systemPrompt: systemPrompt,
+          opening: opening,
+          isTrial: isTrial,
+          limitFollowUps: limitFollowUps,
+          reminder: reminder,
+        );
+
   final Duration idleLimit;
   static const maxHistory = 12;
 
@@ -64,6 +87,10 @@ abstract class V3MarieSession extends ChangeNotifier {
   V3MariePhase get phase;
   bool get muted;
   String? get error;
+
+  /// How many things the learner has said in this call (not capped).
+  int get learnerTurns => _learnerTurns;
+  int _learnerTurns = 0;
 
   bool get isLive => phase == V3MariePhase.live;
   bool get isBusy => phase != V3MariePhase.idle;
@@ -96,11 +123,6 @@ abstract class V3MarieSession extends ChangeNotifier {
   /// away. She is still heard.
   Future<bool> speak(BuildContext context, String text, {bool reveal = true});
 
-  /// Quietly makes the clips for [lines] ahead of the learner's tap so the
-  /// speaker buttons answer at once. Short lines only; already saved clips are
-  /// skipped. Never plays anything and never opens a call.
-  void prefetch(List<String> lines) {}
-
   /// Cuts off what she is saying right now. The call stays open.
   Future<void> skip();
 
@@ -128,6 +150,7 @@ abstract class V3MarieSession extends ChangeNotifier {
   @protected
   void startedCall() {
     _history.clear();
+    _learnerTurns = 0;
     _streaming = '';
     _caption = '';
     _marieSpeaking = false;
@@ -202,6 +225,7 @@ abstract class V3MarieSession extends ChangeNotifier {
   void learnerSaid(String text) {
     final line = text.trim();
     if (line.isEmpty) return;
+    _learnerTurns++;
     _addLine(V3MarieLine(fromMarie: false, text: line));
     touch();
     notifyListeners();
@@ -234,27 +258,60 @@ class V3LiveMarieSession extends V3MarieSession {
     required this.store,
     required this.context,
     super.idleLimit,
+    this.systemPrompt,
+    this.opening,
+    this.isTrial = false,
+    this.limitFollowUps = true,
+    this.reminder,
   });
 
   final LearningStore Function() store;
   final String Function() context;
 
+  /// Set for Talk with Marie and onboarding: a full prompt instead of the
+  /// lesson-help prompt. Lesson Marie leaves all four of these at default.
+  final String? systemPrompt;
+  final String? opening;
+  final bool isTrial;
+  final bool limitFollowUps;
+
+  /// Sent silently after each of her turns so a teaching mode does not drift
+  /// back into casual chat.
+  final String? reminder;
+
   /// Built on the first tap, so a lesson that never calls Marie costs nothing.
   InlineCallController? _callInstance;
   InlineCallController get _call => _callInstance ??= InlineCallController(
     sessionType: LiveSessionType.lessonCoach,
-    lessonContext: () =>
-        'CURRENT APP STEP (the screen changed; this replaces every earlier step): ${context()}',
+    lessonContext: systemPrompt == null && !isTrial
+        ? () =>
+              'CURRENT APP STEP (the screen changed; this replaces every earlier step): ${context()}'
+        : context,
     setupContext: _contextWithMemory,
     learningStoreForProfile: store(),
     onChanged: _changed,
-    openingPrompt: _greeting(),
+    openingPrompt: opening ?? _greeting(),
+    isTrial: isTrial,
+    systemPrompt: systemPrompt,
+    limitFollowUps: limitFollowUps,
     onUserTranscript: learnerSaid,
     onTutorTranscript: marieTurn,
     onTutorTranscriptDelta: marieDelta,
-    onTurnComplete: touch,
+    onTurnComplete: _turnDone,
   );
   var _wasLive = false;
+
+  void _turnDone() {
+    touch();
+    final note = reminder;
+    if (note != null && _callInstance?.active == true) {
+      _callInstance?.gemini?.injectContext(note);
+    }
+  }
+
+  /// The live call controller, for hosts that send app notes (the onboarding
+  /// wrap-up).
+  InlineCallController get call => _call;
 
   /// The screen plus the last few lines of this call, for every connect and
   /// reconnect. A reconnect that forgot the conversation made her introduce
@@ -329,52 +386,11 @@ class V3LiveMarieSession extends V3MarieSession {
   Future<void> toggleMute() async => _callInstance?.toggleMute();
 
   Timer? _clipTimer;
-  final _prefetchQueue = <String>[];
-  final _prefetchSeen = <String>{};
-  var _prefetching = false;
 
-  @override
-  void prefetch(List<String> lines) {
-    for (final raw in lines) {
-      final line = raw.trim();
-      if (line.isEmpty || line.length > 90 || !_prefetchSeen.add(line)) {
-        continue;
-      }
-      _prefetchQueue.add(line);
-    }
-    if (!_prefetching && _prefetchQueue.isNotEmpty) unawaited(_runPrefetch());
-  }
-
-  Future<void> _runPrefetch() async {
-    _prefetching = true;
-    final voice = ActiveTutor.current.voiceName;
-    try {
-      while (_prefetchQueue.isNotEmpty) {
-        final line = _prefetchQueue.removeAt(0);
-        try {
-          final saved = await LessonSpeechService.shared.loadCachedAudio(
-            line,
-            voiceName: voice,
-          );
-          if (saved != null && saved.isNotEmpty) continue;
-          await GeminiLiveAudioService.shared.generateAndCache(
-            text: line,
-            contentItemId: 'v3_speaker',
-            voiceName: voice,
-          );
-        } catch (_) {
-          _prefetchSeen.remove(line);
-        }
-      }
-    } finally {
-      _prefetching = false;
-    }
-  }
-
-  /// A speaker tap plays a saved audio clip in the selected tutor's voice. It
-  /// never opens a call and never touches the microphone: the first tap of a
-  /// line makes the clip once (a few seconds), every later tap is instant and
-  /// works offline. If a call is open, Marie stops talking and the microphone
+  /// A speaker tap plays the line in the selected tutor's voice. It never opens
+  /// a call and never touches the microphone: the first tap of a line makes the
+  /// clip once, live (one attempt, no lookups), every later tap is instant and
+  /// works offline. Nothing is generated ahead of a tap. If a call is open, Marie stops talking and the microphone
   /// stays closed while the clip plays.
   @override
   Future<bool> speak(
@@ -386,16 +402,10 @@ class V3LiveMarieSession extends V3MarieSession {
     if (line.isEmpty) return false;
     final voice = ActiveTutor.current.voiceName;
     try {
-      final bytes =
-          await LessonSpeechService.shared.loadCachedAudio(
-            line,
-            voiceName: voice,
-          ) ??
-          await GeminiLiveAudioService.shared.generateAndCache(
-            text: line,
-            contentItemId: 'v3_speaker',
-            voiceName: voice,
-          );
+      final bytes = await GeminiLiveAudioService.shared.speakOnce(
+        text: line,
+        voiceName: voice,
+      );
       if (bytes == null || bytes.isEmpty || bytes.length.isOdd) return false;
       final call = _callInstance;
       if (call != null && call.active && call.tutorTurnActive) {

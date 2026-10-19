@@ -163,33 +163,6 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
   String? _remoteExplanation;
   String? _remoteCorrectAnswer;
 
-  var _prefetchedAt = -1;
-
-  /// The French lines whose speaker buttons the learner is about to meet:
-  /// this step and the next two. Their clips are made quietly in advance so a
-  /// tap plays at once.
-  List<String> _upcomingSpeakerLines() {
-    final out = <String>[];
-    final steps = _lesson.steps;
-    for (var i = _index; i < steps.length && i < _index + 3; i++) {
-      switch (steps[i]) {
-        case V3WordStep s:
-          out.addAll([s.spoken, s.exampleFr]);
-        case V3PhraseStep s:
-          out.add(s.spoken);
-        case V3ExplainStep s:
-          out.addAll(s.examples.take(2).map((e) => e.fr));
-        case V3ChooseStep s:
-          out.add(s.promptFr);
-        case V3ListenStep s:
-          out.add(s.fr);
-        case V3TableStep _:
-          break;
-      }
-    }
-    return out.where((l) => l.trim().isNotEmpty).take(6).toList();
-  }
-
   V3Lesson get _lesson => widget.lesson;
   V3Step get _step => _lesson.steps[_index];
   bool get _isQuestion => _step is V3ChooseStep || _step is V3ListenStep;
@@ -440,12 +413,6 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
 
   @override
   Widget build(BuildContext context) {
-    if (_prefetchedAt != _index) {
-      _prefetchedAt = _index;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _marie.prefetch(_upcomingSpeakerLines());
-      });
-    }
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: V3Width(

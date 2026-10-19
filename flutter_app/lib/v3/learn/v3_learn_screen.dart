@@ -1,3 +1,4 @@
+import '../marie/v3_talk_setup.dart';
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
@@ -11,7 +12,6 @@ import '../../design/tokens.dart';
 import '../../models/content_models.dart';
 import '../../models/profile.dart';
 import '../../providers/database_provider.dart';
-import '../../screens/speak/live_tutor_setup_screen.dart';
 import '../../screens/labs/vocabulary_flashcards_screen.dart';
 import '../../services/learning_streak_service.dart';
 import '../../services/srs_service.dart';
@@ -1278,7 +1278,7 @@ class _V3LearnScreenState extends ConsumerState<V3LearnScreen>
   Future<void> _openMarie() async {
     await AppRouter.push<void>(
       context,
-      (_) => const LiveTutorSetupScreen(),
+      (_) => const V3TalkSetupScreen(),
       fullscreenDialog: true,
     );
   }

@@ -46,6 +46,9 @@ class InlineCallController {
     this.compactGuidedContext = false,
     this.levelOverride,
     this.lessonContextCharacterLimit,
+    this.isTrial = false,
+    this.systemPrompt,
+    this.limitFollowUps = true,
   });
 
   final LiveSessionType sessionType;
@@ -108,6 +111,13 @@ class InlineCallController {
   /// their complete script/questions available without changing the smaller
   /// default used by ordinary inline helpers.
   final int? lessonContextCharacterLimit;
+
+  /// The pre-sign-up onboarding call: same engine, trial token and prompt.
+  final bool isTrial;
+
+  /// A full system prompt for modes that are not lesson help (Talk with Marie).
+  final String? systemPrompt;
+  final bool limitFollowUps;
 
   GeminiLiveService? gemini;
   AudioStreamingService? audio;
@@ -336,6 +346,9 @@ class InlineCallController {
       compactGuidedContext: compactGuidedContext,
       lessonContextCharacterLimit: lessonContextCharacterLimit,
       tools: tools,
+      isTrial: isTrial,
+      systemPromptOverride: systemPrompt,
+      limitFollowUps: limitFollowUps,
     );
     audio = a;
     gemini = g;

@@ -317,6 +317,32 @@ void main() {
       expect(tutor.last, 'That is great!');
     });
 
+    test('with follow-ups allowed, consecutive questions are kept', () {
+      final s = GeminiLiveService(
+        apiKey: 'unit-test-only',
+        sessionType: LiveSessionType.lessonCoach,
+        limitFollowUps: false,
+      );
+      final tutor = <String>[];
+      final guarded = <String>[];
+      s.onTutorTranscript = tutor.add;
+      s.onReplyGuarded = guarded.add;
+      s.receiveServerMessageForTest({
+        'serverContent': {
+          'inputTranscription': {'text': 'I work in a shop'},
+        },
+      });
+      s.receiveServerMessageForTest(_reply('Good. What do you sell?'));
+      s.receiveServerMessageForTest({
+        'serverContent': {
+          'inputTranscription': {'text': 'Shoes mostly'},
+        },
+      });
+      s.receiveServerMessageForTest(_reply('Nice. Who buys them?'));
+      expect(guarded, isEmpty);
+      expect(tutor, ['Good. What do you sell?', 'Nice. Who buys them?']);
+    });
+
     test('a chatbot tail is cut and not surfaced', () {
       final s = make();
       final audio = <List<int>>[];

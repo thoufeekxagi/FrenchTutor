@@ -40,6 +40,8 @@ class GeminiLiveService {
     this.compactGuidedContext = false,
     this.liveTutorMode = false,
     this.lessonContextCharacterLimit,
+    this.systemPromptOverride,
+    this.limitFollowUps = true,
   });
 
   final String apiKey;
@@ -82,6 +84,15 @@ class GeminiLiveService {
   /// a five-to-ten-minute session remains comfortably below the 6,000-token
   /// product budget. Its lesson bridge is a hint, never a script.
   final bool liveTutorMode;
+
+  /// A complete system prompt owned by the caller (the Talk with Marie modes).
+  /// It replaces the lesson-coach prompt; the lesson context, if any, is
+  /// appended as call memory.
+  final String? systemPromptOverride;
+
+  /// Cuts a second follow-up question in a row. Off for modes where the tutor
+  /// must keep handing the learner something to say.
+  final bool limitFollowUps;
 
   /// Optional feature-owned context budget. Review/Warm-up uses this to keep
   /// the ranked learner evidence intact while still applying a hard bound.
@@ -695,6 +706,20 @@ class GeminiLiveService {
   }
 
   Future<String> _fullSystemPrompt() async {
+    final override = systemPromptOverride;
+    if (override != null) {
+      final ctx = _currentLessonContext?.trim();
+      var prompt = override;
+      if (ctx != null && ctx.isNotEmpty) {
+        prompt += '\n\n${_boundDynamicContext(ctx, _lessonContextLimit)}';
+      }
+      if (_hasConnectedOnce) {
+        prompt +=
+            '\n\nTHE CALL IS CONTINUING after a brief reconnect. Never greet '
+            'or introduce yourself again; carry on from the call memory above.';
+      }
+      return prompt;
+    }
     if (liveTutorMode) {
       // Keep Live Tutor on the small prompt path: no profile, lesson history,
       // lesson context, or rolling transcript is appended to this call. The
@@ -1413,6 +1438,7 @@ class GeminiLiveService {
         suppressCurrentReply();
         onReplyGuarded?.call('chatter');
       } else if (!isTrial &&
+          limitFollowUps &&
           _lastTutorTurnWasQuestion &&
           TutorReplyGuard.followUpQuestionStart(text) >= 0) {
         // A tutor, not a chatbot: no second question in a row.

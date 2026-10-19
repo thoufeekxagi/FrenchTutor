@@ -1,3 +1,4 @@
+import 'v3_talk_setup.dart';
 import '../tests/v3_tests_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +8,6 @@ import '../../design/tokens.dart';
 import '../../models/tutor_persona.dart';
 import '../../providers/database_provider.dart';
 import '../../screens/mocks/mocks_screen.dart';
-import '../../screens/speak/live_tutor_setup_screen.dart';
 import '../ui/v3_ui.dart';
 
 /// Tutor tab. Screen contract:
@@ -46,7 +46,7 @@ class V3MarieScreen extends ConsumerWidget {
               subtitle: 'Speak naturally and get helpful corrections.',
               icon: Icons.chat_bubble_outline_rounded,
               onTap: () =>
-                  AppRouter.push(context, (_) => const LiveTutorSetupScreen()),
+                  AppRouter.push(context, (_) => const V3TalkSetupScreen()),
             ),
             const SizedBox(height: 12),
             _mode(
