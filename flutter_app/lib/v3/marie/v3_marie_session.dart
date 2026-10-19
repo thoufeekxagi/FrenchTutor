@@ -115,13 +115,11 @@ abstract class V3MarieSession extends ChangeNotifier {
   /// model cannot mistake the sound for learner speech.
   void blockMicUntil(DateTime time) {}
 
-  /// Hang up only when the app is really in the background. Split View on an
-  /// iPad (notes beside the app) only makes the app inactive, and that must not
-  /// end a call.
+  /// iOS also reports inactive for notification shade and permission prompts.
+  /// The real call controller handles a short background grace period.
   void handleLifecycle(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
-      if (isBusy) unawaited(end());
+    if (this is V3LiveMarieSession) {
+      (this as V3LiveMarieSession)._callInstance?.handleAppLifecycle(state);
     }
   }
 
@@ -157,9 +155,7 @@ abstract class V3MarieSession extends ChangeNotifier {
   void touch() {
     _idleTimer?.cancel();
     if (!isLive) return;
-    // With the microphone closed nothing is being billed, so she may stay
-    // connected three times as long between speaker taps.
-    _idleTimer = Timer(muted ? idleLimit * 3 : idleLimit, () {
+    _idleTimer = Timer(idleLimit, () {
       if (!isLive) return;
       _endedNote =
           'The call ended after a minute and a half of quiet. Tap the phone to talk again.';

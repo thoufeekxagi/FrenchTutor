@@ -149,6 +149,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   bool _awaitingMicrophonePermissionSettings = false;
   bool _microphonePermissionRecoveryInFlight = false;
   int _callDuration = 0;
+  bool _wrapUpSent = false;
   bool _isSpeakerOn = true;
 
   // Real evidence for the coordinator's completion threshold (P0.3) and for
@@ -291,8 +292,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     super.dispose();
   }
 
-  /// Phone calls, app switches, and lock screen stop the mic and close the
-  /// billable Live socket. A new call requires an explicit learner action.
+  /// Keep the call during short interruptions; never capture in the background.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_callStatus == CallStatus.ended || _sessionSaved) return;
@@ -302,19 +302,18 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     // advance to the next onboarding page before the learner ever spoke.
     if (_microphonePermissionRequestInFlight) return;
     if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
-      _mic.onAppPaused();
-      // A live socket remains billable while the app is backgrounded. End the
-      // call instead of leaving Gemini connected behind the lock screen.
-      _gemini.disconnect();
+        state == AppLifecycleState.hidden) {
+      unawaited(_mic.onAppPaused());
+      unawaited(_audio.stopPlayback());
     } else if (state == AppLifecycleState.resumed) {
       unawaited(_handleAppResumed());
     }
   }
 
   Future<void> _handleAppResumed() async {
+    if (_sessionSaved || !mounted) return;
     try {
-      await _mic.onAppResumed();
+      if (_gemini.isConnected) await _mic.onAppResumed();
     } catch (e) {
       if (mounted) setState(() => _errorMessage = 'Mic error: $e');
       return;
@@ -504,7 +503,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   void _setupCallbacks() {
     _gemini.onConnected = () async {
       if (!mounted) return;
-      _connectedAt = DateTime.now();
+      _connectedAt ??= DateTime.now();
       if (widget.stage == 'trial') {
         await TrialCallGate.markConnected();
         if (!mounted) return;
@@ -569,6 +568,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     // have to fight their way out of.
     _gemini.onDisconnected = () {
       if (!mounted || _sessionSaved) return;
+      if (_connectedAt == null) {
+        // A failed setup is not a completed speaking session.
+        setState(() {
+          _callStatus = CallStatus.connecting;
+          _errorMessage = 'Could not connect to the tutor.';
+        });
+        return;
+      }
       _endedReason = 'disconnected';
       _errorMessage = 'Connection lost';
       _endCall();
@@ -637,7 +644,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
         _liveTutorTranscriptBuffer = finalText;
         _liveTutorTurnComplete = true;
         setState(() {
-          _liveTutorScolding = _isCorrectionLine(text);
+          _liveTutorScolding =
+              widget.stage != 'trial' && _isCorrectionLine(text);
           // The provider's final transcript can normalize or revise the
           // streamed partial. Re-map the visible offset to the audio clock so
           // a word from the old partial cannot linger over the new transcript.
@@ -660,7 +668,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       if (!_showLiveTutorUi || !mounted) return;
       _markLiveTutorResponseStarted();
       _liveTutorTranscriptBuffer += delta;
-      _liveTutorScolding = _isCorrectionLine(_liveTutorTranscriptBuffer);
+      _liveTutorScolding =
+          widget.stage != 'trial' &&
+          _isCorrectionLine(_liveTutorTranscriptBuffer);
       _startLiveTutorTranscriptTicker();
     };
 
@@ -924,13 +934,21 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   }
 
   void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() => _callDuration += 1);
+      // Use elapsed wall time so a delayed timer tick or a brief app pause
+      // cannot stretch the onboarding call past its three-minute limit.
+      final elapsed = DateTime.now().difference(_connectedAt ?? DateTime.now());
+      setState(() => _callDuration = elapsed.inSeconds);
       final limit = widget.durationLimitSeconds;
       if (limit == null) return;
       final note = widget.wrapUpNote;
-      if (note != null && _callDuration == limit - widget.wrapUpLeadSeconds) {
+      if (note != null &&
+          !_wrapUpSent &&
+          _callDuration >= limit - widget.wrapUpLeadSeconds &&
+          _callDuration < limit) {
+        _wrapUpSent = true;
         _gemini.sendText(note);
       }
       if (_callDuration >= limit) {
@@ -1347,6 +1365,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                         ),
                         if (_errorMessage.isNotEmpty)
                           ErrorNotice(message: _errorMessage),
+                        if (_connectedAt == null && _errorMessage.isNotEmpty)
+                          TextButton(
+                            onPressed: _startCall,
+                            child: const Text('Try again'),
+                          ),
                         _callControls(),
                       ],
                     ),
@@ -1382,6 +1405,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                   if (_errorMessage.isNotEmpty) ...[
                     const SizedBox(height: 18),
                     ErrorNotice(message: _errorMessage),
+                    if (_connectedAt == null)
+                      TextButton(
+                        onPressed: _startCall,
+                        child: const Text('Try again'),
+                      ),
                   ],
                 ],
               ),
@@ -1436,8 +1464,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
 
   Widget _liveTutorHeader() {
     final textScale = MediaQuery.textScalerOf(context).scale(1);
+    final isTrial = widget.stage == 'trial';
+    final remaining = (widget.durationLimitSeconds ?? 0) - _callDuration;
     return SizedBox(
-      height: math.max(62.0, 36 + textScale * 30).toDouble(),
+      height: math
+          .max(isTrial ? 82.0 : 62.0, 36 + textScale * (isTrial ? 48 : 30))
+          .toDouble(),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 4, 16, 0),
         child: Row(
@@ -1456,21 +1488,38 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Live tutor',
+                    isTrial ? 'French level check' : 'Live tutor',
                     style: DesignTokens.body(
                       17,
                       weight: FontWeight.w700,
                     ).copyWith(color: DesignTokens.nightText),
                   ),
                   const SizedBox(height: 3),
-                  Text(
-                    'Lesson · ${widget.liveTutorLessonTitle}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: DesignTokens.body(
-                      11,
-                    ).copyWith(color: DesignTokens.nightMuted),
-                  ),
+                  if (isTrial)
+                    Semantics(
+                      label:
+                          '${_formatDuration(math.max(0, remaining))} remaining in the three-minute level check',
+                      child: Text(
+                        _formatDuration(math.max(0, remaining)),
+                        key: const ValueKey('onboarding.trial.timer'),
+                        style: DesignTokens.body(15, weight: FontWeight.w700)
+                            .copyWith(
+                              color: DesignTokens.nightText,
+                              fontFeatures: const [
+                                FontFeature.tabularFigures(),
+                              ],
+                            ),
+                      ),
+                    )
+                  else
+                    Text(
+                      'Lesson · ${widget.liveTutorLessonTitle}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: DesignTokens.body(
+                        11,
+                      ).copyWith(color: DesignTokens.nightMuted),
+                    ),
                   Semantics(
                     label: _liveTutorHeaderStatus,
                     child: Row(

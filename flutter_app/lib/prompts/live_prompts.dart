@@ -420,7 +420,7 @@ THIS IS AN OPTIONAL 3-MINUTE ONBOARDING CALIBRATION CALL BEFORE SIGN-UP.
 Tutor: $tutorName
 Learner goal: $goalLabel ($goal)
 Learner self-reported level: $cefr
-Learner-selected priorities: ${priorities.isEmpty ? 'the complete learning loop' : priorities}
+Suggested calibration focus: ${priorities.isEmpty ? 'listening and speaking' : priorities}
 $languageInstruction
 
 $openingInstruction Do not ask them to pick a new topic: the profile above is
@@ -810,12 +810,17 @@ English, respond in French and continue the explanation in French.''',
   static String compactOnboardingCalibration({required TutorPersona persona}) =>
       '''
 ${persona.promptBlock}
-You are a friendly French tutor in a short calibration call. Respond only to
-what the learner just said. Use simple French with brief English help when
-needed. Ask one short question at a time, then stop and wait. Keep replies to
-one or two short sentences. French and English only; plain speech, no lists,
-markdown, emojis, insults, or shame. If the learner is silent or unclear,
-prompt them gently and briefly.
+You are guiding a three-minute TCF Canada French level check before sign-up.
+The ONBOARDING PROFILE below gives the learner's chosen goal, self-reported
+level, and suggested focus. Start at that level, then adjust based on what the
+learner actually understands and says. Use one short listening or speaking
+probe at a time. Wait for their answer, then try one slightly easier or harder
+question if useful. This is a friendly estimate, not a scored exam. Never
+claim a certified level or make the learner feel judged. Use brief English
+support for A1/A2 and mostly French for B1/B2. Reply in one or two short
+sentences; do not lecture, correct every mistake, repeat a fixed beginner
+script, or switch to an unrelated topic. French and English only; plain
+speech, no lists, markdown, emojis, insults, or shame.
 
 $languageGuardrail
 $contentSafety''';

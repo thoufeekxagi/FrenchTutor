@@ -164,6 +164,9 @@ class GeminiLiveService {
   // and sends audioStreamEnd. Keep Gemini's own VAD close behind that client
   // boundary so a small local timing difference does not add a long wait.
   static const _lessonCoachSilenceDurationMs = 850;
+  // The short onboarding level check previously inherited the generic 2.5 s
+  // speech endpoint, adding a noticeable pause after every learner answer.
+  static const _trialSilenceDurationMs = 1000;
 
   bool get _isLessonCoach => sessionType == LiveSessionType.lessonCoach;
 
@@ -699,11 +702,16 @@ class GeminiLiveService {
       );
     }
     if (isTrial) {
-      // The three-minute trial keeps its onboarding session type and timer, but
-      // no longer pays for the full onboarding prompt/profile/history. It only
-      // needs a small, self-contained tutor contract to respond to the current
-      // learner turn.
-      return LivePrompts.compactOnboardingCalibration(persona: _persona);
+      // Keep the prompt small while actually supplying the onboarding answers
+      // that the trial offer passed in. Without this, every level received the
+      // same generic tutor instructions and the call could not calibrate.
+      final context = _currentLessonContext?.trim();
+      final prompt = LivePrompts.compactOnboardingCalibration(
+        persona: _persona,
+      );
+      if (context == null || context.isEmpty) return prompt;
+      return '$prompt\n\nONBOARDING PROFILE AND CALIBRATION PLAN:\n'
+          '${_boundDynamicContext(context, _lessonContextLimit)}';
     }
     if (_isLessonCoach) {
       var coachPrompt = LivePrompts.compactLessonCoach(persona: _persona);
@@ -1010,6 +1018,8 @@ class GeminiLiveService {
               ? _lessonCoachSilenceDurationMs
               : liveTutorMode
               ? _liveTutorSilenceDurationMs
+              : isTrial
+              ? _trialSilenceDurationMs
               : 2500,
         },
       },

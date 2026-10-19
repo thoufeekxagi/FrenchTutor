@@ -159,6 +159,7 @@ class InlineCallController {
   // resumes on foreground — but only if the student hadn't muted on
   // purpose, so backgrounding never silently un-mutes them.
   bool pausedForLifecycle = false;
+  DateTime? _backgroundedAt;
 
   String? error;
   String? lastTutorLine;
@@ -935,12 +936,26 @@ class InlineCallController {
   /// Forward from the host's `didChangeAppLifecycleState`.
   void handleAppLifecycle(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
-      // A Live socket is billable even while the app is backgrounded and the
-      // learner is muted. End it at the lifecycle boundary; resuming the app
-      // must require an explicit tutor tap. This also prevents an IndexedStack
-      // child or a stale route from keeping a session alive indefinitely.
-      if (isLive) unawaited(_end(notify: false));
+        state == AppLifecycleState.hidden) {
+      if (!isLive || pausedForLifecycle) return;
+      _backgroundedAt = DateTime.now();
+      pausedForLifecycle = true;
+      unawaited(audio?.stopStreaming() ?? Future<void>.value());
+      unawaited(audio?.stopPlayback() ?? Future<void>.value());
+      _notify();
+    } else if (state == AppLifecycleState.resumed && pausedForLifecycle) {
+      pausedForLifecycle = false;
+      final elapsed = DateTime.now().difference(_backgroundedAt!);
+      _backgroundedAt = null;
+      if (elapsed >= const Duration(seconds: 90)) {
+        unawaited(_end(notify: true));
+      } else if (active &&
+          !muted &&
+          !_externalPlaybackPaused &&
+          gemini?.isConnected == true) {
+        unawaited(audio!.startStreaming(onChunk: gemini!.sendAudioChunk));
+        _notify();
+      }
     }
   }
 

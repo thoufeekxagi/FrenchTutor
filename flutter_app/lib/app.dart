@@ -85,6 +85,8 @@ class _AuthGateState extends ConsumerState<AuthGate>
   String? _restoreInFlightUserId;
   String? _restoredUserId;
   Future<void>? _resumeSyncInFlight;
+  Timer? _backgroundLiveTimer;
+  DateTime? _backgroundedAt;
   StreamSubscription<AuthState>? _subscription;
 
   @override
@@ -92,10 +94,12 @@ class _AuthGateState extends ConsumerState<AuthGate>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     // REVIEW_BUILD also opens paid areas. ONBOARDING_PREVIEW replays only the
-    // onboarding flow, without changing subscription access.
+    // onboarding flow, without changing subscription access. Keep that
+    // screenshot-test flag debug-only so stale generated Xcode defines cannot
+    // force onboarding in a Release install or archive.
     _requiresInstallOnboarding =
         const bool.fromEnvironment('REVIEW_BUILD') ||
-        const bool.fromEnvironment('ONBOARDING_PREVIEW') ||
+        (kDebugMode && const bool.fromEnvironment('ONBOARDING_PREVIEW')) ||
         !ref.read(learningStoreProvider).profile().isOnboarded;
     SharedPreferences.getInstance().then((prefs) {
       if (!mounted) return;
@@ -132,15 +136,27 @@ class _AuthGateState extends ConsumerState<AuthGate>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden ||
-        state == AppLifecycleState.detached) {
-      // Route-level observers normally close their own Live service. Keep a
-      // root guard as well: a forgotten observer must never leave a billable
-      // Gemini socket running after the app is backgrounded or terminated.
+    if (state == AppLifecycleState.detached) {
+      _backgroundLiveTimer?.cancel();
       GeminiLiveService.disconnectActiveSocket();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      _backgroundedAt ??= DateTime.now();
+      _backgroundLiveTimer ??= Timer(const Duration(seconds: 90), () {
+        _backgroundLiveTimer = null;
+        GeminiLiveService.disconnectActiveSocket();
+      });
     }
     if (state == AppLifecycleState.resumed) {
+      _backgroundLiveTimer?.cancel();
+      _backgroundLiveTimer = null;
+      if (_backgroundedAt != null &&
+          DateTime.now().difference(_backgroundedAt!) >=
+              const Duration(seconds: 90)) {
+        // iOS can suspend Dart timers while the app is backgrounded.
+        GeminiLiveService.disconnectActiveSocket();
+      }
+      _backgroundedAt = null;
       unawaited(_resumePendingCourseWork());
     }
   }
@@ -426,6 +442,7 @@ class _AuthGateState extends ConsumerState<AuthGate>
 
   @override
   void dispose() {
+    _backgroundLiveTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _subscription?.cancel();
     AuthService.shared.localAuthRevision.removeListener(_onLocalAuthRevision);
