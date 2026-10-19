@@ -163,6 +163,34 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
   String? _remoteExplanation;
   String? _remoteCorrectAnswer;
 
+  /// The last step whose lines were already asked for. Each step is asked for
+  /// once, so the final steps never trigger a second round.
+  var _readyThrough = -1;
+
+  /// The French lines a step's speaker buttons will play.
+  List<String> _speakerLines(V3Step step) => switch (step) {
+    V3WordStep s => [s.spoken, s.exampleFr],
+    V3PhraseStep s => [s.spoken],
+    V3ExplainStep s => s.examples.take(2).map((e) => e.fr).toList(),
+    V3ChooseStep s => [s.promptFr],
+    V3ListenStep s => [s.fr],
+    V3TableStep _ => const [],
+  };
+
+  /// Asks, once, for the clips of this step and the next five.
+  void _prepareUpcomingClips() {
+    final steps = _lesson.steps;
+    if (steps.isEmpty) return;
+    final target = (_index + 5).clamp(0, steps.length - 1);
+    final from = _readyThrough + 1 > _index ? _readyThrough + 1 : _index;
+    if (from > target) return;
+    _readyThrough = target;
+    final lines = [
+      for (var i = from; i <= target; i++) ..._speakerLines(steps[i]),
+    ].where((l) => l.trim().isNotEmpty).toList();
+    if (lines.isNotEmpty) _marie.prefetch(lines);
+  }
+
   V3Lesson get _lesson => widget.lesson;
   V3Step get _step => _lesson.steps[_index];
   bool get _isQuestion => _step is V3ChooseStep || _step is V3ListenStep;
@@ -413,6 +441,12 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
 
   @override
   Widget build(BuildContext context) {
+    if (_readyThrough < _index + 5 &&
+        _readyThrough < _lesson.steps.length - 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _prepareUpcomingClips();
+      });
+    }
     return Scaffold(
       backgroundColor: DesignTokens.canvas,
       body: V3Width(

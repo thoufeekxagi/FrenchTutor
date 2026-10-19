@@ -6,8 +6,8 @@ import 'package:flutter/widgets.dart';
 import '../../data/database/learning_store.dart';
 import '../../models/tutor_persona.dart';
 import '../../prompts/live_prompts.dart';
-import '../../services/gemini_live_audio_service.dart';
 import '../../services/inline_call_controller.dart';
+import '../../services/speaker_clip_service.dart';
 import '../../services/lesson_speech_service.dart';
 
 enum V3MariePhase { idle, connecting, live, error }
@@ -122,6 +122,10 @@ abstract class V3MarieSession extends ChangeNotifier {
   /// shown in the pill or the conversation, so the text cannot give the answer
   /// away. She is still heard.
   Future<bool> speak(BuildContext context, String text, {bool reveal = true});
+
+  /// Quietly gets the next lines' clips ready, once each, with no retry. A line
+  /// that did not arrive is simply tried again when the learner taps it.
+  void prefetch(List<String> lines) {}
 
   /// Cuts off what she is saying right now. The call stays open.
   Future<void> skip();
@@ -387,10 +391,14 @@ class V3LiveMarieSession extends V3MarieSession {
 
   Timer? _clipTimer;
 
+  @override
+  void prefetch(List<String> lines) =>
+      SpeakerClipService.shared.prefetch(lines, ActiveTutor.current.voiceName);
+
   /// A speaker tap plays the line in the selected tutor's voice. It never opens
-  /// a call and never touches the microphone: the first tap of a line makes the
-  /// clip once, live (one attempt, no lookups), every later tap is instant and
-  /// works offline. Nothing is generated ahead of a tap. If a call is open, Marie stops talking and the microphone
+  /// a call and never touches the microphone: the clip comes from this phone,
+  /// else from the shared store, else it is made once for everybody. One
+  /// attempt; a failed tap simply tries again next time. If a call is open, Marie stops talking and the microphone
   /// stays closed while the clip plays.
   @override
   Future<bool> speak(
@@ -402,10 +410,7 @@ class V3LiveMarieSession extends V3MarieSession {
     if (line.isEmpty) return false;
     final voice = ActiveTutor.current.voiceName;
     try {
-      final bytes = await GeminiLiveAudioService.shared.speakOnce(
-        text: line,
-        voiceName: voice,
-      );
+      final bytes = await SpeakerClipService.shared.clip(line, voice);
       if (bytes == null || bytes.isEmpty || bytes.length.isOdd) return false;
       final call = _callInstance;
       if (call != null && call.active && call.tutorTurnActive) {
