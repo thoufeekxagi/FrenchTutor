@@ -221,8 +221,11 @@ verification boundaries and the source-manifest discrepancy recorded for a
 future extension release review.
 
 No Flutter test suite or App Store Connect submission was run in this handoff.
-Website lint and production build results are reported with the repository
-push status after validation.
+Lint and production builds pass in both website copies. Both repository pushes
+succeeded; the Netlify deploy was blocked by strict contributor verification,
+and the live website still serves the previous release. See
+`CROSS_PRODUCT_RELEASE_2026-10-19.md` and the website `DEPLOYMENT.md` for the
+exact error and route verification.
 
 No physical iPad/iPhone course walk or human French/audio review is claimed.
 Specialist review, device QA, course-wide review scheduling and prerequisite

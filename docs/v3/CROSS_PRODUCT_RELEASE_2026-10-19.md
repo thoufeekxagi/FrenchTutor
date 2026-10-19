@@ -12,7 +12,7 @@
 - The standalone `ParleSprintWebsite` repo contains the site refresh and an extension landing page that links to the existing Chrome Web Store listing.
 - The canonical `FrenchTutor/landingpage` source is synced with the extension landing page and privacy page.
 - The `/extension/privacy` route describes optional live tab transcription, translation, account-backed explanations, local storage and server-side explanation caching.
-- Pushing `ParleSprintWebsite` `main` triggers the configured Netlify production build. Verify the deploy and the public route after the push.
+- Website source and standalone production builds pass lint/build locally. The push to `ParleSprintWebsite` `main` succeeded, but Netlify still serves the October 17 deploy (`6ad3f97d77664f5c500e1c90`). Two API deploy attempts failed strict contributor verification. The live `/extension/privacy` route returned 404 and the live `/extension` page still lacks the new store CTA. See `../../../ParleSprintWebsite/DEPLOYMENT.md` for the error and next step; do not claim the site changes are live yet.
 
 ## Chrome extension
 
@@ -23,4 +23,4 @@
 
 ## Validation boundary
 
-This handoff records what was evidenced by repository files and screenshots. Website lint/build results and Git push/deploy status should be appended after they complete. No Flutter tests, App Store submission or Chrome Web Store update is part of this handoff.
+This handoff records what was evidenced by repository files and screenshots. Website lint/build passed in both copies. Both Git pushes succeeded; the Netlify production deploy is blocked by strict contributor verification. No Flutter tests, App Store submission or Chrome Web Store update is part of this handoff.
