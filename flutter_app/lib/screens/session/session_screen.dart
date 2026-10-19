@@ -155,6 +155,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
   // Real evidence for the coordinator's completion threshold (P0.3) and for
   // honest history (the old code saved startedAt == endedAt == save time).
   DateTime? _connectedAt;
+  DateTime? _lastLiveActivityAt;
   int _userUtteranceCount = 0;
   String _endedReason = 'cancelled';
   String? _aiSessionRecordId;
@@ -504,6 +505,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     _gemini.onConnected = () async {
       if (!mounted) return;
       _connectedAt ??= DateTime.now();
+      _lastLiveActivityAt = DateTime.now();
       if (widget.stage == 'trial') {
         await TrialCallGate.markConnected();
         if (!mounted) return;
@@ -617,6 +619,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     };
 
     _gemini.onUserTranscript = (text) {
+      _lastLiveActivityAt = DateTime.now();
       // French/English only (P0.1): other-language speech is omitted entirely —
       // not displayed, not saved, not counted as practice.
       if (!isFrenchEnglishTranscript(text)) return;
@@ -627,6 +630,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
     };
 
     _gemini.onTutorTranscript = (text) {
+      _lastLiveActivityAt = DateTime.now();
       if (!mounted) return;
       _markLiveTutorResponseStarted();
       _clearStaleConnectionError();
@@ -941,6 +945,16 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       // cannot stretch the onboarding call past its three-minute limit.
       final elapsed = DateTime.now().difference(_connectedAt ?? DateTime.now());
       setState(() => _callDuration = elapsed.inSeconds);
+      final lastActivity = _lastLiveActivityAt;
+      if (lastActivity != null &&
+          DateTime.now().difference(lastActivity) >=
+              const Duration(seconds: 90) &&
+          !_gemini.isModelGenerating &&
+          !_audio.hasPendingPlayback) {
+        _endedReason = 'idle';
+        _endCall();
+        return;
+      }
       final limit = widget.durationLimitSeconds;
       if (limit == null) return;
       final note = widget.wrapUpNote;
