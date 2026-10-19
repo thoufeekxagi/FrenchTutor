@@ -61,7 +61,8 @@
           "Le plan doit être prêt vendredi.",
           "The outline must be ready Friday."
         ]
-      ]
+      ],
+      "hear": 0
     },
     {
       "type": "table",
@@ -98,6 +99,10 @@
           "Je l'organise.",
           "Je vais l'organiser."
         ]
+      ],
+      "hearCols": [
+        2,
+        3
       ]
     },
     {

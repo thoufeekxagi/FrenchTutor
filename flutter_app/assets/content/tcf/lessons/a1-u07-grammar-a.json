@@ -78,7 +78,8 @@
           "one bottle of water",
           "Je demande une bouteille d'eau."
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "explain",

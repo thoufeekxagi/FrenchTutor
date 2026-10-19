@@ -42,7 +42,8 @@
           "seize heures",
           "4:00 p.m."
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "choose",

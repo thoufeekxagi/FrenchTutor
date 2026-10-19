@@ -37,7 +37,8 @@
           "mardi 14 avril",
           "mardi, le quatorze avril"
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "table",
@@ -53,40 +54,44 @@
         [
           "janvier",
           "zhah(n)-VYAY",
-          "juillet",
-          "zhwee-YEH"
-        ],
-        [
           "février",
-          "fay-vree-AY",
-          "août",
-          "oot"
+          "fay-vree-AY"
         ],
         [
           "mars",
           "mahrs",
-          "septembre",
-          "sehp-TAH(N)br"
-        ],
-        [
           "avril",
-          "ah-VREEL",
-          "octobre",
-          "ohk-TOHbr"
+          "ah-VREEL"
         ],
         [
           "mai",
           "may",
-          "novembre",
-          "noh-VAH(N)br"
+          "juin",
+          "zhwa(n)"
         ],
         [
-          "juin",
-          "zhwa(n)",
+          "juillet",
+          "zhwee-YEH",
+          "août",
+          "oot"
+        ],
+        [
+          "septembre",
+          "sehp-TAH(N)br",
+          "octobre",
+          "ohk-TOHbr"
+        ],
+        [
+          "novembre",
+          "noh-VAH(N)br",
           "décembre",
           "day-SAH(N)br"
         ]
-      ]
+      ],
+      "layout": "groups",
+      "group": 2,
+      "hear": 0,
+      "perRow": 2
     },
     {
       "type": "explain",

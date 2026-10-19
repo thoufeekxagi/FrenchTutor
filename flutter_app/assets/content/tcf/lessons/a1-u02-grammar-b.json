@@ -71,6 +71,10 @@
           "Pourquoi vous parlez français ?",
           "Parce que j'habite au Canada."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

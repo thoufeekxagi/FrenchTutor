@@ -47,6 +47,10 @@
           "des formulaires",
           "des rues"
         ]
+      ],
+      "hearCols": [
+        1,
+        2
       ]
     },
     {

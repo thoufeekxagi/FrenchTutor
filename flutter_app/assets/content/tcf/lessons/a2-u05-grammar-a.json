@@ -52,7 +52,12 @@
           "vont",
           "ils vont suivre un cours"
         ]
-      ]
+      ],
+      "hearCols": [
+        1,
+        2
+      ],
+      "hearPrefix": true
     },
     {
       "type": "explain",

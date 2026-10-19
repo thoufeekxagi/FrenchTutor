@@ -45,6 +45,10 @@
           "L'article est en solde.",
           "L'article n'est pas en solde."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

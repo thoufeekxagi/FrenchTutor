@@ -41,7 +41,8 @@
           "Une portion individuelle est prévue.",
           "An individual serving is planned."
         ]
-      ]
+      ],
+      "hear": 0
     },
     {
       "type": "table",
@@ -88,6 +89,10 @@
           "Je n'en prends pas.",
           "In the negative, ne comes before en."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

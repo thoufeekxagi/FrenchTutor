@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../models/tutor_persona.dart';
 import '../../design/tokens.dart';
 import '../../prompts/live_prompts.dart';
 import '../../providers/database_provider.dart';
@@ -660,7 +661,138 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
     ),
   ];
 
+  /// Letters, numbers and months: each item with its own speaker, two to a
+  /// line when there is room (one on a narrow screen or at large text).
+  /// `letters` plays the bundled recording of the chosen tutor; `groups` says
+  /// the French cell through the shared clip store.
+  List<Widget> _groupsTable(V3TableStep s) {
+    final letters = s.layout == 'letters';
+    final g = letters ? 2 : s.group;
+    final hearIn = letters ? 0 : (s.hear < 0 ? 0 : s.hear);
+    final tutor = ActiveTutor.current.id;
+    final cells = <List<String>>[
+      for (final row in s.rows)
+        for (var c = 0; c + g <= row.length; c += g)
+          if (row[c].trim().isNotEmpty) row.sublist(c, c + g),
+    ];
+    final minCell = letters ? 140.0 : (g >= 3 ? 200.0 : 150.0);
+
+    Widget cell(List<String> c, int index) {
+      final lead = !letters && hearIn != 0;
+      final main = c[hearIn];
+      final speech = letters ? c[0] : V3TableStep.speechOf(main);
+      final others = [
+        for (var i = 0; i < c.length; i++)
+          if (i != hearIn && !(lead && i == 0) && c[i].trim().isNotEmpty) c[i],
+      ];
+      return Row(
+        children: [
+          if (letters)
+            SizedBox(
+              width: 30,
+              child: Text(
+                c[0],
+                style: V3Type.strong(
+                  22,
+                  DesignTokens.ink,
+                ).copyWith(fontWeight: FontWeight.w800),
+              ),
+            ),
+          if (lead)
+            SizedBox(
+              width: 40,
+              child: Text(
+                c[0],
+                style: V3Type.strong(
+                  18,
+                  DesignTokens.ink,
+                ).copyWith(fontWeight: FontWeight.w800),
+              ),
+            ),
+          Expanded(
+            child: letters
+                ? Text(c[1], style: V3Type.body(16, DesignTokens.ink))
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(main, style: V3Type.strong(17, DesignTokens.ink)),
+                      if (others.isNotEmpty)
+                        Text(
+                          others.join('  ·  '),
+                          style: V3Type.body(13, DesignTokens.inkSoft),
+                        ),
+                    ],
+                  ),
+          ),
+          if (speech != null)
+            V3Speaker(
+              key: ValueKey(
+                letters ? 'table.letter.${c[0]}' : 'table.cell.$index',
+              ),
+              text: speech,
+              asset: letters
+                  ? 'assets/audio/alphabet/$tutor/alphabet_letter_${c[0]}.pcm'
+                  : null,
+              session: _marie,
+              size: 40,
+            ),
+        ],
+      );
+    }
+
+    return [
+      Text('REFERENCE', style: V3Type.eyebrow()),
+      const SizedBox(height: 10),
+      Text(s.title, style: V3Type.title(28)),
+      const SizedBox(height: 18),
+      LayoutBuilder(
+        builder: (context, box) {
+          final pref = letters ? 2 : s.perRow.clamp(1, 4);
+          final roomy =
+              box.maxWidth / pref >= minCell &&
+              MediaQuery.textScalerOf(context).scale(16) <= 21;
+          final perRow = roomy ? pref : 1;
+          return Container(
+            decoration: BoxDecoration(
+              color: DesignTokens.surface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: DesignTokens.hairline),
+            ),
+            child: Column(
+              children: [
+                for (var i = 0; i < cells.length; i += perRow)
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+                    decoration: BoxDecoration(
+                      border: i == 0
+                          ? null
+                          : Border(
+                              top: BorderSide(color: DesignTokens.hairline),
+                            ),
+                    ),
+                    child: Row(
+                      children: [
+                        for (var k = 0; k < perRow; k++) ...[
+                          if (k > 0) const SizedBox(width: 12),
+                          Expanded(
+                            child: i + k < cells.length
+                                ? cell(cells[i + k], i + k)
+                                : const SizedBox.shrink(),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    ];
+  }
+
   List<Widget> _table(V3TableStep s) {
+    if (s.layout == 'letters' || s.layout == 'groups') return _groupsTable(s);
     final cols = s.headers.length;
     return [
       Text('REFERENCE', style: V3Type.eyebrow()),
@@ -704,17 +836,13 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
                         flex: c == s.hear ? 3 : 2,
                         child: Padding(
                           padding: const EdgeInsets.only(right: 8),
-                          child: Text(
-                            s.rows[r][c],
-                            style: c == 0
-                                ? V3Type.strong(15)
-                                : V3Type.body(14, DesignTokens.ink),
-                          ),
+                          child: _gridCell(s, r, c),
                         ),
                       ),
-                    if (s.hear >= 0)
+                    if (s.hear >= 0 &&
+                        V3TableStep.speechOf(s.rows[r][s.hear]) != null)
                       V3Speaker(
-                        text: s.rows[r][s.hear],
+                        text: V3TableStep.speechOf(s.rows[r][s.hear])!,
                         session: _marie,
                         size: 40,
                       ),
@@ -725,6 +853,28 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
         ),
       ),
     ];
+  }
+
+  /// One cell of the plain grid. A French cell listed in `hearCols` can be
+  /// tapped to hear it.
+  Widget _gridCell(V3TableStep s, int r, int c) {
+    final text = s.rows[r][c];
+    final style = c == 0
+        ? V3Type.strong(15)
+        : V3Type.body(14, DesignTokens.ink);
+    if (!s.hearCols.contains(c)) return Text(text, style: style);
+    final speech = V3TableStep.speechOf(
+      text,
+      prefix: s.hearPrefix && c != 0 ? s.rows[r][0] : null,
+    );
+    if (speech == null) return Text(text, style: style);
+    return _HearCell(
+      key: ValueKey('table.hear.$r.$c'),
+      shown: text,
+      speech: speech,
+      session: _marie,
+      style: style,
+    );
   }
 
   List<Widget> _choose(V3ChooseStep s) => [
@@ -1005,6 +1155,84 @@ class _V3LessonPlayerState extends ConsumerState<V3LessonPlayer>
 /// after the tutor was really reached, so a failed tap can be retried.
 /// [hidden] keeps the French text out of the accessibility label until it may
 /// be seen.
+/// A table cell you tap to hear: the text with a small speaker beside it.
+class _HearCell extends StatefulWidget {
+  const _HearCell({
+    super.key,
+    required this.shown,
+    required this.speech,
+    required this.session,
+    required this.style,
+  });
+
+  final String shown;
+  final String speech;
+  final V3MarieSession session;
+  final TextStyle style;
+
+  @override
+  State<_HearCell> createState() => _HearCellState();
+}
+
+class _HearCellState extends State<_HearCell> {
+  var _busy = false;
+
+  Future<void> _tap() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final reached = await widget.session.speak(context, widget.speech);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (!reached) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not play the audio. Check your connection and tap again.',
+            ),
+          ),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: widget.session,
+      builder: (context, _) {
+        final speaking = widget.session.speakingText == widget.speech;
+        return V3Pressable(
+          label: 'Hear ${widget.speech}',
+          onTap: _tap,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 36),
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                _busy
+                    ? const SizedBox.square(
+                        dimension: 16,
+                        child: CupertinoActivityIndicator(radius: 7),
+                      )
+                    : Icon(
+                        speaking
+                            ? CupertinoIcons.speaker_3_fill
+                            : CupertinoIcons.speaker_2_fill,
+                        size: 16,
+                        color: DesignTokens.primary,
+                      ),
+                const SizedBox(width: 6),
+                Flexible(child: Text(widget.shown, style: widget.style)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class V3Speaker extends StatefulWidget {
   const V3Speaker({
     super.key,
@@ -1014,9 +1242,13 @@ class V3Speaker extends StatefulWidget {
     this.oneShot = false,
     this.hidden = false,
     this.onPlayed,
+    this.asset,
   });
 
   final String text;
+
+  /// A bundled recording to play instead of a made clip.
+  final String? asset;
   final V3MarieSession session;
   final double size;
   final bool oneShot;
@@ -1038,6 +1270,7 @@ class _V3SpeakerState extends State<V3Speaker> {
       context,
       widget.text,
       reveal: !widget.hidden,
+      asset: widget.asset,
     );
     if (!mounted) return;
     setState(() {

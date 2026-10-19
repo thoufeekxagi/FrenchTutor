@@ -52,7 +52,12 @@
           "vont",
           "ils vont prendre le métro"
         ]
-      ]
+      ],
+      "hearCols": [
+        1,
+        2
+      ],
+      "hearPrefix": true
     },
     {
       "type": "explain",

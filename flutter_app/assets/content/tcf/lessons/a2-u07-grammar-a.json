@@ -47,6 +47,9 @@
           "Thing as direct object",
           "Je garde le message. Le service a envoyé le message. → Je garde le message que le service a envoyé."
         ]
+      ],
+      "hearCols": [
+        2
       ]
     },
     {

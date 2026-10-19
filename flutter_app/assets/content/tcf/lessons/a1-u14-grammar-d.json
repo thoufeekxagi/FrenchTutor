@@ -33,7 +33,8 @@
           "On va à la cabane à sucre samedi.",
           "We are going to the sugar shack on Saturday."
         ]
-      ]
+      ],
+      "hear": 0
     },
     {
       "type": "choose",

@@ -36,6 +36,10 @@
           "Je vais y retourner.",
           "I am going to return there."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

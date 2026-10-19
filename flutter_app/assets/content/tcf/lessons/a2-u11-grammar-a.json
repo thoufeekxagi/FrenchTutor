@@ -37,7 +37,8 @@
           "Gardez le numéro de confirmation.",
           "Keep the confirmation number."
         ]
-      ]
+      ],
+      "hear": 0
     },
     {
       "type": "table",
@@ -74,6 +75,12 @@
           "Choisissez une option.",
           "Ne choisissez pas sans vérifier."
         ]
+      ],
+      "hearCols": [
+        0,
+        1,
+        2,
+        3
       ]
     },
     {

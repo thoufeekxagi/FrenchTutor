@@ -132,7 +132,11 @@
           "deux mille vingt-six",
           "duh meel va(n)-SEES"
         ]
-      ]
+      ],
+      "layout": "groups",
+      "group": 3,
+      "hear": 1,
+      "perRow": 2
     },
     {
       "type": "explain",
@@ -169,7 +173,8 @@
           "15 %",
           "quinze pour cent"
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "explain",

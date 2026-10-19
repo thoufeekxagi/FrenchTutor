@@ -31,6 +31,10 @@
           "le salon (masculine)",
           "Il est calme."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

@@ -52,7 +52,12 @@
           "ils veulent / elles veulent",
           "ils peuvent / elles peuvent"
         ]
-      ]
+      ],
+      "hearCols": [
+        1,
+        2
+      ],
+      "hearPrefix": true
     },
     {
       "type": "table",

@@ -53,7 +53,13 @@
           "habitent (ah-BEET)",
           "travaillent (trah-VAHY)"
         ]
-      ]
+      ],
+      "hearCols": [
+        1,
+        2,
+        3
+      ],
+      "hearPrefix": true
     },
     {
       "type": "explain",

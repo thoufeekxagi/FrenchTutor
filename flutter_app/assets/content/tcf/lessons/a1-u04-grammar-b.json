@@ -47,6 +47,10 @@
           "elles sont grandes",
           "same as singular"
         ]
+      ],
+      "hearCols": [
+        1,
+        2
       ]
     },
     {

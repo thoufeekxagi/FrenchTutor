@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/widgets.dart';
 
 import '../../data/database/learning_store.dart';
@@ -121,7 +122,16 @@ abstract class V3MarieSession extends ChangeNotifier {
   /// With [reveal] false (an unanswered listening question) her words are not
   /// shown in the pill or the conversation, so the text cannot give the answer
   /// away. She is still heard.
-  Future<bool> speak(BuildContext context, String text, {bool reveal = true});
+  ///
+  /// With [asset] set, that bundled recording is played instead of a made
+  /// clip (the alphabet, recorded once for every tutor). It plays at once,
+  /// offline, and falls back to the made clip only if the asset is missing.
+  Future<bool> speak(
+    BuildContext context,
+    String text, {
+    bool reveal = true,
+    String? asset,
+  });
 
   /// Quietly gets the next lines' clips ready, once each, with no retry. A line
   /// that did not arrive is simply tried again when the learner taps it.
@@ -405,12 +415,15 @@ class V3LiveMarieSession extends V3MarieSession {
     BuildContext context,
     String text, {
     bool reveal = true,
+    String? asset,
   }) async {
     final line = text.trim();
     if (line.isEmpty) return false;
     final voice = ActiveTutor.current.voiceName;
     try {
-      final bytes = await SpeakerClipService.shared.clip(line, voice);
+      final bytes =
+          (asset == null ? null : await _bundled(asset)) ??
+          await SpeakerClipService.shared.clip(line, voice);
       if (bytes == null || bytes.isEmpty || bytes.length.isOdd) return false;
       final call = _callInstance;
       if (call != null && call.active && call.tutorTurnActive) {
@@ -430,6 +443,15 @@ class V3LiveMarieSession extends V3MarieSession {
       return true;
     } catch (_) {
       return false;
+    }
+  }
+
+  static Future<List<int>?> _bundled(String asset) async {
+    try {
+      final data = await rootBundle.load(asset);
+      return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    } catch (_) {
+      return null;
     }
   }
 
@@ -565,6 +587,7 @@ class V3FakeMarieSession extends V3MarieSession {
     BuildContext context,
     String text, {
     bool reveal = true,
+    String? asset,
   }) async {
     final line = text.trim();
     if (line.isEmpty || _phase == V3MariePhase.connecting) return false;

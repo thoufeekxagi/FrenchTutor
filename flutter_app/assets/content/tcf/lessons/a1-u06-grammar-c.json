@@ -45,7 +45,8 @@
           "the appointment is Tuesday, April 14, at 9:30",
           "Le rendez-vous est mardi, le 14 avril, à 9 h 30."
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "explain",

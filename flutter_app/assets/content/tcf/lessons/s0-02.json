@@ -20,84 +20,89 @@
         "Letter",
         "Say it",
         "Letter",
-        "Say it",
-        "Letter",
         "Say it"
       ],
       "rows": [
         [
           "A",
           "ah",
-          "J",
-          "zhee",
-          "S",
-          "ess"
-        ],
-        [
           "B",
-          "bay",
-          "K",
-          "kah",
-          "T",
-          "tay"
+          "bay"
         ],
         [
           "C",
           "say",
-          "L",
-          "ell",
-          "U",
-          "ü"
-        ],
-        [
           "D",
-          "day",
-          "M",
-          "emm",
-          "V",
-          "vay"
+          "day"
         ],
         [
           "E",
           "uh",
-          "N",
-          "enn",
-          "W",
-          "doo-bluh-VAY"
-        ],
-        [
           "F",
-          "eff",
-          "O",
-          "oh",
-          "X",
-          "eeks"
+          "eff"
         ],
         [
           "G",
           "zhay",
-          "P",
-          "pay",
-          "Y",
-          "ee-GREK"
-        ],
-        [
           "H",
-          "ahsh",
-          "Q",
-          "kü",
-          "Z",
-          "zed"
+          "ahsh"
         ],
         [
           "I",
           "ee",
+          "J",
+          "zhee"
+        ],
+        [
+          "K",
+          "kah",
+          "L",
+          "ell"
+        ],
+        [
+          "M",
+          "emm",
+          "N",
+          "enn"
+        ],
+        [
+          "O",
+          "oh",
+          "P",
+          "pay"
+        ],
+        [
+          "Q",
+          "kü",
           "R",
-          "ehR",
-          "",
-          ""
+          "ehR"
+        ],
+        [
+          "S",
+          "ess",
+          "T",
+          "tay"
+        ],
+        [
+          "U",
+          "ü",
+          "V",
+          "vay"
+        ],
+        [
+          "W",
+          "doo-bluh-VAY",
+          "X",
+          "eeks"
+        ],
+        [
+          "Y",
+          "ee-GREK",
+          "Z",
+          "zed"
         ]
-      ]
+      ],
+      "layout": "letters"
     },
     {
       "type": "explain",

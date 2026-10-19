@@ -46,7 +46,12 @@
           "aiment",
           "préfèrent"
         ]
-      ]
+      ],
+      "hearCols": [
+        1,
+        2
+      ],
+      "hearPrefix": true
     },
     {
       "type": "explain",

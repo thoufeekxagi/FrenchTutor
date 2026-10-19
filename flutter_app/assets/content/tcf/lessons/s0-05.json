@@ -57,6 +57,11 @@
           "fou (crazy)",
           "feu (fire)"
         ]
+      ],
+      "hearCols": [
+        0,
+        1,
+        2
       ]
     },
     {

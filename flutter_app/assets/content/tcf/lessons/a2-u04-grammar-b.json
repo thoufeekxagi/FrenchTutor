@@ -35,6 +35,10 @@
           "Ma tante habitait près du collège.",
           "Elle a visité le collège samedi."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

@@ -45,7 +45,8 @@
           "Il fait mauvais.",
           "The weather is bad."
         ]
-      ]
+      ],
+      "hear": 0
     },
     {
       "type": "table",
@@ -80,7 +81,11 @@
           "ils / elles",
           "font"
         ]
-      ]
+      ],
+      "hearCols": [
+        1
+      ],
+      "hearPrefix": true
     },
     {
       "type": "explain",

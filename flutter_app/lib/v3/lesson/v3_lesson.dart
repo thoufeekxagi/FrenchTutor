@@ -184,9 +184,23 @@ sealed class V3Step {
         if (headers.length < 2 || rows.isEmpty) {
           throw FormatException('Step $id needs headers and rows');
         }
+        final layout = str(m, 'layout', required: false);
         final hear = (m['hear'] as num?)?.toInt() ?? -1;
-        if (hear >= headers.length) {
+        final group = (m['group'] as num?)?.toInt() ?? 2;
+        // In a grouped table `hear` counts inside one group, not the row.
+        final hearLimit = layout == 'groups' ? group : headers.length;
+        if (hear >= hearLimit) {
           throw FormatException('Step $id has a bad hear column');
+        }
+        final hearCols = [
+          for (final c in (m['hearCols'] as List? ?? const []))
+            (c as num).toInt(),
+        ];
+        if (hearCols.any((c) => c < 0 || c >= headers.length)) {
+          throw FormatException('Step $id has a bad hearCols column');
+        }
+        if (layout == 'groups' && (group < 1 || headers.length % group != 0)) {
+          throw FormatException('Step $id has a bad group size');
         }
         return V3TableStep(
           id,
@@ -194,6 +208,11 @@ sealed class V3Step {
           headers: headers,
           rows: rows,
           hear: hear,
+          layout: layout.isEmpty ? 'grid' : layout,
+          hearCols: hearCols,
+          group: group,
+          perRow: (m['perRow'] as num?)?.toInt() ?? 2,
+          hearPrefix: m['hearPrefix'] == true,
         );
       case 'phrase':
         return V3PhraseStep(
@@ -324,10 +343,90 @@ class V3TableStep extends V3Step {
     required this.headers,
     required this.rows,
     this.hear = -1,
+    this.layout = 'grid',
+    this.hearCols = const [],
+    this.group = 2,
+    this.perRow = 2,
+    this.hearPrefix = false,
   });
 
   final String title;
   final List<String> headers;
   final List<List<String>> rows;
+
+  /// `grid`: a speaker at the end of each row says this column.
   final int hear;
+
+  /// `grid`: these columns can each be tapped to hear that cell.
+  final List<int> hearCols;
+
+  /// `grid` is the plain table. `letters` shows each (letter, how to say it)
+  /// pair with its own speaker, two to a line, using the bundled recordings.
+  /// `groups` splits every row into groups of [group] columns (a number, its
+  /// French, how to say it), each with a speaker for the cell at [hear], with
+  /// up to [perRow] groups on a line.
+  final String layout;
+  final int group;
+  final int perRow;
+
+  /// Say the row's first column before each tapped cell ("je" + "parle").
+  final bool hearPrefix;
+
+  /// What a speaker should say for a table cell: the French only. Pronunciation
+  /// hints in brackets, the English side of an equation and arrows are dropped,
+  /// and separators become pauses. Null when there is nothing to say.
+  static String? speechOf(String cell, {String? prefix}) {
+    var t = cell;
+    final eq = t.lastIndexOf('=');
+    if (eq >= 0) t = t.substring(eq + 1);
+    final arrow = t.lastIndexOf('→');
+    if (arrow >= 0) t = t.substring(arrow + 1);
+    final out = StringBuffer();
+    var depth = 0;
+    for (final ch in t.split('')) {
+      if (ch == '(') {
+        depth++;
+      } else if (ch == ')') {
+        if (depth > 0) depth--;
+      } else if (depth == 0) {
+        out.write(ch);
+      }
+    }
+    t = out
+        .toString()
+        .replaceAll('·', ', ')
+        .replaceAll(' / ', ', ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    t = t.replaceAll(RegExp(r'^[—–\-\s]+$'), '');
+    if (t.isEmpty) return null;
+    t = t.replaceAll(RegExp(r'\s+,'), ',');
+    if (prefix != null) {
+      var p = prefix;
+      final colon = p.lastIndexOf(':');
+      if (colon >= 0) p = p.substring(colon + 1);
+      p = p.replaceAll(RegExp(r'\([^)]*\)'), '');
+      final alts = [
+        for (final a in p.split(RegExp(r'\s*[,/·]\s*')))
+          if (a.trim().isNotEmpty) a.trim().toLowerCase(),
+      ];
+      final lower = t.toLowerCase();
+      final has =
+          alts.isEmpty ||
+          alts.any(
+            (a) =>
+                lower.startsWith('$a ') ||
+                lower.startsWith("$a'") ||
+                (a == 'je' && lower.startsWith("j'")),
+          ) ||
+          RegExp("^(m|t|s|j|l)'").hasMatch(lower);
+      if (!has) {
+        final first = alts.first;
+        t = first == 'je' && RegExp(r'^[aeiouhàâéèêëîïôûœ]').hasMatch(lower)
+            ? "j'$t"
+            : '$first $t';
+      }
+    }
+    return t;
+  }
 }

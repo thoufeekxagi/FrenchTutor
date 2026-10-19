@@ -31,6 +31,10 @@
           "À quelle heure finis-tu ?",
           "Je finis à seize heures."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

@@ -27,6 +27,10 @@
           "Ça fait combien ?",
           "Ça fait quatre dollars. (used for a total)"
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

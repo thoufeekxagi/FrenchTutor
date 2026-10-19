@@ -31,7 +31,8 @@
           "Total",
           "what you pay"
         ]
-      ]
+      ],
+      "hear": 0
     },
     {
       "type": "choose",

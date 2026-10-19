@@ -42,7 +42,8 @@
           "J'ai mal aux yeux.",
           "My eyes hurt."
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "explain",
@@ -139,7 +140,8 @@
           "Je voudrais un rendez-vous.",
           "I would like an appointment."
         ]
-      ]
+      ],
+      "hear": 0
     },
     {
       "type": "choose",

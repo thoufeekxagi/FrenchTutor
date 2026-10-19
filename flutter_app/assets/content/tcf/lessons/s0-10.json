@@ -29,91 +29,95 @@
           "0",
           "zéro",
           "zay-ROH",
-          "11",
-          "onze",
-          "oh(n)z"
-        ],
-        [
           "1",
           "un, une",
-          "uh(n), ün",
-          "12",
-          "douze",
-          "dooz"
+          "uh(n), ün"
         ],
         [
           "2",
           "deux",
           "duh",
-          "13",
-          "treize",
-          "trehz"
-        ],
-        [
           "3",
           "trois",
-          "trwah",
-          "14",
-          "quatorze",
-          "kah-TOHRZ"
+          "trwah"
         ],
         [
           "4",
           "quatre",
           "KAHtr",
-          "15",
-          "quinze",
-          "ka(n)z"
-        ],
-        [
           "5",
           "cinq",
-          "sa(n)k",
-          "16",
-          "seize",
-          "sehz"
+          "sa(n)k"
         ],
         [
           "6",
           "six",
           "sees",
-          "17",
-          "dix-sept",
-          "dee-SET"
-        ],
-        [
           "7",
           "sept",
-          "set",
-          "18",
-          "dix-huit",
-          "dee-ZWEET"
+          "set"
         ],
         [
           "8",
           "huit",
           "weet",
-          "19",
-          "dix-neuf",
-          "deez-NUHF"
-        ],
-        [
           "9",
           "neuf",
-          "nuhf",
-          "20",
-          "vingt",
-          "va(n)"
+          "nuhf"
         ],
         [
           "10",
           "dix",
           "dees",
+          "11",
+          "onze",
+          "oh(n)z"
+        ],
+        [
+          "12",
+          "douze",
+          "dooz",
+          "13",
+          "treize",
+          "trehz"
+        ],
+        [
+          "14",
+          "quatorze",
+          "kah-TOHRZ",
+          "15",
+          "quinze",
+          "ka(n)z"
+        ],
+        [
+          "16",
+          "seize",
+          "sehz",
+          "17",
+          "dix-sept",
+          "dee-SET"
+        ],
+        [
+          "18",
+          "dix-huit",
+          "dee-ZWEET",
+          "19",
+          "dix-neuf",
+          "deez-NUHF"
+        ],
+        [
+          "20",
+          "vingt",
+          "va(n)",
           "",
           "",
           ""
         ]
-      ]
+      ],
+      "layout": "groups",
+      "group": 3,
+      "hear": 1,
+      "perRow": 2
     },
     {
       "type": "explain",
@@ -150,7 +154,8 @@
           "$5",
           "cinq dollars"
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "explain",

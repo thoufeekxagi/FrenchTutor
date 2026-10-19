@@ -52,7 +52,12 @@
           "ils achètent",
           "elles paient"
         ]
-      ]
+      ],
+      "hearCols": [
+        1,
+        2
+      ],
+      "hearPrefix": true
     }
   ]
 }

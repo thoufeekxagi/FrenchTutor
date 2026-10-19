@@ -41,6 +41,11 @@
           "elle habite",
           "elle s'appelle"
         ]
+      ],
+      "hearCols": [
+        1,
+        2,
+        3
       ]
     },
     {

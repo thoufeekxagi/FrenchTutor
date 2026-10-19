@@ -45,6 +45,10 @@
           "faire les courses",
           "faire l'épicerie, magasiner (to shop)"
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

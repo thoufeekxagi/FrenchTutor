@@ -36,6 +36,10 @@
           "Voudriez-vous confirmer le rendez-vous ?",
           "Make a courteous request."
         ]
+      ],
+      "hearCols": [
+        0,
+        1
       ]
     },
     {

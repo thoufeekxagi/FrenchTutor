@@ -31,6 +31,10 @@
           "il (he) · elle (she)",
           "ils (they, m. or mixed) · elles (they, f.)"
         ]
+      ],
+      "hearCols": [
+        1,
+        2
       ]
     },
     {

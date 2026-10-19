@@ -52,7 +52,8 @@
           "minuit",
           "midnight"
         ]
-      ]
+      ],
+      "hear": 1
     },
     {
       "type": "explain",
