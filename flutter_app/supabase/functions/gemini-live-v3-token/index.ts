@@ -24,7 +24,11 @@ Deno.serve(async (request) => {
     buildAuthTokenRequest(apiKey, now),
   );
   if (!response.ok) {
-    console.error("Gemini auth token request failed", response.status);
+    const failure = await response.json().catch(() => null);
+    const providerMessage = String(failure?.error?.message ?? "unknown error")
+      .replaceAll(apiKey, "[redacted]")
+      .slice(0, 500);
+    console.error("Gemini auth token request failed", response.status, providerMessage);
     return json({ error: "Could not create a Gemini Live session" }, 502);
   }
   const data = await response.json();
