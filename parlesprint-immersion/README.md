@@ -6,7 +6,7 @@ A free Chrome Manifest V3 extension for studying French from videos on regular w
 
 On this Mac, double-click `Launch ParleSprint.command`. It builds and opens a dedicated Chrome for Testing window with the extension loaded and a French TV5MONDE YouTube video ready to play. The launcher watches for live captions and saves the first caption screenshot. It uses its own local browser profile; close that window to stop it. The first launch requires Node.js 22.12+ and downloads the official Playwright Chromium browser if missing.
 
-The current runtime ZIP is `release/parlesprint-immersion-0.1.0-live-2026-10-17.zip`; extract it and load its folder through Chrome Developer mode to use your usual Chrome profile.
+ParleSprint Immersion is live in the [Chrome Web Store](https://chromewebstore.google.com/detail/parlesprint-immersion/ijclgmkoljddlalgcnpodeemcmcipolb) (owner-confirmed October 19, 2026). The source package version in this repository is 0.2.0; check the publisher dashboard for the exact version currently served before preparing a store update.
 
 ## Run locally
 
@@ -43,9 +43,9 @@ Saved transcript cues, words, and preferences use Chrome local extension storage
 
 ## Optional AI backend
 
-The build uses the existing ParleSprint Supabase service. A1/A2 explanations use Gemini 3.1 Flash-Lite; B1/B2 use Gemini 3 Flash. Results are cached, with 20 new generations per account and 500 globally per UTC day. Live transcription uses `immersion-live-token`; Supabase keeps the provider API key and returns a one-use, short-lived token constrained to French transcription. It reserves at most eight minutes at a time, with a 30-minute per-installation and 60-minute global daily cap. Copy `.env.example` to `.env.local` before rebuilding elsewhere; its two values are public browser configuration. The manifest grants access to this project and Google's Gemini API only. Connect an existing email/password account in the popup for optional explanations. No anonymous account sign-in setting was changed.
+The build uses the existing ParleSprint Supabase service. A1/A2 explanations use Gemini 3.1 Flash-Lite; B1/B2 use Gemini 3 Flash. Results are cached, with 20 new generations per account and 500 globally per UTC day. Live transcription uses `immersion-live-token`; Supabase keeps the provider API key and returns a one-use, short-lived token constrained to French transcription. It reserves at most eight minutes at a time, with a 30-minute per-installation and 60-minute global daily cap. Copy `.env.example` to `.env.local` before rebuilding elsewhere; its two values are public browser configuration. The checked-in manifest declares storage, activeTab, scripting, tabCapture and offscreen permissions, with host access to the ParleSprint service, Google Translate and YouTube. The source also contains optional Chrome Identity sign-in and a Gemini Live connection; the local manifest does not declare the `identity` permission or Gemini host. This source/config mismatch is recorded for the next extension release review and is not evidence about the already-live store package. No extension code or store package was changed in this handoff.
 
-The privacy policy is hosted at https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-privacy.
+The current privacy policy is hosted at https://parlesprint.com/extension/privacy. The Supabase function source contains the same policy copy; redeploy that function only if the old Supabase URL is still used in the live store listing.
 
 The `backend/` directory contains the separately deployable Supabase implementation. Follow its setup documentation and configure public extension connection settings as described there. Provider secrets belong in Supabase Edge Function secrets only. Never copy a Gemini/OpenAI secret key into extension source, settings, build variables, screenshots, or the ZIP. Only public Supabase connection settings are distributed.
 
@@ -59,7 +59,7 @@ Run the automated commands above, then complete `store/QA.md` in real Chrome, in
 
 ## Current release status
 
-Built and tested October 17, 2026. See `store/VERIFICATION.md` and `store/AI_EVALUATION.md` for measured checks and limits. The extension and source ZIPs are in `release/`. Chrome Web Store submission has not occurred: Google requires the publisher’s passkey verification in the open Codex browser tab. After signing in, complete `store/SUBMISSION_CHECKLIST.md`. No Git push was performed.
+The Chrome Web Store listing is live, as confirmed by the owner. This repository contains the 0.2.0 source and release documentation; the currently published listing version and metadata have not been independently checked. The website update links to the store listing and does not change the store package or metadata. See `store/RELEASE_0.2.0.md` for the release scope and dated verification notes in `store/VERIFICATION.md` and `store/AI_EVALUATION.md`.
 
 The October 17 UI pass matches the app’s blue action palette, cool gray surfaces and bundled Inter. The YouTube companion uses a compact caption layer, keeps the ParleSprint wordmark out of the video view, and puts setup and study controls behind a disclosure. Practice, Notebook and Account tabs support keyboard navigation. Existing ParleSprint email/password accounts are verified; Google/Apple controls are hidden until their browser authentication configuration is complete. Account connection does not synchronize vocabulary.
 

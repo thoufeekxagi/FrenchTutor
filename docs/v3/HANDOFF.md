@@ -199,41 +199,32 @@ was and was not verified.
 
 ## 9. Current state (update on every handoff)
 
-Date: 2026-10-13. Branch `tcf-v3`; the working tree contains uncommitted
-course-source and generated-app content. The untracked `docs/v3/branding/`
-folder belongs to the owner and was left untouched.
+Date: 2026-10-19. Branch: `tcf-v3`. The course and app architecture remain as
+documented in the roadmap and content audit above. Recent app commits add the
+v3 release metadata, tutor voice consistency, reference-table speech and
+shared tutor behavior.
 
-Done and in the app: Stage 0, all 14 A1 units, all 12 A2 units, all 12 B1 units,
-and all 14 B2 units. The app index orders A1 → A2 → B1 → B2. It contains 732
-non-dev lessons plus the hidden dev sample, and 46 stories. A2 exports 173
-lessons; B1 exports 157; B2 exports 183. B1 source and its 12 chapter adapters
-are in `content/tcf/book/b1_source.py` and `chapters/27_b1_unit01.py` through
-`38_b1_unit12.py`. Its five vocabulary lessons per unit teach 30 focus terms
-each, with 8 reusable chunks, 12 grammar targets, four-skill practice and a
-four-skill entry baseline. B2 exports five vocabulary lessons per unit with 30
-focus terms each and 8 reusable chunks, for a 420-term planning target. The app
-still does not enforce CEFR prerequisites.
+The owner confirmed the Xcode archive for app version 1.0.3 (327) uploaded to
+App Store Connect. The local App Store package contains seven iPhone 6.1/6.3
+screenshots and six iPad 13-inch screenshots, with TCF Canada in the first
+three captions and Bonjour fourth. App Store Connect screenshot upload and
+App Review submission are not verified. Candidate metadata and the screenshot
+status are documented under `flutter_app/app_store_screenshots/v3-submission/`
+and `CROSS_PRODUCT_RELEASE_2026-10-19.md`.
 
-The Stories tab also contains ten new B1 and ten new B2 reading stories,
-attached to Units 1–10. Their master text, sentence translations, quizzes and
-story gloss are in `content/tcf/book/story_extensions.py`; `validate.py` passes
-with zero errors. These additions do not include separate listening materials.
-A fluent speaker should review the new French, translations and glosses before
-release.
+The ParleSprint website work is maintained in `../ParleSprintWebsite`; the
+canonical source is `landingpage/`. The owner confirms the Immersion extension
+is live in the Chrome Web Store. This handoff updates the website install and
+privacy pages and repository docs only; it does not alter or submit an
+extension package or store listing. See the cross-product release note for
+verification boundaries and the source-manifest discrepancy recorded for a
+future extension release review.
 
-Cross-level validation: `check_book.py` reports 0 errors and 0 ledger warnings;
-`validate.py` reports 0 errors and one expected warning for the hidden
-`dev-sample`; `validate_b1.py` checks all 157 B1 lessons and five six-term
-vocabulary sets per unit; `validate_b2.py` checks all 183 B2 lessons and five
-six-term vocabulary sets per unit. The A2-only export produces 173 lessons,
-1,820 steps, 516 generated checks and 12 stories; the other stage exports were
-preserved. `tool/check.sh --quick` and 266 Flutter v3/mic-echo tests pass. The
-complete 152-page reviewer PDF was built from the A2 chapter sources and
-visually checked; see `docs/v3/A2_REVIEW_AND_DEVICE_QA.md`.
+No Flutter test suite or App Store Connect submission was run in this handoff.
+Website lint and production build results are reported with the repository
+push status after validation.
 
-No physical iPad/iPhone course walk, production install or human French/audio
-review has been done. The owner will connect the iPad for device and learner
-checks. Next priorities are specialist review, device QA, course-wide review
-scheduling and prerequisite gates. The B2 syllabus, grammar map and human-review checklist
-are in `content/tcf/syllabus/b2.json`, `content/tcf/syllabus/grammar_b2.json`
-and `content/tcf/REVIEW_NEEDED.md`.
+No physical iPad/iPhone course walk or human French/audio review is claimed.
+Specialist review, device QA, course-wide review scheduling and prerequisite
+gates remain open; see `content/tcf/REVIEW_NEEDED.md` and
+`docs/v3/A2_REVIEW_AND_DEVICE_QA.md`.

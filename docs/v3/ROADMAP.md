@@ -22,6 +22,14 @@ future V4 implementation.
 | iPad layout | **partly done**: universal build, readable column, checked on iPad portrait and landscape, Split View safe for calls. Still to do: keyboard and Pencil friendly writing areas |
 | Progress sync between devices | **not built. Progress is saved on the device only** |
 
+**App Store handoff (2026-10-19):** The owner confirmed the Xcode archive for
+version 1.0.3 (327) uploaded to App Store Connect. The local screenshot package
+contains seven iPhone and six iPad assets with a TCF Canada first-three
+sequence; upload and App Review submission are not verified. Candidate ASO
+metadata is documented in `flutter_app/app_store_screenshots/v3-submission/ASO_METADATA.md`.
+See `CROSS_PRODUCT_RELEASE_2026-10-19.md` for the app, website and extension
+handoff status.
+
 ## A1 course units (hand-authored master chapters)
 
 Each unit follows the same path: words (5 groups), phrases, grammar, 2 dialogues, story, listening (5), reading (5), writing, speaking, TCF corner (4 listening, 3 reading), 10-question checkpoint. Run `python3 content/tcf/book/check_book.py` after each unit: it blocks any French word used before it was taught.

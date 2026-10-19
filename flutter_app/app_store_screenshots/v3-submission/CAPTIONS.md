@@ -1,6 +1,6 @@
 # ParleSprint v3 App Store screenshots
 
-Seven portrait iPhone screenshots, PNG/RGB, 1320 × 2868 pixels. The first three make the TCF Canada purpose explicit; the fourth is the Bonjour vocabulary lesson. Each image uses a clean white background and a genuine v3 app capture. The screen UI is preserved, with a restrained frame and caption added around it.
+Seven portrait iPhone screenshots. The App Store Connect set is in `iphone/required-6.1-6.3/` as PNG/RGB at 1206 × 2622 pixels; optional larger copies are in `iphone/optional-large/` at 1320 × 2868. The first three make the TCF Canada purpose explicit; the fourth is the Bonjour vocabulary lesson. Each image uses a clean white background and a genuine v3 app capture. The screen UI is preserved, with a restrained frame and caption added around it.
 
 ## Submission order and captions
 
@@ -22,12 +22,13 @@ Seven portrait iPhone screenshots, PNG/RGB, 1320 × 2868 pixels. The first three
 4. Put the Bonjour word lesson in the fourth position and tie vocabulary retention to the TCF path.
 5–7. Demonstrate listening, reading, and writing in sequence.
 
-The public Canadian listing currently has four dark, Paris-themed screenshots. Their first messages are general French practice and speaking confidence; the exam-oriented screen appears third. This set replaces that broad opening with the TCF Canada purpose in all first three headlines. Apple says up to three screenshots can appear in search, and recommends stating the app's purpose clearly and leading with its strongest features.
+The supplied App Store Connect view showed the iPhone group at 0 of 10 screenshots before this package was prepared. That screen does not verify the upload state after this package was prepared. The set is designed to state TCF Canada in the first three headlines and put the Bonjour lesson fourth.
 
 ## Source and limitations
 
 - Built from the real v3 iPhone captures in `~/Downloads/app-view-v3/`.
 - Excluded the scripted Marie conversation, the onboarding greeting captured mid-animation, and screenshots whose streak/story state would advertise test data.
 - The small footer reads “Independent preparation. Not affiliated with FEI or IRCC.”
-- This package is iPhone-only. The current branch's iOS target family is `1,2` (iPhone and iPad), while the public App Store page says “Only for iPhone.” App Store Connect must be checked for the pending version's platform/device requirements. If that version supports iPadOS, Apple requires at least one iPad 13-inch screenshot too.
-- The current public version is 1.0.2. Local v3 metadata is 1.0.2+326; App Store Connect build processing/selection could not be verified while sign-in was unavailable.
+- The 1.0.3 (327) archive upload was confirmed in the owner's Xcode screenshot on October 19, 2026. It has not been confirmed as submitted for App Review.
+- This repository has seven iPhone 6.1/6.3-inch screenshots at 1206 × 2622 and six iPad 13-inch screenshots at 2048 × 2732. They are local submission assets; App Store Connect upload status remains unverified.
+- Check the version's platform/device requirements and screenshot groups in App Store Connect before adding the build for review. The public App Store page and the current submission metadata were not rechecked as part of this repository handoff.

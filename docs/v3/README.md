@@ -28,6 +28,8 @@ and `UI_STRUCTURE.md` (look and screens), `LESSON_FORMAT.md` and
 `BUILD_STRUCTURE.md` (repo layout, release), `ROADMAP.md` (what is done and next),
 `SCREEN_MAP.md` (generated, every screen and key), and
 `A2_REVIEW_AND_DEVICE_QA.md` (A2 review status and exact on-device recipes).
+The October 19, 2026 App Store, website and Chrome extension handoff is in
+[`CROSS_PRODUCT_RELEASE_2026-10-19.md`](CROSS_PRODUCT_RELEASE_2026-10-19.md).
 
 The Gemini-first lesson voice architecture, cost controls and public reference
 links are in [`MARIE_VOICE_ARCHITECTURE.md`](MARIE_VOICE_ARCHITECTURE.md).

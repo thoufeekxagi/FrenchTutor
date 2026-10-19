@@ -7,7 +7,13 @@ The free-first site is maintained in two local folders:
 
 The standalone copy preserves its own `netlify.toml`, `next.config.ts`, `package-lock.json`, `.netlify/`, and owner references. Sync only intended website source files. Never use a destructive mirror or remove files just to make the folders identical.
 
-The latest production release was built and published from the standalone folder to <https://parlesprint.com> on 2026-10-17 (Netlify deploy `6ad3f97d77664f5c500e1c90`). The site is also connected to the private GitHub repository on `main`. A future GitHub-triggered production build can replace this CLI release; sync the reviewed source into that repository before its next release.
+The latest production release was built and published from the standalone folder to <https://parlesprint.com> on 2026-10-17 (Netlify deploy `6ad3f97d77664f5c500e1c90`). The site is connected to the private GitHub repository on `main`; pushing the reviewed deployment copy triggers a Netlify production build.
+
+## 2026-10-19 app and extension handoff
+
+The owner confirms ParleSprint Immersion is already live in the Chrome Web Store. The website's `/extension` page links directly to the existing listing; `/extension/privacy` describes the current local source behavior. This handoff does not rebuild or submit an extension package and does not edit the Chrome Web Store listing. The exact published package version, listing fields and store privacy answers have not been independently verified.
+
+The extension page and policy in the standalone deployment copy are synced from this canonical source before deployment. Pushing the standalone repository's `main` branch triggers Netlify. The app's 1.0.3 (327) archive upload is handled in App Store Connect and is separate from the website deployment.
 
 ## Local checks
 

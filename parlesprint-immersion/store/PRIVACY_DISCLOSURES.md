@@ -1,39 +1,41 @@
-# Chrome Web Store privacy form worksheet (v0.2.0)
+# Chrome Web Store privacy form worksheet (version 0.2.0)
 
-Verify the dashboard's current wording before submitting. This is a worksheet, not a claim that the form has been submitted.
+The owner confirmed the extension is live in the Chrome Web Store on October 19, 2026. This is a disclosure worksheet, not a snapshot of the live dashboard form. Verify the publisher dashboard's current questions and package permissions before changing any store declarations. The current public policy page is `https://parlesprint.com/extension/privacy` once the website deploy completes.
 
-Single purpose: help adults learn French while watching YouTube videos by showing French captions, word meanings and translation beside the video.
+## Single purpose
+
+Help people learn French from video using captions, listening practice, phrase support and vocabulary review.
 
 ## Data the extension handles
 
 | Data | When | Where it goes |
 | --- | --- | --- |
-| YouTube French caption track | Opening a YouTube watch page | Requested from youtube.com by the page's own origin; cached locally by video ID |
-| Selected French word, phrase or the caption lines being shown | User taps a word, or English translation is on (default) | Google Translate (translate.googleapis.com). Nothing else is attached: no URL, video ID or identity |
-| Tab audio | Only after the user accepts the audio notice and starts live captions | Streamed straight to Google Gemini live transcription. Not sent to ParleSprint |
-| Selected word/phrase, its caption line and level | User presses Explain in context | ParleSprint Supabase function, then Google Gemini; cached server-side by hash. Random installation ID and IP address (salted hashes only) for daily limits. No account |
-| Consent flag, random installation ID, IP address | Starting live captions | ParleSprint Supabase function: issues a one-use 3-minute Google token and applies daily limits. ID and IP are kept only as salted hashes for about a week. No audio |
-| Preferences, vocabulary, cached captions, live transcripts, per-video timing | Always | Chrome local extension storage only |
+| Captions exposed by a page or subtitles imported by the learner | When selected or opened | Page captions are read in the browser; imported files are processed locally; both may be cached in Chrome local extension storage |
+| Selected French text or caption lines | When the learner taps a word/phrase or English translation is on | Google Translate for an English meaning; no video URL or video ID is attached |
+| Tab audio | Only after the learner accepts the audio notice and starts live captions | Streamed from the browser directly to Google Gemini; not received or stored by ParleSprint |
+| Selected phrase, nearby caption context and learning level | When the learner requests an AI explanation | Authenticated ParleSprint Supabase function, then Google Gemini; the response is cached server-side using a request hash |
+| Email/password credentials or supported provider response, account ID and session tokens | Only when the learner chooses to connect an account for explanations | Supabase processes sign-in; session tokens and display-only account information are kept in Chrome local extension storage |
+| Random installation identifier and network IP address | When requesting a token or explanation, for service limits | The server stores salted hashes for daily limits; raw live audio is never sent to this service |
+| Preferences, cached captions, transcripts and saved vocabulary | During use | Chrome local extension storage on the learner's device |
 
-Not stored in readable form: IP address and installation ID (salted hashes only). Not collected: microphone audio, video frames, browsing history, YouTube account data, name, email, passwords, payments, analytics, advertising identifiers. No sign-in or accounts exist in this version.
+Not collected by the extension: microphone audio, video frames, a browsing-history feed, advertising identifiers or analytics. No information is sold or used for advertising. The extension can process account information when the learner elects to sign in; do not select a disclosure claiming that no data is collected.
 
-## Dashboard categories
+## Dashboard categories to review
 
-- Website content: yes (captions text and selected text, and tab audio when live captions run). Used only for the stated learning function.
-- Personally identifiable information, authentication information: no.
-- Do not select "no data collected": selected text goes to Google Translate and audio goes to Google Gemini on explicit user action.
-- Certify: not sold, not used for advertising, creditworthiness or lending.
+- Website content: yes. Caption text and selected text are used for translations/explanations; tab audio is used only after a separate consent and explicit start action.
+- Personal information: email and account identifier may be handled when the learner signs in.
+- Authentication information: account credentials are sent to Supabase for sign-in; session tokens are stored locally to maintain the session.
+- Audio: tab audio is sent directly to Google Gemini only after the learner consents and starts live transcription. It does not go to ParleSprint.
+- Confirm that data is used for the extension's disclosed learning purpose, is not sold and is not used for advertising, creditworthiness or lending.
 
 ## Permission justifications
 
-Copy from `LISTING.md`. Remote code: none.
+Use the checked-in permission list in `LISTING.md` as a source-code reference only. The live store package's permissions have not been independently verified in this task. This task leaves the live package and listing untouched.
 
 ## Google terms to mention in reviewer notes
 
-- Translation uses Google's keyless translate endpoint and may be rate limited or change. The extension degrades to "No meaning found" and does not break captions.
-- Live transcription uses Google's Gemini API. On Google's unpaid tier submitted audio may be used to improve products and reviewed by people; the consent text says so. Move to a paid key before heavy use.
-- Server-enforced free limits per UTC day. Explain in context: 20 per installation, 60 per IP, 1,500 across all users, 8 per minute per IP. Live captions: 30 minutes per installation, 40 per IP, 360 across all users, 4 tokens per minute per IP. Silent audio is not uploaded. Change limits with the IMMERSION_EXPLAIN_LIMIT_* and IMMERSION_LIVE_LIMIT_* secrets, no redeploy of code needed beyond a restart.
-- IP address: used only to enforce these limits, stored as an HMAC-SHA256 hash with a server secret salt, and deleted after 8 days.
+- Translation uses Google's Translate endpoint. Results may be limited or change; caption practice remains available.
+- Live transcription uses the Gemini API. Google's terms vary by service tier; content sent through unpaid services may be used to improve products or reviewed by people. The extension shows an audio notice before capture. Do not use it with sensitive audio.
+- Service rate limits are enforced by the backend. Check the current Supabase deployment and environment values before publishing; limits documented in historical verification notes may be stale.
 
-Public policy: https://oxfnrsjskdjbroekxdco.supabase.co/functions/v1/immersion-privacy
 Support: thoufeekbaber1@gmail.com

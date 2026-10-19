@@ -1,70 +1,67 @@
-# App Store listing refresh — English (Canada)
+# ParleSprint App Store metadata — English (Canada), version 1.0.3
 
-## Public listing inspected
+## Candidate metadata for review
 
-- Current name: `ParleSprint: French, CLB7+`
-- Current subtitle: `Speaking Practice, TEF & TCF`
-- Current public version: 1.0.2; “What’s New” says the live-tutor UX was updated.
-- Current description leads with CLB7+/TEF/TCF and includes broad claims about native-like correction, daily adaptive missions, and A1–B1 progression. The new v3 product captures show an A1–B2 path and clearly differentiated TCF skill practice.
-- The current public page shows four older dark/Paris-themed screenshots. The v3 package replaces them with seven light, focused app captures.
+- App name: ParleSprint French CLB7+ (24/30 characters)
+- Subtitle: TCF Canada Exam Prep (20/30 characters)
+- Promotional text: within Apple's 170-character limit
+- Keywords: learn,study,immigration,canadian,speak,conversation,listen,read,write,permanent,residency,nclc,exam (99/100 bytes)
+- Description: within Apple's 4,000-character limit
+- What's New: A refreshed TCF Canada study experience: follow the guided A1–B2 course path, practise listening, reading, writing and speaking, and build a routine with daily challenges, Stories and word review. Marie now supports conversation practice during lessons, with clearer onboarding level guidance.
 
-## Recommended metadata
+This is prepared copy; the currently saved localization fields were not re-verified in App Store Connect during this repo update. Keep TCF out of the app name under `docs/v3/BUILD_STRUCTURE.md`; use the subtitle, description, keywords and screenshot captions for TCF intent. The 1.0.3 (327) archive upload is documented separately. The version has not been submitted for review.
 
-**Name — 23/30 characters**
+## Description
 
-`ParleSprint: TCF Canada`
+ParleSprint is an independent French study app for adults preparing for TCF Canada. Follow a guided A1–B2 course, practise listening, reading, writing and speaking, and get conversation practice with Marie, an AI tutor.
 
-**Subtitle — 27/30 characters**
+A CLEAR PATH FROM A1 TO B2
+Study authored French lessons step by step. Hear new words, see example sentences, and review vocabulary as you progress.
 
-`French Exam Prep & Practice`
+PRACTISE TCF SKILLS
+Try TCF-style listening and reading questions. Work through writing prompts and model responses. Practise spoken French with Marie during lessons.
 
-**Keywords — 98/100 bytes**
+BUILD A STEADY ROUTINE
+Use daily challenges, French Stories and word review to keep studying consistently. Course, Practice and Tests bring lessons and skill practice together.
 
-`learn,study,immigration,canadian,speak,conversation,listen,read,write,permanent,residency,beginner`
+FOR YOUR CANADIAN FRENCH GOAL
+ParleSprint is for learners preparing for TCF Canada, including those studying French for Canadian immigration or permanent-residence goals. Some learners describe their goal as CLB 7+ French preparation. TCF Canada results use the NCLC scale; NCLC 7 is a target for some immigration pathways. Requirements vary by program, so check current IRCC guidance.
 
-**Promotional text — 129/170 characters**
+ParleSprint provides independent study content, not official TCF exam questions. It does not issue official scores, certify an NCLC or CLB level, or guarantee an exam score or immigration outcome. ParleSprint is not affiliated with France Éducation international or Immigration, Refugees and Citizenship Canada.
 
-`Study for TCF Canada with a guided A1–B2 French path, exam-skill practice, daily challenges and conversation practice with Marie.`
+Privacy Policy: https://parlesprint.com/privacy
+Terms of Service: https://parlesprint.com/terms
+Apple Standard EULA: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
-**Description — 992/4000 characters**
+## Promotional text
 
-Prepare for TCF Canada with a clear French study path from A1 to B2. ParleSprint brings guided course lessons and exam-focused practice together so you can work on one skill at a time.
+Preparing for TCF Canada and CLB 7+? Follow an A1–B2 French path, practise all four skills, and build a steady routine with Marie.
 
-FOLLOW A STRUCTURED FRENCH PATH
-• Study step by step with a course path from A1 to B2.
-• Practise TCF-style listening and reading questions.
-• Work through writing prompts and study model responses.
-• Practise conversation with Marie, an AI tutor.
-• Review useful French words with audio and example sentences.
-• Build a routine with daily challenges and French Stories.
+## Keywords
 
-For adult French learners preparing for TCF Canada, including people learning French for a Canadian immigration pathway or permanent-residence goal.
+learn,study,immigration,canadian,speak,conversation,listen,read,write,permanent,residency,nclc,exam
 
-ParleSprint is an independent study app, not an official test provider. It does not offer immigration advice or guarantee a test score, permanent residence, or any immigration outcome. Not affiliated with France Éducation international or Immigration, Refugees and Citizenship Canada.
+The title and subtitle cover ParleSprint, French, CLB 7+, TCF Canada and exam prep. The hidden keyword field adds complementary learning, immigration, skill, NCLC and exam terms without repeating title or subtitle words.
 
-**What’s New**
+## Research and rationale
 
-A refreshed TCF Canada study path, updated course progression, exam-skill practice and a redesigned learning experience.
+- Apple's current App Store search guidance says relevance includes the app name, subtitle, keyword field, and primary category; user behavior such as downloads, ratings, and reviews also matters. It does not promise rankings from keyword placement alone.
+- Apple permits a 30-character name, a 30-character subtitle, 100 bytes for keywords, 170 characters for promotional text, and 4,000 characters for a plain-text description. Apple says the description is used for web search engine results after release.
+- Apple's search results may include LLM-generated app tags based on App Store Connect metadata. Current App Store Connect guidance says these tags are supported in the United States; the app's edited localization here is English (Canada).
+- A current Canadian storefront scan found competitors positioning around phrases including “TCF Canada,” “French exam,” “reading and listening practice,” and “CLB 7+.” These listings establish market language, not keyword volume or ranking difficulty. ParleSprint's differentiator is the guided A1–B2 path, four-skill practice, and lesson-linked tutor.
+- The connected Ahrefs API returned “Insufficient plan” for usage information, so no search-volume figures are claimed. Ahrefs search metrics would describe web search, not App Store query volume.
+- For accuracy, the description states that TCF Canada French results use NCLC levels and avoids promising scores, immigration eligibility, or official exam questions. IRCC lists TCF Canada as an accepted French test for Express Entry and gives program-specific NCLC thresholds; requirements vary by program.
+- “AEO” is implemented as clear, answer-first, factual copy that names the audience, purpose, features, and limitations. Apple provides no separate AEO field or ranking guarantee.
 
-## Keyword rationale
+## Research sources
 
-The name puts the exact `TCF Canada` intent beside the established ParleSprint brand. The subtitle adds the plain-language product category. The hidden keyword field adds complementary terms without repeating words from the name or subtitle: learning, Canadian immigration/permanent residence, speaking/conversation, and listening/reading/writing. Because the name already contains TCF Canada, those terms are not repeated in the keyword field. It uses the full words “permanent” and “residency” rather than the two-character “PR” abbreviation, and avoids two-character CEFR tokens. This creates combinations such as “learn French,” “French immigration,” and “Canadian French” without promising an immigration result.
+- Apple App Store search guidance: https://developer.apple.com/app-store/search/
+- Apple app information limits: https://developer.apple.com/help/app-store-connect/reference/app-information/app-information/
+- Apple version metadata fields: https://developer.apple.com/help/app-store-connect/reference/app-information/platform-version-information
+- Apple App Store tags: https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-tags
+- IRCC Express Entry language tests: https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/language-test.html
+- Canadian competitor examples: https://apps.apple.com/ca/app/tcf-canada-practice-tests/id6747463796, https://apps.apple.com/ca/app/tcf-canada-prep/id6746266590, and https://apps.apple.com/ca/app/tcf-exam-hero/id6757088210?platform=ipad
 
-The current App Store page’s “You Might Also Like” section includes several titles explicitly positioned for TCF Canada, which supports TCF as a specific category signal. It does not prove search volume or ranking potential. Apple’s [Keyword Suggestions API](https://developer.apple.com/documentation/apple-ads-platform-api/query-keyword-suggestions) and [Search Term Popularity API](https://developer.apple.com/documentation/apple-ads-platform-api/query-app-search-term-popularity-data) are the closest official tools for seed expansion and relative popularity. The popularity measure is relative, not an absolute search-volume count; these are documented APIs, not an open-source ASO product. A third-party “100 free credits” tool was not identifiable from the available browser tabs/history; confirm its name before spending those credits.
+## Screenshot package
 
-Apple’s [Product Page Optimization](https://developer.apple.com/app-store/product-page-optimization/) can test up to three screenshot/icon/video treatments, but requires the app to be Ready for Distribution. Use it after the v3 listing is approved to compare a single screenshot concept at a time against the live baseline. Apple’s current [asset guidance](https://developer.apple.com/app-store/asset-best-practices/) also describes search-result creative assets and product-page headers; those are optional follow-on assets once App Store Connect access is restored.
-
-Screenshot changes target discovery and product-page conversion. Measure retention and subscription churn separately in App Analytics; Apple supports retention cohorts and filters such as app version, source, territory, and product page. This lets us see whether a clearer TCF promise improves installs and whether those users continue studying after download.
-
-## Apple constraints and validation
-
-- App name: maximum 30 characters; subtitle: maximum 30 characters.
-- Keywords: maximum 100 bytes. The proposed string is ASCII and uses 98 bytes.
-- Promotional text: maximum 170 characters; it can be updated without a new app version.
-- Description: maximum 4,000 characters, plain text. Apple advises against adding unnecessary keywords to the description for search ranking, so the description is written for clear conversion and accurate feature explanation.
-- Screenshots: up to 10 per device size; up to 3 may appear in search depending on orientation. Apple recommends a clear purpose and a feature-led sequence.
-- The screenshot exports in the paired folder are 1320 × 2868, RGB PNGs. If the pending build supports iPadOS, an iPad 13-inch screenshot set is still required.
-
-## Current submission status
-
-I could open the public product page, but App Store Connect redirected to `authResult=FAILED` and its Apple sign-in widget remained on a spinner. Chrome also reported the Mac was locked. I therefore could not confirm the pending version, processed build, current localization fields, iPad requirement, or submit the metadata/assets. The current local branch is `tcf-v3`, and `flutter_app/pubspec.yaml` reports version `1.0.2+326`.
+The iPhone screenshot sequence leads with TCF Canada in its first three screens and puts the Bonjour lesson fourth. The iPad screenshot set contains iPad captures only. In the latest supplied App Store Connect screenshot, the iPhone group showed 0 of 10 screenshots. The local packages are ready, but iPhone upload is not confirmed; the current iPad upload state was not verified. Upload each set to its matching device group before adding version 1.0.3 for review.
