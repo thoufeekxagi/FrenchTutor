@@ -259,7 +259,9 @@ class _V3OnboardingFlowState extends ConsumerState<V3OnboardingFlow>
       selected: _tutor,
     );
     if (picked == null || !mounted) return;
-    setState(() => _tutor = picked);
+    // Saved at once: quitting mid-onboarding must not forget the choice.
+    await ActiveTutor.set(picked);
+    if (mounted) setState(() => _tutor = picked);
   }
 
   void _skipName() {

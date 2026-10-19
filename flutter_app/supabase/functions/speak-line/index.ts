@@ -5,9 +5,17 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 // 16-bit, mono). The phone reads the bucket directly when the clip exists and
 // calls this function only to make a missing one.
 const BUCKET = "speak-lines";
-const VERSION = "tts1";
+const VERSION = "tts2";
 const MODEL = "gemini-3.8-flash-lite-tts";
 const VOICES = new Set(["Aoede", "Puck", "Leda", "Orus"]);
+// Marie (Aoede) and Julien (Puck) speak France French; Camille (Leda) and
+// Mathieu (Orus) speak Quebec French, as in their live calls.
+const LANGUAGE: Record<string, string> = {
+  Aoede: "fr-FR",
+  Puck: "fr-FR",
+  Leda: "fr-CA",
+  Orus: "fr-CA",
+};
 const MAX_CHARS = 200;
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_NEW_PER_WINDOW = 120;
@@ -141,7 +149,7 @@ Deno.serve(async (request) => {
           generationConfig: {
             responseModalities: ["AUDIO"],
             speechConfig: {
-              languageCode: "fr-FR",
+              languageCode: LANGUAGE[voice],
               voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } },
             },
           },

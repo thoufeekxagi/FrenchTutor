@@ -27,6 +27,7 @@ abstract final class V3CloudState {
     V3StateSpec('v3_story_position', V3StateKind.positions),
     V3StateSpec('v3_story_hear_words', V3StateKind.scalar),
     V3StateSpec('learner_name', V3StateKind.scalar),
+    V3StateSpec('tutor_persona_id', V3StateKind.scalar),
     V3StateSpec('v3_free_started_on', V3StateKind.earliest),
     V3StateSpec('v3_free_daily_days', V3StateKind.set),
     V3StateSpec('v3_free_uses_marie', V3StateKind.max),
@@ -123,6 +124,27 @@ abstract final class V3CloudState {
     }
   }
 
+  /// Called after a sign-in merge so the app can re-read values it keeps in
+  /// memory (the chosen tutor). Set in main.dart; null in tests.
+  static Future<void> Function()? onRestored;
+
+  /// Marks a scalar as changed on this phone right now, then copies it to the
+  /// account. The timestamp is written even when nobody is signed in, so a
+  /// choice made during onboarding beats an older one on the account.
+  static void markChanged(String key) {
+    if (_off) return;
+    unawaited(() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+          _atKey(key),
+          DateTime.now().toUtc().toIso8601String(),
+        );
+      } catch (_) {}
+      push(key);
+    }());
+  }
+
   /// Copies one key to the account. Call after every local write; it never
   /// throws and never blocks the screen.
   static void push(String key) {
@@ -188,6 +210,7 @@ abstract final class V3CloudState {
         }
         if (jsonEncode(merged) != jsonEncode(remoteValue)) push(spec.key);
       }
+      await onRestored?.call();
     } catch (error) {
       debugPrint('V3CloudState.sync failed: $error');
     }

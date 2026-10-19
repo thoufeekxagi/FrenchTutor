@@ -13,6 +13,7 @@ import 'data/content_service.dart';
 import 'data/database/pilot_infrastructure_store.dart';
 import 'data/database/competency_store.dart';
 import 'models/tutor_persona.dart';
+import 'v3/v3_cloud_state.dart';
 import 'orchestration/runtime/orchestration_bootstrapper.dart';
 import 'providers/database_provider.dart';
 import 'services/alphabet_prewarm.dart';
@@ -99,6 +100,10 @@ void main() {
         // The chosen tutor persona must be readable synchronously anywhere
         // (P2.1) — loaded once here, updated only from Settings/Onboarding.
         await ActiveTutor.load();
+        // The tutor choice follows the learner to a new phone or a reinstall.
+        ActiveTutor.onSaved = () =>
+            V3CloudState.markChanged('tutor_persona_id');
+        V3CloudState.onRestored = ActiveTutor.load;
         // Alphabet audio is curated and bundled in the app. Seed the selected
         // tutor's 31 clips into the persistent local cache on first install;
         // this reads app assets only and never contacts Supabase or Gemini.

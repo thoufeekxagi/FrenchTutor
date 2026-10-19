@@ -54,6 +54,9 @@ Deno.serve(async (request) => {
       uses: 1,
       expireTime: new Date(now + 5 * 60 * 1000).toISOString(),
       newSessionExpireTime: new Date(now + 60 * 1000).toISOString(),
+      // Lock only the model. Without the mask Google locks the whole setup,
+      // which silently dropped the tutor's voice and the onboarding prompt.
+      fieldMask: "model",
       bidiGenerateContentSetup: { model: "models/gemini-3.8-live" },
     }),
   });

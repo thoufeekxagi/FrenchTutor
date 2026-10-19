@@ -26,23 +26,22 @@ void main() {
     accessToken: () => token,
   );
 
-  test(
-    'a shared clip is downloaded once, then played from the phone',
-    () async {
-      final calls = <String>[];
-      final s = service((r) async {
-        calls.add('${r.method} ${r.url.path}');
-        return http.Response.bytes(pcm, 200);
-      });
-      expect(await s.clip('La banque est là.', 'Aoede'), pcm);
-      expect(await s.clip('  La  banque est là. ', 'Aoede'), pcm);
-      expect(calls, hasLength(1));
-      expect(
-        calls.single,
-        startsWith('GET /storage/v1/object/public/speak-lines/tts1/Aoede/'),
-      );
-    },
-  );
+  test('a shared clip is downloaded once, then played from the phone', () async {
+    final calls = <String>[];
+    final s = service((r) async {
+      calls.add('${r.method} ${r.url.path}');
+      return http.Response.bytes(pcm, 200);
+    });
+    expect(await s.clip('La banque est là.', 'Aoede'), pcm);
+    expect(await s.clip('  La  banque est là. ', 'Aoede'), pcm);
+    expect(calls, hasLength(1));
+    expect(
+      calls.single,
+      startsWith(
+        'GET /storage/v1/object/public/speak-lines/${SpeakerClipService.version}/Aoede/',
+      ),
+    );
+  });
 
   test(
     'a missing clip is made once through the function, with the account',
@@ -107,6 +106,13 @@ void main() {
     final s = service((r) async => http.Response.bytes([1, 2, 3], 200));
     expect(await s.clip('Salut.', 'Aoede'), isNull);
     expect(await s.saved('Salut.', 'Aoede'), isNull);
+  });
+
+  test('Quebec tutors speak Quebec French, the others France French', () {
+    expect(SpeakerClipService.languageFor('Aoede'), 'fr-FR');
+    expect(SpeakerClipService.languageFor('Puck'), 'fr-FR');
+    expect(SpeakerClipService.languageFor('Leda'), 'fr-CA');
+    expect(SpeakerClipService.languageFor('Orus'), 'fr-CA');
   });
 
   test('voices do not share clips', () async {

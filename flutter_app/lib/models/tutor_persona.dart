@@ -174,10 +174,15 @@ class ActiveTutor {
     }
   }
 
+  /// Called after every saved choice so the app can copy it to the learner's
+  /// account (set in main.dart; null in tests).
+  static void Function()? onSaved;
+
   static Future<void> set(TutorPersona persona) async {
     notifier.value = persona;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefsKey, persona.id);
+    onSaved?.call();
   }
 }
 

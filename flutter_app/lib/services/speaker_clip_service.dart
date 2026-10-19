@@ -37,7 +37,7 @@ class SpeakerClipService {
 
   static final shared = SpeakerClipService();
 
-  static const version = 'tts1';
+  static const version = 'tts2';
   static const bucket = 'speak-lines';
   static const maxChars = 200;
   static const _debugGeminiKey = String.fromEnvironment('E2E_GEMINI_API_KEY');
@@ -68,6 +68,11 @@ class SpeakerClipService {
       return null;
     }
   }
+
+  /// Marie and Julien speak France French; Camille and Mathieu speak Quebec
+  /// French, as in their live calls.
+  static String languageFor(String voice) =>
+      (voice == 'Leda' || voice == 'Orus') ? 'fr-CA' : 'fr-FR';
 
   static String normalize(String text) =>
       text.trim().replaceAll(RegExp(r'\s+'), ' ');
@@ -205,7 +210,7 @@ class SpeakerClipService {
             'generationConfig': {
               'responseModalities': ['AUDIO'],
               'speechConfig': {
-                'languageCode': 'fr-FR',
+                'languageCode': languageFor(voice),
                 'voiceConfig': {
                   'prebuiltVoiceConfig': {'voiceName': voice},
                 },
