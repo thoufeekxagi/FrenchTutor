@@ -230,6 +230,11 @@ class GeminiLiveService {
   void Function(String text)? onTutorTranscript;
   void Function(List<int> pcmBytes)? onAudioChunk;
   void Function(String reason)? onReplyGuarded;
+
+  /// When a reply is trimmed by the guard, hand the kept words to
+  /// [onTutorTranscript] at the end of the turn. The call screen that commits
+  /// the partial text itself on interruption turns this off.
+  bool deliverTrimmedTranscript = true;
   void Function()? onTurnComplete;
   void Function()? onInterrupted;
 
@@ -984,13 +989,14 @@ class GeminiLiveService {
       // is. Audio is billed by tokens actually generated, not by this ceiling.
       // Live Tutor gets room for a complete requested explanation; the prompt
       // keeps ordinary voice turns brief.
-      generationConfig['maxOutputTokens'] = liveTutorMode ? 2000 : 1000;
+      generationConfig['maxOutputTokens'] = liveTutorMode ? 700 : 1000;
       // gemini-3.8-live does not accept thinkingLevel in setup.
     } else if (isTrial) {
       // Do not hard-truncate the short onboarding call: the old 64-token cap
       // could cut the opening or a useful answer off mid-sentence. Its compact
       // prompt keeps normal replies brief without a brittle output ceiling.
       generationConfig['thinkingConfig'] = {'thinkingLevel': 'minimal'};
+      generationConfig['maxOutputTokens'] = 500;
     }
     final setupBody = <String, dynamic>{
       'model': _model,
@@ -1316,6 +1322,12 @@ class GeminiLiveService {
         // The stale generation ended naturally before the follow-up injection landed —
         // swallow it whole; the announcement reply will be its own fresh turn.
         _currentTutorTranscript = '';
+        final kept = _keptTranscript;
+        _keptTranscript = '';
+        if (kept.isNotEmpty && deliverTrimmedTranscript) {
+          _dbg('TUTOR(trimmed)', kept);
+          onTutorTranscript?.call(normalizeGeneratedText(kept));
+        }
         _deliverPendingSpokenContext();
         return;
       }
@@ -1356,13 +1368,16 @@ class GeminiLiveService {
 
   bool _guardChecked = false;
   String _turnUserTranscript = '';
+  String _keptTranscript = '';
 
   /// The Live model answers every sound it takes for speech. For the lesson
   /// coach and Live Tutor, silently drop replies to fillers ("hmm, okay",
   /// "thanks") and cut generic chatbot offers ("let me know if you need
   /// anything else"), as a human tutor would not say them.
   void _applyReplyGuard(Map serverContent) {
-    if (!(_isLessonCoach || liveTutorMode) || _suppressStaleReply) return;
+    if (!(_isLessonCoach || liveTutorMode || isTrial) || _suppressStaleReply) {
+      return;
+    }
     final out = serverContent['outputTranscription'];
     final hasReply =
         serverContent['modelTurn'] is Map ||
@@ -1385,10 +1400,21 @@ class GeminiLiveService {
       var cut = TutorReplyGuard.chatterStart(text);
       if (TutorReplyGuard.isUnsupportedLanguage(text)) cut = 0;
       if (cut >= 0) {
-        _currentTutorTranscript = text.substring(0, cut).trimRight();
+        _keptTranscript = text.substring(0, cut).trimRight();
+        _currentTutorTranscript = '';
         _isModelGenerating = true;
         suppressCurrentReply();
         onReplyGuarded?.call('chatter');
+      } else if (TutorReplyGuard.shouldCutRunOn(
+        text,
+        learnerTranscript: _turnUserTranscript + _currentUserTranscript,
+        maxWords: isTrial || _isLessonCoach ? 45 : 55,
+      )) {
+        _keptTranscript = text.trim();
+        _currentTutorTranscript = '';
+        _isModelGenerating = true;
+        suppressCurrentReply();
+        onReplyGuarded?.call('runon');
       }
     }
   }

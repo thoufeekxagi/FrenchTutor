@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-10-18-listening-u01",
+  "revision": 1,
+  "available_on": "2026-10-18",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Listening",
+  "title": "Listen: B2 · From opinion to argument: make the logic visible",
+  "summary": "Listen for two key details about b2 · From opinion to argument: make the logic visible.",
+  "minutes": 4,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "b2-u01-listening"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-10-18-listening-u01",
+    "title": "Listen: B2 · From opinion to argument: make the logic visible",
+    "subtitle": "B2 · Listening · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Je suis favorable à l'essai, à condition qu'on publie les critères avant le début. Sinon, les résultats seront difficiles à comparer.",
+        "question": "What condition does the speaker set?",
+        "options": [
+          "Compare only personal stories",
+          "End the trial after one day",
+          "Let each team choose new criteria later",
+          "Publish the criteria before the trial"
+        ],
+        "answer": 3,
+        "explain": "The speaker says the criteria should be published before the trial."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Certes, le bureau facilite les échanges rapides. Cela dit, le temps de transport représente une contrainte réelle pour une partie de l'équipe.",
+        "question": "What is the speaker doing?",
+        "options": [
+          "Changing the subject to travel",
+          "Acknowledging an advantage and adding a limitation",
+          "Reporting a final survey result",
+          "Rejecting all in-person meetings"
+        ],
+        "answer": 1,
+        "explain": "Certes acknowledges an advantage; cela dit introduces the limitation."
+      }
+    ]
+  }
+}

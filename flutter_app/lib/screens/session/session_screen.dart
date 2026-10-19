@@ -726,6 +726,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen>
       }
     };
 
+    _gemini.deliverTrimmedTranscript = false;
+    _gemini.onReplyGuarded = (_) => _gemini.onInterrupted?.call();
     _gemini.onInterrupted = () {
       _liveTutorInputWatchdog?.cancel();
       _audio.isAwaitingTutorResponse = false;

@@ -178,11 +178,13 @@ def _answer_key(package: dict) -> dict:
     }
 
 
-def publish(package: dict, environment: str, available_on: str) -> None:
+def publish(
+    package: dict, environment: str, available_on: str, dry_run: bool = False
+) -> dict | None:
     prefix = f"DAILY_CHALLENGE_{environment.upper()}"
     url = os.environ.get(f"{prefix}_URL", "").rstrip("/")
     service_key = os.environ.get(f"{prefix}_SERVICE_ROLE_KEY", "")
-    if not url or not service_key:
+    if not dry_run and (not url or not service_key):
         raise ValueError(
             f"Set {prefix}_URL and {prefix}_SERVICE_ROLE_KEY before publishing."
         )
@@ -216,6 +218,8 @@ def publish(package: dict, environment: str, available_on: str) -> None:
         "reviewed_by": package.get("reviewed_by"),
         "reviewed_at": package.get("reviewed_at"),
     }
+    if dry_run:
+        return payload
     endpoint = (
         f"{url}/rest/v1/daily_challenge_versions"
         f"?on_conflict=challenge_key%2Crevision"
@@ -240,10 +244,38 @@ def publish(package: dict, environment: str, available_on: str) -> None:
         raise ValueError(f"Supabase rejected the publish ({error.code}): {body}") from error
     except URLError as error:
         raise ValueError(f"Could not reach the configured Supabase project: {error.reason}") from error
+    return None
+
+
+def approve_schedule(directory: Path, reviewer: str) -> int:
+    """Stamp every package in a schedule as reviewed. A person runs this after
+    reading the content; the tool never approves anything by itself."""
+    from datetime import datetime, timezone
+
+    if not reviewer.strip():
+        raise ValueError("--by must name the human reviewer.")
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    count = 0
+    for path in sorted(directory.rglob("*.json")):
+        package = load_package(path)
+        if "lesson" not in package:
+            continue
+        package["review_status"] = "approved"
+        package["reviewed_by"] = reviewer.strip()
+        package["reviewed_at"] = stamp
+        path.write_text(
+            json.dumps(package, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        count += 1
+    return count
 
 
 def publish_schedule(
-    directory: Path, environment: str, from_date: date, days: int
+    directory: Path,
+    environment: str,
+    from_date: date,
+    days: int,
+    dry_run: bool = False,
 ) -> tuple[int, int]:
     if not directory.is_dir():
         raise ValueError(f"Schedule directory does not exist: {directory}")
@@ -285,8 +317,9 @@ def publish_schedule(
 
     for path, package in selected:
         available_on = package["available_on"]
-        publish(package, environment, available_on)
-        print(f"Published {package['id']} to {environment} for {available_on}.")
+        publish(package, environment, available_on, dry_run=dry_run)
+        verb = "Would publish" if dry_run else "Published"
+        print(f"{verb} {package['id']} to {environment} for {available_on}.")
     if skipped_for_review:
         print(f"Skipped {skipped_for_review} package(s) awaiting human review.")
     return len(selected), skipped_for_review
@@ -311,13 +344,33 @@ def main(argv: list[str] | None = None) -> int:
     schedule.add_argument("--environment", choices=("staging", "production"), required=True)
     schedule.add_argument("--from-date", type=date.fromisoformat, default=date.today())
     schedule.add_argument("--days", type=int, default=30)
+    schedule.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate and build the exact rows, but send nothing",
+    )
+    approve = subparsers.add_parser(
+        "approve", help="Mark every package in a schedule as reviewed by a person"
+    )
+    approve.add_argument("directory", type=Path)
+    approve.add_argument("--by", required=True, help="Name of the human reviewer")
     args = parser.parse_args(argv)
 
     try:
+        if args.command == "approve":
+            count = approve_schedule(args.directory, args.by)
+            print(f"Marked {count} package(s) approved by {args.by}.")
+            return 0
         if args.command == "publish-schedule":
             if args.days < 1 or args.days > 90:
                 raise ValueError("--days must be between 1 and 90.")
-            publish_schedule(args.directory, args.environment, args.from_date, args.days)
+            publish_schedule(
+                args.directory,
+                args.environment,
+                args.from_date,
+                args.days,
+                dry_run=args.dry_run,
+            )
             return 0
         package = load_package(args.package)
         errors = validate(package, getattr(args, "available_on", None))

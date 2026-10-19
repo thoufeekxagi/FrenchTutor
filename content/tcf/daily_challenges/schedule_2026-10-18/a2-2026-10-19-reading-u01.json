@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-19-reading-u01",
+  "revision": 1,
+  "available_on": "2026-10-19",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Reading",
+  "title": "Read: A week in my life: connect the details",
+  "summary": "Read for two key details about a week in my life: connect the details.",
+  "minutes": 3,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "a2-u01-reading"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-19-reading-u01",
+    "title": "Read: A week in my life: connect the details",
+    "subtitle": "A2 · Reading · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "When is Sam available this week?",
+        "options": [
+          "Tuesday morning",
+          "Wednesday evening",
+          "Thursday after 18 h",
+          "Sunday afternoon"
+        ],
+        "answer": 2,
+        "explain": "Sam says he is free Thursday after 18 h.",
+        "promptFr": "Salut Awa, · D'habitude, je révise le mercredi soir. Cette semaine, je suis débordé mardi et mercredi, mais je suis libre jeudi après 18 h. Tu es libre ? · Sam"
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "What should a learner bring?",
+        "options": [
+          "A to-do list",
+          "Their notes",
+          "A work schedule",
+          "A presentation"
+        ],
+        "answer": 1,
+        "explain": "The notice says Apporter ses notes.",
+        "promptFr": "SÉANCE DE FRANÇAIS · Mardi : de dix-huit heures à dix-neuf heures · Jeudi : de dix-huit heures à dix-neuf heures · Apporter ses notes. · Confirmer avant lundi."
+      }
+    ]
+  }
+}

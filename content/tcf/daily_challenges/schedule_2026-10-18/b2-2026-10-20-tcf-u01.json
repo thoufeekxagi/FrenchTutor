@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-10-20-tcf-u01",
+  "revision": 1,
+  "available_on": "2026-10-20",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Reading",
+  "title": "TCF practice: B2 · From opinion to argument: make the logic visible",
+  "summary": "Read for two key details about b2 · From opinion to argument: make the logic visible.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b2-u01-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-10-20-tcf-u01",
+    "title": "TCF practice: B2 · From opinion to argument: make the logic visible",
+    "subtitle": "B2 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What does the committee propose?",
+        "options": [
+          "A survey without reporting its limits",
+          "The removal of every on-site role",
+          "A limited trial with criteria set in advance",
+          "A permanent rule based on the survey"
+        ],
+        "answer": 2,
+        "explain": "The committee proposes a limited trial and criteria defined before it begins.",
+        "promptFr": "Dans un sondage interne fictif, plusieurs employés disent apprécier la souplesse d'un horaire hybride. Le document ne mesure toutefois ni la qualité du travail ni la situation des postes qui exigent une présence continue. Le comité propose donc un essai limité, avec des critères définis avant le lancement. Les résultats seraient présentés avec les limites de l'enquête. Cette méthode permettrait de comparer des expériences sans transformer une préférence déclarée en preuve d'efficacité."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "On what do both groups agree?",
+        "options": [
+          "Every meeting should be online",
+          "Meetings without a clear purpose are rarely useful",
+          "The office is always more accessible",
+          "Spontaneous discussion has no value"
+        ],
+        "answer": 1,
+        "explain": "Both groups agree that meetings need a clear purpose.",
+        "promptFr": "Pour certains collègues, les échanges spontanés au bureau accélèrent la résolution de problèmes. D'autres soulignent que des réunions en ligne bien préparées peuvent être plus accessibles. Les deux groupes s'accordent sur un point : les réunions sans objectif clair sont rarement utiles. Le débat porte donc moins sur un lieu unique que sur les conditions d'un échange efficace."
+      }
+    ]
+  }
+}

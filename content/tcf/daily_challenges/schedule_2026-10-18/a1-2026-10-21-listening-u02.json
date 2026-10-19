@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-10-21-listening-u02",
+  "revision": 1,
+  "available_on": "2026-10-21",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "Listen: Greet, be polite, spell your name",
+  "summary": "Listen for two key details about greet, be polite, spell your name.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a1-u02-listening"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-10-21-listening-u02",
+    "title": "Listen: Greet, be polite, spell your name",
+    "subtitle": "A1 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Pardon, madame. Pouvez-vous répéter, s'il vous plaît ?",
+        "question": "What does the person want?",
+        "options": [
+          "To buy something",
+          "To hear it again",
+          "To say goodbye",
+          "To give a name"
+        ],
+        "answer": 1,
+        "explain": "Répéter: say again."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Quel âge avez-vous ? — J'ai trente-deux ans.",
+        "question": "How old is the person?",
+        "options": [
+          "22",
+          "32",
+          "42",
+          "23"
+        ],
+        "answer": 1,
+        "explain": "Trente-deux: 32."
+      }
+    ]
+  }
+}

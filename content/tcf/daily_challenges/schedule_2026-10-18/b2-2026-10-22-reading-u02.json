@@ -1,0 +1,56 @@
+{
+  "id": "b2-2026-10-22-reading-u02",
+  "revision": 1,
+  "available_on": "2026-10-22",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b2",
+  "primary_skill": "Reading",
+  "title": "Read: B2 · News and public claims: report without overstating",
+  "summary": "Read for two key details about b2 · News and public claims: report without overstating.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b2-u02-reading"
+  ],
+  "lesson": {
+    "id": "daily-b2-2026-10-22-reading-u02",
+    "title": "Read: B2 · News and public claims: report without overstating",
+    "subtitle": "B2 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "Which detail is not final?",
+        "options": [
+          "The length of the first phase",
+          "The budget",
+          "The pilot start",
+          "The plan to examine results"
+        ],
+        "answer": 1,
+        "explain": "The notice says there is no final budget yet.",
+        "promptFr": "Un communiqué fictif annonce le lancement d'un projet pilote. Il précise que la première phase durera quatre mois et que les résultats seront rendus publics après examen. Le document ne donne pas encore de budget final. Un média rapporte qu'un coût plus élevé est possible, mais cette estimation n'a pas été confirmée par l'organisme responsable. Le lecteur doit donc distinguer l'annonce officielle de l'estimation rapportée."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Why is the conclusion limited?",
+        "options": [
+          "No one answered",
+          "The survey had no question",
+          "The results were not published",
+          "Participants volunteered themselves"
+        ],
+        "answer": 3,
+        "explain": "Self-selection limits how broadly the findings can be generalized.",
+        "promptFr": "Une enquête menée auprès de 180 volontaires révèle que plusieurs répondants souhaitent des horaires plus prévisibles. Les auteurs indiquent cependant que les participants se sont inscrits eux-mêmes. Le résultat renseigne sur ces répondants; il ne permet pas, à lui seul, de décrire toutes les personnes concernées."
+      }
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-21-listening-u02",
+  "revision": 1,
+  "available_on": "2026-10-21",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: What happened this week?",
+  "summary": "Listen for two key details about what happened this week?.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u02-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-21-listening-u02",
+    "title": "Listen: What happened this week?",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Hier soir, j'ai terminé mon devoir et j'ai préparé mon exposé.",
+        "question": "What did the speaker prepare?",
+        "options": [
+          "A presentation",
+          "A delivery",
+          "A refund",
+          "A guided tour"
+        ],
+        "answer": 0,
+        "explain": "The speaker says j'ai préparé mon exposé."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "La semaine dernière, nous avons réservé une visite guidée pour samedi.",
+        "question": "When did they book the tour?",
+        "options": [
+          "Last week",
+          "Yesterday morning",
+          "This afternoon",
+          "Next month"
+        ],
+        "answer": 0,
+        "explain": "The first words are la semaine dernière."
+      }
+    ]
+  }
+}

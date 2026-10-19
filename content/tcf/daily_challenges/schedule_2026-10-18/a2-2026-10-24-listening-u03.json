@@ -1,0 +1,56 @@
+{
+  "id": "a2-2026-10-24-listening-u03",
+  "revision": 1,
+  "available_on": "2026-10-24",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a2",
+  "primary_skill": "Listening",
+  "title": "Listen: Everyday events: what I did",
+  "summary": "Listen for two key details about everyday events: what I did.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a2-u03-listening"
+  ],
+  "lesson": {
+    "id": "daily-a2-2026-10-24-listening-u03",
+    "title": "Listen: Everyday events: what I did",
+    "subtitle": "A2 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Hier, j'ai pris le train pour Gatineau et j'ai lu un avis sur le quai.",
+        "question": "Where did the speaker read the notice?",
+        "options": [
+          "On the platform",
+          "At the library",
+          "At the clinic",
+          "On the bus"
+        ],
+        "answer": 0,
+        "explain": "The speaker says sur le quai, on the platform."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "J'ai fait une demande au guichet, puis j'ai pris le reçu.",
+        "question": "What did the speaker take?",
+        "options": [
+          "The receipt",
+          "The ticket",
+          "The newspaper",
+          "The map"
+        ],
+        "answer": 0,
+        "explain": "The second action is taking the receipt."
+      }
+    ]
+  }
+}

@@ -288,6 +288,31 @@ class TutorReplyGuard {
     caseSensitive: false,
   );
 
+  static final _wantsLong = RegExp(
+    r"(explain|in detail|detailed|difference|compare|examples?|tell me (more|about)|"
+    r"teach me|how does|why (is|are|do|does)|step by step|everything about|"
+    r"expliqu|détail|différence|exemple|raconte|pourquoi)",
+    caseSensitive: false,
+  );
+
+  /// True when the learner asked for an explanation, so a longer answer is OK.
+  static bool wantsLongAnswer(String learnerTranscript) =>
+      _wantsLong.hasMatch(learnerTranscript);
+
+  /// True when a reply has run on: past [maxWords] and finished a sentence, or
+  /// far past it mid-sentence. Never true when the learner asked for depth.
+  static bool shouldCutRunOn(
+    String tutorTranscript, {
+    required String learnerTranscript,
+    int maxWords = 45,
+  }) {
+    if (wantsLongAnswer(learnerTranscript)) return false;
+    final text = tutorTranscript.trim();
+    final words = text.isEmpty ? 0 : text.split(RegExp(r'\s+')).length;
+    if (words <= maxWords) return false;
+    return RegExp(r'[.!?…»"”]$').hasMatch(text) || words > maxWords * 1.6;
+  }
+
   /// Index in [tutorTranscript] where a generic chatbot offer starts, or -1.
   static int chatterStart(String tutorTranscript) =>
       _chatter.firstMatch(tutorTranscript)?.start ?? -1;

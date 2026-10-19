@@ -1,0 +1,56 @@
+{
+  "id": "b1-2026-10-20-tcf-u01",
+  "revision": 1,
+  "available_on": "2026-10-20",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "b1",
+  "primary_skill": "Reading",
+  "title": "TCF practice: B1 · Tell the story clearly: before, during and after",
+  "summary": "Read for two key details about b1 · Tell the story clearly: before, during and after.",
+  "minutes": 4,
+  "steps": [
+    "Read the text",
+    "Check what you understood"
+  ],
+  "source_lesson_ids": [
+    "b1-u01-tcf"
+  ],
+  "lesson": {
+    "id": "daily-b1-2026-10-20-tcf-u01",
+    "title": "TCF practice: B1 · Tell the story clearly: before, during and after",
+    "subtitle": "B1 · Reading · 4 min",
+    "minutes": 4,
+    "steps": [
+      {
+        "type": "choose",
+        "id": "question-1",
+        "prompt": "What had the teacher done before sending the notice?",
+        "options": [
+          "Changed the course topic",
+          "Sent everyone home",
+          "Reserved another room",
+          "Cancelled the next session"
+        ],
+        "answer": 2,
+        "explain": "The notice says she had reserved room 204 before sending the update.",
+        "promptFr": "Message — Le cours devait commencer à 18 h. La salle étant encore occupée, l'enseignante avait réservé la salle 204. Elle a envoyé un avis à 16 h 30. Le cours a finalement commencé à 18 h 20. Les personnes déjà parties ont reçu un lien pour la séance suivante."
+      },
+      {
+        "type": "choose",
+        "id": "question-2",
+        "prompt": "Why were the participants waiting outside?",
+        "options": [
+          "The event had ended",
+          "The main entrance was closed",
+          "They had lost the room number",
+          "The centre had moved to another city"
+        ],
+        "answer": 1,
+        "explain": "The account states the main entrance was closed.",
+        "promptFr": "Compte rendu — Nous attendions dehors parce que la porte principale était fermée. Une participante avait appelé le centre plus tôt, mais la réponse n'était pas arrivée. Un employé nous a finalement indiqué l'entrée latérale."
+      }
+    ]
+  }
+}

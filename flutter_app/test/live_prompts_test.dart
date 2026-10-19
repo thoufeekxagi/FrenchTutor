@@ -122,11 +122,11 @@ void main() {
           level: 'A1',
         );
 
-        expect(prompt, contains('ADAPT REPLY LENGTH TO THE REQUEST'));
-        expect(prompt, contains('one or two concise sentences'));
-        expect(prompt, contains('If they ask for an explanation'));
-        expect(prompt, contains('Never pad, repeat an old French word'));
-        expect(prompt, contains('complete, step-by-step explanation'));
+        expect(prompt, contains('CONDUCT (hard rules)'));
+        expect(prompt, contains('one or two short sentences'));
+        expect(prompt, contains('asks you to explain'));
+        expect(prompt, contains('Never say "anything else?"'));
+        expect(prompt, contains('Speak only English and French'));
       },
     );
 

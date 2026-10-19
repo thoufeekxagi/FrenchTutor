@@ -62,7 +62,7 @@ void main() {
   });
 
   test(
-    'Live Tutor uses Gemini 3.8 with a 2k answer ceiling and bounded history',
+    'Live Tutor uses Gemini 3.8 with a 700-token answer ceiling and bounded history',
     () {
       final service = GeminiLiveService(
         apiKey: 'unit-test-only',
@@ -80,7 +80,7 @@ void main() {
         2000,
       );
       final generation = setup['generationConfig'] as Map<String, dynamic>;
-      expect(generation['maxOutputTokens'], 2000);
+      expect(generation['maxOutputTokens'], 700);
       expect(generation['thinkingConfig'], isNull);
       final vad =
           (setup['realtimeInputConfig']

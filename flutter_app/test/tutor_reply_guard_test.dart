@@ -126,6 +126,45 @@ void main() {
     });
   });
 
+  group('run-on guard', () {
+    const long =
+        'You can say it in many ways and there are lots of options to learn '
+        'today so let us go through each one in order and then practise all of '
+        'them again slowly so that you remember every single phrase well and '
+        'can use them with confidence in any situation that you may meet.';
+    test('a long reply to a simple message is cut at a sentence end', () {
+      expect(
+        TutorReplyGuard.shouldCutRunOn(long, learnerTranscript: 'I like pizza'),
+        isTrue,
+      );
+    });
+    test('a short reply is never cut', () {
+      expect(
+        TutorReplyGuard.shouldCutRunOn(
+          'Bonjour ! Ça va très bien, merci.',
+          learnerTranscript: 'Bonjour',
+        ),
+        isFalse,
+      );
+    });
+    test('an explanation request allows a long answer', () {
+      expect(
+        TutorReplyGuard.shouldCutRunOn(
+          long,
+          learnerTranscript: 'Explain the difference between tu and vous',
+        ),
+        isFalse,
+      );
+    });
+    test('a very long unfinished reply is cut even mid-sentence', () {
+      final words = List.filled(80, 'word').join(' ');
+      expect(
+        TutorReplyGuard.shouldCutRunOn(words, learnerTranscript: 'hello'),
+        isTrue,
+      );
+    });
+  });
+
   group('GeminiLiveService reply guard', () {
     GeminiLiveService make() => GeminiLiveService(
       apiKey: 'unit-test-only',
@@ -178,6 +217,34 @@ void main() {
       s.receiveServerMessageForTest(_reply('It means hello.'));
       expect(audio, hasLength(1));
       expect(tutor, ['It means hello.']);
+    });
+
+    test('a run-on reply stops playback and keeps the first sentences', () {
+      final s = GeminiLiveService(
+        apiKey: 'unit-test-only',
+        sessionType: LiveSessionType.liveTutor,
+        liveTutorMode: true,
+      );
+      final audio = <List<int>>[];
+      final tutor = <String>[];
+      final guarded = <String>[];
+      s.onAudioChunk = audio.add;
+      s.onTutorTranscript = tutor.add;
+      s.onReplyGuarded = guarded.add;
+      s.receiveServerMessageForTest({
+        'serverContent': {
+          'inputTranscription': {'text': 'I like pizza'},
+        },
+      });
+      final sentence = List.filled(14, 'word').join(' ');
+      s.receiveServerMessageForTest(
+        _reply('$sentence. $sentence. $sentence. $sentence.', done: false),
+      );
+      s.receiveServerMessageForTest(_reply(' More and more words.'));
+      expect(guarded, ['runon']);
+      expect(audio, isEmpty);
+      expect(tutor, hasLength(1));
+      expect(tutor.single.contains('More and more'), isFalse);
     });
 
     test('a chatbot tail is cut and not surfaced', () {

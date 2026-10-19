@@ -1,0 +1,56 @@
+{
+  "id": "a1-2026-10-23-tcf-u02",
+  "revision": 1,
+  "available_on": "2026-10-23",
+  "author": "ParleSprint Editorial · draft schedule",
+  "review_status": "needs_human_review",
+  "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
+  "level": "a1",
+  "primary_skill": "Listening",
+  "title": "TCF practice: Greet, be polite, spell your name",
+  "summary": "Listen for two key details about greet, be polite, spell your name.",
+  "minutes": 3,
+  "steps": [
+    "Listen for a detail",
+    "Listen for one more detail"
+  ],
+  "source_lesson_ids": [
+    "a1-u02-tcf"
+  ],
+  "lesson": {
+    "id": "daily-a1-2026-10-23-tcf-u02",
+    "title": "TCF practice: Greet, be polite, spell your name",
+    "subtitle": "A1 · Listening · 3 min",
+    "minutes": 3,
+    "steps": [
+      {
+        "type": "listen",
+        "id": "question-1",
+        "fr": "Bonjour, ici Marc. Mon numéro de téléphone est le quatre, un, six, cinq, cinq, cinq, zéro, un, deux, trois.",
+        "question": "Which city has this area code (416)?",
+        "options": [
+          "Toronto",
+          "Montréal",
+          "Ottawa",
+          "Québec"
+        ],
+        "answer": 0,
+        "explain": "416 is the Toronto area code."
+      },
+      {
+        "type": "listen",
+        "id": "question-2",
+        "fr": "Quel âge as-tu ? — J'ai vingt et un ans.",
+        "question": "How old is the person?",
+        "options": [
+          "20",
+          "21",
+          "12",
+          "31"
+        ],
+        "answer": 1,
+        "explain": "Vingt et un: 21."
+      }
+    ]
+  }
+}
