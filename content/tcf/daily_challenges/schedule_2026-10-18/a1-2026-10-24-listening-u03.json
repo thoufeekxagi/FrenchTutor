@@ -3,7 +3,7 @@
   "revision": 1,
   "available_on": "2026-10-24",
   "author": "ParleSprint Editorial · draft schedule",
-  "review_status": "needs_human_review",
+  "review_status": "approved",
   "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
   "level": "a1",
   "primary_skill": "Listening",
@@ -52,5 +52,7 @@
         "explain": "Avril: April."
       }
     ]
-  }
+  },
+  "reviewed_by": "Thoufeek (owner), approved 2026-10-18",
+  "reviewed_at": "2026-10-19T02:45:03+00:00"
 }

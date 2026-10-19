@@ -1608,6 +1608,7 @@ body {
 /* Rolling two-line live caption window */
 .ps .tail-clamp { display: block; position: relative; }
 .ps .tail-measure { position: absolute; left: 0; right: 0; top: 0; display: block; visibility: hidden; pointer-events: none; }
+.ps .sentence.live .word { padding-left: 0; padding-right: 0; }
 .ps.youtube-companion .sentence.live { display: block; -webkit-line-clamp: unset; max-height: none; overflow: visible; }
 
 /* Play / pause between the chevrons */

@@ -33,8 +33,10 @@ encode_define() {
 }
 
 # Keep Flutter's own generated defines (engine/channel/version) but remove
-# stale app defines. The values from secrets.local.properties are appended
-# below, so a changed local key replaces the previous generated value.
+# stale test and app defines. A Flutter screenshot run can leave its flags in
+# Generated.xcconfig; a later Xcode Release run must not inherit them. The
+# values from secrets.local.properties are appended below, so a changed local
+# key replaces the previous generated value.
 generated_defines=""
 if [ -f "$IOS_DIR/Flutter/Generated.xcconfig" ]; then
   generated_defines=$(awk -F= '/^DART_DEFINES=/ {sub(/^[^=]*=/, ""); print; exit}' "$IOS_DIR/Flutter/Generated.xcconfig")
@@ -47,7 +49,7 @@ for encoded in $generated_defines; do
   [ -n "$encoded" ] || continue
   decoded=$(printf '%s' "$encoded" | base64 -D 2>/dev/null || printf '%s' "$encoded" | base64 -d 2>/dev/null || true)
   case "$decoded" in
-    SUPABASE_URL=*|SUPABASE_ANON_KEY=*|GOOGLE_IOS_CLIENT_ID=*|GOOGLE_WEB_CLIENT_ID=*|REVENUECAT_IOS_KEY=*|REVENUECAT_ANDROID_KEY=*|POSTHOG_API_KEY=*|POSTHOG_HOST=*)
+    ONBOARDING_PREVIEW=*|E2E_*=*|SKIP_NOTIFICATION_PROMPT=*|SUPABASE_URL=*|SUPABASE_ANON_KEY=*|GOOGLE_IOS_CLIENT_ID=*|GOOGLE_WEB_CLIENT_ID=*|REVENUECAT_IOS_KEY=*|REVENUECAT_ANDROID_KEY=*|POSTHOG_API_KEY=*|POSTHOG_HOST=*)
       continue
       ;;
   esac

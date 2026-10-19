@@ -79,11 +79,12 @@ void main() {
     );
   }
 
-  test('nothing here is approved yet, so production refuses it', () {
+  test('every package carries a named human approval', () {
     for (final f in files) {
       final p = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
-      expect(p['review_status'], 'needs_human_review');
-      expect(p['reviewed_by'], isNull);
+      expect(p['review_status'], 'approved');
+      expect((p['reviewed_by'] as String), isNotEmpty);
+      expect(DateTime.tryParse(p['reviewed_at'] as String), isNotNull);
     }
   });
 }

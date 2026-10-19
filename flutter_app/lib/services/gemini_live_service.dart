@@ -110,7 +110,7 @@ class GeminiLiveService {
   // Both tutor experiences use Google's current Live model. Other established
   // call types retain their tested model until their tool contracts are
   // evaluated separately.
-  bool get _usesGemini38Live => _isLessonCoach || liveTutorMode;
+  bool get _usesGemini38Live => _isLessonCoach || liveTutorMode || isTrial;
 
   String get _model => _usesGemini38Live
       ? 'models/gemini-3.8-live'
@@ -989,7 +989,11 @@ class GeminiLiveService {
       // is. Audio is billed by tokens actually generated, not by this ceiling.
       // Live Tutor gets room for a complete requested explanation; the prompt
       // keeps ordinary voice turns brief.
-      generationConfig['maxOutputTokens'] = liveTutorMode ? 700 : 1000;
+      generationConfig['maxOutputTokens'] = isTrial
+          ? 500
+          : liveTutorMode
+          ? 700
+          : 1000;
       // gemini-3.8-live does not accept thinkingLevel in setup.
     } else if (isTrial) {
       // Do not hard-truncate the short onboarding call: the old 64-token cap
@@ -1324,6 +1328,7 @@ class GeminiLiveService {
         _currentTutorTranscript = '';
         final kept = _keptTranscript;
         _keptTranscript = '';
+        _lastTutorTurnWasQuestion = false;
         if (kept.isNotEmpty && deliverTrimmedTranscript) {
           _dbg('TUTOR(trimmed)', kept);
           onTutorTranscript?.call(normalizeGeneratedText(kept));
@@ -1334,6 +1339,7 @@ class GeminiLiveService {
       if (_currentTutorTranscript.isNotEmpty) {
         final tutorTranscript = normalizeGeneratedText(_currentTutorTranscript);
         _currentTutorTranscript = '';
+        _lastTutorTurnWasQuestion = tutorTranscript.trimRight().endsWith('?');
         _dbg('TUTOR', tutorTranscript);
         onTutorTranscript?.call(tutorTranscript);
       }
@@ -1369,6 +1375,7 @@ class GeminiLiveService {
   bool _guardChecked = false;
   String _turnUserTranscript = '';
   String _keptTranscript = '';
+  bool _lastTutorTurnWasQuestion = false;
 
   /// The Live model answers every sound it takes for speech. For the lesson
   /// coach and Live Tutor, silently drop replies to fillers ("hmm, okay",
@@ -1405,6 +1412,16 @@ class GeminiLiveService {
         _isModelGenerating = true;
         suppressCurrentReply();
         onReplyGuarded?.call('chatter');
+      } else if (!isTrial &&
+          _lastTutorTurnWasQuestion &&
+          TutorReplyGuard.followUpQuestionStart(text) >= 0) {
+        // A tutor, not a chatbot: no second question in a row.
+        final at = TutorReplyGuard.followUpQuestionStart(text);
+        _keptTranscript = text.substring(0, at).trim();
+        _currentTutorTranscript = '';
+        _isModelGenerating = true;
+        suppressCurrentReply();
+        onReplyGuarded?.call('question');
       } else if (TutorReplyGuard.shouldCutRunOn(
         text,
         learnerTranscript: _turnUserTranscript + _currentUserTranscript,

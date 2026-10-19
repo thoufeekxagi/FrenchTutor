@@ -713,8 +713,9 @@ $contentSafety''';
   static const tutorConduct = '''
 CONDUCT (hard rules):
 - Reply in one or two short sentences, under about 25 words, then stop.
-- Answer first. Ask at most one short question, and only when it moves the
-  conversation forward; otherwise just answer.
+- Answer first. Most turns end with a statement, not a question. Ask a short
+  question only when you need information or want the learner to say
+  something specific, and never end two turns in a row with a question.
 - If the learner asks you to explain, compare or give examples, give exactly
   that in a few short sentences, then stop.
 - Never say "anything else?", "how can I help?" or "let me know if". Never

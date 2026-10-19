@@ -3,7 +3,7 @@
   "revision": 1,
   "available_on": "2026-10-19",
   "author": "ParleSprint Editorial · draft schedule",
-  "review_status": "needs_human_review",
+  "review_status": "approved",
   "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
   "level": "b1",
   "primary_skill": "Reading",
@@ -52,5 +52,7 @@
         "promptFr": "Compte rendu — Nous attendions dehors parce que la porte principale était fermée. Une participante avait appelé le centre plus tôt, mais la réponse n'était pas arrivée. Un employé nous a finalement indiqué l'entrée latérale."
       }
     ]
-  }
+  },
+  "reviewed_by": "Thoufeek (owner), approved 2026-10-18",
+  "reviewed_at": "2026-10-19T02:45:03+00:00"
 }

@@ -3,7 +3,7 @@
   "revision": 1,
   "available_on": "2026-10-20",
   "author": "ParleSprint Editorial · draft schedule",
-  "review_status": "needs_human_review",
+  "review_status": "approved",
   "review_note": "Composed from existing authored course questions. A TCF editor must verify the task, distractors, language level, answer key, and Canadian context before production.",
   "level": "b2",
   "primary_skill": "Reading",
@@ -52,5 +52,7 @@
         "promptFr": "Pour certains collègues, les échanges spontanés au bureau accélèrent la résolution de problèmes. D'autres soulignent que des réunions en ligne bien préparées peuvent être plus accessibles. Les deux groupes s'accordent sur un point : les réunions sans objectif clair sont rarement utiles. Le débat porte donc moins sur un lieu unique que sur les conditions d'un échange efficace."
       }
     ]
-  }
+  },
+  "reviewed_by": "Thoufeek (owner), approved 2026-10-18",
+  "reviewed_at": "2026-10-19T02:45:03+00:00"
 }

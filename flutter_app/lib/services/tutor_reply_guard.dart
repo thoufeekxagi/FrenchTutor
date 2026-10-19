@@ -313,6 +313,27 @@ class TutorReplyGuard {
     return RegExp(r'[.!?…»"”]$').hasMatch(text) || words > maxWords * 1.6;
   }
 
+  static final _questionOpener = RegExp(
+    r"^(do|does|did|are|is|was|were|have|has|can|could|would|will|shall|what|which|who|"
+    r"where|when|why|how|est-ce|avez|êtes|etes|as-tu|es-tu|quel|quelle|quels|quelles|"
+    r"qu'|qu’|où|comment|pourquoi|pourriez|voulez|aimez|préférez|aimeriez)[\s'’-]+\S+",
+    caseSensitive: false,
+  );
+
+  /// Start index of a trailing follow-up question in [text] (the last
+  /// sentence, when it ends in "?" or opens like a question), or -1. A reply
+  /// that is one single question returns 0.
+  static int followUpQuestionStart(String text) {
+    final t = text.trimRight();
+    if (t.isEmpty) return -1;
+    final body = t.endsWith('?') ? t.substring(0, t.length - 1) : t;
+    final boundary = RegExp(r'[.!?…]\s+').allMatches(body).toList();
+    final start = boundary.isEmpty ? 0 : boundary.last.end;
+    final sentence = t.substring(start);
+    if (t.endsWith('?') || _questionOpener.hasMatch(sentence)) return start;
+    return -1;
+  }
+
   /// Index in [tutorTranscript] where a generic chatbot offer starts, or -1.
   static int chatterStart(String tutorTranscript) =>
       _chatter.firstMatch(tutorTranscript)?.start ?? -1;

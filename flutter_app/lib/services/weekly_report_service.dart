@@ -384,7 +384,7 @@ class WeeklyReportService {
   List<WeeklyCorrection> _correctionsInWeek(DateTime start, DateTime end) {
     final byPair = <String, _CorrectionAccumulator>{};
     for (final submission in learning.submissions()) {
-      final submittedAt = _date(submission.submittedAt)?.toLocal();
+      final submittedAt = _sqliteUtcDate(submission.submittedAt)?.toLocal();
       if (submittedAt == null || !_inRange(submittedAt, start, end)) continue;
       try {
         final decoded = jsonDecode(submission.feedback);
@@ -429,6 +429,17 @@ class WeeklyReportService {
         )
         .toList(growable: false)
       ..sort((a, b) => b.submittedAt.compareTo(a.submittedAt));
+  }
+
+  /// SQLite's `datetime('now')` is UTC but carries no zone marker, so a plain
+  /// parse would read it as local time and shift the day near midnight.
+  static DateTime? _sqliteUtcDate(String? value) {
+    final text = value?.trim();
+    if (text == null || text.isEmpty) return null;
+    final hasZone = RegExp(r'(Z|[+-]\d{2}:?\d{2})$').hasMatch(text);
+    return DateTime.tryParse(
+      hasZone ? text : '${text.replaceFirst(' ', 'T')}Z',
+    );
   }
 
   static DateTime? _date(String? value) {

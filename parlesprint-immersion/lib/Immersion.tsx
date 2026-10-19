@@ -506,11 +506,14 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
     : video?.paused && heldCue && Math.abs(now - heldCue.end - offset) < 0.3
       ? heldCue
       : activeCue(cues, now - offset);
+  const isLiveCue = !!cue?.id.startsWith("live-");
   const cueKey = `${videoId}:${cue?.id}`;
   useEffect(() => {
     if (practice || !prefs.showTranslation || !cue) return;
     const at = cues.findIndex((c) => c.id === cue.id);
-    const wanted = cues.slice(Math.max(0, at), at + 4).filter((c) => !(c.id in lineTx));
+    const wanted = cues.slice(Math.max(0, at), at + 4).filter((c) =>
+      !(c.id in lineTx) && !(c.id === cue.id && c.id.startsWith("live-"))
+    );
     let live = true;
     for (const c of wanted) {
       setLineTx((old) => (c.id in old ? old : { ...old, [c.id]: "" }));
@@ -527,11 +530,30 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   }, [cue?.id, prefs.showTranslation, practice]);
   // Live captions: translate the two-line window as it changes (free Google Translate, debounced).
   useEffect(() => {
-    if (!liveInterim) { setLiveShown(""); setLiveTx(""); }
-  }, [liveInterim]);
+    if (!liveInterim && !isLiveCue) { setLiveShown(""); setLiveTx(""); }
+    else if (isLiveCue) setLiveTx("");
+  }, [isLiveCue, liveInterim]);
   useEffect(() => {
-    if (practice || !prefs.showTranslation || !liveShown) return;
+    if (practice || liveInterim || !prefs.showTranslation || !isLiveCue || !cue || !liveShown) return;
+    const id = cue.id;
     let live = true;
+    setLineTx((old) => ({ ...old, [id]: "" }));
+    const timer = window.setTimeout(() => {
+      browser.runtime
+        .sendMessage({ type: "lookup", text: liveShown.slice(-300) })
+        .then((result) => {
+          if (live && result?.meaning?.translation)
+            setLineTx((old) => ({ ...old, [id]: result.meaning.translation }));
+        })
+        .catch(() => undefined);
+    }, 300);
+    return () => { live = false; window.clearTimeout(timer); };
+  }, [cue?.id, isLiveCue, liveInterim, liveShown, prefs.showTranslation, practice]);
+  useEffect(() => {
+    if (practice || !liveInterim || !prefs.showTranslation || !liveShown) return;
+    let live = true;
+    // Never leave the prior segment's English under a newer French window.
+    setLiveTx("");
     const timer = window.setTimeout(() => {
       browser.runtime
         .sendMessage({ type: "lookup", text: liveShown.slice(-300) })
@@ -539,7 +561,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
         .catch(() => undefined);
     }, 300);
     return () => { live = false; window.clearTimeout(timer); };
-  }, [liveShown, prefs.showTranslation, practice]);
+  }, [liveInterim, liveShown, prefs.showTranslation, practice]);
   const tokens = useMemo(() => tokenizeCaption(cue?.text ?? ""), [cue?.text]);
   const spokenWordIndex =
     prefs.highlightSpokenWords &&
@@ -925,8 +947,8 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
   const practiceCue = practice?.cues.find(
     (c) => c.id === cue?.id && c.text === cue?.text,
   );
-  const tokenButtons = () =>
-    tokens.map((token) => {
+  const tokenButtons = (fromOffset = 0) =>
+    tokens.filter((token) => token.start >= fromOffset).map((token) => {
       if (token.kind !== "word") return <span key={token.index}>{token.text}</span>;
       const isSelected = !!selectedRange && token.index >= selectedRange.start && token.index <= selectedRange.end;
       const isSaved = savedRanges.some((range) => token.index >= range.start && token.index <= range.end);
@@ -1009,6 +1031,7 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
       pausedByLookup.current = false;
     };
     const tx = cue ? lineTx[cue.id] : "";
+    const visibleTranslation = liveInterim ? liveTx : isLiveCue ? tx : cue ? tx : "";
     return (
       <aside
         className={`ps ov${docked ? " docked" : ""}${prefs.placement === "side" ? " side" : ""} caption-${prefs.captionSize}`}
@@ -1048,12 +1071,21 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
         )}
         {prefs.showCaptions && (cue || liveInterim) && (
           <div className={`ov-line${tourStep !== null && compactTour[tourStep]?.target === "word" ? " tour-hl" : ""}`}>
-            {liveInterim ? (
-              <p className="sentence live" lang="fr"><TailClamp text={liveInterim} lines={2} onChange={setLiveShown} /></p>
+            {liveInterim || isLiveCue ? (
+              <p className="sentence live" lang="fr">
+                <TailClamp
+                  text={liveInterim || cue?.text || ""}
+                  lines={2}
+                  onChange={setLiveShown}
+                  renderFrom={isLiveCue && !liveInterim ? tokenButtons : undefined}
+                />
+              </p>
             ) : (
               <p className="sentence" lang="fr">{tokenButtons()}</p>
             )}
-            {prefs.showTranslation && (liveInterim ? liveTx : tx) && <p className="ov-tx" lang="en">{liveInterim ? liveTx : tx}</p>}
+            {prefs.showTranslation && (visibleTranslation || liveInterim || isLiveCue) && (
+              <p className="ov-tx" lang="en">{visibleTranslation || "Translating…"}</p>
+            )}
           </div>
         )}
         <div className="ov-controls" role="toolbar" aria-label="Caption controls">
@@ -1327,6 +1359,19 @@ export function Immersion({ practice }: { practice?: Practice } = {}) {
                 </div>}
                 {liveInterim ? (
                   <p className="sentence live" lang="fr" aria-live="polite"><TailClamp text={liveInterim} lines={2} onChange={setLiveShown} /></p>
+                ) : cue && isLiveCue ? (
+                  <p className="sentence live" lang="fr" aria-live="polite">
+                    <TailClamp
+                      text={cue.text}
+                      lines={2}
+                      onChange={setLiveShown}
+                      renderFrom={(fromOffset) =>
+                        prefs.hidden && !captionRevealed
+                          ? <button onClick={() => setCaptionRevealed(true)}>Reveal French sentence</button>
+                          : tokenButtons(fromOffset)
+                      }
+                    />
+                  </p>
                 ) : cue ? (
                   <div className="sentence" lang="fr">
                     {prefs.hidden && !captionRevealed ? (
@@ -1822,13 +1867,26 @@ function MeaningCard({ meaning, state, compact }: { meaning?: Meaning; state: "i
 }
 
 /** Shows only the newest words that fit in `lines` lines, dropping the oldest as text grows. */
-function TailClamp({ text, lines = 2, onChange }: { text: string; lines?: number; onChange?: (shown: string) => void }) {
+function TailClamp({
+  text,
+  lines = 2,
+  onChange,
+  renderFrom,
+}: {
+  text: string;
+  lines?: number;
+  onChange?: (shown: string) => void;
+  renderFrom?: (startOffset: number) => React.ReactNode;
+}) {
   const measure = useRef<HTMLSpanElement>(null);
   const [shown, setShown] = useState(text);
+  const [startOffset, setStartOffset] = useState(0);
+  const offsets = [...text.matchAll(/\S+/g)].map((match) => match.index ?? 0);
   useLayoutEffect(() => {
     const el = measure.current;
     const words = text.split(/\s+/).filter(Boolean);
     let out = text;
+    let start = offsets[0] ?? 0;
     if (el && words.length > 1) {
       const lineHeight = parseFloat(getComputedStyle(el).lineHeight) || el.getBoundingClientRect().height || 24;
       const limit = lineHeight * lines + 2;
@@ -1841,13 +1899,15 @@ function TailClamp({ text, lines = 2, onChange }: { text: string; lines?: number
         if (fits(mid)) { best = mid; hi = mid - 1; } else lo = mid + 1;
       }
       out = words.slice(best).join(" ");
+      start = offsets[best] ?? start;
     }
     setShown(out);
+    setStartOffset(start);
     onChange?.(out);
   }, [text, lines]);
   return (
     <span className="tail-clamp">
-      <span>{shown}</span>
+      <span>{renderFrom ? renderFrom(startOffset) : shown}</span>
       <span ref={measure} className="tail-measure" aria-hidden="true" />
     </span>
   );

@@ -2,5 +2,9 @@
 #include "Generated.xcconfig"
 #include? "XcodeSecrets.xcconfig"
 
+// Flutter drive leaves its integration-test entry point in Generated.xcconfig.
+// Direct Xcode Release runs and archives must always compile the app entry point.
+FLUTTER_TARGET = lib/main.dart
+
 // Xcode 26 can deadlock when CocoaPods signs embedded frameworks in parallel.
 COCOAPODS_PARALLEL_CODE_SIGN = false

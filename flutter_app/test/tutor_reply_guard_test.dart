@@ -126,6 +126,44 @@ void main() {
     });
   });
 
+  group('follow-up question guard', () {
+    test('finds a trailing question after an answer', () {
+      const text = 'That sounds fun! Do you play hockey yourself?';
+      expect(
+        TutorReplyGuard.followUpQuestionStart(text),
+        text.indexOf('Do you'),
+      );
+    });
+    test('catches a question that has only just started', () {
+      const text = 'That sounds fun! Do you play';
+      expect(
+        TutorReplyGuard.followUpQuestionStart(text),
+        text.indexOf('Do you'),
+      );
+    });
+    test('a lone question starts at zero', () {
+      expect(
+        TutorReplyGuard.followUpQuestionStart('Quel film avez-vous vu ?'),
+        0,
+      );
+    });
+    test('plain answers are left alone', () {
+      expect(
+        TutorReplyGuard.followUpQuestionStart(
+          '"Déménager" means to move house.',
+        ),
+        -1,
+      );
+      expect(
+        TutorReplyGuard.followUpQuestionStart(
+          'You are welcome. How kind of you.',
+        ),
+        greaterThan(0),
+        reason: 'an opener-like sentence is treated as a question tail',
+      );
+    });
+  });
+
   group('run-on guard', () {
     const long =
         'You can say it in many ways and there are lots of options to learn '
@@ -245,6 +283,38 @@ void main() {
       expect(audio, isEmpty);
       expect(tutor, hasLength(1));
       expect(tutor.single.contains('More and more'), isFalse);
+    });
+
+    test('a second question in a row is trimmed off, the first is kept', () {
+      final s = GeminiLiveService(
+        apiKey: 'unit-test-only',
+        sessionType: LiveSessionType.liveTutor,
+        liveTutorMode: true,
+      );
+      final tutor = <String>[];
+      final guarded = <String>[];
+      s.onTutorTranscript = tutor.add;
+      s.onReplyGuarded = guarded.add;
+      // Turn 1: a statement then a question. Allowed (first question).
+      s.receiveServerMessageForTest({
+        'serverContent': {
+          'inputTranscription': {'text': 'I like pizza'},
+        },
+      });
+      s.receiveServerMessageForTest(_reply('Nice choice! Do you cook it?'));
+      expect(guarded, isEmpty);
+      expect(tutor, ['Nice choice! Do you cook it?']);
+      // Turn 2: another question is trimmed, the statement stays.
+      s.receiveServerMessageForTest({
+        'serverContent': {
+          'inputTranscription': {'text': 'Yes I do'},
+        },
+      });
+      s.receiveServerMessageForTest(
+        _reply('That is great! What toppings do you use?'),
+      );
+      expect(guarded, ['question']);
+      expect(tutor.last, 'That is great!');
     });
 
     test('a chatbot tail is cut and not surfaced', () {

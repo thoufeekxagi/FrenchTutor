@@ -59,7 +59,9 @@ class GeminiLiveTokenService {
     final response = await Supabase.instance.client.functions
         .invoke(
           trial
-              ? 'gemini-live-trial-token'
+              ? (modern
+                    ? 'gemini-live-v3-trial-token'
+                    : 'gemini-live-trial-token')
               : modern
               ? 'gemini-live-v3-token'
               : 'gemini-live-token',

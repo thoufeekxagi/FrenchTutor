@@ -153,18 +153,14 @@ void main() {
     expect(marie.phase, V3MariePhase.live);
   });
 
-  live('only a real background ends the call, not Split View', (tester) async {
+  live('lifecycle changes never hang up the fake; the real call controller '
+      'owns the background grace period', (tester) async {
     await pumpHost(tester);
     await connect(tester);
     marie.handleLifecycle(AppLifecycleState.inactive);
-    expect(
-      marie.phase,
-      V3MariePhase.live,
-      reason: 'inactive is Split View or Control Center',
-    );
     marie.handleLifecycle(AppLifecycleState.paused);
     await tester.pump();
-    expect(marie.phase, V3MariePhase.idle);
+    expect(marie.phase, V3MariePhase.live);
   });
 
   live('a second tap while connecting ends it cleanly', (tester) async {
@@ -260,15 +256,13 @@ void main() {
     expect(V3MarieSession.debugLog, isEmpty);
   });
 
-  live('a muted audio-only call may idle three times as long', (tester) async {
+  live('a muted audio-only call idles out on the same limit', (tester) async {
     await pumpHost(tester, idle: const Duration(seconds: 5));
     final f = marie.speak(ctx, 'bonjour');
     await tester.pump(const Duration(milliseconds: 400));
     await f;
     await tester.pump(const Duration(seconds: 2));
     await tester.pump(const Duration(seconds: 10)); // past the 5 s limit
-    expect(marie.phase, V3MariePhase.live, reason: 'closed mic costs nothing');
-    await tester.pump(const Duration(seconds: 10)); // past 15 s
     expect(marie.phase, V3MariePhase.idle);
   });
 

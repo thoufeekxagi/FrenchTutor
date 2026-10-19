@@ -63,7 +63,7 @@ export default function Home() {
           <ToolCards />
         </Reveal>
 
-        <section className="home-products-band">
+        <section className="home-products-band home-products-showcase">
           <div className="site-container">
             <Reveal>
               <div className="home-section-heading product-heading">
@@ -80,22 +80,22 @@ export default function Home() {
                 <div className="product-copy">
                   <span className="product-icon"><Captions size={20} /></span>
                   <p className="eyebrow">PARLESPRINT IMMERSION · CHROME</p>
-                  <h3>Learn from a line in a video.</h3>
-                  <p>Follow French captions on YouTube, tap a word, and save the phrase with its context. Import your own SRT or VTT when captions aren’t available.</p>
+                  <h3>French, while the video is still playing.</h3>
+                  <p>Follow live French captions on YouTube, replay a line, and tap a word to keep its meaning in context. You can also bring your own SRT or VTT file.</p>
                   <Link className="button button-primary" href="/extension">See the Chrome extension <ArrowRight size={16} /></Link>
-                  <p className="product-caption">Caption availability depends on the video. No universal transcription.</p>
+                  <p className="product-caption">A real capture from a live French video in YouTube.</p>
                 </div>
                 <figure className="product-visual extension-visual">
                   <div className="product-screenshot-frame">
                     <Image
-                      src="/product-screenshots/immersion-youtube-companion.png"
+                      src="/product-screenshots/immersion-live-captions.png"
                       width={1280}
-                      height={800}
-                      alt="A real Chrome session with ParleSprint Immersion open over a TV5MONDE French video on YouTube. The companion is ready to start live captions."
+                      height={720}
+                      alt="A real Chrome screenshot showing ParleSprint Immersion transcribing live French speech over a YouTube video."
                       sizes="(min-width: 1600px) 42vw, (min-width: 761px) 44vw, 100vw"
                     />
                   </div>
-                  <figcaption><span>Chrome · real YouTube session</span><span>Companion ready for captions</span></figcaption>
+                  <figcaption><span>Chrome · real YouTube session</span><span>Live French captions</span></figcaption>
                 </figure>
               </Reveal>
 
@@ -103,22 +103,26 @@ export default function Home() {
                 <div className="product-copy">
                   <span className="product-icon"><BookOpen size={20} /></span>
                   <p className="eyebrow">PARLESPRINT FOR IPHONE</p>
-                  <h3>A guided path, with Marie beside you.</h3>
-                  <p>Move through authored lessons for everyday French and TCF Canada practice. Bring each lesson into a live conversation when you’re ready.</p>
+                  <h3>A clear path from A1 to TCF practice.</h3>
+                  <p>Build French through short lessons and a daily challenge, then practise speaking with Marie when you’re ready.</p>
                   <Link className="button button-secondary" href="/app">Explore the iPhone app <ArrowUpRight size={16} /></Link>
-                  <p className="product-caption">One email and password connects the iPhone app, Chrome extension and website.</p>
+                  <a className="app-rating-chip" href="https://apps.apple.com/ca/app/parlesprint-french-clb7/id6788485664?platform=iphone&see-all=reviews" target="_blank" rel="noreferrer" aria-label="See ParleSprint’s 5.0 rating from 5 App Store ratings">
+                    <span className="app-rating-stars" aria-hidden="true">★★★★★</span>
+                    <span><strong>5.0</strong> from 5 App Store ratings</span>
+                    <ArrowUpRight size={15} aria-hidden="true" />
+                  </a>
                 </div>
                 <figure className="product-visual app-visual">
                   <div className="app-device">
                     <Image
-                      src="/product-screenshots/iphone-today.png"
-                      width={1206}
-                      height={2622}
-                      alt="A real iPhone simulator capture of ParleSprint Today, with an A1 level, a guided course, review, Stories and Listening."
-                      sizes="(min-width: 761px) 180px, 46vw"
+                      src="/product-screenshots/iphone-v3-practice.png"
+                      width={1284}
+                      height={2778}
+                      alt="A real iPhone capture of ParleSprint V3 showing A1 daily practice, the daily challenge, speaking with Marie, word review, Stories, and the TCF path."
+                      sizes="(min-width: 1280px) 280px, (min-width: 761px) 26vw, 290px"
                     />
                   </div>
-                  <figcaption><span>iPhone · Today screen</span><span>From the ParleSprint app</span></figcaption>
+                  <figcaption><span>iPhone · V3 daily practice</span><span>Real app screen</span></figcaption>
                 </figure>
               </Reveal>
             </div>

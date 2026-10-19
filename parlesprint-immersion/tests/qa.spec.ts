@@ -966,9 +966,19 @@ test("previous and next chevrons move between lines in the slim bar and the full
 
 test("live captions: a rolling two-line window and a live English line, in both views", async () => {
   const { page, panel } = await fixture();
-  await context.route("https://translate.googleapis.com/**", (route) =>
-    route.fulfill({ contentType: "application/json", body: JSON.stringify([[["Live English line", "x"]], null, "fr"]) }),
-  );
+  await context.route("https://translate.googleapis.com/**", async (route) => {
+    const text = new URL(route.request().url()).searchParams.get("q") ?? "";
+    const translation = text.startsWith("ancien")
+      ? "Old English line"
+      : text.startsWith("nouveau")
+        ? "New English line"
+        : "Live English line";
+    if (text.startsWith("nouveau")) await new Promise((resolve) => setTimeout(resolve, 700));
+    await route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify([[[translation, text]], null, "fr"]),
+    });
+  });
   const worker = context.serviceWorkers()[0]!;
   const long = Array.from({ length: 70 }, (_, i) => `mot${i}`).join(" ");
   const send = (message: Record<string, unknown>) =>
@@ -977,15 +987,12 @@ test("live captions: a rolling two-line window and a live English line, in both 
       const [tab] = await c.tabs.query({ url: "https://www.youtube.com/watch*" });
       await c.tabs.sendMessage(tab.id, { ...m, tabId: tab.id });
     }, message);
-  const check = async () => {
-    await send({ type: "live-transcription-status", status: "listening" });
-    await send({ type: "live-transcription-interim", text: long, at: 0, epoch: 0 });
-    const line = panel.locator(".sentence.live");
+  const assertWindow = async (line: ReturnType<typeof panel.locator>) => {
     await expect(line).toBeVisible();
     await expect(line).toContainText("mot69");
     await expect(line).not.toContainText("mot0 ");
     const lines = await line.evaluate((el) => {
-      const visible = el.querySelector("span > span") as HTMLElement;
+      const visible = el.querySelector(".tail-clamp > span:first-child") as HTMLElement;
       const lh = parseFloat(getComputedStyle(el).lineHeight);
       return visible.getBoundingClientRect().height / lh;
     });
@@ -994,14 +1001,35 @@ test("live captions: a rolling two-line window and a live English line, in both 
     // the French text is shown once, not duplicated in a status card
     await expect(panel.locator("text=mot69 >> visible=true")).toHaveCount(1);
   };
+  const check = async () => {
+    await send({ type: "live-transcription-status", status: "listening" });
+    await send({ type: "live-transcription-interim", text: long, at: 0, epoch: 0 });
+    await assertWindow(panel.locator(".sentence.live"));
+  };
+  const checkFinal = async () => {
+    await send({ type: "live-transcription-final", text: long, at: 30, epoch: 0 });
+    await assertWindow(panel.locator(".sentence.live"));
+  };
+  const checkTranslationRefresh = async () => {
+    const translation = panel.locator(".ov-tx, .sentence-translation").first();
+    await send({ type: "live-transcription-interim", text: "ancien segment", at: 0, epoch: 0 });
+    await expect(translation).toHaveText("Old English line");
+    await send({ type: "live-transcription-interim", text: "nouveau segment", at: 0, epoch: 0 });
+    await expect(translation).toHaveText("Translating…");
+    await expect(translation).toHaveText("New English line");
+  };
   // slim bar
   await panel.getByLabel("Import French subtitles").setInputFiles("public/demo-fr.srt").catch(() => undefined);
   await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: true, placement: "below", tourDone: true, showTranslation: true } }));
   await seek(page, 30);
   await check();
+  await checkTranslationRefresh();
+  await checkFinal();
   // full panel
   await worker.evaluate(() => (globalThis as any).chrome.storage.local.set({ prefs: { compactView: false, placement: "below", tourDone: true, showTranslation: true } }));
   await check();
+  await checkTranslationRefresh();
+  await checkFinal();
   await context.unroute("https://translate.googleapis.com/**");
 });
 

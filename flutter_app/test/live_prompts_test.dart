@@ -126,6 +126,10 @@ void main() {
         expect(prompt, contains('one or two short sentences'));
         expect(prompt, contains('asks you to explain'));
         expect(prompt, contains('Never say "anything else?"'));
+        expect(
+          prompt,
+          contains('never end two turns in a row with a question'),
+        );
         expect(prompt, contains('Speak only English and French'));
       },
     );
