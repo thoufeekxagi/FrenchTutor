@@ -46,18 +46,20 @@ android {
         }
         // Every machine/emulator otherwise gets its own auto-generated
         // ~/.android/debug.keystore, which means a fresh SHA-1 has to be
-        // whitelisted in Google Cloud Console (Android OAuth client) every
-        // single time someone builds debug on a new box or emulator —
-        // Google Sign-In fails with ApiException: 10 (DEVELOPER_ERROR) until
-        // that happens. Using this one shared, checked-in keystore for every
-        // debug build means the SHA-1 only ever needs to be registered once,
-        // for the whole team, forever. It is not a secret — the password is
-        // always "android" and it can never sign a Play Store release.
-        getByName("debug") {
-            storeFile = file("shared-debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+        // whitelisted in Google Cloud Console (Android OAuth client) before
+        // Google Sign-In works (ApiException: 10 otherwise). To avoid that,
+        // each dev machine keeps a private copy of shared-debug.keystore in
+        // this folder. It is gitignored (public repo) and never signs a Play
+        // Store release. If the file is missing, Gradle's default debug
+        // keystore is used, and Google Sign-In needs that machine's SHA-1.
+        val sharedDebugKeystore = file("shared-debug.keystore")
+        if (sharedDebugKeystore.exists()) {
+            getByName("debug") {
+                storeFile = sharedDebugKeystore
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
         }
     }
 

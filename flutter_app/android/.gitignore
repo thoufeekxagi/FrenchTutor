@@ -12,8 +12,8 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
-# Exception: shared-debug.keystore is intentionally committed — a fixed,
-# public-password debug-only keystore shared by the whole team so every
-# machine/emulator produces the same SHA-1 and never needs re-whitelisting
-# in Google Cloud Console. It cannot sign a Play Store release.
-!app/shared-debug.keystore
+# shared-debug.keystore is NOT tracked (the repo is public). Copy it privately
+# to flutter_app/android/app/ on each dev machine so debug builds keep the
+# Google-Sign-In-registered SHA-1. Without it, Gradle falls back to the
+# machine's own ~/.android/debug.keystore.
+app/shared-debug.keystore
